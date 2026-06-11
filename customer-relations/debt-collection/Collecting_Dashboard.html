@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת לניהול חובות - אגף טכנולוגיות דיגיטליות ומידע</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS (Excel Parser) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0B3C5D',
+                        secondary: '#328CC1',
+                        accent: '#D9B310',
+                        neutralBg: '#F9F9F9',
+                        darkText: '#1D2731'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap');
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .scrollable-element::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrollable-element::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .scrollable-element::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="text-darkText min-h-screen flex flex-col">
+
+    <!-- Toast Notification for Data Copy -->
+    <div id="toast" class="fixed top-5 left-5 bg-slate-800 text-white px-4 py-3 rounded-lg shadow-lg z-50 transform -translate-y-20 opacity-0 transition-all duration-300 flex items-center space-x-2 space-x-reverse text-sm">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-message">הנתונים הועתקו ללוח בהצלחה!</span>
+    </div>
+
+    <!-- Header with official Ministry Logo and corrected titles -->
+    <header class="bg-primary text-white shadow-md px-6 py-4 flex flex-col md:flex-row justify-between items-center border-b-4 border-secondary">
+        <div class="flex items-center space-x-4 space-x-reverse mb-4 md:mb-0">
+            <!-- Official Ministry Logo Vector Representation -->
+            <div class="bg-white p-2 rounded-lg shadow-sm flex flex-col items-center justify-center">
+                <svg class="w-20 h-10 flex-shrink-0" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Blue skewed ellipse matching original logo -->
+                    <path d="M120 10 C186.274 10, 235 27.9086, 235 50 C235 72.0914, 186.274 90, 120 90 C53.7258 90, 5 72.0914, 5 50 C5 27.9086, 53.7258 10, 120 10 Z" fill="#20348D" transform="rotate(-6 120 50)"/>
+                    <!-- Three precise converging road lanes -->
+                    <path d="M60 43 C95 28, 155 33, 205 68 C170 58, 115 48, 62 46 Z" fill="white" />
+                    <path d="M50 58 C90 41, 150 45, 200 85 C160 73, 110 61, 52 61 Z" fill="white" />
+                    <path d="M42 73 C85 55, 140 59, 190 98 C150 86, 102 75, 44 76 Z" fill="white" />
+                </svg>
+                <div class="text-center mt-1">
+                    <div class="text-[9px] font-black text-blue-900 tracking-tight leading-none">משרד התחבורה</div>
+                    <div class="text-[8px] font-bold text-blue-900 leading-none mt-0.5">והבטיחות בדרכים</div>
+                </div>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight">מערכת לניהול חובות</h1>
+                <p class="text-xs text-slate-300">אגף טכנולוגיות דיגיטליות ומידע</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-6 space-x-reverse">
+            <div class="text-right">
+                <span class="text-xs text-slate-300 block">עדכון אחרון</span>
+                <span class="text-sm font-semibold"><i class="fa-regular fa-clock ml-1"></i>יוני 2026</span>
+            </div>
+            <div class="border-r border-slate-600 h-8"></div>
+            <div class="text-right">
+                <span class="text-xs text-slate-300 block">סטטוס תיק חוב</span>
+                <span id="system-status" class="px-2 py-0.5 bg-yellow-500/20 text-yellow-300 text-xs rounded-full font-medium border border-yellow-500/30">מוצג חוב מובנה</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Upload Panel Row -->
+    <div class="p-4 md:p-6 max-w-[1600px] w-full mx-auto pb-0">
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center"><i class="fa-solid fa-file-excel text-lg"></i></div>
+                <div>
+                    <h3 class="font-bold text-sm text-slate-800">טעינת קובץ אקסל גבייה עדכני</h3>
+                    <p class="text-xs text-slate-500">בחרו קובץ אקסל המכיל 3 גיליונות (ממשלה, שלטון מקומי, רשויות ופרטיים) לעדכון הדשבורד בזמן אמת</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3 space-x-reverse w-full md:w-auto justify-end">
+                <input type="file" id="excel-uploader" accept=".xlsx, .xls" class="hidden" onchange="processExcel(event)">
+                <label for="excel-uploader" class="cursor-pointer px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-colors flex items-center space-x-2 space-x-reverse">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>בחר קובץ אקסל (.xlsx)</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Body Container -->
+    <main class="flex-grow p-4 md:p-6 max-w-[1600px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Side: Dashboard Workspace (8 Columns) -->
+        <div class="lg:col-span-8 flex flex-col space-y-6">
+            
+            <!-- Cards Row: Key Financial Indicators (KPIs) -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-semibold text-slate-500">חובות בפיגור פעיל</span>
+                        <span class="p-1.5 bg-red-50 text-red-500 rounded-lg"><i class="fa-solid fa-triangle-exclamation"></i></span>
+                    </div>
+                    <div class="my-2">
+                        <span class="text-2xl font-black text-slate-800" id="kpi-overdue">₪10,907,728</span>
+                    </div>
+                    <div class="text-[11px] text-red-600">
+                        <i class="fa-solid fa-arrow-trend-up ml-1"></i>חלף מועד הפירעון החוקי
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-semibold text-slate-500">צפי תזרים עתידי</span>
+                        <span class="p-1.5 bg-emerald-50 text-emerald-500 rounded-lg"><i class="fa-solid fa-calendar-days"></i></span>
+                    </div>
+                    <div class="my-2">
+                        <span class="text-2xl font-black text-slate-800" id="kpi-future">₪307,289</span>
+                    </div>
+                    <div class="text-[11px] text-emerald-600">
+                        <i class="fa-solid fa-circle-check ml-1"></i>חשבוניות שטרם נפרעו
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-semibold text-slate-500">חובות בסיכון גבוה (מעל שנה)</span>
+                        <span class="p-1.5 bg-amber-50 text-amber-600 rounded-lg"><i class="fa-solid fa-hourglass-end"></i></span>
+                    </div>
+                    <div class="my-2">
+                        <span class="text-2xl font-black text-slate-800" id="kpi-historic">₪1,154,611</span>
+                    </div>
+                    <div class="text-[11px] text-amber-700">
+                        <i class="fa-solid fa-circle-exclamation ml-1"></i>דורש טיפול משפטי מיידי
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-semibold text-slate-500">יחס גבייה שנתי</span>
+                        <span class="p-1.5 bg-blue-50 text-blue-500 rounded-lg"><i class="fa-solid fa-chart-line"></i></span>
+                    </div>
+                    <div class="my-2">
+                        <span class="text-2xl font-black text-slate-800">88.4%</span>
+                    </div>
+                    <div class="text-[11px] text-slate-500">
+                        יעד חטיבתי שנתי: 92%
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Workspace / Drill Down Section -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col flex-grow min-h-[550px]">
+                
+                <div class="bg-slate-50 p-4 border-b border-slate-200 flex flex-col md:flex-row justify-between items-center gap-2">
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <button id="btn-back" class="hidden px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-sm font-medium transition-colors" onclick="navigateBack()">
+                            <i class="fa-solid fa-arrow-right ml-1"></i> חזרה
+                        </button>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-800" id="drilldown-title">מבנה חובות לפי סקטורים עיקריים</h2>
+                            <p class="text-xs text-slate-500" id="drilldown-subtitle">לחץ על סקטור כדי לראות את תתי-המגזרים והחשבונות השייכים לו</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2 space-x-reverse w-full md:w-auto">
+                        <!-- Copy Data Button -->
+                        <button onclick="copyActiveTableData()" class="flex items-center space-x-1.5 space-x-reverse px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors shadow-sm" title="העתק נתונים ללוח">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>העתק נתוני טבלה</span>
+                        </button>
+
+                        <div class="relative w-full md:w-48">
+                            <input type="text" id="search-input" placeholder="חיפוש לקוח..." class="w-full pl-3 pr-9 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent" onkeyup="handleFilterSearch(this.value)">
+                            <i class="fa-solid fa-search absolute right-3 top-2.5 text-slate-400 text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 md:p-6 flex-grow overflow-y-auto max-h-[550px] scrollable-element" id="drilldown-viewport">
+                    <!-- Dynamic views drawn here -->
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Right Side: Aging Breakdown & Prior Years Table (4 Columns) -->
+        <div class="lg:col-span-4 flex flex-col space-y-6">
+            
+            <!-- Aging Bucket Breakdown Card -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 h-full flex flex-col justify-between">
+                <div>
+                    <h3 class="text-base font-bold text-slate-800 mb-4 border-b pb-2"><i class="fa-solid fa-chart-pie text-secondary ml-2"></i>פילוח החוב לפי גיול ותקופות</h3>
+                    
+                    <!-- Dynamic Grid Layout -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                        <!-- Doughnut Chart -->
+                        <div class="relative h-44 md:h-48">
+                            <canvas id="agingChart"></canvas>
+                        </div>
+                        
+                        <!-- Prior Years Breakdown Table -->
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <span class="text-[11px] font-bold text-slate-500 block mb-2"><i class="fa-solid fa-clock-rotate-left text-indigo-500 ml-1"></i>פילוח חובות לפי שנים</span>
+                            <div id="prior-years-table-container" class="scrollable-element max-h-36 overflow-y-auto">
+                                <!-- JS Injects Table Here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 gap-2.5 mt-6 text-xs font-semibold">
+                    <div class="flex items-center justify-between p-2.5 bg-emerald-50 text-emerald-800 rounded-lg">
+                        <span>טרם נפרע (עתידי):</span>
+                        <span id="legend-future">2.7%</span>
+                    </div>
+                    <div class="flex items-center justify-between p-2.5 bg-yellow-50 text-yellow-800 rounded-lg">
+                        <span>31-90 ימים:</span>
+                        <span id="legend-30">42.1%</span>
+                    </div>
+                    <div class="flex items-center justify-between p-2.5 bg-orange-50 text-orange-800 rounded-lg">
+                        <span>91-365 ימים:</span>
+                        <span id="legend-90">44.6%</span>
+                    </div>
+                    <div class="flex items-center justify-between p-2.5 bg-red-50 text-red-800 rounded-lg">
+                        <span>מעל שנה:</span>
+                        <span id="legend-365">10.6%</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-slate-400 py-3 text-center text-xs mt-auto">
+        <p>© 2026 משרד התחבורה והבטיחות בדרכים - כל הזכויות שמורות ליחידת הגבייה הארצית</p>
+    </footer>
+
+    <script>
+        // Default Embedded Database (Fallback)
+        let dbData = {
+            sectors: [
+                {
+                    id: "sec_gov",
+                    name: "משרדי ממשלה",
+                    icon: "fa-building-columns",
+                    color: "border-blue-500",
+                    total: 1822700,
+                    categories: [
+                        {
+                            id: "gov_enforcement",
+                            name: "רשות האכיפה והגבייה",
+                            total: 760505,
+                            debts: [
+                                { invoice: "1800210091", desc: "חשבון חודש 04.26 עבור קשרי לקוחות", date: "06/05/2026", amount: 760505, status: "overdue", days: 33 }
+                            ]
+                        },
+                        {
+                            id: "gov_tax",
+                            name: "נציבות מס הכנסה",
+                            total: 408865,
+                            debts: [
+                                { invoice: "1800179250", desc: "חשבון עבור קבצי רכב ומובילים חוב פתוח", date: "07/12/2023", amount: 408865, status: "overdue", days: 914 }
+                            ]
+                        },
+                        {
+                            id: "gov_bld",
+                            name: "ביטוח לאומי - משרד ראשי",
+                            total: 104691,
+                            debts: [
+                                { invoice: "1800063393", desc: "חודש 03/24 - נתוני נהגים", date: "08/04/2024", amount: 15000, status: "overdue", days: 792 },
+                                { invoice: "1800089402", desc: "חודש 04/24 - נתוני נהגים לקוח", date: "12/05/2024", amount: 25000, status: "overdue", days: 758 },
+                                { invoice: "1800074653", desc: "חודש 05/25 - קובץ צמ\"ה", date: "03/06/2025", amount: 34691, status: "overdue", days: 371 },
+                                { invoice: "1800166392", desc: "חודש 10/25 - נתוני נהגים פתוח", date: "02/11/2025", amount: 30000, status: "overdue", days: 219 }
+                            ]
+                        },
+                        {
+                            id: "gov_airport",
+                            name: "רשות שדות התעופה",
+                            total: 186412,
+                            debts: [
+                                { invoice: "1800154933", desc: "חשבון איתור רכבים לתאריך 07.25", date: "12/08/2025", amount: 186412, status: "overdue", days: 300 }
+                            ]
+                        },
+                        {
+                            id: "gov_others",
+                            name: "משרדים וגופים קטנים",
+                            total: 362227,
+                            debts: [
+                                { invoice: "1800210321", desc: "משרד הביטחון - נתוני נהגים 11/24", date: "08/12/2024", amount: 87046, status: "overdue", days: 547 },
+                                { invoice: "1800166235", desc: "המשרד להגנת הסביבה - איתור 11.23", date: "08/11/2023", amount: 71499, status: "overdue", days: 943 },
+                                { invoice: "1800034791", desc: "רשות העתיקות - חוב פתוח חודש 02/22", date: "04/04/2022", amount: 3682, status: "overdue", days: 1526 },
+                                { invoice: "1800085852", desc: "יתרת חשבוניות קטנות (מצרפי)", date: "15/05/2026", amount: 200000, status: "overdue", days: 25 }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "sec_muni",
+                    name: "שלטון מקומי",
+                    icon: "fa-city",
+                    color: "border-purple-500",
+                    total: 4550700,
+                    categories: [
+                        {
+                            id: "muni_tlv",
+                            name: "עיריית תל אביב-יפו",
+                            total: 4100791,
+                            debts: [
+                                { invoice: "1800089790", desc: "חשבון אגרות והצלבות נהגים חודשי 04.26", date: "10/05/2026", amount: 1229569, status: "overdue", days: 28 },
+                                { invoice: "1800051322", desc: "חשבון חומרה ותקשורת מחשוב קצה 01.26", date: "02/03/2026", amount: 862577, status: "overdue", days: 97 },
+                                { invoice: "1800051458", desc: "הצלבות תאריך פירעון קובץ רישיונות 02.26", date: "04/03/2026", amount: 790872, status: "overdue", days: 95 },
+                                { invoice: "1800051460", desc: "ממשק בדיקות רכבים חודשי 02.26", date: "04/03/2026", amount: 660546, status: "overdue", days: 95 },
+                                { invoice: "1800071846", desc: "חשבון אגרות העברת בעלות חודש 03.26", date: "15/04/2026", amount: 324344, status: "overdue", days: 54 },
+                                { invoice: "1800051323", desc: "חשבון נתוני נהגים ושאילתות קוד 02.26", date: "02/03/2026", amount: 177352, status: "overdue", days: 97 },
+                                { invoice: "1800034423", desc: "חשבון פתוח עבור חודש 03/2020", date: "28/04/2020", amount: 7295, status: "overdue", days: 2231 },
+                                { invoice: "1800123753", desc: "חשבון פתוח עבור חודש 09/2021", date: "11/11/2021", amount: 141, status: "overdue", days: 1669 },
+                                { invoice: "1800088819", desc: "חשבון פתוח עבור חודש 04/2024", date: "12/05/2024", amount: 8232, status: "overdue", days: 747 },
+                                { invoice: "1800111717", desc: "חשבון פתוח עבור חודש 05/2024", date: "18/06/2024", amount: 8232, status: "overdue", days: 720 },
+                                { invoice: "1800085852", desc: "חשבון פתוח עבור חודש 04/2026", date: "04/05/2026", amount: 699, status: "overdue", days: 35 },
+                                { invoice: "-", desc: "יתרת חשבוניות מצרפית (31 מסמכים נוספים)", date: "12/12/2025", amount: 30932, status: "overdue", days: 181 }
+                            ]
+                        },
+                        {
+                            id: "muni_haifa",
+                            name: "עיריית חיפה",
+                            total: 209431,
+                            debts: [
+                                { invoice: "1800051403", desc: "חשבון איתור רכבים חוב פתוח", date: "02/04/2026", amount: 75897, status: "overdue", days: 67 },
+                                { invoice: "1800051404", desc: "חשבונית ממשק איתור והצלבות נהגים", date: "02/04/2026", amount: 71399, status: "overdue", days: 67 },
+                                { invoice: "1800084146", desc: "חשבון אגרות העברת בעלות חודש 04.26", date: "04/05/2026", amount: 62135, status: "overdue", days: 35 }
+                            ]
+                        },
+                        {
+                            id: "muni_ashdod",
+                            name: "עיריית אשדוד",
+                            total: 170152,
+                            debts: [
+                                { invoice: "1800030347", desc: "איתור רכבים לתאריך 15.01.26", date: "09/02/2026", amount: 39965.31, status: "overdue", days: 119 },
+                                { invoice: "1800030348", desc: "איתור רכבים לתאריך 29.01.26", date: "09/02/2026", amount: 1247, status: "overdue", days: 119 },
+                                { invoice: "1800032474", desc: "חשבון חודש 01.26 עבור קשרי לקוחות", date: "11/02/2026", amount: 5550.93, status: "overdue", days: 117 },
+                                { invoice: "1800051386", desc: "חשבון איתור רכבים חודשי 02.26", date: "03/03/2026", amount: 49736.61, status: "overdue", days: 97 },
+                                { invoice: "1800055548", desc: "חשבון אגרות והצלבות חודש 02.26", date: "12/03/2026", amount: 4989.60, status: "overdue", days: 88 },
+                                { invoice: "1800066601", desc: "חשבון איתור רכבים לתאריך 03.26", date: "12/04/2026", amount: 3520.44, status: "overdue", days: 57 },
+                                { invoice: "1800068260", desc: "חשבון חוב חודשי 03.26", date: "13/04/2026", amount: 2952, status: "overdue", days: 56 },
+                                { invoice: "1800084136", desc: "איתור רכבים לתאריך 01.04.26", date: "04/05/2026", amount: 263.34, status: "overdue", days: 35 },
+                                { invoice: "1800084137", desc: "חשבון איתור רכבים מאוחד מתאריך 03.04.26-30.04.26", date: "04/05/2026", amount: 58260.51, status: "overdue", days: 35 },
+                                { invoice: "1800086108", desc: "חשבון אגרות העברת בעלות חודש 04.26", date: "06/05/2026", amount: 3665.97, status: "overdue", days: 33 }
+                            ]
+                        },
+                        {
+                            id: "muni_others",
+                            name: "מועצות ועיריות קטנות",
+                            total: 70326,
+                            debts: [
+                                { invoice: "1800084159", desc: "עיריית נתיבות - חוב שירותים 04.26", date: "04/05/2026", amount: 8011, status: "overdue", days: 35 },
+                                { invoice: "1800032609", desc: "מועצה מקומית קדימה-צורן - חוב 01.26", date: "11/02/2026", amount: 5453, status: "overdue", days: 117 },
+                                { invoice: "1800086058", desc: "מועצה מקומית גן יבנה - חוב 04.26", date: "06/05/2026", amount: 31210, status: "overdue", days: 33 },
+                                { invoice: "1800085899", desc: "מועצה מקומית ראש פינה - חוב 04.26", date: "06/05/2026", amount: 25652, status: "overdue", days: 33 }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: "sec_priv",
+                    name: "רשויות ממשלתיות ולקוחות פרטיים",
+                    icon: "fa-handshake",
+                    color: "border-teal-500",
+                    total: 4534400,
+                    categories: [
+                        {
+                            id: "priv_leasing",
+                            name: "חברות ליסינג והשכרה",
+                            total: 2508200,
+                            debts: [
+                                { invoice: "1800151488", desc: "אלבר ציי רכב - חוב חודש 09.25", date: "19/10/2025", amount: 150000, status: "overdue", days: 233 },
+                                { invoice: "1800180766", desc: "אלבר ציי רכב - חוב חודש 10.25", date: "10/11/2025", amount: 250000, status: "overdue", days: 211 },
+                                { invoice: "1800200111", desc: "אלבר ציי רכב - חוב חודש 11.25", date: "03/01/2026", amount: 300000, status: "overdue", days: 157 },
+                                { invoice: "1800035587", desc: "אלבר ציי רכב - אגרות חודש 01.26", date: "18/03/2026", amount: 340841, status: "overdue", days: 83 },
+                                { invoice: "1800055828", desc: "אלבר ציי רכב - אגרות חודש 02/26", date: "14/04/2026", amount: 298714, status: "overdue", days: 56 },
+                                { invoice: "1800072673", desc: "אלבר ציי רכב - אגרות חודש 03.26", date: "15/05/2026", amount: 271926, status: "overdue", days: 25 },
+                                { invoice: "1800085828", desc: "אלבר ציי רכב - חוב חודש 04/26", date: "04/06/2026", amount: 22446, status: "current", days: 5 },
+                                { invoice: "-", desc: "יתרת חובות - חברות פסיפיק, אופרייט ליס ויורודרייב", date: "15/05/2026", amount: 1124273, status: "overdue", days: 25 }
+                            ]
+                        },
+                        {
+                            id: "priv_importers",
+                            name: "יבואני רכב ומכוניות",
+                            total: 463500,
+                            debts: [
+                                { invoice: "1800122626", desc: "כלמוביל - אגרות העברת בעלות לחודש 07.25", date: "12/08/2025", amount: 167496, status: "overdue", days: 300 },
+                                { invoice: "1800035893", desc: "מכשירי תנועה - חוב אגרות 01.26", date: "18/03/2026", amount: 174140, status: "overdue", days: 82 },
+                                { invoice: "1800068044", desc: "דוד לובינסקי בע\"מ - חשבון חודש 03.26", date: "13/05/2026", amount: 56203, status: "overdue", days: 26 },
+                                { invoice: "1800054282", desc: "חברת המזרח - חוב פתוח קריאה שנתית", date: "25/05/2022", amount: 10958, status: "historic", days: 1475 },
+                                { invoice: "1800086093", desc: "סמלת מוטורס בע\"מ - אגרות 04.26", date: "05/06/2026", amount: 54703, status: "current", days: 3 }
+                            ]
+                        },
+                        {
+                            id: "priv_others",
+                            name: "לקוחות ורשויות אחרים",
+                            total: 1562700,
+                            debts: [
+                                { invoice: "1800174979", desc: "רכבת ישראל - כרטיסי זיהוי", date: "08/11/2024", amount: 3639, status: "historic", days: 577 },
+                                { invoice: "1800004537", desc: "מטרופולין בע\"מ - חוב 12.25", date: "10/02/2026", amount: 46132, status: "overdue", days: 118 },
+                                { invoice: "1800145868", desc: "פמי פרימיום - חוב חודש 08/23 שאילתות לקוח", date: "19/10/2023", amount: 2626.95, status: "historic", days: 964 },
+                                { invoice: "1800157908", desc: "פמי פרימיום - חוב חודש 08.24 רישיונות מיוחדים", date: "04/10/2024", amount: 47339.05, status: "historic", days: 613 },
+                                { invoice: "1800157909", desc: "פמי פרימיום - חוב חודש 08.24 קובצי רכב", date: "04/10/2024", amount: 67837.76, status: "historic", days: 613 },
+                                { invoice: "1800175009", desc: "פמי פרימיום - חוב חודש 09.24 קובצי נהגים", date: "08/11/2024", amount: 71461.00, status: "historic", days: 578 },
+                                { invoice: "1800175010", desc: "פמי פרימיום - חוב חודש 09.24 תגי זיהוי", date: "08/11/2024", amount: 41827.85, status: "historic", days: 578 },
+                                { invoice: "1800188506", desc: "פמי פרימיום - חוב חודש 10.24 שאילתות לקוח", date: "04/12/2024", amount: 30809.60, status: "historic", days: 552 },
+                                { invoice: "1800195301", desc: "פמי פרימיום - חוב חודש 10.24 קובצי נהגים", date: "12/12/2024", amount: 41404.36, status: "historic", days: 544 },
+                                { invoice: "1800206189", desc: "פמי פרימיום - חוב חודש 11/24 קובצי רכב", date: "01/01/2025", amount: 30687.60, status: "historic", days: 525 },
+                                { invoice: "1800206190", desc: "פמי פרימיום - חוב חודש 11.24 תגי זיהוי", date: "01/01/2025", amount: 37901.95, status: "historic", days: 525 },
+                                { invoice: "1800003159", desc: "פמי פרימיום - חוב חודש 12.24 תגי זיהוי", date: "11/02/2025", amount: 41060.10, status: "historic", days: 484 },
+                                { invoice: "1800003160", desc: "פמי פרימיום - חוב חודש 12.24 שאילתות לקוח", date: "11/02/2025", amount: 35969.50, status: "historic", days: 484 },
+                                { invoice: "1800202008", desc: "וואן סיטי איי טי - חוב חומרה ותפעול 11.25", date: "07/01/2026", amount: 255989, status: "overdue", days: 152 },
+                                { invoice: "-", desc: "יתרת חובות - חברת מרמנת ומערכות מידע", date: "15/05/2026", amount: 788413, status: "overdue", days: 25 }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        let currentLevel = 0;
+        let selectedSectorId = null;
+        let selectedCategoryId = null;
+        let originalDataCopy = JSON.parse(JSON.stringify(dbData));
+        let agingChartObj = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderView();
+            initChart();
+            renderPriorYearsTable();
+        });
+
+        function renderView() {
+            const viewport = document.getElementById('drilldown-viewport');
+            const title = document.getElementById('drilldown-title');
+            const subtitle = document.getElementById('drilldown-subtitle');
+            const backBtn = document.getElementById('btn-back');
+
+            if (currentLevel === 0) {
+                backBtn.classList.add('hidden');
+                title.innerText = "מבנה חובות לפי סקטורים עיקריים";
+                subtitle.innerText = "לחץ על סקטור כדי לראות את תתי-המגזרים והחשבונות השייכים לו";
+                
+                let html = `<div class="grid grid-cols-1 md:grid-cols-3 gap-6">`;
+                dbData.sectors.forEach(sector => {
+                    const progressWidth = Math.min((sector.total / 5000000) * 100, 100);
+                    html += `
+                        <div class="bg-white border-t-4 ${sector.color} rounded-xl shadow-sm hover:shadow-md transition-all p-5 flex flex-col justify-between cursor-pointer" onclick="selectSector('${sector.id}')">
+                            <div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <span class="text-xs font-bold text-slate-500 tracking-wider">מבט על</span>
+                                    <span class="text-primary"><i class="fa-solid ${sector.icon} text-lg"></i></span>
+                                </div>
+                                <h3 class="text-base font-black text-slate-800 mb-1">${sector.name}</h3>
+                                <p class="text-2xl font-black text-slate-700">${formatCurrency(sector.total)}</p>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <div class="w-full bg-slate-100 rounded-full h-2.5 mb-2">
+                                    <div class="bg-primary h-2.5 rounded-full" style="width: ${progressWidth}%"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-slate-500">
+                                    <span>${sector.categories.length} מגזרי משנה</span>
+                                    <span>${calculatePercentage(sector.total)} מכלל החוב</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                viewport.innerHTML = html;
+
+            } else if (currentLevel === 1) {
+                backBtn.classList.remove('hidden');
+                const sector = dbData.sectors.find(s => s.id === selectedSectorId);
+                title.innerText = sector.name;
+                subtitle.innerText = `מבט ממוקד על תתי-המגזרים ב-${sector.name}`;
+
+                let html = `<div class="space-y-4">`;
+                sector.categories.forEach(cat => {
+                    const numDebts = cat.debts.length;
+                    html += `
+                        <div class="bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 cursor-pointer hover:bg-slate-100/50 transition-all" onclick="selectCategory('${cat.id}')">
+                            <div class="flex items-center space-x-3 space-x-reverse">
+                                <div class="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                                    <i class="fa-solid fa-folder-open text-base"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800">${cat.name}</h4>
+                                    <p class="text-xs text-slate-500">${numDebts} שורות חוב פתוחות</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4 space-x-reverse self-stretch md:self-auto justify-between">
+                                <div class="text-right">
+                                    <span class="text-xs text-slate-400 block">סך החוב</span>
+                                    <span class="text-lg font-black text-slate-800">${formatCurrency(cat.total)}</span>
+                                </div>
+                                <div class="text-slate-400">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                viewport.innerHTML = html;
+
+            } else if (currentLevel === 2) {
+                backBtn.classList.remove('hidden');
+                const sector = dbData.sectors.find(s => s.id === selectedSectorId);
+                const category = sector.categories.find(c => c.id === selectedCategoryId);
+                title.innerText = category.name;
+                subtitle.innerText = `פירוט חשבוניות פתוחות וימי פיגור עבור ${category.name}`;
+
+                let html = `
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-xs md:text-sm border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
+                                    <th class="p-3">מספר מסמך</th>
+                                    <th class="p-3">תיאור ומהות החוב</th>
+                                    <th class="p-3">תאריך פירעון</th>
+                                    <th class="p-3">ימי פיגור</th>
+                                    <th class="p-3">סכום</th>
+                                    <th class="p-3">סטטוס סיכון</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 border-b border-slate-200">
+                `;
+
+                category.debts.forEach(debt => {
+                    let statusBadge = "";
+                    let daysClass = "text-slate-700";
+                    if (debt.days < 0 || debt.days === "עתידי") {
+                        statusBadge = `<span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200 text-[10px]">טרם הגיע מועד</span>`;
+                        daysClass = "text-emerald-600 font-medium";
+                    } else if (debt.days <= 30) {
+                        statusBadge = `<span class="px-2 py-0.5 bg-yellow-50 text-yellow-700 rounded-full border border-yellow-200 text-[10px]">פיגור קל</span>`;
+                    } else if (debt.days <= 365) {
+                        statusBadge = `<span class="px-2 py-0.5 bg-orange-50 text-orange-700 rounded-full border border-orange-200 text-[10px]">פיגור משמעותי</span>`;
+                    } else {
+                        statusBadge = `<span class="px-2 py-0.5 bg-red-50 text-red-700 rounded-full border border-red-200 text-[10px]">סיכון גבוה</span>`;
+                        daysClass = "text-red-600 font-bold";
+                    }
+
+                    html += `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-3 font-mono font-medium">${debt.invoice}</td>
+                            <td class="p-3">${debt.desc}</td>
+                            <td class="p-3 text-slate-500">${debt.date}</td>
+                            <td class="p-3 ${daysClass}">${typeof debt.days === 'string' ? debt.days : debt.days + ' ימים'}</td>
+                            <td class="p-3 font-black text-slate-800">${formatCurrency(debt.amount)}</td>
+                            <td class="p-3">${statusBadge}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                viewport.innerHTML = html;
+            }
+        }
+
+        function selectSector(id) {
+            selectedSectorId = id;
+            currentLevel = 1;
+            renderView();
+        }
+
+        function selectCategory(id) {
+            selectedCategoryId = id;
+            currentLevel = 2;
+            renderView();
+        }
+
+        function navigateBack() {
+            if (currentLevel > 0) {
+                currentLevel--;
+                renderView();
+            }
+        }
+
+        function calculatePercentage(sectorSum) {
+            const grandTotal = 10907728;
+            return ((sectorSum / grandTotal) * 100).toFixed(1) + "%";
+        }
+
+        function formatCurrency(val) {
+            return "₪" + val.toLocaleString('he-IL');
+        }
+
+        function handleFilterSearch(searchTerm) {
+            if (!searchTerm.trim()) {
+                dbData.sectors = JSON.parse(JSON.stringify(originalDataCopy));
+                renderView();
+                return;
+            }
+
+            const term = searchTerm.toLowerCase();
+            const filteredSectors = JSON.parse(JSON.stringify(originalDataCopy));
+
+            filteredSectors.forEach(sector => {
+                sector.categories = sector.categories.filter(cat => {
+                    const matchesCatName = cat.name.toLowerCase().includes(term);
+                    const hasMatchingInvoice = cat.debts.some(d => 
+                        d.invoice.includes(term) || d.desc.toLowerCase().includes(term)
+                    );
+                    return matchesCatName || hasMatchingInvoice;
+                });
+            });
+
+            dbData.sectors = filteredSectors.filter(s => s.categories.length > 0);
+            renderView();
+        }
+
+        // Smart SAP/Priority summary row-filtering validator
+        function isValidTransactionRow(row) {
+            const invoiceNum = String(row['מספר מסמך'] || row['מספר חשבונית'] || row['מספר'] || '').trim();
+            const desc = String(row['מהות החיוב'] || row['תיאור'] || row['טקסט'] || '').trim();
+            const clientName = String(row['שם לקוח'] || row['שם חשבון'] || row['שם'] || '').trim();
+            
+            if (!invoiceNum || invoiceNum === 'ללא מספר' || invoiceNum.toLowerCase().includes('חשבון')) {
+                return false;
+            }
+            
+            const summaryKeywords = ['@', 'פתיחה', 'סיכום', 'סה"כ', 'סהכ', 'יתרה', 'סה קיזוז', 'פתח', 'opening', 'balance', 'total'];
+            for (let kw of summaryKeywords) {
+                if (invoiceNum.toLowerCase().includes(kw) || 
+                    desc.toLowerCase().includes(kw) || 
+                    clientName.toLowerCase().includes(kw)) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // Categorize overdue debt by specific financial period
+        function categorizeDebtByPeriod(dateStr) {
+            const parts = dateStr.split('/');
+            if (parts.length !== 3) return null;
+            const month = parseInt(parts[1], 10);
+            const year = parseInt(parts[2], 10);
+
+            if (year === 2026) {
+                return { key: "2026", label: "שנת 2026 (נוכחית)" };
+            } else if (year === 2025) {
+                if (month >= 10) {
+                    return { key: "2025_q4", label: "סוף 2025 (אוק'-דצמ')" };
+                } else {
+                    return { key: "2025_prev", label: "שנת 2025 (ינו'-ספט')" };
+                }
+            } else if (year === 2024) {
+                return { key: "2024", label: "שנת 2024" };
+            } else {
+                return { key: String(year), label: `שנת ${year}` };
+            }
+        }
+
+        function getPeriodOrder(key) {
+            if (key === "2026") return 1;
+            if (key === "2025_q4") return 2;
+            if (key === "2025_prev") return 3;
+            if (key === "2024") return 4;
+            const yr = parseInt(key, 10);
+            if (!isNaN(yr)) {
+                return 1000 - yr; // Ensures older years descend correctly
+            }
+            return 999;
+        }
+
+        function getPriorYearsDebts() {
+            const periodsMap = {};
+
+            dbData.sectors.forEach(sector => {
+                sector.categories.forEach(cat => {
+                    cat.debts.forEach(d => {
+                        if (d.status === "overdue") {
+                            const period = categorizeDebtByPeriod(d.date);
+                            if (period) {
+                                if (!periodsMap[period.key]) {
+                                    periodsMap[period.key] = { label: period.label, amount: 0, order: getPeriodOrder(period.key) };
+                                }
+                                periodsMap[period.key].amount += d.amount;
+                            }
+                        }
+                    });
+                });
+            });
+
+            return Object.values(periodsMap).sort((a, b) => a.order - b.order);
+        }
+
+        function renderPriorYearsTable() {
+            const container = document.getElementById('prior-years-table-container');
+            const data = getPriorYearsDebts();
+
+            if (data.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-4 text-xs text-slate-400">
+                        <i class="fa-solid fa-folder-open block mb-1 text-slate-300 text-lg"></i>
+                        אין חובות לדיווח
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-xs">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-500 font-bold border-b border-slate-200">
+                                <th class="py-2 px-1">תקופה/שנת חוב</th>
+                                <th class="py-2 px-1 text-left">סכום פתוח</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 font-medium">
+            `;
+
+            data.forEach(item => {
+                html += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-2 px-1 text-slate-700">${item.label}</td>
+                        <td class="py-2 px-1 text-left text-slate-950 font-bold">${formatCurrency(Math.round(item.amount))}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        // Dynamic Excel processing function using SheetJS
+        function processExcel(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const data = evt.target.result;
+                const workbook = XLSX.read(data, { type: 'array' });
+                
+                // Clear state
+                const loadedData = {
+                    sectors: [
+                        { id: "sec_gov", name: "משרדי ממשלה", icon: "fa-building-columns", color: "border-blue-500", total: 0, categories: [] },
+                        { id: "sec_muni", name: "שלטון מקומי", icon: "fa-city", color: "border-purple-500", total: 0, categories: [] },
+                        { id: "sec_priv", name: "רשויות ממשלתיות ולקוחות פרטיים", icon: "fa-handshake", color: "border-teal-500", total: 0, categories: [] }
+                    ]
+                };
+
+                const sheetMappings = [
+                    { sheetIndex: 0, sectorId: "sec_gov" }, // Sheet 1
+                    { sheetIndex: 1, sectorId: "sec_muni" }, // Sheet 2
+                    { sheetIndex: 2, sectorId: "sec_priv" }  // Sheet 3
+                ];
+
+                let grandOverdueTotal = 0;
+                let grandFutureTotal = 0;
+                let grandHistoricTotal = 0;
+
+                let bucketFuture = 0;
+                let bucket30 = 0;
+                let bucket90 = 0;
+                let bucket365 = 0;
+                let bucketMore = 0;
+
+                const today = new Date(2026, 5, 10); // June 10, 2026
+
+                sheetMappings.forEach(mapping => {
+                    const sheetName = workbook.SheetNames[mapping.sheetIndex];
+                    if (!sheetName) return;
+
+                    const sheet = workbook.Sheets[sheetName];
+                    const rows = XLSX.utils.sheet_to_json(sheet, { raw: false });
+                    const sector = loadedData.sectors.find(s => s.id === mapping.sectorId);
+                    
+                    const categoriesMap = {};
+
+                    rows.forEach(row => {
+                        if (!isValidTransactionRow(row)) {
+                            return; // Skip summary rows (yellow rows)
+                        }
+
+                        const clientName = row['שם לקוח'] || row['שם חשבון'] || row['שם'] || Object.values(row)[0] || 'לקוח כללי';
+                        const invoiceNum = row['מספר מסמך'] || row['מספר חשבונית'] || row['מספר'] || 'ללא מספר';
+                        const dateVal = row['תאריך פירעון'] || row['מועד פירעון'] || row['תאריך'];
+                        const amountVal = parseFloat(String(row['סכום'] || row['סכום חוב'] || row['סכום במטבע מקומי'] || 0).replace(/,/g, '')) || 0;
+                        const desc = row['מהות החיוב'] || row['תיאור'] || row['טקסט'] || 'פירוט חוב מזהה';
+
+                        if (!categoriesMap[clientName]) {
+                            categoriesMap[clientName] = { id: clientName, name: clientName, total: 0, debts: [] };
+                        }
+
+                        let dueDate = parseExcelDate(dateVal, today);
+                        let daysOverdue = 0;
+                        let status = "current";
+
+                        if (dueDate > today) {
+                            status = "current";
+                            daysOverdue = "עתידי";
+                            grandFutureTotal += amountVal;
+                            bucketFuture += amountVal;
+                        } else {
+                            status = "overdue";
+                            const diffTime = Math.abs(today - dueDate);
+                            daysOverdue = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                            grandOverdueTotal += amountVal;
+
+                            if (daysOverdue <= 30) {
+                                bucket30 += amountVal;
+                            } else if (daysOverdue <= 90) {
+                                bucket90 += amountVal;
+                            } else if (daysOverdue <= 365) {
+                                bucket365 += amountVal;
+                            } else {
+                                bucketMore += amountVal;
+                                grandHistoricTotal += amountVal;
+                            }
+                        }
+
+                        categoriesMap[clientName].debts.push({
+                            invoice: invoiceNum,
+                            desc: desc,
+                            date: formatDate(dueDate),
+                            amount: amountVal,
+                            status: status,
+                            days: daysOverdue
+                        });
+
+                        if (status === "overdue") {
+                            categoriesMap[clientName].total += amountVal;
+                            sector.total += amountVal;
+                        }
+                    });
+
+                    sector.categories = Object.values(categoriesMap);
+                });
+
+                // Apply Loaded Data to Dashboard State
+                dbData = loadedData;
+                originalDataCopy = JSON.parse(JSON.stringify(dbData));
+                currentLevel = 0;
+                
+                // Update KPI Cards
+                document.getElementById('kpi-overdue').innerText = formatCurrency(grandOverdueTotal);
+                document.getElementById('kpi-future').innerText = formatCurrency(grandFutureTotal);
+                document.getElementById('kpi-historic').innerText = formatCurrency(grandHistoricTotal);
+                
+                // Update System Status Label
+                const statusLabel = document.getElementById('system-status');
+                statusLabel.innerText = "פעיל - קובץ אקסל נטען";
+                statusLabel.className = "px-2 py-0.5 bg-emerald-500/20 text-emerald-300 text-xs rounded-full font-medium border border-emerald-500/30";
+
+                // Update Legend Percentages
+                const totalInvoices = grandOverdueTotal + grandFutureTotal;
+                document.getElementById('legend-future').innerText = totalInvoices > 0 ? ((bucketFuture / totalInvoices) * 100).toFixed(1) + "%" : "0%";
+                document.getElementById('legend-30').innerText = totalInvoices > 0 ? ((bucket30 / totalInvoices) * 100).toFixed(1) + "%" : "0%";
+                document.getElementById('legend-90').innerText = totalInvoices > 0 ? ((bucket90 / totalInvoices) * 100).toFixed(1) + "%" : "0%";
+                document.getElementById('legend-365').innerText = totalInvoices > 0 ? ((bucketMore / totalInvoices) * 100).toFixed(1) + "%" : "0%";
+
+                // Redraw Views, Charts, and Historical Table
+                renderView();
+                updateChart(bucketFuture, bucket30, bucket90, bucketMore);
+                renderPriorYearsTable();
+                showToast("קובץ האקסל נטען ועובד בהצלחה!");
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Robust Excel Date parser
+        function parseExcelDate(dateStr, fallback) {
+            if (!dateStr) return fallback;
+            if (!isNaN(dateStr)) {
+                return new Date(Math.round((Number(dateStr) - 25569) * 86400 * 1000));
+            }
+            let parts = String(dateStr).split('/');
+            if (parts.length === 3) {
+                let day = parseInt(parts[0], 10);
+                let month = parseInt(parts[1], 10) - 1;
+                let year = parseInt(parts[2], 10);
+                if (year < 100) year += 2000;
+                return new Date(year, month, day);
+            }
+            let parsed = Date.parse(dateStr);
+            if (!isNaN(parsed)) {
+                return new Date(parsed);
+            }
+            return fallback;
+        }
+
+        function formatDate(dateObj) {
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const year = dateObj.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('agingChart').getContext('2d');
+            agingChartObj = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['טרם נפרע (עתידי)', '31-90 ימים', '91-365 ימים', 'חובות מעל שנה'],
+                    datasets: [{
+                        data: [295000, 4591000, 4865117, 1154611],
+                        backgroundColor: ['#10b981', '#f59e0b', '#f97316', '#ef4444'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        function updateChart(future, p30, p90, pMore) {
+            if (agingChartObj) {
+                agingChartObj.destroy();
+            }
+            const ctx = document.getElementById('agingChart').getContext('2d');
+            agingChartObj = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['טרם נפרע (עתידי)', '31-90 ימים', '91-365 ימים', 'חובות מעל שנה'],
+                    datasets: [{
+                        data: [future, p30, p90, pMore],
+                        backgroundColor: ['#10b981', '#f59e0b', '#f97316', '#ef4444'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        function copyActiveTableData() {
+            let textToCopy = "";
+            
+            if (currentLevel === 0) {
+                textToCopy = "ריכוז חובות לפי סקטורים ראשיים:\n";
+                dbData.sectors.forEach(s => {
+                    textToCopy += `- ${s.name}: ${formatCurrency(s.total)}\n`;
+                });
+            } else if (currentLevel === 1) {
+                const sector = dbData.sectors.find(s => s.id === selectedSectorId);
+                textToCopy = `ריכוז חובות עבור סקטור: ${sector.name}\n`;
+                sector.categories.forEach(c => {
+                    textToCopy += `- ${c.name}: ${formatCurrency(c.total)}\n`;
+                });
+            } else if (currentLevel === 2) {
+                const sector = dbData.sectors.find(s => s.id === selectedSectorId);
+                const category = sector.categories.find(c => c.id === selectedCategoryId);
+                textToCopy = `פירוט חשבוניות פתוחות עבור ${category.name}:\n`;
+                category.debts.forEach(d => {
+                    textToCopy += `- מס' מסמך: ${d.invoice} | תיאור: ${d.desc} | מועד פירעון: ${d.date} | פיגור: ${typeof d.days === 'string' ? d.days : d.days + ' ימים'} | סכום: ${formatCurrency(d.amount)}\n`;
+                });
+            }
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showToast("הנתונים הועתקו ללוח בהצלחה!");
+            }).catch(err => {
+                console.error("שגיאה בהעתקת נתונים: ", err);
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            toastMessage.innerText = message;
+            
+            toast.classList.remove('-translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
