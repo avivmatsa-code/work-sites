@@ -16,113 +16,36 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://placehold.co/1200x630/0b3b63/a7f3d0.png?text=Customer+Relations" />
     <style>
-      :root {
-        color-scheme: light;
-        --ink:#0f172a;
-        --muted:#526174;
-        --navy:#082b61;
-        --teal:#0ea5b7;
-        --soft:#eef9fc;
-        --line:#d7e7ef;
-        --card:#ffffff;
-      }
+      :root { color-scheme: light; --ink:#0f172a; --muted:#526174; --navy:#082b61; --teal:#0ea5b7; --soft:#eef9fc; --line:#d7e7ef; --card:#ffffff; }
       * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background:
-          radial-gradient(circle at 15% 15%, rgba(14,165,183,.16), transparent 28%),
-          linear-gradient(180deg, #f8fcff, #eef7fb);
-        color: var(--ink);
-      }
-      header, main, footer { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
-      header { padding: 28px 0 16px; display:flex; justify-content:space-between; gap:16px; align-items:center; }
+      body { margin:0; font-family:Arial,sans-serif; background:radial-gradient(circle at 15% 15%, rgba(14,165,183,.16), transparent 28%), linear-gradient(180deg,#f8fcff,#eef7fb); color:var(--ink); }
+      header, main, footer { width:min(1120px, calc(100% - 32px)); margin:0 auto; }
+      header { padding:28px 0 16px; display:flex; justify-content:space-between; gap:16px; align-items:center; }
       .brand { font-weight:900; color:var(--navy); font-size:1.1rem; }
-      .hero { padding: 44px 0 26px; display:grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr); gap: 30px; align-items:center; }
+      .hero { padding:44px 0 26px; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr); gap:30px; align-items:center; }
       .eyebrow { color:var(--teal); font-weight:900; margin:0 0 10px; }
       h1 { margin:0; font-size:clamp(2.4rem,7vw,5rem); color:var(--navy); line-height:1.05; }
-      .lead { margin:18px 0 0; color:var(--muted); font-size:1.16rem; line-height:1.8; max-width: 62ch; }
-      .panel {
-        min-height: 270px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: rgba(255,255,255,.82);
-        display:grid;
-        place-items:center;
-        text-align:center;
-        box-shadow: 0 20px 70px rgba(8,43,97,.12);
-        padding:24px;
-      }
+      .lead { margin:18px 0 0; color:var(--muted); font-size:1.16rem; line-height:1.8; max-width:62ch; }
+      .panel { min-height:270px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.82); display:grid; place-items:center; text-align:center; box-shadow:0 20px 70px rgba(8,43,97,.12); padding:24px; }
       .panel strong { display:block; font-size:2rem; color:var(--navy); margin-top:10px; }
-      .grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:16px; padding: 16px 0 28px; }
-      .section-title {
-        margin: 8px 0 14px;
-        font-size: 1.45rem;
-        color: var(--navy);
-      }
-      .card {
-        border:1px solid var(--line);
-        border-radius:8px;
-        background:var(--card);
-        overflow:hidden;
-        box-shadow: 0 12px 34px rgba(8,43,97,.09);
-        display:flex;
-        flex-direction:column;
-      }
-      .business-card {
-        padding: 12px;
-        border-bottom:1px solid var(--line);
-        background: #fff;
-      }
-      .business-card img {
-        display: block;
-        width: 100%;
-        aspect-ratio: 16 / 10;
-        object-fit: cover;
-        border-radius: 8px;
-        border: 1px solid var(--line);
-      }
-      .tool-card { padding: 20px; min-height: 260px; }
-      .tool-visual {
-        height: 92px;
-        border-radius: 8px;
-        border: 1px solid var(--line);
-        background: linear-gradient(135deg, #f8fcff, #e8f8fb);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 16px;
-        margin-bottom: 16px;
-      }
-      .tool-visual img { max-width: 100%; max-height: 58px; object-fit: contain; }
-      .tool-visual.icon img { max-height: 70px; }
+      .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; padding:16px 0 28px; }
+      .section-title { margin:8px 0 14px; font-size:1.45rem; color:var(--navy); }
+      .card { border:1px solid var(--line); border-radius:8px; background:var(--card); overflow:hidden; box-shadow:0 12px 34px rgba(8,43,97,.09); display:flex; flex-direction:column; }
+      .business-card { padding:12px; border-bottom:1px solid var(--line); background:#fff; }
+      .business-card img { display:block; width:100%; aspect-ratio:16/10; object-fit:cover; border-radius:8px; border:1px solid var(--line); }
+      .tool-card { padding:20px; min-height:260px; }
+      .tool-visual { height:92px; border-radius:8px; border:1px solid var(--line); background:linear-gradient(135deg,#f8fcff,#e8f8fb); display:flex; align-items:center; justify-content:center; padding:16px; margin-bottom:16px; }
+      .tool-visual img { max-width:100%; max-height:58px; object-fit:contain; }
+      .tool-visual.icon img { max-height:70px; }
       .meta { padding:18px; display:flex; flex-direction:column; gap:14px; flex:1; }
       .meta p { margin:0; color:var(--muted); line-height:1.65; }
-      a.button {
-        min-height:46px;
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        border-radius:8px;
-        padding:0 16px;
-        background:var(--navy);
-        color:white;
-        text-decoration:none;
-        font-weight:900;
-        margin-top:auto;
-      }
-      footer { padding: 8px 0 30px; color:var(--muted); }
-      @media (max-width: 860px) {
-        .hero { grid-template-columns:1fr; }
-        .grid { grid-template-columns:1fr; }
-      }
+      a.button { min-height:46px; display:inline-flex; align-items:center; justify-content:center; border-radius:8px; padding:0 16px; background:var(--navy); color:white; text-decoration:none; font-weight:900; margin-top:auto; }
+      footer { padding:8px 0 30px; color:var(--muted); }
+      @media (max-width:860px) { .hero { grid-template-columns:1fr; } .grid { grid-template-columns:1fr; } }
     </style>
   </head>
   <body>
-    <header>
-      <div class="brand">משרד התחבורה והבטיחות בדרכים · קשרי לקוחות</div>
-    </header>
-
+    <header><div class="brand">משרד התחבורה והבטיחות בדרכים · קשרי לקוחות</div></header>
     <main>
       <section class="hero" aria-labelledby="page-title">
         <div>
@@ -130,80 +53,20 @@
           <h1 id="page-title">מחלקת קשרי לקוחות</h1>
           <p class="lead">דף קישורים פנימי ל-Gems מקצועיים ולמערכות העבודה של המחלקה. חלק מהקישורים מיועדים לשימוש מתוך סביבת הדומיין של mot.gov.il.</p>
         </div>
-        <div class="panel" aria-hidden="true">
-          <div>
-            <div style="font-size:4rem">☎</div>
-            <strong>ידע, שירות ונתונים</strong>
-          </div>
-        </div>
+        <div class="panel" aria-hidden="true"><div><div style="font-size:4rem">☎</div><strong>ידע, שירות ונתונים</strong></div></div>
       </section>
-
       <section class="grid" aria-label="רשימת Gems">
-        <article class="card">
-          <div class="business-card">
-            <img src="./assets/business-cards/yael-shingut.webp" alt="כרטיס ביקור של יעל שינגוט" />
-          </div>
-          <div class="meta">
-            <p>Gem מקצועי להתייעצות, ידע ארגוני וניסיון ניהולי במחלקת קשרי לקוחות.</p>
-            <a class="button" href="https://gemini.google.com/gem/1N2spLfMH5u7UP3mYtnmqpG-wGihivmhB?usp=sharing" target="_blank" rel="noreferrer">פתיחת ה-Gem</a>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="business-card">
-            <img src="./assets/business-cards/natan-data.webp" alt="כרטיס ביקור של נתן דאטה" />
-          </div>
-          <div class="meta">
-            <p>Gem ייעודי לנושאי נתונים, העברת מידע ותהליכי הוועדה.</p>
-            <a class="button" href="https://gemini.google.com/gem/1NVsUiNcpi2KRXjZX98comWugDOaC3WSS?usp=sharing" target="_blank" rel="noreferrer">פתיחת ה-Gem</a>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="business-card">
-            <img src="./assets/business-cards/asaf-shkalim.webp" alt="כרטיס ביקור של אסף שקלים" />
-          </div>
-          <div class="meta">
-            <p>Gem מקצועי לנושאי גבייה, חובות, טיפול בפניות ותהליכים מול לקוחות.</p>
-            <a class="button" href="https://gemini.google.com/gem/1Mv0Cs1kdfhJuaHboAJ_eLJEoCceHsXca?usp=sharing" target="_blank" rel="noreferrer">פתיחת ה-Gem</a>
-          </div>
-        </article>
+        <article class="card"><div class="business-card"><img src="./assets/business-cards/yael-shingut.webp" alt="כרטיס ביקור של יעל שינגוט" /></div><div class="meta"><p>Gem מקצועי להתייעצות, ידע ארגוני וניסיון ניהולי במחלקת קשרי לקוחות.</p><a class="button" href="https://gemini.google.com/gem/1N2spLfMH5u7UP3mYtnmqpG-wGihivmhB?usp=sharing" target="_blank" rel="noreferrer">פתיחת ה-Gem</a></div></article>
+        <article class="card"><div class="business-card"><img src="./assets/business-cards/natan-data.webp" alt="כרטיס ביקור של נתן דאטה" /></div><div class="meta"><p>Gem ייעודי לנושאי נתונים, העברת מידע ותהליכי הוועדה.</p><a class="button" href="https://gemini.google.com/gem/1NVsUiNcpi2KRXjZX98comWugDOaC3WSS?usp=sharing" target="_blank" rel="noreferrer">פתיחת ה-Gem</a></div></article>
+        <article class="card"><div class="business-card"><img src="./assets/business-cards/asaf-shkalim.webp" alt="כרטיס ביקור של אסף שקלים" /></div><div class="meta"><p>Gem מקצועי לנושאי גבייה, חובות, טיפול בפניות ותהליכים מול לקוחות.</p><a class="button" href="https://gemini.google.com/gem/1Mv0Cs1kdfhJuaHboAJ_eLJEoCceHsXca?usp=sharing" target="_blank" rel="noreferrer">פתיחת ה-Gem</a></div></article>
       </section>
-
       <h2 class="section-title">מערכות עבודה</h2>
       <section class="grid" aria-label="מערכות עבודה">
-        <article class="card tool-card">
-          <div class="tool-visual">
-            <img src="./assets/logos/cheetah.png" alt="לוגו צ'יטה" />
-          </div>
-          <div class="meta">
-            <p>כניסה למערכת צ'יטה לטיפול בתהליכי עבודה ומעקב.</p>
-            <a class="button" href="https://cheetah.digital.gov.il/CHEETA/Dashboard" target="_blank" rel="noreferrer">פתיחת צ'יטה</a>
-          </div>
-        </article>
-
-        <article class="card tool-card">
-          <div class="tool-visual">
-            <img src="./assets/logos/monday.png" alt="לוגו monday.com" />
-          </div>
-          <div class="meta">
-            <p>כניסה ללוח Monday של הוועדות ולמעקב אחר משימות ותהליכים.</p>
-            <a class="button" href="https://mot.monday.com/boards/9480215728" target="_blank" rel="noreferrer">פתיחת Monday ועדות</a>
-          </div>
-        </article>
-
-        <article class="card tool-card">
-          <div class="tool-visual icon">
-            <img src="./assets/icons/debt-collection.svg" alt="אייקון מערכת ניהול חובות וגבייה" />
-          </div>
-          <div class="meta">
-            <p>דשבורד לניהול חובות וגבייה, כולל פילוח חובות, טעינת אקסל ומעקב אחר סטטוס טיפול.</p>
-            <a class="button" href="./debt-collection/" target="_blank" rel="noreferrer">פתיחת מערכת החובות</a>
-          </div>
-        </article>
+        <article class="card tool-card"><div class="tool-visual"><img src="./assets/logos/cheetah.png" alt="לוגו צ'יטה" /></div><div class="meta"><p>כניסה למערכת צ'יטה לטיפול בתהליכי עבודה ומעקב.</p><a class="button" href="https://cheetah.digital.gov.il/CHEETA/Dashboard" target="_blank" rel="noreferrer">פתיחת צ'יטה</a></div></article>
+        <article class="card tool-card"><div class="tool-visual"><img src="./assets/logos/monday.svg" alt="לוגו monday.com" /></div><div class="meta"><p>כניסה ללוח Monday של הוועדות ולמעקב אחר משימות ותהליכים.</p><a class="button" href="https://mot.monday.com/boards/9480215728" target="_blank" rel="noreferrer">פתיחת Monday ועדות</a></div></article>
+        <article class="card tool-card"><div class="tool-visual icon"><img src="./assets/icons/debt-collection.svg" alt="אייקון מערכת ניהול חובות וגבייה" /></div><div class="meta"><p>דשבורד לניהול חובות וגבייה, כולל פילוח חובות, טעינת אקסל ומעקב אחר סטטוס טיפול.</p><a class="button" href="./debt-collection/" target="_blank" rel="noreferrer">פתיחת מערכת החובות</a></div></article>
       </section>
     </main>
-
     <footer>אתר עבודה פנימי · חלק מהקישורים עשויים לעבוד רק מתוך סביבת mot.gov.il</footer>
   </body>
 </html>
