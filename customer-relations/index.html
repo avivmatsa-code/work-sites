@@ -4,11 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>מחלקת קשרי לקוחות | אתרי עבודה</title>
-    <meta name="description" content="קישורים לשלושה Gems מקצועיים של מחלקת קשרי לקוחות." />
+    <meta name="description" content="קישורים ל-Gems מקצועיים ולמערכות עבודה של מחלקת קשרי לקוחות." />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="he_IL" />
     <meta property="og:title" content="מחלקת קשרי לקוחות" />
-    <meta property="og:description" content="קישורים ל-Gems מקצועיים: יעל שינגוט, נתן דאטה ואסף שקלים." />
+    <meta property="og:description" content="קישורים ל-Gems מקצועיים, צ'יטה, Monday ועדות ומערכת ניהול חובות וגבייה." />
     <meta property="og:image" content="https://placehold.co/1200x630/0b3b63/a7f3d0.png?text=Customer+Relations" />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
@@ -54,7 +54,12 @@
         padding:24px;
       }
       .panel strong { display:block; font-size:2rem; color:var(--navy); margin-top:10px; }
-      .grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:16px; padding: 16px 0 36px; }
+      .grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:16px; padding: 16px 0 28px; }
+      .section-title {
+        margin: 8px 0 14px;
+        font-size: 1.45rem;
+        color: var(--navy);
+      }
       .card {
         border:1px solid var(--line);
         border-radius:8px;
@@ -77,6 +82,20 @@
         border-radius: 8px;
         border: 1px solid var(--line);
       }
+      .tool-card { padding: 20px; min-height: 260px; }
+      .tool-visual {
+        height: 92px;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background: linear-gradient(135deg, #f8fcff, #e8f8fb);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      .tool-visual img { max-width: 100%; max-height: 58px; object-fit: contain; }
+      .tool-visual.icon img { max-height: 70px; }
       .meta { padding:18px; display:flex; flex-direction:column; gap:14px; flex:1; }
       .meta p { margin:0; color:var(--muted); line-height:1.65; }
       a.button {
@@ -107,9 +126,9 @@
     <main>
       <section class="hero" aria-labelledby="page-title">
         <div>
-          <p class="eyebrow">Gems מקצועיים</p>
+          <p class="eyebrow">Gems ומערכות עבודה</p>
           <h1 id="page-title">מחלקת קשרי לקוחות</h1>
-          <p class="lead">דף קישורים פנימי לשלושה Gems שנועדו לסייע בעבודה המקצועית של המחלקה. הקישורים מיועדים לשימוש מתוך סביבת הדומיין של mot.gov.il.</p>
+          <p class="lead">דף קישורים פנימי ל-Gems מקצועיים ולמערכות העבודה של המחלקה. חלק מהקישורים מיועדים לשימוש מתוך סביבת הדומיין של mot.gov.il.</p>
         </div>
         <div class="panel" aria-hidden="true">
           <div>
@@ -150,8 +169,41 @@
           </div>
         </article>
       </section>
+
+      <h2 class="section-title">מערכות עבודה</h2>
+      <section class="grid" aria-label="מערכות עבודה">
+        <article class="card tool-card">
+          <div class="tool-visual">
+            <img src="./assets/logos/cheetah.png" alt="לוגו צ'יטה" />
+          </div>
+          <div class="meta">
+            <p>כניסה למערכת צ'יטה לטיפול בתהליכי עבודה ומעקב.</p>
+            <a class="button" href="https://cheetah.digital.gov.il/CHEETA/Dashboard" target="_blank" rel="noreferrer">פתיחת צ'יטה</a>
+          </div>
+        </article>
+
+        <article class="card tool-card">
+          <div class="tool-visual">
+            <img src="./assets/logos/monday.png" alt="לוגו monday.com" />
+          </div>
+          <div class="meta">
+            <p>כניסה ללוח Monday של הוועדות ולמעקב אחר משימות ותהליכים.</p>
+            <a class="button" href="https://mot.monday.com/boards/9480215728" target="_blank" rel="noreferrer">פתיחת Monday ועדות</a>
+          </div>
+        </article>
+
+        <article class="card tool-card">
+          <div class="tool-visual icon">
+            <img src="./assets/icons/debt-collection.svg" alt="אייקון מערכת ניהול חובות וגבייה" />
+          </div>
+          <div class="meta">
+            <p>דשבורד לניהול חובות וגבייה, כולל פילוח חובות, טעינת אקסל ומעקב אחר סטטוס טיפול.</p>
+            <a class="button" href="./debt-collection/" target="_blank" rel="noreferrer">פתיחת מערכת החובות</a>
+          </div>
+        </article>
+      </section>
     </main>
 
-    <footer>אתר עבודה פנימי · הקישורים ל-Gems עשויים לעבוד רק מתוך סביבת mot.gov.il</footer>
+    <footer>אתר עבודה פנימי · חלק מהקישורים עשויים לעבוד רק מתוך סביבת mot.gov.il</footer>
   </body>
 </html>
