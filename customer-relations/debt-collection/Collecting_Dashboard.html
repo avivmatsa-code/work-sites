@@ -24,17 +24,17 @@
         <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 border border-slate-200">
             <h3 class="text-xl font-black text-slate-800 mb-6 border-b pb-2">הפקת מכתב דרישה</h3>
             <div class="grid grid-cols-1 gap-4">
-                <button onclick="generateAction('download')" class="flex items-center gap-4 p-4 bg-slate-50 hover:bg-indigo-50 border border-slate-200 rounded-2xl transition-all group">
+                <button onclick="generateAction('download')" class="flex items-center gap-4 p-4 bg-slate-50 hover:bg-indigo-50 border border-slate-200 rounded-2xl transition-all group text-right">
                     <i class="fa-solid fa-file-pdf text-indigo-600 text-2xl"></i>
-                    <div class="text-right"><p class="font-bold">שמור כ-PDF</p><p class="text-xs text-slate-500">הורדה למחשב</p></div>
+                    <div><p class="font-bold">שמור כ-PDF</p><p class="text-xs text-slate-500">הורדה למחשב</p></div>
                 </button>
-                <button onclick="generateAction('print')" class="flex items-center gap-4 p-4 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-2xl transition-all group">
+                <button onclick="generateAction('print')" class="flex items-center gap-4 p-4 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-2xl transition-all group text-right">
                     <i class="fa-solid fa-print text-blue-600 text-2xl"></i>
-                    <div class="text-right"><p class="font-bold">הדפס מסמך</p><p class="text-xs text-slate-500">שליחה למדפסת</p></div>
+                    <div><p class="font-bold">הדפס מסמך</p><p class="text-xs text-slate-500">שליחה למדפסת</p></div>
                 </button>
-                <button onclick="generateAction('email')" class="flex items-center gap-4 p-4 bg-slate-50 hover:bg-emerald-50 border border-slate-200 rounded-2xl transition-all group">
+                <button onclick="generateAction('email')" class="flex items-center gap-4 p-4 bg-slate-50 hover:bg-emerald-50 border border-slate-200 rounded-2xl transition-all group text-right">
                     <i class="fa-solid fa-envelope-open-text text-emerald-600 text-2xl"></i>
-                    <div class="text-right"><p class="font-bold">שלח בדוא"ל</p><p class="text-xs text-slate-500">העתקת טבלה למייל</p></div>
+                    <div><p class="font-bold">שלח בדוא"ל</p><p class="text-xs text-slate-500">העתקת טבלה למייל</p></div>
                 </button>
                 <button onclick="toggleExportModal(false)" class="mt-2 text-sm font-bold text-slate-400 hover:text-slate-600">סגור</button>
             </div>
@@ -46,7 +46,7 @@
         <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-4 space-x-reverse">
                 <div class="bg-white p-2 rounded-lg text-[#0B3C5D] font-black text-lg">משרד התחבורה</div>
-                <h1 class="text-xl font-bold italic">ניהול חובות ותזרים</h1>
+                <h1 class="text-xl font-bold">ניהול חובות ותזרים</h1>
             </div>
 
             <div class="flex bg-black/20 p-1 rounded-xl border border-white/10 shadow-inner">
@@ -104,33 +104,28 @@
                 </div>
             </div>
             <div id="drilldown-viewport" class="p-6 flex-grow overflow-y-auto">
-                <div class="text-center py-20 text-slate-300 font-medium">המערכת מאופסת. אנא טען קובץ אקסל גבייה מעודכן.</div>
+                <div class="text-center py-20 text-slate-300 font-medium italic opacity-60">המערכת מאופסת. אנא טען קובץ אקסל גבייה מעודכן.</div>
             </div>
         </div>
 
         <!-- Analytics Area -->
         <div id="analytics-area" class="space-y-6 hidden">
-            <!-- Row 1: Years -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                    <h3 class="font-black text-slate-700 mb-4 border-b pb-2 tracking-tight"><i class="fa-solid fa-chart-pie ml-2 text-blue-500"></i>פילוח חוב לפי שנים (לתצוגה הנוכחית)</h3>
+                    <h3 class="font-black text-slate-700 mb-4 border-b pb-2 tracking-tight"><i class="fa-solid fa-chart-pie ml-2 text-blue-500"></i>פילוח חוב לפי שנים</h3>
                     <div class="h-64 flex justify-center"><canvas id="yearsChart"></canvas></div>
                 </div>
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 overflow-x-auto">
                     <h3 class="font-black text-slate-700 mb-4 border-b pb-2 tracking-tight"><i class="fa-solid fa-table ml-2 text-blue-500"></i>ריכוז לפי שנים</h3>
                     <table class="w-full text-right text-sm">
-                        <thead><tr class="text-slate-400 border-b"><th class="p-3 text-right">שנה</th><th class="p-3 text-center">כמות מסמכים</th><th class="p-3 text-left">סה"כ בש"ח</th></tr></thead>
+                        <thead><tr class="text-slate-400 border-b"><th class="p-3">שנה</th><th class="p-3 text-center">כמות מסמכים</th><th class="p-3 text-left">סה"כ בש"ח</th></tr></thead>
                         <tbody id="years-table-body" class="divide-y divide-slate-50"></tbody>
                     </table>
                 </div>
             </div>
-
-            <!-- Row 2: Months of Current Year -->
             <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                <h3 class="font-black text-slate-700 mb-4 border-b pb-2 tracking-tight"><i class="fa-solid fa-calendar-days ml-2 text-[#D9B310]"></i>פירוט שנה נוכחית (2026) לפי חודשים</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="monthly-grid">
-                    <!-- Monthly cards injected here -->
-                </div>
+                <h3 class="font-black text-slate-700 mb-4 border-b pb-2 tracking-tight"><i class="fa-solid fa-calendar-days ml-2 text-[#D9B310]"></i>פירוט שנת 2026 לפי חודשים</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="monthly-grid"></div>
             </div>
         </div>
     </main>
@@ -150,7 +145,6 @@
         const FEE_KEYWORDS = ['אגרה', 'אגרות', 'בעלות', 'רישיון'];
         const MONTH_NAMES = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
 
-        // --- Core Functions ---
         function setIncomeFilter(f) {
             incomeFilter = f;
             document.querySelectorAll('[id^="f-"]').forEach(el => el.classList.remove('active-filter'));
@@ -168,13 +162,14 @@
         function setSort(s) {
             sortMode = s;
             document.getElementById('sort-amount').classList.toggle('bg-white', s === 'amount');
+            document.getElementById('sort-amount').classList.toggle('shadow-sm', s === 'amount');
             document.getElementById('sort-name').classList.toggle('bg-white', s === 'name');
+            document.getElementById('sort-name').classList.toggle('shadow-sm', s === 'name');
             renderView();
         }
 
         function refresh() {
             if (db.length === 0) return;
-            const currentFilter = incomeFilter;
             const overdue = db.filter(r => r.isOverdue && isTypeMatch(r)).reduce((a, b) => a + b.amount, 0);
             const future = db.filter(r => !r.isOverdue && isTypeMatch(r)).reduce((a, b) => a + b.amount, 0);
             document.getElementById('total-overdue').innerText = formatCurrency(overdue);
@@ -216,20 +211,35 @@
             } 
             else if (currentLevel === 1) {
                 back.classList.remove('hidden'); btnLetter.classList.add('hidden'); sortTools.classList.remove('hidden');
-                title.innerText = path.sector;
+                title.innerText = "ארגונים בסקטור " + path.sector;
                 const sectorData = data.filter(r => r.sector === path.sector);
+                
                 const orgs = {};
-                sectorData.forEach(r => { if (!orgs[r.name]) orgs[r.name] = { sum: 0 }; orgs[r.name].sum += r.amount; });
+                sectorData.forEach(r => {
+                    if (!orgs[r.name]) orgs[r.name] = { sum: 0, count: 0 };
+                    orgs[r.name].sum += r.amount;
+                    orgs[r.name].count++;
+                });
+
                 let orgList = Object.entries(orgs).map(([name, val]) => ({ name, ...val }));
-                if (sortMode === 'amount') orgList.sort((a,b) => b.sum - a.sum); else orgList.sort((a,b) => a.name.localeCompare(b.name, 'he'));
+                if (sortMode === 'amount') orgList.sort((a,b) => b.sum - a.sum); 
+                else orgList.sort((a,b) => a.name.localeCompare(b.name, 'he'));
+
                 let html = `<div class="space-y-3">`;
                 orgList.forEach(org => {
-                    html += `<div onclick="selectOrg('${org.name.replace(/'/g, "\\'")}')" class="flex justify-between items-center p-5 bg-white border border-slate-200 rounded-2xl hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all shadow-sm">
-                        <span class="font-bold text-slate-700 text-base"><i class="fa-solid fa-chevron-left ml-3 text-slate-300 text-xs"></i>${org.name}</span>
-                        <span class="font-black text-xl text-blue-800">${formatCurrency(org.sum)}</span>
+                    const safeName = org.name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                    html += `<div onclick="selectOrg('${safeName}')" class="flex justify-between items-center p-5 bg-white border border-slate-200 rounded-2xl hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all shadow-sm">
+                        <div class="text-right">
+                            <p class="font-bold text-slate-700 text-base leading-tight">${org.name}</p>
+                            <p class="text-[11px] text-slate-400 font-bold mt-1">${org.count} מסמכים פתוחים</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-black text-xl text-blue-800">${formatCurrency(org.sum)}</span>
+                            <i class="fa-solid fa-chevron-left text-slate-300 text-xs"></i>
+                        </div>
                     </div>`;
                 });
-                view.innerHTML = html || `<p class="text-center py-10 font-bold">אין נתונים</p>`;
+                view.innerHTML = html || `<p class="text-center py-10 font-bold">אין נתונים בסקטור זה</p>`;
                 updateAnalytics(sectorData);
             }
             else if (currentLevel === 2) {
@@ -237,11 +247,11 @@
                 title.innerText = path.orgName;
                 const orgData = data.filter(r => r.name === path.orgName);
                 let html = `<div id="capture-area"><table class="w-full text-right border-collapse rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
-                    <thead class="bg-slate-100 text-xs font-black border-b text-slate-500">
-                        <tr><th class="p-4">מסמך</th><th class="p-4">מועד פירעון</th><th class="p-4">תיאור</th><th class="p-4 text-left">סכום בש"ח</th></tr>
+                    <thead class="bg-slate-100 text-xs font-black border-b text-slate-500 uppercase">
+                        <tr><th class="p-4">מספר מסמך</th><th class="p-4">מועד פירעון</th><th class="p-4">תיאור השירות</th><th class="p-4 text-left">סכום בש"ח</th></tr>
                     </thead><tbody class="divide-y divide-slate-100 bg-white">`;
                 orgData.forEach(r => {
-                    html += `<tr><td class="p-4 font-mono text-slate-700 font-bold">${r.doc}</td><td class="p-4 text-slate-600">${r.dueDate.toLocaleDateString('he-IL')}</td><td class="p-4 text-slate-600">${r.desc}</td><td class="p-4 font-black text-left text-slate-900">${formatCurrency(r.amount)}</td></tr>`;
+                    html += `<tr class="hover:bg-blue-50 transition-colors"><td class="p-4 font-mono font-bold text-slate-700">${r.doc}</td><td class="p-4">${r.dueDate.toLocaleDateString('he-IL')}</td><td class="p-4 text-slate-600">${r.desc}</td><td class="p-4 font-black text-left text-slate-900">${formatCurrency(r.amount)}</td></tr>`;
                 });
                 view.innerHTML = html + `</tbody></table></div>`;
                 updateAnalytics(orgData);
@@ -255,55 +265,28 @@
         function updateAnalytics(data) {
             const yearGroups = {};
             const monthGroups = Array(12).fill(0).map(() => ({ sum: 0, count: 0 }));
-
             data.forEach(r => {
                 const yr = r.dueDate.getFullYear();
                 if (!yearGroups[yr]) yearGroups[yr] = { sum: 0, count: 0 };
-                yearGroups[yr].sum += r.amount;
-                yearGroups[yr].count++;
-
-                if (yr === CURRENT_YEAR) {
-                    const m = r.dueDate.getMonth();
-                    monthGroups[m].sum += r.amount;
-                    monthGroups[m].count++;
-                }
+                yearGroups[yr].sum += r.amount; yearGroups[yr].count++;
+                if (yr === CURRENT_YEAR) { const m = r.dueDate.getMonth(); monthGroups[m].sum += r.amount; monthGroups[m].count++; }
             });
-
-            // Update Years Table
-            const tbody = document.getElementById('years-table-body');
-            tbody.innerHTML = '';
+            const tbody = document.getElementById('years-table-body'); tbody.innerHTML = '';
             Object.entries(yearGroups).sort((a,b) => b[0]-a[0]).forEach(([yr, val]) => {
                 tbody.innerHTML += `<tr><td class="p-3 font-bold text-blue-900">${yr}</td><td class="p-3 text-slate-400 text-center">${val.count}</td><td class="p-3 text-left font-black">${formatCurrency(val.sum)}</td></tr>`;
             });
-
-            // Update Monthly Grid
-            const mGrid = document.getElementById('monthly-grid');
-            mGrid.innerHTML = '';
+            const mGrid = document.getElementById('monthly-grid'); mGrid.innerHTML = '';
             monthGroups.forEach((m, idx) => {
                 const hasData = m.sum > 0;
-                mGrid.innerHTML += `
-                    <div class="p-3 rounded-2xl border ${hasData ? 'bg-slate-50 border-blue-100' : 'bg-white border-slate-100 opacity-40'} transition-all">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase">${MONTH_NAMES[idx]}</p>
-                        <p class="text-sm font-black ${hasData ? 'text-blue-900' : 'text-slate-300'}">${formatCurrency(m.sum)}</p>
-                        <p class="text-[9px] text-slate-400">${m.count} מסמכים</p>
-                    </div>`;
+                mGrid.innerHTML += `<div class="p-3 rounded-2xl border ${hasData ? 'bg-slate-50 border-blue-100' : 'bg-white border-slate-100 opacity-40'}">
+                    <p class="text-[10px] font-bold text-slate-400">${MONTH_NAMES[idx]}</p>
+                    <p class="text-sm font-black ${hasData ? 'text-blue-900' : 'text-slate-200'}">${formatCurrency(m.sum)}</p>
+                    <p class="text-[9px] text-slate-300 font-bold">${m.count} מסמכים</p>
+                </div>`;
             });
-
-            // Update Chart
             const ctx = document.getElementById('yearsChart').getContext('2d');
             if (myChart) myChart.destroy();
-            myChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(yearGroups),
-                    datasets: [{
-                        data: Object.values(yearGroups).map(v => v.sum),
-                        backgroundColor: ['#0B3C5D', '#328CC1', '#D9B310', '#1D2731', '#718096'],
-                        borderWidth: 5, borderColor: '#ffffff'
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { weight: 'bold', size: 11 } } } } }
-            });
+            myChart = new Chart(ctx, { type: 'doughnut', data: { labels: Object.keys(yearGroups), datasets: [{ data: Object.values(yearGroups).map(v => v.sum), backgroundColor: ['#0B3C5D', '#328CC1', '#D9B310', '#1D2731', '#718096'], borderWidth: 5, borderColor: '#ffffff' }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom' } } } });
         }
 
         function toggleExportModal(show) { document.getElementById('export-modal').style.display = show ? 'flex' : 'none'; }
@@ -320,7 +303,7 @@
                 canvas.toBlob(async (blob) => {
                     const item = new ClipboardItem({ "image/png": blob });
                     await navigator.clipboard.write([item]);
-                    alert("טבלת החשבוניות הועתקה כתמונה ללוח! פתח את המייל והדבק (Ctrl+V).");
+                    alert("טבלת החשבוניות הועתקה ללוח כתמונה! כעת פתח את המייל והדבק (Ctrl+V).");
                     window.location.href = `mailto:?subject=${encodeURIComponent('דרישת חוב - ' + path.orgName)}&body=${encodeURIComponent('שלום רב,\nמצורף פירוט חוב פתוח.\n\n[הדבק כאן את הטבלה]\n\nבכבוד רב,\nצוות הגבייה')}`;
                 });
                 return;
@@ -330,26 +313,30 @@
             win.document.write(`
                 <html dir="rtl" lang="he"><head><title>מכתב חוב - ${path.orgName}</title>
                 <style>
-                    body { font-family: 'Segoe UI', Arial, sans-serif; padding: 60px; line-height: 1.6; color: #333; }
-                    .header { display: flex; justify-content: space-between; border-bottom: 2px solid #0B3C5D; padding-bottom: 10px; }
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; padding: 60px; line-height: 1.6; color: #333; }
+                    .header { display: flex; justify-content: space-between; border-bottom: 3px solid #0B3C5D; padding-bottom: 10px; }
                     table { width: 100%; border-collapse: collapse; margin-top: 30px; }
-                    th, td { border: 1px solid #ccc; padding: 12px; text-align: right; }
-                    th { background: #f8f9fa; font-weight: bold; }
-                    .signature-container { margin-top: 100px; display: flex; justify-content: flex-end; }
-                    .signature-block { width: 480px; display: flex; justify-content: space-between; align-items: flex-start; }
+                    th, td { border: 1px solid #ddd; padding: 12px; text-align: right; }
+                    th { background: #f8f9fa; }
+                    .signature-area { margin-top: 80px; display: flex; justify-content: flex-end; }
+                    .signature-box { width: 380px; display: flex; flex-direction: column; }
                 </style></head>
                 <body>
                     <div class="header"><div><b style="font-size:18px">משרד התחבורה והבטיחות בדרכים</b><br>אגף טכנולוגיות דיגיטליות ומידע</div><div>${new Date().toLocaleDateString('he-IL')}</div></div>
                     <p style="margin-top:40px">לכבוד: <br><b style="font-size:18px">${path.orgName}</b></p>
-                    <h2 style="text-align:center; text-decoration:underline; margin: 40px 0">דרישת תשלום עבור ${typeText}</h2>
+                    <h2 style="text-align:center; margin: 40px 0">דרישת תשלום עבור ${typeText}</h2>
                     <p>שלום רב,<br>להלן פירוט החשבוניות והחיובים הפתוחים במערכותינו שטרם נפרעו:</p>
                     <table><thead><tr><th>מספר מסמך</th><th>מועד פירעון</th><th>תיאור השירות</th><th>סכום בש"ח</th></tr></thead>
                     <tbody>${data.map(r => `<tr><td>${r.doc}</td><td>${r.dueDate.toLocaleDateString('he-IL')}</td><td>${r.desc}</td><td style="text-align:left">${formatCurrency(r.amount)}</td></tr>`).join('')}
                     <tr style="font-weight:bold; background:#eee"><td colspan="3">סה"כ לתשלום</td><td style="text-align:left">${formatCurrency(total)}</td></tr></tbody></table>
-                    <div class="signature-container">
-                        <div class="signature-block">
-                            <div style="font-size: 16px; margin-top: 5px;">בכבוד רב,</div>
-                            <div style="text-align: center;">_______________________<br><b>צוות הגבייה</b><br>אגף טכנולוגיות דיגיטליות ומידע</div>
+                    <div class="signature-area">
+                        <div class="signature-box">
+                            <div style="font-weight: bold; text-align: right; padding-right: 40px;">בכבוד רב,</div>
+                            <div style="text-align: center; margin-right: auto; width: 220px; margin-top: 40px;">
+                                _______________________<br>
+                                <b style="display: inline-block; margin-top: 8px;">צוות הגבייה</b><br>
+                                אגף טכנולוגיות דיגיטליות ומידע
+                            </div>
                         </div>
                     </div>
                 </body></html>`);
