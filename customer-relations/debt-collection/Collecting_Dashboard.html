@@ -8,40 +8,45 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap');
         body { font-family: 'Heebo', sans-serif; background-color: #f3f4f6; }
         .active-kpi { border-color: #328CC1 !important; background-color: #f0f9ff !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         .active-filter { background-color: white !important; color: #0B3C5D !important; }
+        @media print { .no-print { display: none; } }
     </style>
 </head>
 <body class="min-h-screen flex flex-col text-slate-800">
 
-    <!-- Modal אפשרויות הפקה -->
-    <div id="export-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full mx-4">
-            <h3 class="text-lg font-bold mb-4 border-b pb-2">בחר אפשרות הפקה</h3>
-            <div class="space-y-3">
-                <button onclick="generateDebtLetter('print')" class="w-full bg-indigo-600 text-white p-3 rounded-xl font-bold hover:bg-indigo-700 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-file-pdf"></i> הדפסה / שמירה כ-PDF
+    <!-- Export Modal -->
+    <div id="export-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 border border-slate-200">
+            <h3 class="text-xl font-black text-slate-800 mb-6 border-b pb-2">הפקת מכתב דרישה</h3>
+            <div class="grid grid-cols-1 gap-4">
+                <button onclick="generateAction('download')" class="flex items-center gap-4 p-4 bg-slate-50 hover:bg-indigo-50 border border-slate-200 rounded-2xl transition-all">
+                    <i class="fa-solid fa-file-pdf text-indigo-600 text-2xl"></i>
+                    <div class="text-right"><p class="font-bold">שמור כ-PDF</p><p class="text-xs text-slate-500">הורדה למחשב</p></div>
                 </button>
-                <button onclick="generateDebtLetter('email')" class="w-full bg-emerald-600 text-white p-3 rounded-xl font-bold hover:bg-emerald-700 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-envelope"></i> שליחת מייל עם פירוט חוב
+                <button onclick="generateAction('print')" class="flex items-center gap-4 p-4 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-2xl transition-all">
+                    <i class="fa-solid fa-print text-blue-600 text-2xl"></i>
+                    <div class="text-right"><p class="font-bold">הדפס מסמך</p><p class="text-xs text-slate-500">שליחה למדפסת</p></div>
                 </button>
-                <button onclick="toggleExportModal(false)" class="w-full bg-slate-200 text-slate-600 p-2 rounded-xl text-sm font-bold">ביטול</button>
+                <button onclick="generateAction('email')" class="flex items-center gap-4 p-4 bg-slate-50 hover:bg-emerald-50 border border-slate-200 rounded-2xl transition-all">
+                    <i class="fa-solid fa-envelope-open-text text-emerald-600 text-2xl"></i>
+                    <div class="text-right"><p class="font-bold">שלח בדוא"ל</p><p class="text-xs text-slate-500">העתקת טבלה למייל</p></div>
+                </button>
+                <button onclick="toggleExportModal(false)" class="mt-2 text-sm font-bold text-slate-400 hover:text-slate-600">סגור</button>
             </div>
         </div>
     </div>
 
     <!-- Header -->
-    <header class="bg-[#0B3C5D] text-white px-6 py-4 shadow-lg border-b-4 border-[#328CC1]">
+    <header class="bg-[#0B3C5D] text-white px-6 py-4 shadow-lg border-b-4 border-[#328CC1] no-print">
         <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-4 space-x-reverse">
                 <div class="bg-white p-2 rounded-lg text-[#0B3C5D] font-black text-lg">משרד התחבורה</div>
-                <div>
-                    <h1 class="text-xl font-bold leading-tight">מערכת לניהול חובות</h1>
-                    <p class="text-xs text-blue-200 font-medium">אגף טכנולוגיות דיגיטליות ומידע</p>
-                </div>
+                <h1 class="text-xl font-bold">ניהול חובות ותזרים</h1>
             </div>
 
             <div class="flex bg-black/20 p-1 rounded-xl border border-white/10 shadow-inner">
@@ -52,86 +57,80 @@
 
             <div class="flex items-center gap-4">
                 <input type="file" id="excel-uploader" class="hidden" onchange="processExcel(event)">
-                <label for="excel-uploader" class="cursor-pointer bg-[#D9B310] hover:bg-yellow-500 text-black px-5 py-2.5 rounded-full font-black text-sm shadow-md transition-all">
-                    <i class="fa-solid fa-cloud-arrow-up ml-2"></i> טען קובץ אקסל
+                <label for="excel-uploader" class="cursor-pointer bg-[#D9B310] hover:bg-yellow-500 text-black px-6 py-2 rounded-full font-black text-sm shadow-md transition-all">
+                    <i class="fa-solid fa-file-import ml-2"></i> קליטת קובץ אקסל
                 </label>
             </div>
         </div>
     </header>
 
-    <main class="max-w-[1600px] w-full mx-auto p-6 space-y-6 flex-grow">
+    <main class="max-w-[1600px] w-full mx-auto p-6 space-y-6 flex-grow no-print">
         
         <!-- KPIs -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div id="kpi-card-overdue" onclick="setKpiFilter('overdue')" class="bg-white p-6 rounded-2xl border-2 border-transparent cursor-pointer transition-all active-kpi shadow-sm">
                 <div class="flex justify-between items-center mb-1">
                     <span class="text-slate-400 font-bold text-xs uppercase tracking-widest">חובות בפיגור</span>
-                    <i class="fa-solid fa-circle-exclamation text-red-500"></i>
+                    <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
                 </div>
-                <div class="text-4xl font-black text-slate-800" id="total-overdue">₪0</div>
+                <div class="text-4xl font-black text-red-700" id="total-overdue">₪0</div>
             </div>
-
             <div id="kpi-card-future" onclick="setKpiFilter('future')" class="bg-white p-6 rounded-2xl border-2 border-transparent cursor-pointer transition-all shadow-sm">
                 <div class="flex justify-between items-center mb-1">
                     <span class="text-slate-400 font-bold text-xs uppercase tracking-widest">צפי תזרים עתידי</span>
-                    <i class="fa-solid fa-clock text-emerald-500"></i>
+                    <i class="fa-solid fa-calendar-check text-emerald-500"></i>
                 </div>
-                <div class="text-4xl font-black text-slate-800" id="total-future">₪0</div>
+                <div class="text-4xl font-black text-emerald-700" id="total-future">₪0</div>
             </div>
         </div>
 
-        <!-- Drilldown Table Area -->
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[450px]">
+        <!-- Table Area -->
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[450px]">
             <div class="bg-slate-50 p-4 border-b flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <button id="btn-back" onclick="navigateBack()" class="hidden bg-white border border-slate-300 px-4 py-1.5 rounded-xl text-sm font-bold shadow-sm transition-all">
+                    <button id="btn-back" onclick="navigateBack()" class="hidden bg-white border border-slate-300 px-4 py-2 rounded-xl text-sm font-bold shadow-sm">
                         <i class="fa-solid fa-arrow-right ml-2 text-blue-600"></i> חזרה
                     </button>
                     <h2 id="view-title" class="text-lg font-black text-[#0B3C5D]">מבנה חובות</h2>
                 </div>
-                <div id="export-tools" class="hidden">
-                    <button onclick="toggleExportModal(true)" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-indigo-700 transition-all">
-                        <i class="fa-solid fa-file-invoice ml-2"></i> הפק מכתב חוב
+                <div id="level-tools" class="flex items-center gap-3">
+                    <div id="sort-tools" class="hidden flex bg-slate-200 p-1 rounded-xl items-center">
+                        <button onclick="setSort('amount')" id="sort-amount" class="px-3 py-1 text-[11px] font-bold rounded-lg bg-white shadow-sm">לפי סכום</button>
+                        <button onclick="setSort('name')" id="sort-name" class="px-3 py-1 text-[11px] font-bold rounded-lg">לפי א-ת</button>
+                    </div>
+                    <button id="btn-letter" onclick="toggleExportModal(true)" class="hidden bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-indigo-700 transition-all">
+                        <i class="fa-solid fa-file-invoice-dollar ml-2"></i> הפק מכתב חוב
                     </button>
                 </div>
             </div>
-            <div id="drilldown-viewport" class="p-6 overflow-y-auto">
-                <div class="text-center py-20 text-slate-400 font-medium">
-                    <i class="fa-solid fa-file-excel text-4xl mb-4 block opacity-20"></i>
-                    אנא טען קובץ אקסל גבייה כדי להציג נתונים
-                </div>
+            <div id="drilldown-viewport" class="p-6 flex-grow overflow-y-auto">
+                <div class="text-center py-20 text-slate-300 font-medium">המערכת מאופסת. טען קובץ אקסל.</div>
             </div>
         </div>
 
-        <!-- Analytics Section -->
-        <div id="analytics-section" class="grid grid-cols-1 lg:grid-cols-2 gap-6 hidden">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h3 class="font-black text-slate-700 mb-4 border-b pb-2 italic"><i class="fa-solid fa-chart-pie ml-2 text-blue-500"></i>ניתוח חובות לפי שנים</h3>
-                <div class="h-64 flex justify-center">
-                    <canvas id="yearsChart"></canvas>
-                </div>
+        <!-- Analytics -->
+        <div id="analytics-area" class="grid grid-cols-1 lg:grid-cols-2 gap-6 hidden">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                <h3 class="font-black text-slate-700 mb-4 border-b pb-2 tracking-tight text-center">פילוח חוב לפי שנים (לתצוגה הנוכחית)</h3>
+                <div class="h-64 flex justify-center"><canvas id="yearsChart"></canvas></div>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
-                <h3 class="font-black text-slate-700 mb-4 border-b pb-2 italic"><i class="fa-solid fa-table ml-2 text-blue-500"></i>טבלת ריכוז שנתית</h3>
-                <table class="w-full text-right">
-                    <thead>
-                        <tr class="text-sm font-bold text-slate-500 border-b">
-                            <th class="p-2">שנה</th><th class="p-2">מספר חשבוניות</th><th class="p-2 text-left">סה"כ בש"ח</th>
-                        </tr>
-                    </thead>
-                    <tbody id="years-table-body" class="divide-y"></tbody>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 overflow-x-auto">
+                <h3 class="font-black text-slate-700 mb-4 border-b pb-2 tracking-tight">ריכוז שנתית</h3>
+                <table class="w-full text-right text-sm">
+                    <thead><tr class="text-slate-400 border-b"><th class="p-3 text-right">שנה</th><th class="p-3 text-center">כמות</th><th class="p-3 text-left">סה"כ בש"ח</th></tr></thead>
+                    <tbody id="years-table-body" class="divide-y divide-slate-50"></tbody>
                 </table>
             </div>
         </div>
     </main>
 
     <script>
-        // System State
         let db = []; 
         let incomeFilter = 'all';
         let kpiFilter = 'overdue';
-        let currentLevel = 0; // 0: Sector, 1: Organization, 2: Invoices
-        let path = { sectorId: null, orgName: null };
+        let currentLevel = 0; 
+        let sortMode = 'amount';
+        let path = { sector: null, orgName: null };
         let myChart = null;
 
         const TODAY = new Date(2026, 5, 22);
@@ -141,132 +140,114 @@
             incomeFilter = f;
             document.querySelectorAll('[id^="f-"]').forEach(el => el.classList.remove('active-filter'));
             document.getElementById('f-' + f).classList.add('active-filter');
-            currentLevel = 0;
-            refresh();
+            currentLevel = 0; refresh();
         }
 
         function setKpiFilter(f) {
             kpiFilter = f;
             document.getElementById('kpi-card-overdue').classList.toggle('active-kpi', f === 'overdue');
             document.getElementById('kpi-card-future').classList.toggle('active-kpi', f === 'future');
-            currentLevel = 0;
-            refresh();
+            currentLevel = 0; refresh();
+        }
+
+        function setSort(s) {
+            sortMode = s;
+            document.getElementById('sort-amount').classList.toggle('bg-white', s === 'amount');
+            document.getElementById('sort-name').classList.toggle('bg-white', s === 'name');
+            renderView();
         }
 
         function refresh() {
-            calculateKPIs();
-            renderView();
-            updateAnalytics();
-        }
-
-        function calculateKPIs() {
-            const currentFilter = incomeFilter;
-            const overdue = db.filter(r => r.isOverdue && (currentFilter === 'all' || (currentFilter === 'fees' ? r.isFee : !r.isFee))).reduce((a, b) => a + b.amount, 0);
-            const future = db.filter(r => !r.isOverdue && (currentFilter === 'all' || (currentFilter === 'fees' ? r.isFee : !r.isFee))).reduce((a, b) => a + b.amount, 0);
+            if (db.length === 0) return;
+            const overdue = db.filter(r => r.isOverdue && isTypeMatch(r)).reduce((a, b) => a + b.amount, 0);
+            const future = db.filter(r => !r.isOverdue && isTypeMatch(r)).reduce((a, b) => a + b.amount, 0);
             document.getElementById('total-overdue').innerText = formatCurrency(overdue);
             document.getElementById('total-future').innerText = formatCurrency(future);
+            renderView();
+        }
+
+        function isTypeMatch(row) {
+            if (incomeFilter === 'all') return true;
+            return incomeFilter === 'fees' ? row.isFee : !row.isFee;
         }
 
         function renderView() {
             const view = document.getElementById('drilldown-viewport');
             const title = document.getElementById('view-title');
             const back = document.getElementById('btn-back');
-            const tools = document.getElementById('export-tools');
-            const filteredData = getFilteredDB();
-
+            const btnLetter = document.getElementById('btn-letter');
+            const sortTools = document.getElementById('sort-tools');
+            
+            // Filter global data for Level 0, Level 1, Level 2
+            let data = db.filter(r => (kpiFilter === 'overdue' ? r.isOverdue : !r.isOverdue) && isTypeMatch(r));
+            
             if (db.length === 0) return;
+            document.getElementById('analytics-area').classList.remove('hidden');
 
             if (currentLevel === 0) {
-                back.classList.add('hidden');
-                tools.classList.add('hidden');
-                title.innerText = "סקטורים (" + (kpiFilter === 'overdue' ? 'בפיגור' : 'תזרים עתידי') + ")";
-                
+                back.classList.add('hidden'); btnLetter.classList.add('hidden'); sortTools.classList.add('hidden');
+                title.innerText = "סקטורים עיקריים";
                 const sectors = [
                     { id: "ממשלתי", name: "לקוחות ממשלתיים", icon: "fa-building-columns" },
                     { id: "שלטון מקומי", name: "לקוחות שלטון מקומי", icon: "fa-city" },
                     { id: "פרטי/רשויות", name: "רשויות ממשלתיות ולקוחות פרטיים", icon: "fa-handshake" }
                 ];
-
                 let html = `<div class="grid grid-cols-1 md:grid-cols-3 gap-6">`;
                 sectors.forEach(s => {
-                    const sum = filteredData.filter(r => r.sector === s.id).reduce((acc, r) => acc + r.amount, 0);
-                    html += `
-                        <div onclick="selectSector('${s.id}')" class="bg-white border border-slate-200 p-8 rounded-2xl hover:shadow-lg hover:border-blue-400 cursor-pointer transition-all text-center">
-                            <i class="fa-solid ${s.icon} text-4xl text-slate-200 mb-4"></i>
-                            <h3 class="font-black text-lg text-slate-800">${s.name}</h3>
-                            <p class="text-2xl font-black text-blue-700 mt-2">${formatCurrency(sum)}</p>
-                        </div>`;
+                    const sum = data.filter(r => r.sector === s.id).reduce((acc, r) => acc + r.amount, 0);
+                    html += `<div onclick="selectSector('${s.id}')" class="bg-white border border-slate-200 p-8 rounded-3xl hover:shadow-xl hover:border-blue-400 cursor-pointer transition-all text-center">
+                        <i class="fa-solid ${s.icon} text-4xl text-slate-200 mb-4"></i>
+                        <h3 class="font-black text-lg">${s.name}</h3>
+                        <p class="text-2xl font-black text-blue-700 mt-2">${formatCurrency(sum)}</p>
+                    </div>`;
                 });
                 view.innerHTML = html + `</div>`;
+                updateAnalytics(data);
             } 
             else if (currentLevel === 1) {
-                back.classList.remove('hidden');
-                tools.classList.add('hidden');
-                title.innerText = path.sectorId;
-
-                const orgsMap = {};
-                filteredData.filter(r => r.sector === path.sectorId).forEach(r => {
-                    orgsMap[r.name] = (orgsMap[r.name] || 0) + r.amount;
+                back.classList.remove('hidden'); btnLetter.classList.add('hidden'); sortTools.classList.remove('hidden');
+                title.innerText = "ארגונים בסקטור " + path.sector;
+                const sectorData = data.filter(r => r.sector === path.sector);
+                const orgs = {};
+                sectorData.forEach(r => {
+                    if (!orgs[r.name]) orgs[r.name] = { sum: 0 };
+                    orgs[r.name].sum += r.amount;
                 });
+                let orgList = Object.entries(orgs).map(([name, val]) => ({ name, ...val }));
+                if (sortMode === 'amount') orgList.sort((a,b) => b.sum - a.sum);
+                else orgList.sort((a,b) => a.name.localeCompare(b.name, 'he'));
 
-                let html = `<div class="grid grid-cols-1 gap-3">`;
-                Object.entries(orgsMap).sort((a,b) => b[1]-a[1]).forEach(([name, sum]) => {
-                    // Escape single quotes for the JS function call
-                    const safeName = name.replace(/'/g, "\\'");
-                    html += `
-                        <div onclick="selectOrg('${safeName}')" class="flex justify-between items-center p-5 bg-white border border-slate-200 rounded-2xl hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all shadow-sm">
-                            <span class="font-bold text-slate-700"><i class="fa-solid fa-chevron-left ml-3 text-slate-300 text-xs"></i>${name}</span>
-                            <span class="font-black text-xl text-blue-800">${formatCurrency(sum)}</span>
-                        </div>`;
+                let html = `<div class="space-y-3">`;
+                orgList.forEach(org => {
+                    html += `<div onclick="selectOrg('${org.name.replace(/'/g, "\\'")}')" class="flex justify-between items-center p-5 bg-white border border-slate-200 rounded-2xl hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all shadow-sm">
+                        <span class="font-bold text-slate-700 text-base"><i class="fa-solid fa-chevron-left ml-3 text-slate-300 text-xs"></i>${org.name}</span>
+                        <span class="font-black text-xl text-blue-800">${formatCurrency(org.sum)}</span>
+                    </div>`;
                 });
-                view.innerHTML = html + `</div>`;
+                view.innerHTML = html || `<p class="text-center py-10 font-bold">אין נתונים</p>`;
+                updateAnalytics(sectorData);
             }
             else if (currentLevel === 2) {
-                back.classList.remove('hidden');
-                tools.classList.remove('hidden');
+                back.classList.remove('hidden'); btnLetter.classList.remove('hidden'); sortTools.classList.add('hidden');
                 title.innerText = path.orgName;
-
-                let html = `<table class="w-full text-right border-collapse">
-                    <thead><tr class="bg-slate-50 text-xs font-black border-b text-slate-500 uppercase tracking-widest">
-                        <th class="p-4">מסמך</th><th class="p-4">מועד פירעון</th><th class="p-4">תיאור</th><th class="p-4 text-left">סכום</th>
-                    </tr></thead><tbody class="divide-y">`;
-                
-                filteredData.filter(r => r.name === path.orgName).forEach(r => {
-                    html += `<tr class="hover:bg-blue-50 transition-colors">
-                        <td class="p-4 font-mono font-bold">${r.doc}</td>
-                        <td class="p-4">${r.dueDate.toLocaleDateString('he-IL')}</td>
-                        <td class="p-4 text-slate-600">${r.desc}</td>
-                        <td class="p-4 font-black text-left">${formatCurrency(r.amount)}</td>
-                    </tr>`;
+                const orgData = data.filter(r => r.name === path.orgName);
+                let html = `<div id="capture-area"><table class="w-full text-right border-collapse rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
+                    <thead class="bg-slate-100 text-xs font-black border-b text-slate-500">
+                        <tr><th class="p-4">מסמך</th><th class="p-4">מועד פירעון</th><th class="p-4">תיאור</th><th class="p-4 text-left">סכום בש"ח</th></tr>
+                    </thead><tbody class="divide-y divide-slate-100 bg-white">`;
+                orgData.forEach(r => {
+                    html += `<tr><td class="p-4 font-mono text-slate-700">${r.doc}</td><td class="p-4 text-slate-600">${r.dueDate.toLocaleDateString('he-IL')}</td><td class="p-4 text-slate-600">${r.desc}</td><td class="p-4 font-black text-left text-slate-900">${formatCurrency(r.amount)}</td></tr>`;
                 });
-                view.innerHTML = html + `</tbody></table>`;
+                view.innerHTML = html + `</tbody></table></div>`;
+                updateAnalytics(orgData);
             }
         }
 
-        function selectSector(id) { path.sectorId = id; currentLevel = 1; renderView(); }
+        function selectSector(id) { path.sector = id; currentLevel = 1; renderView(); }
         function selectOrg(name) { path.orgName = name; currentLevel = 2; renderView(); }
-        function navigateBack() { currentLevel--; renderView(); }
+        function navigateBack() { if(currentLevel > 0) { currentLevel--; renderView(); } }
 
-        function getFilteredDB() {
-            return db.filter(r => {
-                const typeMatch = (incomeFilter === 'all') || (incomeFilter === 'fees' && r.isFee) || (incomeFilter === 'info' && !r.isFee);
-                const statusMatch = (kpiFilter === 'overdue' && r.isOverdue) || (kpiFilter === 'future' && !r.isOverdue);
-                return typeMatch && statusMatch;
-            });
-        }
-
-        function updateAnalytics() {
-            const data = db.filter(r => {
-                const currentFilter = incomeFilter;
-                return (currentFilter === 'all' || (currentFilter === 'fees' ? r.isFee : !r.isFee));
-            });
-            
-            if (data.length === 0) {
-                document.getElementById('analytics-section').classList.add('hidden');
-                return;
-            }
-            document.getElementById('analytics-section').classList.remove('hidden');
-
+        function updateAnalytics(data) {
             const yearGroups = {};
             data.forEach(r => {
                 const yr = r.dueDate.getFullYear();
@@ -274,19 +255,11 @@
                 yearGroups[yr].sum += r.amount;
                 yearGroups[yr].count++;
             });
-
-            // Table
             const tbody = document.getElementById('years-table-body');
             tbody.innerHTML = '';
             Object.entries(yearGroups).sort((a,b) => b[0]-a[0]).forEach(([yr, val]) => {
-                tbody.innerHTML += `<tr class="text-sm">
-                    <td class="p-3 font-bold text-blue-900">${yr}</td>
-                    <td class="p-3 text-slate-500">${val.count} מסמכים</td>
-                    <td class="p-3 text-left font-black">${formatCurrency(val.sum)}</td>
-                </tr>`;
+                tbody.innerHTML += `<tr><td class="p-3 font-bold text-blue-900">${yr}</td><td class="p-3 text-slate-400 text-center">${val.count}</td><td class="p-3 text-left font-black">${formatCurrency(val.sum)}</td></tr>`;
             });
-
-            // Chart
             const ctx = document.getElementById('yearsChart').getContext('2d');
             if (myChart) myChart.destroy();
             myChart = new Chart(ctx, {
@@ -295,109 +268,89 @@
                     labels: Object.keys(yearGroups),
                     datasets: [{
                         data: Object.values(yearGroups).map(v => v.sum),
-                        backgroundColor: ['#0B3C5D', '#328CC1', '#D9B310', '#1D2731', '#718096', '#94a3b8'],
-                        borderWidth: 2
+                        backgroundColor: ['#0B3C5D', '#328CC1', '#D9B310', '#1D2731', '#718096'],
+                        borderWidth: 5, borderColor: '#ffffff'
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } }
             });
         }
 
-        function toggleExportModal(show) {
-            document.getElementById('export-modal').style.display = show ? 'flex' : 'none';
-        }
+        function toggleExportModal(show) { document.getElementById('export-modal').style.display = show ? 'flex' : 'none'; }
 
-        function generateDebtLetter(mode) {
-            toggleExportModal(false);
-            const invoices = getFilteredDB().filter(r => r.name === path.orgName);
-            const total = invoices.reduce((s, r) => s + r.amount, 0);
-            const typeText = incomeFilter === 'fees' ? 'אגרות' : incomeFilter === 'info' ? 'שירותי מידע' : 'כלל השירותים';
+        async function generateAction(mode) {
+            const data = db.filter(r => r.name === path.orgName && (kpiFilter === 'overdue' ? r.isOverdue : !r.isOverdue) && isTypeMatch(r));
+            const total = data.reduce((s, r) => s + r.amount, 0);
+            const typeText = incomeFilter === 'all' ? 'כלל השירותים' : (incomeFilter === 'fees' ? 'אגרות' : 'שירותי מידע');
 
-            if (mode === 'print') {
-                const win = window.open('', '_blank');
-                win.document.write(`
-                    <html dir="rtl" lang="he">
-                    <head>
-                        <title>מכתב חוב - ${path.orgName}</title>
-                        <style>
-                            body { font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; padding: 50px; line-height: 1.6; }
-                            .header { display: flex; justify-content: space-between; border-bottom: 2px solid #0B3C5D; padding-bottom: 10px; margin-bottom: 30px; }
-                            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                            th, td { border: 1px solid #ccc; padding: 10px; text-align: right; }
-                            th { background: #f0f0f0; }
-                            .signature-area { margin-top: 80px; display: flex; justify-content: flex-end; }
-                            .signature-wrap { width: 50%; display: flex; justify-content: space-between; }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="header">
-                            <div><b>משרד התחבורה והבטיחות בדרכים</b><br>אגף טכנולוגיות דיגיטליות ומידע</div>
-                            <div>תאריך: ${new Date().toLocaleDateString('he-IL')}</div>
-                        </div>
-                        <p>לכבוד: <br><b>${path.orgName}</b></p>
-                        <h2 style="text-align:center">דרישת תשלום - ריכוז חשבוניות פתוחות (${typeText})</h2>
-                        <p>שלום רב,<br>להלן פירוט החשבוניות והחיובים הפתוחים במערכותינו שטרם נפרעו:</p>
-                        <table>
-                            <thead><tr><th>מספר מסמך</th><th>מועד פירעון</th><th>תיאור</th><th>סכום בש"ח</th></tr></thead>
-                            <tbody>
-                                ${invoices.map(r => `<tr><td>${r.doc}</td><td>${r.dueDate.toLocaleDateString('he-IL')}</td><td>${r.desc}</td><td style="text-align:left">${formatCurrency(r.amount)}</td></tr>`).join('')}
-                                <tr style="font-weight:bold; background:#eee"><td colspan="3">סה"כ לתשלום</td><td style="text-align:left">${formatCurrency(total)}</td></tr>
-                            </tbody>
-                        </table>
-                        <div class="signature-area">
-                            <div class="signature-wrap">
-                                <div style="padding-top:10px">בכבוד רב,</div>
-                                <div style="text-align:center">_________________<br><b>צוות הגבייה</b><br>אגף טכנולוגיות דיגיטליות ומידע</div>
-                            </div>
-                        </div>
-                    </body>
-                    </html>
-                `);
-                win.document.close();
-                setTimeout(() => win.print(), 500);
-            } else {
-                let body = `לכבוד: ${path.orgName}\n\nשלום רב,\n\nלהלן פירוט החשבוניות הפתוחות לתשלום (${typeText}):\n\n`;
-                invoices.forEach(r => {
-                    body += `מסמך: ${r.doc} | מועד פירעון: ${r.dueDate.toLocaleDateString('he-IL')} | תיאור: ${r.desc} | סכום: ${formatCurrency(r.amount)}\n`;
+            if (mode === 'email') {
+                toggleExportModal(false);
+                const captureArea = document.getElementById('capture-area');
+                const canvas = await html2canvas(captureArea);
+                canvas.toBlob(async (blob) => {
+                    const item = new ClipboardItem({ "image/png": blob });
+                    await navigator.clipboard.write([item]);
+                    alert("טבלת החשבוניות הועתקה כתמונה ללוח! פתח את המייל והדבק (Ctrl+V).");
+                    window.location.href = `mailto:?subject=${encodeURIComponent('דרישת חוב - ' + path.orgName)}&body=${encodeURIComponent('שלום רב,\nמצורף פירוט חוב פתוח.\n\n[הדבק כאן את הטבלה]\n\nבכבוד רב,\nצוות הגבייה')}`;
                 });
-                body += `\nסה"כ לתשלום: ${formatCurrency(total)}\n\nבכבוד רב,\nצוות הגבייה\nאגף טכנולוגיות דיגיטליות ומידע`;
-                window.location.href = `mailto:?subject=${encodeURIComponent('דרישת תשלום - משרד התחבורה')}&body=${encodeURIComponent(body)}`;
+                return;
             }
+
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <html dir="rtl" lang="he"><head><title>מכתב חוב - ${path.orgName}</title>
+                <style>
+                    body { font-family: 'Segoe UI', Arial, sans-serif; padding: 60px; line-height: 1.6; color: #333; }
+                    .header { display: flex; justify-content: space-between; border-bottom: 2px solid #0B3C5D; padding-bottom: 10px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+                    th, td { border: 1px solid #ccc; padding: 12px; text-align: right; }
+                    .signature-container { margin-top: 100px; display: flex; justify-content: flex-end; }
+                    .signature-block { width: 500px; display: flex; justify-content: space-between; align-items: flex-start; }
+                </style></head>
+                <body>
+                    <div class="header"><div><b>משרד התחבורה והבטיחות בדרכים</b><br>אגף טכנולוגיות דיגיטליות ומידע</div><div>${new Date().toLocaleDateString('he-IL')}</div></div>
+                    <p>לכבוד: <br><b>${path.orgName}</b></p>
+                    <h2 style="text-align:center">דרישת תשלום עבור ${typeText}</h2>
+                    <table><thead><tr><th>מסמך</th><th>מועד פירעון</th><th>תיאור</th><th>סכום בש"ח</th></tr></thead>
+                    <tbody>${data.map(r => `<tr><td>${r.doc}</td><td>${r.dueDate.toLocaleDateString('he-IL')}</td><td>${r.desc}</td><td style="text-align:left">${formatCurrency(r.amount)}</td></tr>`).join('')}
+                    <tr style="font-weight:bold; background:#eee"><td colspan="3">סה"כ לתשלום</td><td style="text-align:left">${formatCurrency(total)}</td></tr></tbody></table>
+                    <div class="signature-container">
+                        <div class="signature-block">
+                            <div style="font-size: 16px; margin-top: 5px;">בכבוד רב,</div>
+                            <div style="text-align: center;">_______________________<br><b>צוות הגבייה</b><br>אגף טכנולוגיות דיגיטליות ומידע</div>
+                        </div>
+                    </div>
+                </body></html>`);
+            win.document.close();
+            toggleExportModal(false);
+            if (mode === 'print') setTimeout(() => win.print(), 500);
         }
 
         function processExcel(e) {
-            const file = e.target.files[0];
             const reader = new FileReader();
             reader.onload = (evt) => {
                 const wb = XLSX.read(evt.target.result, { type: 'array' });
                 const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-                
                 db = rows.filter(r => String(r['לקוח'] || '').length === 8).map(r => {
                     const code = String(r['לקוח']);
                     const dueDate = parseExcelDate(r['מועד פרעון נטו'] || r['תאריך תשלום']);
                     const desc = r['טקסט'] || '';
                     return {
-                        code,
-                        name: (r['שם חשבון'] || 'לקוח כללי').trim(),
+                        code, name: String(r['שם חשבון'] || 'לקוח').trim(),
                         doc: r['מספר מסמך'] || '-',
-                        dueDate,
-                        amount: parseFloat(String(r['סכום במטבע מסמך'] || 0).replace(/,/g, '')),
-                        desc,
-                        isFee: FEE_KEYWORDS.some(kw => desc.includes(kw)),
+                        dueDate, amount: parseFloat(String(r['סכום במטבע מסמך'] || 0).replace(/,/g, '')),
+                        desc, isFee: FEE_KEYWORDS.some(kw => desc.includes(kw)),
                         isOverdue: dueDate < TODAY,
                         sector: code.startsWith('1') ? "ממשלתי" : code.startsWith('2') ? "שלטון מקומי" : "פרטי/רשויות"
                     };
                 });
-                
-                currentLevel = 0;
-                refresh();
+                currentLevel = 0; refresh();
             };
-            reader.readAsArrayBuffer(file);
+            reader.readAsArrayBuffer(e.target.files[0]);
         }
 
         function parseExcelDate(val) {
             if (!val) return new Date();
-            if (val instanceof Date) return val;
             if (!isNaN(val)) return new Date(Math.round((val - 25569) * 86400 * 1000));
             const p = String(val).split('/');
             return p.length === 3 ? new Date(p[2], p[1]-1, p[0]) : new Date(val);
