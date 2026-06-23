@@ -78,6 +78,11 @@
                     <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
                 </div>
                 <div class="text-4xl font-black text-red-700" id="total-overdue">₪0</div>
+                <!-- פירוט חובות בפיגור לשנה הנוכחית ולשנים קודמות -->
+                <div id="overdue-breakdown" class="text-xs text-red-600 font-bold mt-2 flex gap-4 hidden border-t border-red-50 pt-1.5">
+                    <span>שנה נוכחית (2026): <span id="overdue-current">₪0</span></span>
+                    <span>שנים קודמות: <span id="overdue-past">₪0</span></span>
+                </div>
             </div>
             <div id="kpi-card-future" onclick="setKpiFilter('future')" class="bg-white p-6 rounded-2xl border-2 border-transparent cursor-pointer transition-all shadow-sm">
                 <div class="flex justify-between items-center mb-1">
@@ -98,6 +103,13 @@
                     <h2 id="view-title" class="text-lg font-black text-[#0B3C5D]">מבנה חובות</h2>
                 </div>
                 <div id="level-tools" class="flex items-center gap-3">
+                    
+                    <!-- אפשרות הצגת אחוז חוב של לקוח מהסך במסך -->
+                    <label id="pct-toggle-container" class="hidden flex items-center gap-2 cursor-pointer bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition-all border border-slate-300">
+                        <input type="checkbox" id="chk-show-pct" onchange="toggleShowPct(this.checked)" class="rounded text-blue-600 focus:ring-blue-500">
+                        <span class="text-xs font-bold text-slate-700">הצג אחוזי חוב</span>
+                    </label>
+
                     <div id="sort-tools" class="hidden flex bg-slate-200 p-1 rounded-xl items-center shadow-inner">
                         <button onclick="setSort('amount')" id="sort-amount" class="px-3 py-1 text-[11px] font-bold rounded-lg bg-white shadow-sm transition-all">לפי סכום</button>
                         <button onclick="setSort('name')" id="sort-name" class="px-3 py-1 text-[11px] font-bold rounded-lg transition-all">לפי א-ת</button>
@@ -142,6 +154,7 @@
         let sortMode = 'amount';
         let path = { sector: null, orgName: null };
         let myChart = null;
+        let showClientPct = false; // מעקב אחר הצגת האחוזים במסך Drilldown
 
         const TODAY = new Date(2026, 5, 22);
         const CURRENT_YEAR = 2026;
@@ -171,12 +184,28 @@
             renderView();
         }
 
+        function toggleShowPct(checked) {
+            showClientPct = checked;
+            renderView();
+        }
+
         function refresh() {
             if (db.length === 0) return;
-            const overdue = db.filter(r => r.isOverdue && isTypeMatch(r)).reduce((a, b) => a + b.amount, 0);
+            const overdueRows = db.filter(r => r.isOverdue && isTypeMatch(r));
+            const overdue = overdueRows.reduce((a, b) => a + b.amount, 0);
             const future = db.filter(r => !r.isOverdue && isTypeMatch(r)).reduce((a, b) => a + b.amount, 0);
+            
+            // עדכון חלוקה פנימית של חובות בפיגור
+            const overdueCurrent = overdueRows.filter(r => r.dueDate.getFullYear() === CURRENT_YEAR).reduce((a, b) => a + b.amount, 0);
+            const overduePast = overdueRows.filter(r => r.dueDate.getFullYear() < CURRENT_YEAR).reduce((a, b) => a + b.amount, 0);
+            
             document.getElementById('total-overdue').innerText = formatCurrency(overdue);
             document.getElementById('total-future').innerText = formatCurrency(future);
+            
+            document.getElementById('overdue-current').innerText = formatCurrency(overdueCurrent);
+            document.getElementById('overdue-past').innerText = formatCurrency(overduePast);
+            document.getElementById('overdue-breakdown').classList.remove('hidden');
+            
             renderView();
         }
 
@@ -191,31 +220,54 @@
             const back = document.getElementById('btn-back');
             const btnLetter = document.getElementById('btn-letter');
             const sortTools = document.getElementById('sort-tools');
+            const pctToggle = document.getElementById('pct-toggle-container');
             
             let data = db.filter(r => (kpiFilter === 'overdue' ? r.isOverdue : !r.isOverdue) && isTypeMatch(r));
             if (db.length === 0) return;
             document.getElementById('analytics-area').classList.remove('hidden');
 
             if (currentLevel === 0) {
-                back.classList.add('hidden'); btnLetter.classList.add('hidden'); sortTools.classList.add('hidden');
+                back.classList.add('hidden'); btnLetter.classList.add('hidden'); sortTools.classList.add('hidden'); pctToggle.classList.add('hidden');
                 title.innerText = "סקטורים עיקריים";
-                const sectors = [{ id: "ממשלתי", name: "לקוחות ממשלתיים", icon: "fa-building-columns" },{ id: "שלטון מקומי", name: "לקוחות שלטון מקומי", icon: "fa-city" },{ id: "פרטי/רשויות", name: "רשויות ממשלתיות ולקוחות פרטיים", icon: "fa-handshake" }];
+                const sectors = [
+                    { id: "ממשלתי", name: "לקוחות ממשלתיים", icon: "fa-building-columns" },
+                    { id: "שלטון מקומי", name: "לקוחות שלטון מקומי", icon: "fa-city" },
+                    { id: "פרטי/רשויות", name: "רשויות ממשלתיות ולקוחות פרטיים", icon: "fa-handshake" }
+                ];
+                
+                // חישוב הסכום הכולל בסינון הנוכחי לצורך חישוב אחוזים
+                const totalSum = data.reduce((acc, r) => acc + r.amount, 0);
+
                 let html = `<div class="grid grid-cols-1 md:grid-cols-3 gap-6">`;
                 sectors.forEach(s => {
                     const sum = data.filter(r => r.sector === s.id).reduce((acc, r) => acc + r.amount, 0);
-                    html += `<div onclick="selectSector('${s.id}')" class="bg-white border border-slate-200 p-8 rounded-3xl hover:shadow-xl hover:border-blue-400 cursor-pointer transition-all text-center">
-                        <i class="fa-solid ${s.icon} text-4xl text-slate-200 mb-4"></i>
-                        <h3 class="font-black text-lg">${s.name}</h3>
-                        <p class="text-2xl font-black text-blue-700 mt-2">${formatCurrency(sum)}</p>
-                    </div>`;
+                    // חישוב האחוז מהחוב הכללי
+                    const percentage = totalSum > 0 ? (sum / totalSum * 100).toFixed(1) : "0.0";
+                    
+                    html += `
+                        <div onclick="selectSector('${s.id}')" class="bg-white border border-slate-200 p-8 rounded-3xl hover:shadow-xl hover:border-blue-400 cursor-pointer transition-all text-center flex flex-col justify-between h-full min-h-[200px]">
+                            <div>
+                                <i class="fa-solid ${s.icon} text-4xl text-slate-200 mb-4"></i>
+                                <h3 class="font-black text-lg text-slate-800">${s.name}</h3>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-2xl font-black text-blue-700">${formatCurrency(sum)}</p>
+                                <p class="text-xs text-slate-400 font-bold mt-1">${percentage}% מסך החוב</p>
+                            </div>
+                        </div>
+                    `;
                 });
                 view.innerHTML = html + `</div>`;
                 updateAnalytics(data);
             } 
             else if (currentLevel === 1) {
-                back.classList.remove('hidden'); btnLetter.classList.add('hidden'); sortTools.classList.remove('hidden');
+                back.classList.remove('hidden'); btnLetter.classList.add('hidden'); sortTools.classList.remove('hidden'); pctToggle.classList.remove('hidden');
+                document.getElementById('chk-show-pct').checked = showClientPct;
                 title.innerText = "ארגונים בסקטור " + path.sector;
+                
                 const sectorData = data.filter(r => r.sector === path.sector);
+                // חישוב סך החובות של כלל הלקוחות המוצגים כעת במסך
+                const sectorTotalSum = sectorData.reduce((acc, r) => acc + r.amount, 0);
                 
                 const orgs = {};
                 sectorData.forEach(r => {
@@ -231,10 +283,18 @@
                 let html = `<div class="space-y-3">`;
                 orgList.forEach(org => {
                     const safeName = org.name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                    
+                    // חישוב האחוז מהחוב המוצג במסך ללקוח הנוכחי
+                    const clientPct = sectorTotalSum > 0 ? (org.sum / sectorTotalSum * 100).toFixed(1) : "0.0";
+                    // יצירת תיאור השורה בהתאם לבחירת המשתמש
+                    const displayDetails = showClientPct 
+                        ? `${clientPct}% מסך החוב, ${org.count} מסמכים פתוחים`
+                        : `${org.count} מסמכים פתוחים`;
+
                     html += `<div onclick="selectOrg('${safeName}')" class="flex justify-between items-center p-5 bg-white border border-slate-200 rounded-2xl hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all shadow-sm">
                         <div class="text-right">
                             <p class="font-bold text-slate-700 text-base leading-tight">${org.name}</p>
-                            <p class="text-[11px] text-slate-400 font-bold mt-1">${org.count} מסמכים פתוחים</p>
+                            <p class="text-[11px] text-slate-400 font-bold mt-1">${displayDetails}</p>
                         </div>
                         <div class="flex items-center gap-3">
                             <span class="font-black text-xl text-blue-800">${formatCurrency(org.sum)}</span>
@@ -246,7 +306,7 @@
                 updateAnalytics(sectorData);
             }
             else if (currentLevel === 2) {
-                back.classList.remove('hidden'); btnLetter.classList.remove('hidden'); sortTools.classList.add('hidden');
+                back.classList.remove('hidden'); btnLetter.classList.remove('hidden'); sortTools.classList.add('hidden'); pctToggle.classList.add('hidden');
                 title.innerText = path.orgName;
                 const orgData = data.filter(r => r.name === path.orgName);
                 let html = `<div id="capture-area"><table class="w-full text-right border-collapse rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
@@ -453,12 +513,18 @@
                 db = rows.filter(r => String(r['לקוח'] || '').length === 8).map(r => {
                     const code = String(r['לקוח']);
                     const dueDate = parseExcelDate(r['מועד פרעון נטו'] || r['תאריך תשלום']);
+                    
+                    // זיהוי תאריך רישום/מסמך לצורך חישוב עדכניות הנתונים (תאריך יצירת המסמך ולא מועד פירעונו)
+                    const regDate = parseExcelDate(r['תאריך רישום'] || r['תאריך מסמך'] || r['תאריך תנועה'] || r['תאריך הזנה'] || r['תאריך ערך']);
+                    
                     const desc = r['טקסט'] || '';
                     const counterAccount = String(r['שם חשבון נגדי'] || '').trim();
                     return {
                         code, name: String(r['שם חשבון'] || 'לקוח').trim(),
                         doc: r['מספר מסמך'] || '-',
-                        dueDate, amount: parseFloat(String(r['סכום במטבע מסמך'] || 0).replace(/,/g, '')),
+                        dueDate,
+                        regDate,
+                        amount: parseFloat(String(r['סכום במטבע מסמך'] || 0).replace(/,/g, '')),
                         desc,
                         counterAccount,
                         isFee: FEE_KEYWORDS.some(kw => counterAccount.includes(kw)),
@@ -467,12 +533,12 @@
                     };
                 });
 
-                // חישוב והצגת תאריך עדכניות הנתונים (התאריך המאוחר ביותר שנמצא בקובץ)
+                // חישוב והצגת תאריך עדכניות הנתונים לפי תאריך הרישום המאוחר ביותר
                 if (db.length > 0) {
-                    const dates = db.map(r => r.dueDate).filter(d => d instanceof Date && !isNaN(d.getTime()));
-                    if (dates.length > 0) {
-                        const maxDate = new Date(Math.max(...dates));
-                        const formattedDate = maxDate.toLocaleDateString('he-IL');
+                    const regDates = db.map(r => r.regDate).filter(d => d instanceof Date && !isNaN(d.getTime()));
+                    if (regDates.length > 0) {
+                        const maxRegDate = new Date(Math.max(...regDates));
+                        const formattedDate = maxRegDate.toLocaleDateString('he-IL');
                         const currencyEl = document.getElementById('data-currency-date');
                         currencyEl.innerText = `תאריך עדכניות הנתונים: ${formattedDate}`;
                         currencyEl.classList.remove('hidden');
