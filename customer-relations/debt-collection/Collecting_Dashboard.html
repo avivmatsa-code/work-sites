@@ -53,10 +53,11 @@
                 </div>
             </div>
 
+            <!-- סידור מחדש של סדר האפשרויות במסנן -->
             <div class="flex bg-black/20 p-1 rounded-xl border border-white/10 shadow-inner">
                 <button onclick="setIncomeFilter('all')" id="f-all" class="px-5 py-2 rounded-lg text-sm font-bold transition-all active-filter">הכל</button>
-                <button onclick="setIncomeFilter('fees')" id="f-fees" class="px-5 py-2 rounded-lg text-sm font-bold transition-all hover:bg-white/5">אגרות העברת בעלות</button>
                 <button onclick="setIncomeFilter('info')" id="f-info" class="px-5 py-2 rounded-lg text-sm font-bold transition-all hover:bg-white/5">שירותי מידע</button>
+                <button onclick="setIncomeFilter('fees')" id="f-fees" class="px-5 py-2 rounded-lg text-sm font-bold transition-all hover:bg-white/5">אגרות העברת בעלות</button>
             </div>
 
             <div class="flex items-center gap-4">
@@ -114,6 +115,12 @@
                         <button onclick="setSort('amount')" id="sort-amount" class="px-3 py-1 text-[11px] font-bold rounded-lg bg-white shadow-sm transition-all">לפי סכום</button>
                         <button onclick="setSort('name')" id="sort-name" class="px-3 py-1 text-[11px] font-bold rounded-lg transition-all">לפי א-ת</button>
                     </div>
+
+                    <!-- כפתור לייצוא רשימת הלקוחות ל-PDF בדרגה 1 -->
+                    <button id="btn-export-clients" onclick="exportClientsPdf()" class="hidden bg-emerald-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-emerald-700 transition-all">
+                        <i class="fa-solid fa-file-invoice-dollar ml-2"></i> ייצוא רשימה ל-PDF
+                    </button>
+
                     <button id="btn-letter" onclick="toggleExportModal(true)" class="hidden bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-indigo-700 transition-all">
                         <i class="fa-solid fa-file-invoice-dollar ml-2"></i> הפק מכתב חוב
                     </button>
@@ -154,7 +161,7 @@
         let sortMode = 'amount';
         let path = { sector: null, orgName: null };
         let myChart = null;
-        let showClientPct = false; // מעקב אחר הצגת האחוזים במסך Drilldown
+        let showClientPct = true; // ברירת המחדל להצגת אחוזים היא פעילה (כן)
 
         const TODAY = new Date(2026, 5, 22);
         const CURRENT_YEAR = 2026;
@@ -221,13 +228,14 @@
             const btnLetter = document.getElementById('btn-letter');
             const sortTools = document.getElementById('sort-tools');
             const pctToggle = document.getElementById('pct-toggle-container');
+            const btnExportClients = document.getElementById('btn-export-clients');
             
             let data = db.filter(r => (kpiFilter === 'overdue' ? r.isOverdue : !r.isOverdue) && isTypeMatch(r));
             if (db.length === 0) return;
             document.getElementById('analytics-area').classList.remove('hidden');
 
             if (currentLevel === 0) {
-                back.classList.add('hidden'); btnLetter.classList.add('hidden'); sortTools.classList.add('hidden'); pctToggle.classList.add('hidden');
+                back.classList.add('hidden'); btnLetter.classList.add('hidden'); sortTools.classList.add('hidden'); pctToggle.classList.add('hidden'); btnExportClients.classList.add('hidden');
                 title.innerText = "סקטורים עיקריים";
                 const sectors = [
                     { id: "ממשלתי", name: "לקוחות ממשלתיים", icon: "fa-building-columns" },
@@ -261,7 +269,7 @@
                 updateAnalytics(data);
             } 
             else if (currentLevel === 1) {
-                back.classList.remove('hidden'); btnLetter.classList.add('hidden'); sortTools.classList.remove('hidden'); pctToggle.classList.remove('hidden');
+                back.classList.remove('hidden'); btnLetter.classList.add('hidden'); sortTools.classList.remove('hidden'); pctToggle.classList.remove('hidden'); btnExportClients.classList.remove('hidden');
                 document.getElementById('chk-show-pct').checked = showClientPct;
                 title.innerText = "ארגונים בסקטור " + path.sector;
                 
@@ -271,7 +279,7 @@
                 
                 const orgs = {};
                 sectorData.forEach(r => {
-                    if (!orgs[r.name]) orgs[r.name] = { sum: 0, count: 0 };
+                    if (!orgs[r.name]) orgs[r.name] = { sum: 0, count: 0, code: r.code };
                     orgs[r.name].sum += r.amount;
                     orgs[r.name].count++;
                 });
@@ -306,7 +314,7 @@
                 updateAnalytics(sectorData);
             }
             else if (currentLevel === 2) {
-                back.classList.remove('hidden'); btnLetter.classList.remove('hidden'); sortTools.classList.add('hidden'); pctToggle.classList.add('hidden');
+                back.classList.remove('hidden'); btnLetter.classList.remove('hidden'); sortTools.classList.add('hidden'); pctToggle.classList.add('hidden'); btnExportClients.classList.add('hidden');
                 title.innerText = path.orgName;
                 const orgData = data.filter(r => r.name === path.orgName);
                 let html = `<div id="capture-area"><table class="w-full text-right border-collapse rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
@@ -411,6 +419,94 @@
         }
 
         function toggleExportModal(show) { document.getElementById('export-modal').style.display = show ? 'flex' : 'none'; }
+
+        // פונקציית ייצוא לרשימת הלקוחות הנוכחית של הסקטור ל-PDF במיון הנוכחי
+        function exportClientsPdf() {
+            const data = db.filter(r => (kpiFilter === 'overdue' ? r.isOverdue : !r.isOverdue) && isTypeMatch(r));
+            const sectorData = data.filter(r => r.sector === path.sector);
+            
+            const orgs = {};
+            sectorData.forEach(r => {
+                if (!orgs[r.name]) orgs[r.name] = { sum: 0, count: 0, code: r.code };
+                orgs[r.name].sum += r.amount;
+                orgs[r.name].count++;
+            });
+
+            let orgList = Object.entries(orgs).map(([name, val]) => ({ name, ...val }));
+            // ביצוע המיון התואם למיון הנוכחי במסך
+            if (sortMode === 'amount') orgList.sort((a,b) => b.sum - a.sum); 
+            else orgList.sort((a,b) => a.name.localeCompare(b.name, 'he'));
+
+            const totalSum = orgList.reduce((acc, o) => acc + o.sum, 0);
+            const totalDocs = orgList.reduce((acc, o) => acc + o.count, 0);
+
+            const win = window.open('', '_blank');
+            if (!win) {
+                alert("פתיחת החלון החדש נחסמה על ידי הדפדפן. אנא אפשר חלונות קופצים (Pop-ups) עבור אתר זה כדי להדפיס.");
+                return;
+            }
+
+            const printScript = `
+                <script>
+                    window.focus();
+                    setTimeout(function() {
+                        window.print();
+                    }, 250);
+                <\/script>
+            `;
+
+            win.document.write(`
+                <html dir="rtl" lang="he"><head><title>ריכוז לקוחות סקטור ${path.sector}</title>
+                <style>
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; padding: 60px; line-height: 1.6; color: #333; }
+                    .header { display: flex; justify-content: space-between; border-bottom: 3px solid #0B3C5D; padding-bottom: 10px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+                    th, td { border: 1px solid #ddd; padding: 12px; text-align: right; }
+                    th { background: #f8f9fa; }
+                    @media print {
+                        @page { margin: 0; }
+                        body { margin: 2cm; padding: 0; }
+                    }
+                </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div><b style="font-size:18px">משרד התחבורה והבטיחות בדרכים</b><br>אגף טכנולוגיות דיגיטליות ומידע</div>
+                        <div>${new Date().toLocaleDateString('he-IL')}</div>
+                    </div>
+                    <h2 style="text-align:center; margin: 40px 0">ריכוז לקוחות - סקטור ${path.sector}</h2>
+                    <p><b>סוג החוב:</b> ${kpiFilter === 'overdue' ? 'חובות בפיגור' : 'צפי תזרים עתידי'}</p>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>מספר חשבון</th>
+                                <th>שם הלקוח</th>
+                                <th style="text-align: center;">מספר מסמכים</th>
+                                <th style="text-align: left;">גובה החוב (ש"ח)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${orgList.map(o => `
+                                <tr>
+                                    <td>${o.code}</td>
+                                    <td>${o.name}</td>
+                                    <td style="text-align: center;">${o.count}</td>
+                                    <td style="text-align: left; font-weight: bold;">${formatCurrency(o.sum)}</td>
+                                </tr>
+                            `).join('')}
+                            <tr style="font-weight:bold; background:#eee">
+                                <td colspan="2">סה"כ</td>
+                                <td style="text-align: center;">${totalDocs}</td>
+                                <td style="text-align: left;">${formatCurrency(totalSum)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    ${printScript}
+                </body></html>
+            `);
+            win.document.close();
+        }
 
         async function generateAction(mode) {
             const data = db.filter(r => r.name === path.orgName && (kpiFilter === 'overdue' ? r.isOverdue : !r.isOverdue) && isTypeMatch(r));
