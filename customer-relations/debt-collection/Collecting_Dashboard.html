@@ -288,7 +288,19 @@
                 if (sortMode === 'amount') orgList.sort((a,b) => b.sum - a.sum); 
                 else orgList.sort((a,b) => a.name.localeCompare(b.name, 'he'));
 
-                let html = `<div class="space-y-3">`;
+                // תיבת חיפוש חכמה עם השלמה אוטומטית הממוקמת בראש מסך הלקוחות
+                let searchHtml = `
+                <div class="relative w-full max-w-md mb-5 no-print">
+                    <div class="flex items-center bg-slate-100 border border-slate-200 rounded-2xl px-4 py-2.5 focus-within:ring-2 focus-within:ring-blue-500 focus-within:bg-white transition-all shadow-sm">
+                        <i class="fa-solid fa-magnifying-glass text-slate-400 ml-2.5 text-sm"></i>
+                        <input type="text" id="client-search-input" oninput="handleSearchInput(this.value)" placeholder="חיפוש לקוח מהיר עם השלמה אוטומטית..." class="bg-transparent border-none outline-none w-full text-sm text-slate-700 placeholder-slate-400" autocomplete="off">
+                    </div>
+                    <!-- רשימת הצעות להשלמה אוטומטית -->
+                    <div id="search-suggestions" class="absolute right-0 left-0 bg-white border border-slate-200 rounded-2xl shadow-xl mt-1.5 hidden z-50 max-h-60 overflow-y-auto divide-y divide-slate-100"></div>
+                </div>
+                `;
+
+                let html = searchHtml + `<div class="space-y-3">`;
                 orgList.forEach(org => {
                     const safeName = org.name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
                     
@@ -328,6 +340,61 @@
                 updateAnalytics(orgData);
             }
         }
+
+        // פונקציות ניהול החיפוש החכם והשלמה אוטומטית
+        function handleSearchInput(query) {
+            const suggestionsBox = document.getElementById('search-suggestions');
+            if (!query || query.trim() === '') {
+                suggestionsBox.innerHTML = '';
+                suggestionsBox.classList.add('hidden');
+                return;
+            }
+
+            const normalizedQuery = query.toLowerCase();
+            const data = db.filter(r => (kpiFilter === 'overdue' ? r.isOverdue : !r.isOverdue) && isTypeMatch(r) && r.sector === path.sector);
+            const uniqueClients = [...new Set(data.map(r => r.name))];
+            const matches = uniqueClients.filter(name => name.toLowerCase().includes(normalizedQuery)).slice(0, 8);
+
+            if (matches.length === 0) {
+                suggestionsBox.innerHTML = '<div class="p-3 text-xs text-slate-400 italic text-right">לא נמצאו לקוחות מתאימים</div>';
+                suggestionsBox.classList.remove('hidden');
+                return;
+            }
+
+            let html = '';
+            matches.forEach(name => {
+                const escapedName = name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                html += `
+                    <div onclick="selectSearchClient('${escapedName}')" class="p-3 text-sm hover:bg-blue-50 cursor-pointer transition-colors text-right font-medium text-slate-700">
+                        ${name}
+                    </div>
+                `;
+            });
+            suggestionsBox.innerHTML = html;
+            suggestionsBox.classList.remove('hidden');
+        }
+
+        function selectSearchClient(name) {
+            const suggestionsBox = document.getElementById('search-suggestions');
+            if (suggestionsBox) {
+                suggestionsBox.innerHTML = '';
+                suggestionsBox.classList.add('hidden');
+            }
+            const input = document.getElementById('client-search-input');
+            if (input) input.value = '';
+
+            // העברה ישירה למסך החשבוניות (Level 2)
+            selectOrg(name);
+        }
+
+        // סגירת התיבה בלחיצה מחוץ לטווח החיפוש
+        document.addEventListener('click', function(e) {
+            const box = document.getElementById('search-suggestions');
+            const input = document.getElementById('client-search-input');
+            if (box && !box.contains(e.target) && e.target !== input) {
+                box.classList.add('hidden');
+            }
+        });
 
         function selectSector(id) { path.sector = id; currentLevel = 1; renderView(); }
         function selectOrg(name) { path.orgName = name; currentLevel = 2; renderView(); }
@@ -463,7 +530,7 @@
                     table { width: 100%; border-collapse: collapse; margin-top: 30px; }
                     th, td { border: 1px solid #ddd; padding: 12px; text-align: right; }
                     th { background: #f8f9fa; }
-                    .signature-area { margin-top: 80px; display: flex; justify-content: flex-end; }
+                    .signature-area { margin-top: 80px; display: flex; justify-content: flex-end; page-break-inside: avoid; break-inside: avoid; }
                     .signature-box { width: 380px; display: flex; flex-direction: column; }
                     @media print {
                         @page { margin: 0; }
@@ -505,15 +572,15 @@
                         </tbody>
                     </table>
                     
-                    <!-- הוספת חתימת צוות הגבייה למסמכי ה-PDF של פירוט הסקטור -->
+                    <!-- הוספת חתימת מחלקת שירות לקוחות וגבייה למסמכי ה-PDF של פירוט הסקטור (עם מנגנון מניעת שבירת עמוד) -->
                     <div class="signature-area">
                         <div class="signature-box">
                             <div style="font-weight: bold; text-align: right; padding-right: 40px;">בכבוד רב,</div>
                             <div style="text-align: center; margin-right: auto; width: 220px; margin-top: 40px; font-size: 14px; line-height: 1.6;">
                                 _______________________<br>
-                                <b style="display: inline-block; margin-top: 8px;">צוות הגבייה</b><br>
+                                <b style="display: inline-block; margin-top: 8px;">מחלקת שירות לקוחות וגבייה</b><br>
                                 אגף טכנולוגיות דיגיטליות ומידע<br>
-                                <a href="mailto:costumer@mot.gov.il" style="color: #0B3C5D; text-decoration: none;">costumer@mot.gov.il</a>
+                                <a href="mailto:customer@mot.gov.il" style="color: #0B3C5D; text-decoration: none;">customer@mot.gov.il</a>
                             </div>
                         </div>
                     </div>
@@ -533,8 +600,8 @@
             // הגדרת סוג השירות עם הכותרת החדשה "אגרות העברת בעלות"
             const typeText = incomeFilter === 'all' ? 'כלל השירותים' : (incomeFilter === 'fees' ? 'אגרות העברת בעלות' : 'שירותי מידע');
             
-            // עדכון המייל האוטומטי בנוסח החדש ובכתובת המייל בחתימה
-            const mailtoUrl = `mailto:?subject=${encodeURIComponent('ריכוז חשבוניות פתוחות - ' + path.orgName)}&body=${encodeURIComponent('שלום רב,\nמצורף פירוט חוב פתוח.\n\n[הדבק כאן את הטבלה שמועתקת בלוח (Ctrl+V)]\n\nלהלן הקישור לתשלום החוב בשרת התשלומים: https://ecom.gov.il/voucherspa/input/414\nמספר לקוח במרכבה: ' + clientCode + '\n\nהשירות מותנה בתשלום. נבקשכם להסדיר את החוב בהקדם.\nאם ברשותכם אסמכתא שהחשבוניות שולמו או שאתם סבורים שנפלה טעות, פנו אלינו בכתב.\n\nבכבוד רב,\nצוות הגבייה\nאגף טכנולוגיות דיגיטליות ומידע\ncostumer@mot.gov.il')}`;
+            // עדכון המייל האוטומטי בנוסח החדש, ללא "או שסבורים שנפלה טעות" ובכתובת המייל המעודכנת
+            const mailtoUrl = `mailto:?subject=${encodeURIComponent('ריכוז חשבוניות פתוחות - ' + path.orgName)}&body=${encodeURIComponent('שלום רב,\nמצורף פירוט חוב פתוח.\n\n[הדבק כאן את הטבלה שמועתקת בלוח (Ctrl+V)]\n\nלהלן הקישור לתשלום החוב בשרת התשלומים: https://ecom.gov.il/voucherspa/input/414\nמספר לקוח במרכבה: ' + clientCode + '\n\nהשירות מותנה בתשלום. נבקשכם להסדיר את החוב בהקדם.\nאם ברשותכם אסמכתא שהחשבוניות שולמו, פנו אלינו בכתב.\n\nבכבוד רב,\nמחלקת שירות לקוחות וגבייה\nאגף טכנולוגיות דיגיטליות ומידע\ncustomer@mot.gov.il')}`;
 
             if (mode === 'email') {
                 toggleExportModal(false);
@@ -606,23 +673,27 @@
                     <tbody>${data.map(r => `<tr><td>${r.doc}</td><td>${r.dueDate.toLocaleDateString('he-IL')}</td><td>${r.desc}</td><td style="text-align:left">${formatCurrency(r.amount)}</td></tr>`).join('')}
                     <tr style="font-weight:bold; background:#eee"><td colspan="3">סה"כ לתשלום</td><td style="text-align:left">${formatCurrency(total)}</td></tr></tbody></table>
                     
-                    <!-- קישור לתשלום, מספר לקוח במרכבה והודעות נלוות חדשות עם שורת רווח -->
-                    <div style="margin-top: 30px; font-size: 14px; color: #333; line-height: 1.8;">
-                        <p style="margin-bottom: 8px;">להלן הקישור לתשלום החוב בשרת התשלומים: <a href="https://ecom.gov.il/voucherspa/input/414" target="_blank" style="color: #0B3C5D; font-weight: bold; text-decoration: underline;">https://ecom.gov.il/voucherspa/input/414</a></p>
-                        <p style="margin-bottom: 16px;">מספר לקוח במרכבה: <b>${clientCode}</b></p>
-                        
-                        <p style="margin-top: 16px; margin-bottom: 8px;">השירות מותנה בתשלום. נבקשכם להסדיר את החוב בהקדם.</p>
-                        <p>אם ברשותכם אסמכתא שהחשבוניות שולמו או שאתם סבורים שנפלה טעות, פנו אלינו בכתב.</p>
-                    </div>
+                    <!-- מקטע ההודעות והחתימה עטופים בבלוק המונע פיצול/שבירת דפים ומאלץ עמוד חדש במידת הצורך -->
+                    <div style="page-break-inside: avoid; break-inside: avoid; margin-top: 30px;">
+                        <!-- קישור לתשלום, מספר לקוח במרכבה והודעות נלוות חדשות עם שורת רווח ללא "או שסבורים שנפלה טעות" -->
+                        <div style="font-size: 14px; color: #333; line-height: 1.8;">
+                            <p style="margin-bottom: 8px;">להלן הקישור לתשלום החוב בשרת התשלומים: <a href="https://ecom.gov.il/voucherspa/input/414" target="_blank" style="color: #0B3C5D; font-weight: bold; text-decoration: underline;">https://ecom.gov.il/voucherspa/input/414</a></p>
+                            <p style="margin-bottom: 16px;">מספר לקוח במרכבה: <b>${clientCode}</b></p>
+                            
+                            <p style="margin-top: 16px; margin-bottom: 8px;">השירות מותנה בתשלום. נבקשכם להסדיר את החוב בהקדם.</p>
+                            <p>אם ברשותכם אסמכתא שהחשבוניות שולמו, פנו אלינו בכתב.</p>
+                        </div>
 
-                    <div class="signature-area">
-                        <div class="signature-box">
-                            <div style="font-weight: bold; text-align: right; padding-right: 40px;">בכבוד רב,</div>
-                            <div style="text-align: center; margin-right: auto; width: 220px; margin-top: 40px; font-size: 14px; line-height: 1.6;">
-                                _______________________<br>
-                                <b style="display: inline-block; margin-top: 8px;">צוות הגבייה</b><br>
-                                אגף טכנולוגיות דיגיטליות ומידע<br>
-                                <a href="mailto:costumer@mot.gov.il" style="color: #0B3C5D; text-decoration: none;">costumer@mot.gov.il</a>
+                        <!-- חתימה מעודכנת עבור מחלקת שירות לקוחות וגבייה -->
+                        <div class="signature-area">
+                            <div class="signature-box">
+                                <div style="font-weight: bold; text-align: right; padding-right: 40px;">בכבוד רב,</div>
+                                <div style="text-align: center; margin-right: auto; width: 220px; margin-top: 40px; font-size: 14px; line-height: 1.6;">
+                                    _______________________<br>
+                                    <b style="display: inline-block; margin-top: 8px;">מחלקת שירות לקוחות וגבייה</b><br>
+                                    אגף טכנולוגיות דיגיטליות ומידע<br>
+                                    <a href="mailto:customer@mot.gov.il" style="color: #0B3C5D; text-decoration: none;">customer@mot.gov.il</a>
+                                </div>
                             </div>
                         </div>
                     </div>
