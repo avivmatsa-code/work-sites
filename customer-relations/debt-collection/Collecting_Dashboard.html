@@ -414,7 +414,13 @@
             const tbody = document.getElementById('years-table-body'); 
             tbody.innerHTML = '';
             Object.entries(yearGroups).sort((a,b) => b[0] - a[0]).forEach(([yr, val]) => {
-                tbody.innerHTML += `<tr><td class="p-3 font-bold text-blue-900">${yr}</td><td class="p-3 text-slate-400 text-center">${val.count}</td><td class="p-3 text-left font-black">${formatCurrency(val.sum)}</td></tr>`;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <!-- עמודת השנה הופכת לקישור לחיץ להפקת PDF של המרכיבים -->
+                        <td class="p-3 font-bold text-blue-900 cursor-pointer underline hover:text-blue-700" onclick="exportBreakdownPdf(${yr})">${yr}</td>
+                        <td class="p-3 text-slate-400 text-center">${val.count}</td>
+                        <td class="p-3 text-left font-black">${formatCurrency(val.sum)}</td>
+                    </tr>`;
             });
 
             // 2. פילוח חודשי דינמי לכל השנים שיש בהן נתונים
@@ -440,10 +446,14 @@
                 let monthGridHtml = '';
                 monthGroups.forEach((m, idx) => {
                     const hasData = m.sum > 0;
+                    // לחיצה על הריבוע (אם מכיל סכום) מפעילה ייצוא דוח PDF מותאם
+                    const clickAttr = hasData ? `onclick="exportBreakdownPdf(${year}, ${idx})"` : '';
+                    const cursorClass = hasData ? 'cursor-pointer hover:border-blue-400 hover:shadow-sm transition-all' : '';
+                    
                     monthGridHtml += `
-                        <div class="p-3 rounded-2xl border ${hasData ? 'bg-slate-50 border-blue-100' : 'bg-white border-slate-100 opacity-40'}">
+                        <div ${clickAttr} class="p-3 rounded-2xl border ${hasData ? 'bg-slate-50 border-blue-100 ' + cursorClass : 'bg-white border-slate-100 opacity-40'}">
                             <p class="text-[10px] font-bold text-slate-400">${MONTH_NAMES[idx]}</p>
-                            <p class="text-sm font-black ${hasData ? 'text-blue-900' : 'text-slate-200'}">${formatCurrency(m.sum)}</p>
+                            <p class="text-sm font-black ${hasData ? 'text-blue-900 underline' : 'text-slate-200'}">${formatCurrency(m.sum)}</p>
                             <p class="text-[9px] text-slate-300 font-bold">${m.count} מסמכים</p>
                         </div>
                     `;
@@ -573,6 +583,134 @@
                     </table>
                     
                     <!-- הוספת חתימת מחלקת שירות לקוחות וגבייה למסמכי ה-PDF של פירוט הסקטור (עם מנגנון מניעת שבירת עמוד) -->
+                    <div class="signature-area">
+                        <div class="signature-box">
+                            <div style="font-weight: bold; text-align: right; padding-right: 40px;">בכבוד רב,</div>
+                            <div style="text-align: center; margin-right: auto; width: 220px; margin-top: 40px; font-size: 14px; line-height: 1.6;">
+                                _______________________<br>
+                                <b style="display: inline-block; margin-top: 8px;">מחלקת שירות לקוחות וגבייה</b><br>
+                                אגף טכנולוגיות דיגיטליות ומידע<br>
+                                <a href="mailto:customer@mot.gov.il" style="color: #0B3C5D; text-decoration: none;">customer@mot.gov.il</a>
+                            </div>
+                        </div>
+                    </div>
+                    ${printScript}
+                </body></html>
+            `);
+            win.document.close();
+        }
+
+        // פונקציה לייצוא PDF מפורט של רשימת המסמכים המרכיבים סכום שנתי או חודשי
+        function exportBreakdownPdf(year, month = null) {
+            // קבלת נתונים מסוננים בהתאם למצב הנוכחי במערכת (Level, KPI ו-Income)
+            let data = db.filter(r => (kpiFilter === 'overdue' ? r.isOverdue : !r.isOverdue) && isTypeMatch(r));
+            
+            if (currentLevel === 1) {
+                data = data.filter(r => r.sector === path.sector);
+            } else if (currentLevel === 2) {
+                data = data.filter(r => r.name === path.orgName);
+            }
+
+            // סינון לפי שנה
+            data = data.filter(r => r.dueDate.getFullYear() === year);
+
+            // סינון לפי חודש (אם צוין)
+            if (month !== null) {
+                data = data.filter(r => r.dueDate.getMonth() === month);
+            }
+
+            if (data.length === 0) {
+                alert("אין מסמכים פתוחים להצגה עבור החתך המבוקש.");
+                return;
+            }
+
+            // מיון המסמכים לפי סכום בסדר יורד
+            data.sort((a, b) => b.amount - a.amount);
+            const totalSum = data.reduce((acc, r) => acc + r.amount, 0);
+
+            // בניית כותרת דינמית מותאמת לכל החתכים
+            let prefix = kpiFilter === 'overdue' ? 'חוב' : 'צפי תזרים עתידי';
+            let subject = "כלל הסקטורים";
+            if (currentLevel === 1) {
+                if (path.sector === 'ממשלתי') subject = "לקוחות ממשלתיים";
+                else if (path.sector === 'שלטון מקומי') subject = "לקוחות שלטון מקומי";
+                else subject = "רשויות ממשלתיות ולקוחות פרטיים";
+            } else if (currentLevel === 2) {
+                subject = path.orgName;
+            }
+
+            let targetText = `${prefix} ל${subject}`;
+            let timeScope = month === null ? `בשנת ${year}` : `בחודש ${MONTH_NAMES[month]} ${year}`;
+            let incomeScope = incomeFilter === 'all' ? 'עבור כלל השירותים' : (incomeFilter === 'fees' ? 'עבור אגרות העברת בעלות' : 'עבור שירותי מידע');
+            
+            const reportTitle = `${targetText} ${timeScope}, ${incomeScope}`;
+
+            const win = window.open('', '_blank');
+            if (!win) {
+                alert("פתיחת החלון החדש נחסמה על ידי הדפדפן. אנא אפשר חלונות קופצים (Pop-ups) עבור אתר זה כדי להדפיס.");
+                return;
+            }
+
+            const printScript = `
+                <script>
+                    window.focus();
+                    setTimeout(function() {
+                        window.print();
+                    }, 250);
+                <\/script>
+            `;
+
+            win.document.write(`
+                <html dir="rtl" lang="he"><head><title>${reportTitle}</title>
+                <style>
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; padding: 60px; line-height: 1.6; color: #333; }
+                    .header { display: flex; justify-content: space-between; border-bottom: 3px solid #0B3C5D; padding-bottom: 10px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+                    th, td { border: 1px solid #ddd; padding: 12px; text-align: right; }
+                    th { background: #f8f9fa; }
+                    .signature-area { margin-top: 80px; display: flex; justify-content: flex-end; page-break-inside: avoid; break-inside: avoid; }
+                    .signature-box { width: 380px; display: flex; flex-direction: column; }
+                    @media print {
+                        @page { margin: 0; }
+                        body { margin: 2cm; padding: 0; }
+                    }
+                </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div><b style="font-size:18px">משרד התחבורה והבטיחות בדרכים</b><br>אגף טכנולוגיות דיגיטליות ומידע</div>
+                        <div>${new Date().toLocaleDateString('he-IL')}</div>
+                    </div>
+                    <h2 style="text-align:center; margin: 40px 0; font-size: 18px; line-height: 1.5;">ריכוז פריטי חיוב פתוחים<br><span style="font-size: 15px; color:#555; font-weight:normal;">${reportTitle}</span></h2>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>שם הלקוח</th>
+                                <th>מספר מסמך</th>
+                                <th>מועד פירעון</th>
+                                <th>תיאור השירות</th>
+                                <th style="text-align: left;">סכום בש"ח</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(r => `
+                                <tr>
+                                    <td>${r.name}</td>
+                                    <td style="font-family: monospace;">${r.doc}</td>
+                                    <td>${r.dueDate.toLocaleDateString('he-IL')}</td>
+                                    <td>${r.desc}</td>
+                                    <td style="text-align: left; font-weight: bold;">${formatCurrency(r.amount)}</td>
+                                </tr>
+                            `).join('')}
+                            <tr style="font-weight:bold; background:#eee">
+                                <td colspan="4">סה"כ</td>
+                                <td style="text-align: left;">${formatCurrency(totalSum)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <!-- חתימת מחלקת שירות לקוחות וגבייה (עם מניעת שבירת עמוד) -->
                     <div class="signature-area">
                         <div class="signature-box">
                             <div style="font-weight: bold; text-align: right; padding-right: 40px;">בכבוד רב,</div>
