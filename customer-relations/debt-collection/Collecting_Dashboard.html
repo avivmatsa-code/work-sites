@@ -463,6 +463,8 @@
                     table { width: 100%; border-collapse: collapse; margin-top: 30px; }
                     th, td { border: 1px solid #ddd; padding: 12px; text-align: right; }
                     th { background: #f8f9fa; }
+                    .signature-area { margin-top: 80px; display: flex; justify-content: flex-end; }
+                    .signature-box { width: 380px; display: flex; flex-direction: column; }
                     @media print {
                         @page { margin: 0; }
                         body { margin: 2cm; padding: 0; }
@@ -502,6 +504,19 @@
                             </tr>
                         </tbody>
                     </table>
+                    
+                    <!-- הוספת חתימת צוות הגבייה למסמכי ה-PDF של פירוט הסקטור -->
+                    <div class="signature-area">
+                        <div class="signature-box">
+                            <div style="font-weight: bold; text-align: right; padding-right: 40px;">בכבוד רב,</div>
+                            <div style="text-align: center; margin-right: auto; width: 220px; margin-top: 40px; font-size: 14px; line-height: 1.6;">
+                                _______________________<br>
+                                <b style="display: inline-block; margin-top: 8px;">צוות הגבייה</b><br>
+                                אגף טכנולוגיות דיגיטליות ומידע<br>
+                                <a href="mailto:costumer@mot.gov.il" style="color: #0B3C5D; text-decoration: none;">costumer@mot.gov.il</a>
+                            </div>
+                        </div>
+                    </div>
                     ${printScript}
                 </body></html>
             `);
@@ -512,9 +527,14 @@
             const data = db.filter(r => r.name === path.orgName && (kpiFilter === 'overdue' ? r.isOverdue : !r.isOverdue) && isTypeMatch(r));
             const total = data.reduce((s, r) => s + r.amount, 0);
             
+            // שליפת מספר לקוח במרכבה (הקוד של הארגון)
+            const clientCode = data.length > 0 ? data[0].code : '-';
+            
             // הגדרת סוג השירות עם הכותרת החדשה "אגרות העברת בעלות"
             const typeText = incomeFilter === 'all' ? 'כלל השירותים' : (incomeFilter === 'fees' ? 'אגרות העברת בעלות' : 'שירותי מידע');
-            const mailtoUrl = `mailto:?subject=${encodeURIComponent('ריכוז חשבוניות פתוחות - ' + path.orgName)}&body=${encodeURIComponent('שלום רב,\nמצורף פירוט חוב פתוח.\n\n[הדבק כאן את הטבלה שמועתקת בלוח (Ctrl+V)]\n\nבכבוד רב,\nצוות הגבייה')}`;
+            
+            // עדכון המייל האוטומטי בנוסח החדש ובכתובת המייל בחתימה
+            const mailtoUrl = `mailto:?subject=${encodeURIComponent('ריכוז חשבוניות פתוחות - ' + path.orgName)}&body=${encodeURIComponent('שלום רב,\nמצורף פירוט חוב פתוח.\n\n[הדבק כאן את הטבלה שמועתקת בלוח (Ctrl+V)]\n\nלהלן הקישור לתשלום החוב בשרת התשלומים: https://ecom.gov.il/voucherspa/input/414\nמספר לקוח במרכבה: ' + clientCode + '\n\nהשירות מותנה בתשלום. נבקשכם להסדיר את החוב בהקדם.\nאם ברשותכם אסמכתא שהחשבוניות שולמו או שאתם סבורים שנפלה טעות, פנו אלינו בכתב.\n\nבכבוד רב,\nצוות הגבייה\nאגף טכנולוגיות דיגיטליות ומידע\ncostumer@mot.gov.il')}`;
 
             if (mode === 'email') {
                 toggleExportModal(false);
@@ -581,16 +601,28 @@
                     <p style="margin-top:40px">לכבוד: <br><b style="font-size:18px">${path.orgName}</b></p>
                     <h2 style="text-align:center; margin: 40px 0">ריכוז חשבוניות פתוחות עבור ${typeText}</h2>
                     <p>שלום רב,<br>להלן פירוט החשבוניות והחיובים הפתוחים במערכותינו שטרם הותאמו:</p>
+                    
                     <table><thead><tr><th>מספר מסמך</th><th>מועד פירעון</th><th>תיאור השירות</th><th>סכום בש"ח</th></tr></thead>
                     <tbody>${data.map(r => `<tr><td>${r.doc}</td><td>${r.dueDate.toLocaleDateString('he-IL')}</td><td>${r.desc}</td><td style="text-align:left">${formatCurrency(r.amount)}</td></tr>`).join('')}
                     <tr style="font-weight:bold; background:#eee"><td colspan="3">סה"כ לתשלום</td><td style="text-align:left">${formatCurrency(total)}</td></tr></tbody></table>
+                    
+                    <!-- קישור לתשלום, מספר לקוח במרכבה והודעות נלוות חדשות עם שורת רווח -->
+                    <div style="margin-top: 30px; font-size: 14px; color: #333; line-height: 1.8;">
+                        <p style="margin-bottom: 8px;">להלן הקישור לתשלום החוב בשרת התשלומים: <a href="https://ecom.gov.il/voucherspa/input/414" target="_blank" style="color: #0B3C5D; font-weight: bold; text-decoration: underline;">https://ecom.gov.il/voucherspa/input/414</a></p>
+                        <p style="margin-bottom: 16px;">מספר לקוח במרכבה: <b>${clientCode}</b></p>
+                        
+                        <p style="margin-top: 16px; margin-bottom: 8px;">השירות מותנה בתשלום. נבקשכם להסדיר את החוב בהקדם.</p>
+                        <p>אם ברשותכם אסמכתא שהחשבוניות שולמו או שאתם סבורים שנפלה טעות, פנו אלינו בכתב.</p>
+                    </div>
+
                     <div class="signature-area">
                         <div class="signature-box">
                             <div style="font-weight: bold; text-align: right; padding-right: 40px;">בכבוד רב,</div>
-                            <div style="text-align: center; margin-right: auto; width: 220px; margin-top: 40px;">
+                            <div style="text-align: center; margin-right: auto; width: 220px; margin-top: 40px; font-size: 14px; line-height: 1.6;">
                                 _______________________<br>
                                 <b style="display: inline-block; margin-top: 8px;">צוות הגבייה</b><br>
-                                אגף טכנולוגיות דיגיטליות ומידע
+                                אגף טכנולוגיות דיגיטליות ומידע<br>
+                                <a href="mailto:costumer@mot.gov.il" style="color: #0B3C5D; text-decoration: none;">costumer@mot.gov.il</a>
                             </div>
                         </div>
                     </div>
