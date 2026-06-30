@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -9,204 +8,457 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    
+    <script>
+        // הגדרת Arial כגופן ה-sans הבלעדי של Tailwind (ללא שימוש ב-extend) 
+        tailwind.config = {
+            theme: {
+                fontFamily: {
+                    sans: ['Arial', 'Helvetica', 'sans-serif'],
+                }
+            }
+        }
+    </script>
+
+    <!-- הזרקת סגנון אריאל ישירות לשכבת הבסיס של Tailwind -->
+    <style type="text/tailwindcss">
+        @layer base {
+            html, body, button, select, input, textarea, label, span, p, div, table, tr, th, td, h1, h2, h3, h4, h5, h6, a, b, strong {
+                font-family: Arial, Helvetica, sans-serif !important;
+            }
+        }
+    </style>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap');
-        body { font-family: 'Heebo', sans-serif; background-color: #f3f4f6; }
+        /* כפייה מוחלטת ואחידה של גופן אריאל על כל פריט מלל ואלמנט במערכת */
+        html, body, html *, body *, [class*="text-"], h1, h2, h3, h4, h5, h6, button, span, div, p, label, input, select, td, th, a {
+            font-family: Arial, Helvetica, sans-serif !important;
+        }
+        
+        /* החרגה של סמלי ה-FontAwesome מהחלת אריאל כדי להבטיח את תצוגתם התקינה */
+        .fa, .fas, .far, .fab, .fa-solid, .fa-regular, .fa-brands, i, i * {
+            font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "FontAwesome" !important;
+        }
+
+        body { background-color: #f3f4f6; }
         .active-kpi { border-color: #328CC1 !important; background-color: #f0f9ff !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         .active-filter { background-color: white !important; color: #0B3C5D !important; }
-        @media print { .no-print { display: none; } }
+        
+        @media print { 
+            .no-print { display: none !important; } 
+            body { background: white !important; font-size: 11px !important; }
+            @page { size: portrait; margin: 1.5cm; }
+            
+            .print-row-layout {
+                display: table !important;
+                width: 100% !important;
+                table-layout: fixed !important;
+                border-collapse: separate !important;
+                border-spacing: 8px !important;
+            }
+            .print-col-layout {
+                display: table-cell !important;
+                width: 25% !important;
+                background: white !important;
+                border: 1px solid #cbd5e1 !important;
+                padding: 10px !important;
+                border-radius: 8px !important;
+                vertical-align: top !important;
+            }
+            .page-break { page-break-before: always; }
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col text-slate-800">
+<body class="min-h-screen flex flex-col text-slate-800" style="font-family: Arial, Helvetica, sans-serif !important;">
 
     <!-- Export Modal -->
     <div id="export-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
         <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 border border-slate-200">
-            <h3 class="text-xl font-black text-slate-800 mb-6 border-b pb-2" id="export-modal-title">הפקת ריכוז חשבוניות</h3>
+            <h3 class="text-xl font-bold text-slate-800 mb-6 border-b pb-2" id="export-modal-title" style="font-family: Arial, Helvetica, sans-serif !important;">הפקת ריכוז חשבוניות</h3>
             <div class="grid grid-cols-1 gap-4">
                 <button onclick="generateAction('download')" class="flex items-center gap-4 p-4 bg-slate-50 hover:bg-indigo-50 border border-slate-200 rounded-2xl transition-all group text-right">
                     <i class="fa-solid fa-file-pdf text-indigo-600 text-2xl"></i>
-                    <div><p class="font-bold">שמור כ-PDF</p><p class="text-xs text-slate-500">הורדה למחשב</p></div>
+                    <div><p class="font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">שמור כ-PDF</p><p class="text-xs text-slate-500" style="font-family: Arial, Helvetica, sans-serif !important;">הורדה למחשב</p></div>
                 </button>
                 <button onclick="generateAction('print')" class="flex items-center gap-4 p-4 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-2xl transition-all group text-right">
                     <i class="fa-solid fa-print text-blue-600 text-2xl"></i>
-                    <div><p class="font-bold">הדפס מסמך</p><p class="text-xs text-slate-500">שליחה למדפסת</p></div>
+                    <div><p class="font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">הדפס מסמך</p><p class="text-xs text-slate-500" style="font-family: Arial, Helvetica, sans-serif !important;">שליחה למדפסת</p></div>
                 </button>
                 <button onclick="generateAction('email')" class="flex items-center gap-4 p-4 bg-slate-50 hover:bg-emerald-50 border border-slate-200 rounded-2xl transition-all group text-right">
                     <i class="fa-solid fa-envelope-open-text text-emerald-600 text-2xl"></i>
-                    <div><p class="font-bold">שלח בדוא"ל</p><p class="text-xs text-slate-500">העתקת טבלה למייל</p></div>
+                    <div><p class="font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">שלח בדוא"ל</p><p class="text-xs text-slate-500" style="font-family: Arial, Helvetica, sans-serif !important;">העתקת טבלה למייל</p></div>
                 </button>
-                <button onclick="toggleExportModal(false)" class="mt-2 text-sm font-bold text-slate-400 hover:text-slate-600">סגור</button>
+                <button onclick="toggleExportModal(false)" class="mt-2 text-sm font-bold text-slate-400 hover:text-slate-600" style="font-family: Arial, Helvetica, sans-serif !important;">סגור</button>
             </div>
         </div>
     </div>
 
-    <!-- Header -->
-    <header class="bg-[#0B3C5D] text-white px-6 py-4 shadow-lg border-b-4 border-[#328CC1] no-print">
-        <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center space-x-4 space-x-reverse">
-                <div class="bg-white p-2 rounded-lg text-[#0B3C5D] font-black text-lg">משרד התחבורה</div>
-                <div class="flex flex-col">
-                    <h1 class="text-xl font-bold leading-tight">ניהול הכנסות וגביית חובות</h1>
+    <!-- MAIN APP CONTAINER -->
+    <div id="main-app-container" class="flex flex-col flex-grow">
+        <!-- Header -->
+        <header class="bg-[#0B3C5D] text-white px-6 py-5 shadow-lg border-b-4 border-[#328CC1] no-print">
+            <div class="max-w-[1600px] mx-auto flex flex-col xl:flex-row justify-between items-center gap-6">
+                <!-- שם משרד ואגף מוגדלים וממורכזים בגופן אריאל אחיד ישיר (בפקודה עצמה תוך שימוש ב-font-bold) -->
+                <div class="flex flex-col items-center justify-center text-center bg-white/10 px-8 py-3.5 rounded-2xl border border-white/15 shadow-inner">
+                    <div class="text-xl md:text-2xl font-bold text-white leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">משרד התחבורה והבטיחות בדרכים</div>
+                    <div class="text-sm md:text-base text-slate-300 font-bold mt-1.5" style="font-family: Arial, Helvetica, sans-serif !important;">אגף טכנולוגיות דיגיטליות ומידע</div>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <h1 class="text-2xl md:text-3xl font-bold leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">ניהול הכנסות וגבייה</h1>
                     <!-- תאריך עדכניות הנתונים יוצג כאן לאחר טעינת הקובץ -->
-                    <p id="data-currency-date" class="text-xs text-slate-300 font-medium mt-0.5 hidden"></p>
+                    <p id="data-currency-date" class="text-xs text-slate-300 font-medium mt-0.5 hidden" style="font-family: Arial, Helvetica, sans-serif !important;"></p>
                 </div>
-            </div>
 
-            <!-- סידור מחדש של סדר האפשרויות במסנן -->
-            <div class="flex bg-black/20 p-1 rounded-xl border border-white/10 shadow-inner">
-                <button onclick="setIncomeFilter('all')" id="f-all" class="px-5 py-2 rounded-lg text-sm font-bold transition-all active-filter">הכל</button>
-                <button onclick="setIncomeFilter('info')" id="f-info" class="px-5 py-2 rounded-lg text-sm font-bold transition-all hover:bg-white/5">שירותי מידע</button>
-                <button onclick="setIncomeFilter('fees')" id="f-fees" class="px-5 py-2 rounded-lg text-sm font-bold transition-all hover:bg-white/5">אגרות העברת בעלות</button>
-            </div>
-
-            <div class="flex items-center gap-4 flex-wrap">
-                <!-- קליטת קובץ חובות -->
-                <input type="file" id="excel-uploader" class="hidden" onchange="processExcel(event)">
-                <label for="excel-uploader" class="cursor-pointer bg-[#D9B310] hover:bg-yellow-500 text-black px-6 py-2 rounded-full font-black text-sm shadow-md transition-all">
-                    <i class="fa-solid fa-file-import ml-2"></i> קליטת קובץ חובות
-                </label>
-                
-                <input type="file" id="revenue-uploader" class="hidden" onchange="processRevenueExcel(event)">
-                <label for="revenue-uploader" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-full font-black text-sm shadow-md transition-all">
-                    <i class="fa-solid fa-file-import ml-2"></i> קליטת קובץ הכנסות שנה נוכחית
-                </label>
-            </div>
-        </div>
-    </header>
-
-    <main class="max-w-[1600px] w-full mx-auto p-6 space-y-6 flex-grow no-print">
-        
-        <!-- KPIs (סודרו מחדש: הכנסות מימין, אז חובות בפיגור ואז תזרים עתידי) -->
-        <div id="kpi-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- סה"כ הכנסות (מופיע בצד ימין קיצוני בטעינת קובץ) -->
-            <div id="kpi-card-revenue" class="bg-white p-6 rounded-2xl border-2 border-transparent transition-all shadow-sm hidden">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="text-slate-400 font-bold text-xs uppercase tracking-widest">סה"כ הכנסות שנת 2026</span>
-                    <i class="fa-solid fa-money-bill-wave text-emerald-500"></i>
-                </div>
-                <div class="text-4xl font-black text-emerald-700" id="total-revenue-kpi">₪0</div>
-            </div>
-
-            <!-- חובות בפיגור (מוצג במרכז) -->
-            <div id="kpi-card-overdue" onclick="setKpiFilter('overdue')" class="bg-white p-6 rounded-2xl border-2 border-transparent cursor-pointer transition-all active-kpi shadow-sm">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="text-slate-400 font-bold text-xs uppercase tracking-widest">חובות בפיגור</span>
-                    <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
-                </div>
-                <div class="text-4xl font-black text-red-700" id="total-overdue">₪0</div>
-                <!-- פירוט חובות בפיגור לשנה הנוכחית ולשנים קודמות -->
-                <div id="overdue-breakdown" class="text-xs text-red-600 font-bold mt-2 flex gap-4 hidden border-t border-red-50 pt-1.5">
-                    <span>שנה נוכחית (2026): <span id="overdue-current">₪0</span></span>
-                    <span>שנים קודמות: <span id="overdue-past">₪0</span></span>
-                </div>
-            </div>
-            
-            <!-- צפי תזרים עתידי (מוצג בשמאל) -->
-            <div id="kpi-card-future" onclick="setKpiFilter('future')" class="bg-white p-6 rounded-2xl border-2 border-transparent cursor-pointer transition-all shadow-sm">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="text-slate-400 font-bold text-xs uppercase tracking-widest">צפי תזרים עתידי</span>
-                    <i class="fa-solid fa-calendar-check text-emerald-500"></i>
-                </div>
-                <div class="text-4xl font-black text-emerald-700" id="total-future">₪0</div>
-            </div>
-        </div>
-
-        <!-- Table Area -->
-        <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[450px]">
-            <div class="bg-slate-50 p-4 border-b flex justify-between items-center flex-wrap gap-4">
-                <div class="flex items-center gap-3">
-                    <button id="btn-back" onclick="navigateBack()" class="hidden bg-white border border-slate-300 px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition-all">
-                        <i class="fa-solid fa-arrow-right ml-2 text-blue-600"></i> חזרה
+                <!-- מסנני המערכת הראשית - גופנים אחידים בגודלם ישיר -->
+                <div class="flex items-center bg-black/20 p-1.5 rounded-xl border border-white/10 shadow-inner">
+                    <span class="text-xs text-slate-300 font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;">סנן לפי:</span>
+                    <button onclick="setIncomeFilter('info')" id="f-info" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all active-filter leading-tight">
+                        <span class="block text-xs font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">שירותי</span><span class="block text-xs font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">מידע</span>
                     </button>
-                    <h2 id="view-title" class="text-lg font-black text-[#0B3C5D]">מבנה חובות</h2>
+                    <button onclick="setIncomeFilter('fees')" id="f-fees" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all hover:bg-white/5 leading-tight">
+                        <span class="block text-xs font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">אגרות העברת</span><span class="block text-xs font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">בעלות</span>
+                    </button>
+                    <button onclick="setIncomeFilter('all')" id="f-all" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all hover:bg-white/5 leading-tight">
+                        <span class="block text-xs font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">הכל</span>
+                    </button>
                 </div>
-                <div id="level-tools" class="flex items-center gap-3 flex-wrap">
+
+                <!-- לחצני פעולה עליונים מעוצבים כפתורים בני 2 שורות בגודל גופן אחיד ישיר -->
+                <div class="flex items-center gap-3 flex-wrap">
+                    <!-- קליטת קובץ חובות -->
+                    <input type="file" id="excel-uploader" class="hidden" onchange="processExcel(event)">
+                    <label for="excel-uploader" class="cursor-pointer bg-[#D9B310] hover:bg-yellow-500 text-black px-4 py-2 rounded-xl font-bold shadow-md transition-all flex flex-col items-center justify-center text-center h-[52px] w-[130px] leading-tight">
+                        <span class="text-xs font-bold opacity-80" style="font-family: Arial, Helvetica, sans-serif !important;">טעינת קובץ</span>
+                        <span class="text-xs font-bold opacity-80" style="font-family: Arial, Helvetica, sans-serif !important;">חובות</span>
+                    </label>
                     
-                    <!-- מסנן רשימת לקוחות (Level 1) - חובות / הכנסות / גם וגם -->
-                    <div id="list-filter-container" class="hidden flex bg-slate-200 p-1 rounded-xl items-center shadow-inner">
-                        <button onclick="setListFilter('debts')" id="lf-debts" class="px-3 py-1 text-[11px] font-bold rounded-lg bg-white shadow-sm transition-all">רק חובות</button>
-                        <button onclick="setListFilter('revenue')" id="lf-revenue" class="px-3 py-1 text-[11px] font-bold rounded-lg transition-all">רק הכנסות</button>
-                        <button onclick="setListFilter('both')" id="lf-both" class="px-3 py-1 text-[11px] font-bold rounded-lg transition-all">גם וגם</button>
-                    </div>
-
-                    <!-- מסנן פירוט חשבוניות לקוח (Level 2) - חובות / הכנסות שנה נוכחית -->
-                    <div id="lvl2-filter-container" class="hidden flex bg-slate-200 p-1 rounded-xl items-center shadow-inner">
-                        <button onclick="setLvl2View('debt')" id="l2-debt" class="px-3 py-1 text-[11px] font-bold rounded-lg bg-white shadow-sm transition-all">חשבוניות חוב</button>
-                        <button onclick="setLvl2View('revenue')" id="l2-revenue" class="px-3 py-1 text-[11px] font-bold rounded-lg transition-all">הכנסות שנה נוכחית</button>
-                    </div>
-
-                    <!-- אפשרות הצגת אחוז חוב של לקוח מהסך במסך (שם שונה ל"הצג אחוז") -->
-                    <label id="pct-toggle-container" class="hidden flex items-center gap-2 cursor-pointer bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition-all border border-slate-300">
-                        <input type="checkbox" id="chk-show-pct" onchange="toggleShowPct(this.checked)" class="rounded text-blue-600 focus:ring-blue-500">
-                        <span class="text-xs font-bold text-slate-700">הצג אחוז</span>
+                    <input type="file" id="revenue-uploader" class="hidden" onchange="processRevenueExcel(event)">
+                    <label for="revenue-uploader" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-bold shadow-md transition-all flex flex-col items-center justify-center text-center h-[52px] w-[130px] leading-tight">
+                        <span class="text-xs font-bold opacity-80" style="font-family: Arial, Helvetica, sans-serif !important;">טעינת קובץ</span>
+                        <span class="text-xs font-bold opacity-80" style="font-family: Arial, Helvetica, sans-serif !important;">הכנסות שוטפות</span>
                     </label>
 
-                    <div id="sort-tools" class="hidden flex bg-slate-200 p-1 rounded-xl items-center shadow-inner">
-                        <button onclick="setSort('amount')" id="sort-amount" class="px-3 py-1 text-[11px] font-bold rounded-lg bg-white shadow-sm transition-all">לפי סכום</button>
-                        <button onclick="setSort('name')" id="sort-name" class="px-3 py-1 text-[11px] font-bold rounded-lg transition-all">לפי א-ת</button>
-                    </div>
-
-                    <!-- כפתור לייצוא רשימת הלקוחות ל-PDF בדרגה 1 -->
-                    <button id="btn-export-clients" onclick="exportClientsPdf()" class="hidden bg-emerald-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-emerald-700 transition-all">
-                        <i class="fa-solid fa-file-invoice-dollar ml-2"></i> ייצוא רשימה ל-PDF
-                    </button>
-
-                    <!-- כפתור הפקת מכתב חוב מסורתי -->
-                    <button id="btn-letter" onclick="toggleExportModal(true, 'debt')" class="hidden bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-indigo-700 transition-all">
-                        <i class="fa-solid fa-file-invoice-dollar ml-2"></i> הפק מכתב חוב
-                    </button>
-
-                    <!-- לחצן הפקת דוח לקוח שנתי -->
-                    <button id="btn-annual-report" onclick="toggleExportModal(true, 'annual')" class="hidden bg-emerald-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-emerald-700 transition-all">
-                        <i class="fa-solid fa-file-invoice ml-2"></i> הפק דוח ללקוח
+                    <!-- לחצן דינמי למעבר לדשבורד -->
+                    <button id="btn-goto-dashboard" onclick="enterDashboard()" class="hidden bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-xl font-bold shadow-md transition-all flex-col items-center justify-center text-center h-[52px] w-[130px] leading-tight">
+                        <span class="text-xs font-bold opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;">מעבר לדשבורד</span>
+                        <span class="text-xs font-bold opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;">סיכום שנה</span>
                     </button>
                 </div>
             </div>
-            <div id="drilldown-viewport" class="p-6 flex-grow overflow-y-auto">
-                <div class="text-center py-20 text-slate-300 font-medium italic opacity-60">המערכת מאופסת. אנא טען קובץ אקסל גבייה מעודכן.</div>
-            </div>
-        </div>
+        </header>
 
-        <!-- מיכל דינמי לפילוח חודשי של הכנסות - מוצג לפני פילוח החוב (החל מ-Analytics) -->
-        <div id="revenue-monthly-container" class="space-y-6 hidden no-print"></div>
-
-        <!-- Analytics Area -->
-        <div id="analytics-area" class="space-y-6 hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                    <h3 class="font-black text-slate-700 mb-4 border-b pb-2 tracking-tight" id="lbl-years-pie"><i class="fa-solid fa-chart-pie ml-2 text-blue-500"></i>פילוח חובות לפי שנים</h3>
-                    <div class="h-64 flex justify-center"><canvas id="yearsChart"></canvas></div>
-                </div>
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 overflow-x-auto">
-                    <h3 class="font-black text-slate-700 mb-4 border-b pb-2 tracking-tight" id="lbl-years-table"><i class="fa-solid fa-table ml-2 text-blue-500"></i>ריכוז חובות לפי שנים</h3>
-                    <table class="w-full text-right text-sm">
-                        <thead><tr class="text-slate-400 border-b"><th class="p-3">שנה</th><th class="p-3 text-center">כמות מסמכים</th><th class="p-3 text-left">סה"כ בש"ח</th></tr></thead>
-                        <tbody id="years-table-body" class="divide-y divide-slate-50"></tbody>
-                    </table>
-                </div>
-            </div>
+        <main class="max-w-[1600px] w-full mx-auto p-6 space-y-6 flex-grow no-print">
             
-            <!-- מיכל דינמי לפילוח חודשי עבור כל השנים שיש בהן חוב -->
-            <div id="yearly-monthly-grids-container" class="space-y-6"></div>
-        </div>
-    </main>
+            <!-- KPIs -->
+            <div id="kpi-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- סה"כ הכנסות (מופיע בצד ימין קיצוני בטעינת קובץ) -->
+                <div id="kpi-card-revenue" class="bg-white p-6 rounded-2xl border-2 border-transparent transition-all shadow-sm hidden">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-slate-400 font-bold text-xs uppercase tracking-widest" style="font-family: Arial, Helvetica, sans-serif !important;">סה"כ הכנסות שנת 2026</span>
+                        <i class="fa-solid fa-money-bill-wave text-emerald-500"></i>
+                    </div>
+                    <div class="text-4xl font-bold text-emerald-700" id="total-revenue-kpi" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</div>
+                </div>
+
+                <!-- חובות בפיגור (מוצג במרכז) -->
+                <div id="kpi-card-overdue" onclick="setKpiFilter('overdue')" class="bg-white p-6 rounded-2xl border-2 border-transparent cursor-pointer transition-all active-kpi shadow-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-slate-400 font-bold text-xs uppercase tracking-widest" style="font-family: Arial, Helvetica, sans-serif !important;">חובות בפיגור</span>
+                        <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
+                    </div>
+                    <div class="text-4xl font-bold text-red-700" id="total-overdue" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</div>
+                    <!-- פירוט חובות בפיגור לשנה הנוכחית ולשנים קודמות -->
+                    <div id="overdue-breakdown" class="text-xs text-red-600 font-bold mt-2 flex gap-4 hidden border-t border-red-50 pt-1.5" style="font-family: Arial, Helvetica, sans-serif !important;">
+                        <span style="font-family: Arial, Helvetica, sans-serif !important;">שנה נוכחית (2026): <span id="overdue-current" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</span></span>
+                        <span style="font-family: Arial, Helvetica, sans-serif !important;">שנים קודמות: <span id="overdue-past" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</span></span>
+                    </div>
+                </div>
+                
+                <!-- צפי תזרים עתידי (מוצג בשמאל) -->
+                <div id="kpi-card-future" onclick="setKpiFilter('future')" class="bg-white p-6 rounded-2xl border-2 border-transparent cursor-pointer transition-all shadow-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-slate-400 font-bold text-xs uppercase tracking-widest" style="font-family: Arial, Helvetica, sans-serif !important;">צפי תזרים עתידי</span>
+                        <i class="fa-solid fa-calendar-check text-emerald-500"></i>
+                    </div>
+                    <div class="text-4xl font-bold text-emerald-700" id="total-future" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</div>
+                </div>
+            </div>
+
+            <!-- Table Area -->
+            <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[450px]">
+                <div class="bg-slate-50 p-4 border-b flex justify-between items-center flex-wrap gap-4">
+                    <div class="flex items-center gap-3">
+                        <button id="btn-back" onclick="navigateBack()" class="hidden bg-white border border-slate-300 px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">
+                            <i class="fa-solid fa-arrow-right ml-2 text-blue-600"></i> חזרה
+                        </button>
+                        <h2 id="view-title" class="text-lg font-bold text-[#0B3C5D]" style="font-family: Arial, Helvetica, sans-serif !important;">מבנה חובות</h2>
+                    </div>
+                    <div id="level-tools" class="flex items-center gap-3 flex-wrap">
+                        
+                        <!-- מסנן רשימת לקוחות (Level 1) - חובות / הכנסות / גם וגם -->
+                        <div id="list-filter-container" class="hidden flex bg-slate-200 p-1 rounded-xl items-center shadow-inner">
+                            <button onclick="setListFilter('debts')" id="lf-debts" class="px-3 py-1 text-[11px] font-bold rounded-lg bg-white shadow-sm transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">רק חובות</button>
+                            <button onclick="setListFilter('revenue')" id="lf-revenue" class="px-3 py-1 text-[11px] font-bold rounded-lg transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">רק הכנסות</button>
+                            <button onclick="setListFilter('both')" id="lf-both" class="px-3 py-1 text-[11px] font-bold rounded-lg transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">גם וגם</button>
+                        </div>
+
+                        <!-- מסנן פירוט חשבוניות לקוח (Level 2) - חובות / הכנסות שנה נוכחית -->
+                        <div id="lvl2-filter-container" class="hidden flex bg-slate-200 p-1 rounded-xl items-center shadow-inner">
+                            <button onclick="setLvl2View('debt')" id="l2-debt" class="px-3 py-1 text-[11px] font-bold rounded-lg bg-white shadow-sm transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">חשבוניות חוב</button>
+                            <button onclick="setLvl2View('revenue')" id="l2-revenue" class="px-3 py-1 text-[11px] font-bold rounded-lg transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">הכנסות שנה נוכחית</button>
+                        </div>
+
+                        <!-- אפשרות הצגת אחוז חוב של לקוח מהסך במסך -->
+                        <label id="pct-toggle-container" class="hidden flex items-center gap-2 cursor-pointer bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition-all border border-slate-300">
+                            <input type="checkbox" id="chk-show-pct" onchange="toggleShowPct(this.checked)" class="rounded text-blue-600 focus:ring-blue-500">
+                            <span class="text-xs font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;">הצג אחוז</span>
+                        </label>
+
+                        <!-- תיבת סימון מוסר תשלומים -->
+                        <label id="morale-toggle-container" class="hidden flex items-center gap-2 cursor-pointer bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition-all border border-slate-300">
+                            <input type="checkbox" id="chk-show-morale" onchange="toggleShowMorale(this.checked)" class="rounded text-blue-600 focus:ring-blue-500">
+                            <span class="text-xs font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;">הצג מוסר תשלומים <span class="text-[10px] text-slate-500 font-normal" style="font-family: Arial, Helvetica, sans-serif !important;">(מסמכי חוב בלבד)</span></span>
+                        </label>
+
+                        <!-- כלי מיון -->
+                        <div id="sort-tools" class="hidden flex bg-slate-200 p-1 rounded-xl items-center shadow-inner gap-1">
+                            <button onclick="setSort('amount')" id="sort-amount" class="px-3 py-1 text-[11px] font-bold rounded-lg bg-white shadow-sm transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">לפי סכום</button>
+                            <button onclick="setSort('docs')" id="sort-docs" class="px-3 py-1 text-[11px] font-bold rounded-lg transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">מס' חשבוניות פתוחות</button>
+                            <button onclick="setSort('name')" id="sort-name" class="px-3 py-1 text-[11px] font-bold rounded-lg transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">לפי א-ת</button>
+                        </div>
+
+                        <!-- כפתור לייצוא רשימת הלקוחות ל-PDF בדרגה 1 -->
+                        <button id="btn-export-clients" onclick="exportClientsPdf()" class="hidden bg-emerald-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-emerald-700 transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">
+                            <i class="fa-solid fa-file-invoice-dollar ml-2"></i> ייצוא רשימה ל-PDF
+                        </button>
+
+                        <!-- כפתור הפקת מכתב חוב מסורתי -->
+                        <button id="btn-letter" onclick="toggleExportModal(true, 'debt')" class="hidden bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-indigo-700 transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">
+                            <i class="fa-solid fa-file-invoice-dollar ml-2"></i> הפק מכתב חוב
+                        </button>
+
+                        <!-- לחצן הפקת דוח לקוח שנתי -->
+                        <button id="btn-annual-report" onclick="toggleExportModal(true, 'annual')" class="hidden bg-emerald-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-emerald-700 transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">
+                            <i class="fa-solid fa-file-invoice ml-2"></i> הפק דוח ללקוח
+                        </button>
+                    </div>
+                </div>
+                <div id="drilldown-viewport" class="p-6 flex-grow overflow-y-auto">
+                    <div class="text-center py-20 text-slate-300 font-medium italic opacity-60" style="font-family: Arial, Helvetica, sans-serif !important;">המערכת מאופסת. אנא טען קובץ אקסל גבייה מעודכן.</div>
+                </div>
+            </div>
+
+            <!-- מיכל דינמי לפילוח חודשי של הכנסות - מוצג לפני פילוח החוב -->
+            <div id="revenue-monthly-container" class="space-y-6 hidden no-print"></div>
+
+            <!-- Analytics Area -->
+            <div id="analytics-area" class="space-y-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                        <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 tracking-tight" id="lbl-years-pie" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-chart-pie ml-2 text-blue-500"></i>פילוח חובות לפי שנים</h3>
+                        <div class="h-64 flex justify-center"><canvas id="yearsChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 overflow-x-auto">
+                        <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 tracking-tight" id="lbl-years-table" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-table ml-2 text-blue-500"></i>ריכוז חובות לפי שנים</h3>
+                        <table class="w-full text-right text-sm">
+                            <thead><tr class="text-slate-400 border-b"><th class="p-3" style="font-family: Arial, Helvetica, sans-serif !important;">שנה</th><th class="p-3 text-center" style="font-family: Arial, Helvetica, sans-serif !important;">כמות מסמכים</th><th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">סה"כ בש"ח</th></tr></thead>
+                            <tbody id="years-table-body" class="divide-y divide-slate-50"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- מיכל דינמי לפילוח חודשי עבור כל השנים שיש בהן חוב -->
+                <div id="yearly-monthly-grids-container" class="space-y-6"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- DASHBOARD CONTAINER (חלק 2) -->
+    <div id="dashboard-container" class="hidden flex-col flex-grow bg-[#f3f4f6]" style="font-family: Arial, Helvetica, sans-serif !important;">
+        <!-- Header -->
+        <header class="bg-[#0B3C5D] text-white px-6 py-5 shadow-lg border-b-4 border-[#328CC1] no-print">
+            <div class="max-w-[1600px] mx-auto flex flex-col xl:flex-row justify-between items-center gap-6">
+                <!-- שם משרד ואגף מוגדלים וממורכזים בדשבורד בגופן אריאל אחיד ישיר (בפקודה עצמה תוך שימוש ב-font-bold) -->
+                <div class="flex flex-col items-center justify-center text-center bg-white/10 px-8 py-3.5 rounded-2xl border border-white/15 shadow-inner">
+                    <div class="text-xl md:text-2xl font-bold text-white leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">משרד התחבורה והבטיחות בדרכים</div>
+                    <div class="text-sm md:text-base text-slate-300 font-bold mt-1.5" style="font-family: Arial, Helvetica, sans-serif !important;">אגף טכנולוגיות דיגיטליות ומידע</div>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <h1 class="text-2xl md:text-3xl font-bold leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">דשבורד הכנסות וגבייה</h1>
+                </div>
+
+                <!-- מסננים היררכיים דו-שלביים -->
+                <div class="flex flex-col gap-2 bg-black/15 p-2.5 rounded-2xl border border-white/5 shadow-inner">
+                    <!-- שלב א' -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-300 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">סנן לפי (שלב א'):</span>
+                        <button id="db-sa-info" onclick="setDashStageA('info')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">שירותי מידע</button>
+                        <button id="db-sa-fees" onclick="setDashStageA('fees')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">אגרות העברת בעלות</button>
+                        <button id="db-sa-all" onclick="setDashStageA('all')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">הכל</button>
+                    </div>
+                    <!-- שלב ב' -->
+                    <div id="dash-stage-b-container" class="flex items-center gap-2 border-t border-white/10 pt-1.5 transition-all">
+                        <span class="text-xs text-slate-300 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">סקטור (שלב ב'):</span>
+                        <button id="db-sb-all-sectors" onclick="setDashStageB('all-sectors')" class="px-2.5 py-0.5 rounded-md text-[11px] font-bold transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">כלל הסקטורים</button>
+                        <button id="db-sb-gov" onclick="setDashStageB('gov')" class="px-2.5 py-0.5 rounded-md text-[11px] font-bold transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">סקטור ממשלה</button>
+                        <button id="db-sb-local" onclick="setDashStageB('local')" class="px-2.5 py-0.5 rounded-md text-[11px] font-bold transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">שלטון מקומי</button>
+                        <button id="db-sb-private" onclick="setDashStageB('private')" class="px-2.5 py-0.5 rounded-md text-[11px] font-bold transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">רשויות ופרטיים</button>
+                    </div>
+                </div>
+
+                <!-- לחצני פעולה עליונים בדשבורד (גודל גופן אחיד לשתי השורות) ישיר (בפקודה עצמה) -->
+                <div class="flex items-center gap-3 flex-wrap">
+                    <button onclick="printDashboardCurrent()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-bold shadow transition-all flex flex-col items-center justify-center text-center h-[52px] w-[120px] leading-tight">
+                        <span class="text-xs opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;">הדפס דוח</span>
+                        <span class="text-xs font-normal opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;">נוכחי</span>
+                    </button>
+                    <button onclick="printDashboardAll()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold shadow transition-all flex flex-col items-center justify-center text-center h-[52px] w-[120px] leading-tight">
+                        <span class="text-xs opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;">הדפס דוח</span>
+                        <span class="text-xs font-normal opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;">מאוחד הכל</span>
+                    </button>
+                    <button onclick="exitDashboard()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-xl font-bold shadow transition-all flex flex-col items-center justify-center text-center h-[52px] w-[120px] leading-tight">
+                        <span class="text-xs opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;">חזרה למערכת</span>
+                        <span class="text-xs font-normal opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-door-open ml-1"></i>הראשית</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard content -->
+        <main class="max-w-[1600px] w-full mx-auto p-6 space-y-6 flex-grow">
+            <!-- KPIs -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 print-row-layout">
+                <!-- KPI 1 -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
+                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">סה"כ הכנסות (שנת 2026)</p>
+                    <p id="db-kpi-billed" class="text-3xl font-bold text-blue-900 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</p>
+                </div>
+                <!-- KPI 2 -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
+                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">סה"כ תקבולים בפועל</p>
+                    <p id="db-kpi-collected" class="text-3xl font-bold text-emerald-700 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</p>
+                </div>
+                <!-- KPI 3 -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
+                    <div>
+                        <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">יתרת חוב פתוחה (שנת 2026)</p>
+                        <p id="db-kpi-debt" class="text-3xl font-bold text-red-700 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</p>
+                    </div>
+                    <div class="text-[11px] text-slate-500 font-bold mt-2 pt-1.5 border-t border-slate-100 flex justify-between" style="font-family: Arial, Helvetica, sans-serif !important;">
+                        <span style="font-family: Arial, Helvetica, sans-serif !important;">חוב בפיגור: <span id="db-sub-overdue" class="text-red-600" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</span></span>
+                        <span style="font-family: Arial, Helvetica, sans-serif !important;">תזרים עתידי: <span id="db-sub-future" class="text-emerald-600" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</span></span>
+                    </div>
+                </div>
+                <!-- KPI 4 -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
+                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">שיעור גבייה בפועל</p>
+                    <p id="db-kpi-rate" class="text-3xl font-bold text-indigo-700 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">0.0%</p>
+                </div>
+            </div>
+
+            <!-- Half-Half Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+                <!-- Monthly Table Card (הסרת fixed height וביטול פסי הגלילה להתארכות טבעית) -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col h-auto">
+                    <h3 class="font-bold text-slate-700 mb-3 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
+                        <i class="fa-solid fa-calendar-days ml-2 text-indigo-600"></i>פילוח חודשי שנת 2026
+                    </h3>
+                    <div class="pr-1">
+                        <table class="w-full text-right text-xs" style="font-family: Arial, Helvetica, sans-serif !important;">
+                            <thead>
+                                <tr class="text-slate-400 border-b">
+                                    <th class="p-2 text-right" style="font-family: Arial, Helvetica, sans-serif !important;">חודש</th>
+                                    <th class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">הכנסות (ש"ח)</th>
+                                    <th class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">גבייה (ש"ח)</th>
+                                    <th class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">אחוז גבייה</th>
+                                </tr>
+                            </thead>
+                            <tbody id="db-monthly-table-body" class="divide-y divide-slate-50">
+                                <!-- Dynamic rows populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Monthly Chart Card -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col min-h-[480px]">
+                    <h3 class="font-bold text-slate-700 mb-3 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
+                        <i class="fa-solid fa-chart-column ml-2 text-emerald-600"></i>השוואת תקבולים מול יתרת חוב פתוחה (2026)
+                    </h3>
+                    <div class="flex-grow relative h-[380px] min-h-[380px]">
+                        <canvas id="dashChartCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Supporting Tables -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Table 1: Top Active Clients -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
+                        <i class="fa-solid fa-star ml-2 text-yellow-500"></i>עשרת הלקוחות הפעילים (שנת 2026)
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-xs" style="font-family: Arial, Helvetica, sans-serif !important;">
+                            <thead>
+                                <tr class="text-slate-400 border-b">
+                                    <th class="p-3" style="font-family: Arial, Helvetica, sans-serif !important;">שם הלקוח</th>
+                                    <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">סך חיובים (ש"ח)</th>
+                                    <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">תקבולים בפועל (ש"ח)</th>
+                                    <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">יתרת חוב (ש"ח)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="db-active-clients-body" class="divide-y divide-slate-50"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Table 2: Top Debtors -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
+                        <i class="fa-solid fa-hand-holding-dollar ml-2 text-red-500"></i>עשרת החייבים הגדולים (שנת 2026)
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-xs" style="font-family: Arial, Helvetica, sans-serif !important;">
+                            <thead>
+                                <tr class="text-slate-400 border-b">
+                                    <th class="p-3">שם הלקוח</th>
+                                    <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">יתרת חוב פתוחה (ש"ח)</th>
+                                    <th class="p-3 text-center" style="font-family: Arial, Helvetica, sans-serif !important;">מספר מסמכים פתוחים</th>
+                                </tr>
+                            </thead>
+                            <tbody id="db-debtors-body" class="divide-y divide-slate-50"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 
     <script>
         // --- State ---
         let db = []; 
-        let revenueDb = []; // מאגר נתוני הכנסות שוטפות
-        let incomeFilter = 'all';
+        let revenueDb = []; 
+        let incomeFilter = 'info'; 
         let kpiFilter = 'overdue';
         let currentLevel = 0; 
         let sortMode = 'amount';
-        let listFilter = 'debts'; // מסנן לקוחות Level 1: debts, revenue, both
-        let lvl2View = 'debt'; // מסנן חשבוניות לקוח Level 2: debt, revenue
-        let exportContext = 'debt'; // 'debt' או 'annual' להפקת מכתבים
+        let listFilter = 'debts'; 
+        let lvl2View = 'debt'; 
+        let exportContext = 'debt'; 
         let path = { sector: null, orgName: null };
         let myChart = null;
-        let showClientPct = true; // ברירת המחדל להצגת אחוזים היא פעילה (כן)
-        let currentOrgList = []; // שמירת רשימת הלקוחות המוצגים כעת במסך לצורך החיפוש החכם
+        let showClientPct = true; 
+        let showClientMorale = false; 
+        let currentOrgList = []; 
+        
+        // Dashboard state
+        let isDashboardActive = false;
+        let dashStageA = 'info'; 
+        let dashStageB = 'all-sectors'; 
+        let dashChart = null;
 
         const TODAY = new Date(2026, 5, 22);
         const CURRENT_YEAR = 2026;
@@ -233,11 +485,35 @@
             document.getElementById('sort-amount').classList.toggle('shadow-sm', s === 'amount');
             document.getElementById('sort-name').classList.toggle('bg-white', s === 'name');
             document.getElementById('sort-name').classList.toggle('shadow-sm', s === 'name');
+            document.getElementById('sort-docs').classList.toggle('bg-white', s === 'docs');
+            document.getElementById('sort-docs').classList.toggle('shadow-sm', s === 'docs');
             renderView();
         }
 
         function toggleShowPct(checked) {
             showClientPct = checked;
+            renderView();
+        }
+
+        // שינוי הקישור בטבלת עשרת החייבים הגדולים כך שלחיצה תוביל ישירות להפקת מכתב חוב
+        function drillToClientDebtLetter(clientName) {
+            exitDashboard();
+            setIncomeFilter('all');
+            
+            const clientRow = db.find(r => r.name === clientName);
+            if (clientRow) {
+                path.sector = clientRow.sector;
+                path.orgName = clientName;
+                currentLevel = 2;
+                renderView();
+                toggleExportModal(true, 'debt');
+            } else {
+                alert("לקוח זה לא נמצא במאגר החובות המקורי.");
+            }
+        }
+
+        function toggleShowMorale(checked) {
+            showClientMorale = checked;
             renderView();
         }
 
@@ -255,13 +531,426 @@
             renderView();
         }
 
+        // --- Dashboard Navigation & Control ---
+        function enterDashboard() {
+            isDashboardActive = true;
+            document.getElementById('main-app-container').classList.add('hidden');
+            document.getElementById('dashboard-container').classList.remove('hidden');
+            document.getElementById('dashboard-container').classList.add('flex');
+            
+            dashStageA = 'info';
+            dashStageB = 'all-sectors';
+            
+            updateDashFiltersUI();
+            renderDashboard();
+        }
+
+        function exitDashboard() {
+            isDashboardActive = false;
+            document.getElementById('dashboard-container').classList.remove('flex');
+            document.getElementById('dashboard-container').classList.add('hidden');
+            document.getElementById('main-app-container').classList.remove('hidden');
+            refresh();
+        }
+
+        function setDashStageA(val) {
+            dashStageA = val;
+            const containerB = document.getElementById('dash-stage-b-container');
+            if (val === 'info') {
+                containerB.classList.remove('opacity-25', 'pointer-events-none');
+            } else {
+                containerB.classList.add('opacity-25', 'pointer-events-none');
+                dashStageB = 'all-sectors';
+            }
+            updateDashFiltersUI();
+            renderDashboard();
+        }
+
+        function setDashStageB(val) {
+            if (dashStageA !== 'info') return;
+            dashStageB = val;
+            updateDashFiltersUI();
+            renderDashboard();
+        }
+
+        function updateDashFiltersUI() {
+            document.querySelectorAll('[id^="db-sa-"]').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-[#0B3C5D]', 'shadow-sm');
+            });
+            const activeA = document.getElementById('db-sa-' + dashStageA);
+            if (activeA) activeA.classList.add('bg-white', 'text-[#0B3C5D]', 'shadow-sm');
+
+            document.querySelectorAll('[id^="db-sb-"]').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-[#0B3C5D]', 'shadow-sm');
+            });
+            const activeB = document.getElementById('db-sb-' + dashStageB);
+            if (activeB) activeB.classList.add('bg-white', 'text-[#0B3C5D]', 'shadow-sm');
+        }
+
+        function isDashboardMatch(row) {
+            if (dashStageA === 'fees' && !row.isFee) return false;
+            if (dashStageA === 'info' && row.isFee) return false;
+            
+            if (dashStageA === 'info') {
+                if (dashStageB === 'gov' && row.sector !== 'ממשלתי') return false;
+                if (dashStageB === 'local' && row.sector !== 'שלטון מקומי') return false;
+                if (dashStageB === 'private' && row.sector !== 'פרטי/רשויות') return false;
+            }
+            return true;
+        }
+
+        function calculateMorale(orgName) {
+            const clientDebts = db.filter(r => r.name === orgName && isTypeMatch(r));
+            if (clientDebts.length === 0) return { score: 100, label: "מצוין", color: "bg-emerald-50 text-emerald-700 border-emerald-200 border animate-pulse" };
+            
+            let score = 100;
+            clientDebts.forEach(d => {
+                if (d.isOverdue) {
+                    score -= 4; 
+                    const months = (TODAY - d.dueDate) / (1000 * 60 * 60 * 24 * 30);
+                    if (months > 0) {
+                        score -= Math.round(months * 2); 
+                    }
+                }
+            });
+            
+            score = Math.max(10, Math.min(100, Math.round(score)));
+            let label = "מצוין";
+            let color = "bg-emerald-50 text-emerald-700 border-emerald-200 border";
+            if (score < 50) {
+                label = "טעון שיפור";
+                color = "bg-rose-50 text-rose-700 border-rose-200 border";
+            } else if (score < 75) {
+                label = "בינוני";
+                color = "bg-amber-50 text-amber-700 border-amber-200 border";
+            } else if (score < 90) {
+                label = "טוב";
+                color = "bg-blue-50 text-blue-700 border-blue-200 border";
+            }
+            return { score, label, color };
+        }
+
+        function drillToClientAnnualReport(clientName) {
+            exitDashboard();
+            setIncomeFilter('all');
+            
+            const clientRow = db.find(r => r.name === clientName);
+            if (clientRow) {
+                path.sector = clientRow.sector;
+                path.orgName = clientName;
+                currentLevel = 2;
+                renderView();
+                toggleExportModal(true, 'annual');
+            } else {
+                alert("לקוח זה לא נמצא במאגר החובות המקורי.");
+            }
+        }
+
+        // --- Render Dashboard ---
+        function renderDashboard() {
+            const dashRevenues = revenueDb.filter(r => r.regDate.getFullYear() === CURRENT_YEAR && isDashboardMatch(r));
+            const dashDebts = db.filter(r => r.dueDate.getFullYear() === CURRENT_YEAR && isDashboardMatch(r));
+
+            const totalBilled = dashRevenues.reduce((acc, r) => acc + r.amount, 0);
+            const totalDebt = dashDebts.reduce((acc, r) => acc + r.amount, 0);
+            const totalCollected = Math.max(0, totalBilled - totalDebt);
+
+            const debtOverdue = dashDebts.filter(r => r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
+            const debtFuture = dashDebts.filter(r => !r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
+
+            const collectionRate = totalBilled > 0 ? (totalCollected / totalBilled * 100).toFixed(1) : "0.0";
+
+            // עדכון כרטיסי KPIs
+            document.getElementById('db-kpi-billed').innerText = formatCurrency(totalBilled);
+            document.getElementById('db-kpi-collected').innerText = formatCurrency(totalCollected);
+            document.getElementById('db-kpi-debt').innerText = formatCurrency(totalDebt);
+            document.getElementById('db-sub-overdue').innerText = formatCurrency(debtOverdue);
+            document.getElementById('db-sub-future').innerText = formatCurrency(debtFuture);
+            document.getElementById('db-kpi-rate').innerText = collectionRate + "%";
+
+            // פילוח חודשי שנת 2026
+            const monthlyBilled = Array(12).fill(0);
+            const monthlyUnpaid = Array(12).fill(0);
+
+            dashRevenues.forEach(r => monthlyBilled[r.regDate.getMonth()] += r.amount);
+            
+            dashDebts.forEach(d => {
+                const m = (d.regDate && !isNaN(d.regDate.getTime())) ? d.regDate.getMonth() : d.dueDate.getMonth();
+                monthlyUnpaid[m] += d.amount;
+            });
+
+            const monthlyCollected = monthlyBilled.map((b, idx) => Math.max(0, b - monthlyUnpaid[idx]));
+
+            let tableHTML = "";
+            let sumBilled = 0, sumCollected = 0;
+
+            for (let i = 0; i < 12; i++) {
+                sumBilled += monthlyBilled[i];
+                sumCollected += monthlyCollected[i];
+                const monthlyRate = monthlyBilled[i] > 0 ? (monthlyCollected[i] / monthlyBilled[i] * 100).toFixed(1) + "%" : "0.0%";
+
+                tableHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-2 border-b font-medium" style="font-family: Arial, Helvetica, sans-serif !important;">${MONTH_NAMES[i]}</td>
+                        <td class="p-2 border-b text-left" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(monthlyBilled[i])}</td>
+                        <td class="p-2 border-b text-left text-emerald-700 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(monthlyCollected[i])}</td>
+                        <td class="p-2 border-b text-left text-indigo-700 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${monthlyRate}</td>
+                    </tr>
+                `;
+            }
+
+            const totalRate = sumBilled > 0 ? (sumCollected / sumBilled * 100).toFixed(1) + "%" : "0.0%";
+            
+            tableHTML += `
+                <tr class="bg-slate-100 font-bold">
+                    <td class="p-2" style="font-family: Arial, Helvetica, sans-serif !important;">סה"כ</td>
+                    <td class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(sumBilled)}</td>
+                    <td class="p-2 text-left text-emerald-700" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(sumCollected)}</td>
+                    <td class="p-2 text-left text-indigo-700" style="font-family: Arial, Helvetica, sans-serif !important;">${totalRate}</td>
+                </tr>
+            `;
+            document.getElementById('db-monthly-table-body').innerHTML = tableHTML;
+
+            // עדכון גרף עמודות צבעוני (חיובים וגבייה בלבד)
+            const ctx = document.getElementById('dashChartCanvas').getContext('2d');
+            if (dashChart) dashChart.destroy();
+            dashChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: MONTH_NAMES,
+                    datasets: [
+                        {
+                            label: 'חיובים',
+                            data: monthlyBilled,
+                            backgroundColor: '#0B3C5D', 
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'גבייה',
+                            data: monthlyCollected,
+                            backgroundColor: '#10b981', 
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) { return '₪' + value.toLocaleString(); }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // טבלה 1: עשרת הלקוחות הפעילים (הכנסות שנת 2026)
+            const activeClientsData = {};
+            dashRevenues.forEach(r => {
+                if (!activeClientsData[r.name]) activeClientsData[r.name] = { billed: 0, unpaid: 0 };
+                activeClientsData[r.name].billed += r.amount;
+            });
+            dashDebts.forEach(d => {
+                if (activeClientsData[d.name]) {
+                    activeClientsData[d.name].unpaid += d.amount;
+                }
+            });
+
+            const activeClientsList = Object.entries(activeClientsData).map(([name, data]) => ({
+                name,
+                billed: data.billed,
+                unpaid: data.unpaid,
+                collected: Math.max(0, data.billed - data.unpaid)
+            })).sort((a, b) => b.billed - a.billed).slice(0, 10);
+
+            let activeClientsHTML = "";
+            activeClientsList.forEach(c => {
+                const safeName = c.name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                activeClientsHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-3 border-b" style="font-family: Arial, Helvetica, sans-serif !important;">
+                            <a href="#" onclick="drillToClientAnnualReport('${safeName}'); return false;" class="text-blue-600 hover:underline font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${c.name}</a>
+                        </td>
+                        <td class="p-3 border-b text-left" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(c.billed)}</td>
+                        <td class="p-3 border-b text-left text-emerald-700 font-semibold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(c.collected)}</td>
+                        <td class="p-3 border-b text-left text-red-600 font-semibold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(c.unpaid)}</td>
+                    </tr>
+                `;
+            });
+            if (activeClientsList.length === 0) {
+                activeClientsHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400" style="font-family: Arial, Helvetica, sans-serif !important;">אין נתונים זמינים</td></tr>`;
+            }
+            document.getElementById('db-active-clients-body').innerHTML = activeClientsHTML;
+
+            // טבלה 2: עשרת החייבים הגדולים (חוב פתוח שנת 2026)
+            const debtorsData = {};
+            dashDebts.forEach(d => {
+                if (!debtorsData[d.name]) debtorsData[d.name] = { debt: 0, count: 0 };
+                debtorsData[d.name].debt += d.amount;
+                debtorsData[d.name].count++;
+            });
+
+            const debtorsList = Object.entries(debtorsData).map(([name, data]) => ({
+                name,
+                debt: data.debt,
+                count: data.count
+            })).sort((a, b) => b.debt - a.debt).slice(0, 10);
+
+            let debtorsHTML = "";
+            debtorsList.forEach(c => {
+                const safeName = c.name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                debtorsHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-3 border-b" style="font-family: Arial, Helvetica, sans-serif !important;">
+                            <a href="#" onclick="drillToClientDebtLetter('${safeName}'); return false;" class="text-blue-600 hover:underline font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${c.name}</a>
+                        </td>
+                        <td class="p-3 border-b text-left text-red-700 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(c.debt)}</td>
+                        <td class="p-3 border-b text-center font-semibold" style="font-family: Arial, Helvetica, sans-serif !important;">${c.count}</td>
+                    </tr>
+                `;
+            });
+            if (debtorsList.length === 0) {
+                debtorsHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400" style="font-family: Arial, Helvetica, sans-serif !important;">אין נתונים זמינים</td></tr>`;
+            }
+            document.getElementById('db-debtors-body').innerHTML = debtorsHTML;
+        }
+
+        function printDashboardCurrent() {
+            window.print();
+        }
+
+        function printDashboardAll() {
+            const win = window.open('', '_blank');
+            if (!win) {
+                alert("פתיחת החלון החדש נחסמה."); return;
+            }
+
+            const printConfigs = [
+                { stageA: 'info', stageB: 'all-sectors', title: 'שירותי מידע - כלל הסקטורים' },
+                { stageA: 'info', stageB: 'gov', title: 'שירותי מידע - סקטור ממשלה' },
+                { stageA: 'info', stageB: 'local', title: 'שירותי מידע - שלטון מקומי' },
+                { stageA: 'info', stageB: 'private', title: 'שירותי מידע - רשויות ופרטיים' },
+                { stageA: 'fees', stageB: 'all-sectors', title: 'אגרות העברת בעלות - כלל הסקטורים' },
+                { stageA: 'all', stageB: 'all-sectors', title: 'סיכום משולב (הכל)' }
+            ];
+
+            let documentHTML = `
+                <html dir="rtl" lang="he"><head><title>דוח מאוחד - הכנסות וגבייה 2026</title>
+                <style>
+                    * { font-family: 'Arial', sans-serif !important; }
+                    body { font-family: 'Arial', sans-serif; padding: 40px; color: #333; }
+                    .header { display: flex; justify-content: space-between; border-bottom: 3px solid #0B3C5D; padding-bottom: 10px; margin-bottom: 25px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 25px; font-size: 12px; }
+                    th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: right; }
+                    th { background: #f8f9fa; }
+                    .page-break { page-break-after: always; }
+                    .kpis { display: flex; gap: 15px; margin-bottom: 20px; }
+                    .kpi-card { flex: 1; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; background: #fafafa; }
+                    .kpi-title { font-size: 10px; color: #666; font-weight: bold; }
+                    .kpi-value { font-size: 18px; font-weight: 900; margin-top: 4px; }
+                </style>
+                </head>
+                <body>
+            `;
+
+            printConfigs.forEach((config, idx) => {
+                const dashStageA_orig = dashStageA;
+                const dashStageB_orig = dashStageB;
+                
+                dashStageA = config.stageA;
+                dashStageB = config.stageB;
+
+                const rRows = revenueDb.filter(r => r.regDate.getFullYear() === CURRENT_YEAR && isDashboardMatch(r));
+                const dRows = db.filter(r => r.dueDate.getFullYear() === CURRENT_YEAR && isDashboardMatch(r));
+
+                const totalBilled = rRows.reduce((acc, r) => acc + r.amount, 0);
+                const totalDebt = dRows.reduce((acc, r) => acc + r.amount, 0);
+                const totalCollected = Math.max(0, totalBilled - totalDebt);
+                const collectionRate = totalBilled > 0 ? (totalCollected / totalBilled * 100).toFixed(1) : "0.0";
+
+                const monthlyBilled = Array(12).fill(0);
+                const monthlyUnpaid = Array(12).fill(0);
+                rRows.forEach(r => monthlyBilled[r.regDate.getMonth()] += r.amount);
+                dRows.forEach(d => {
+                    const m = (d.regDate && !isNaN(d.regDate.getTime())) ? d.regDate.getMonth() : d.dueDate.getMonth();
+                    monthlyUnpaid[m] += d.amount;
+                });
+                const monthlyCollected = monthlyBilled.map((b, i) => Math.max(0, b - monthlyUnpaid[i]));
+
+                dashStageA = dashStageA_orig;
+                dashStageB = dashStageB_orig;
+
+                documentHTML += `
+                    <div class="${idx < printConfigs.length - 1 ? 'page-break' : ''}">
+                        <div class="header">
+                            <div><b style="font-size:16px">משרד התחבורה והבטיחות בדרכים</b><br><span style="font-size:12px">אגף טכנולוגיות דיגיטליות ומידע</span></div>
+                            <div>תאריך הפקה: ${new Date().toLocaleDateString('he-IL')}</div>
+                        </div>
+                        <h2 style="text-align:center; color:#0B3C5D; margin-bottom: 20px;">דוח גבייה והכנסות: ${config.title}</h2>
+                        
+                        <div class="kpis">
+                            <div class="kpi-card"><div class="kpi-title">סה"כ חיובים</div><div class="kpi-value" style="color:#1e3a8a">${formatCurrency(totalBilled)}</div></div>
+                            <div class="kpi-card"><div class="kpi-title">תקבולים בפועל</div><div class="kpi-value" style="color:#047857">${formatCurrency(totalCollected)}</div></div>
+                            <div class="kpi-card"><div class="kpi-title">יתרת חוב</div><div class="kpi-value" style="color:#b91c1c">${formatCurrency(totalDebt)}</div></div>
+                            <div class="kpi-card"><div class="kpi-title">שיעור גבייה</div><div class="kpi-value" style="color:#4338ca">${collectionRate}%</div></div>
+                        </div>
+
+                        <h3>פילוח חודשי שנת ${CURRENT_YEAR}</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>חודש</th>
+                                    <th style="text-align:left">הכנסות (ש"ח)</th>
+                                    <th style="text-align:left">גבייה (ש"ח)</th>
+                                    <th style="text-align:left">אחוז גבייה</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${MONTH_NAMES.map((m, i) => {
+                                    const rate = monthlyBilled[i] > 0 ? (monthlyCollected[i] / monthlyBilled[i] * 100).toFixed(1) + "%" : "0.0%";
+                                    return `
+                                        <tr>
+                                            <td>${m}</td>
+                                            <td style="text-align:left">${formatCurrency(monthlyBilled[i])}</td>
+                                            <td style="text-align:left; color:#047857">${formatCurrency(monthlyCollected[i])}</td>
+                                            <td style="text-align:left; color:#4338ca">${rate}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                                <tr style="font-weight:bold; background:#f1f5f9;">
+                                    <td>סה"כ</td>
+                                    <td style="text-align:left">${formatCurrency(totalBilled)}</td>
+                                    <td style="text-align:left; color:#047857">${formatCurrency(totalCollected)}</td>
+                                    <td style="text-align:left; color:#4338ca">${collectionRate}%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            });
+
+            documentHTML += `</body></html>`;
+            win.document.write(documentHTML);
+            win.document.close();
+
+            win.focus();
+            setTimeout(function() { win.print(); }, 500);
+        }
+
+        // --- End of Dashboard Functions ---
+
         function refresh() {
             if (db.length === 0) return;
             const overdueRows = db.filter(r => r.isOverdue && isTypeMatch(r));
             const overdue = overdueRows.reduce((a, b) => a + b.amount, 0);
             const future = db.filter(r => !r.isOverdue && isTypeMatch(r)).reduce((a, b) => a + b.amount, 0);
             
-            // עדכון חלוקה פנימית של חובות בפיגור
             const overdueCurrent = overdueRows.filter(r => r.dueDate.getFullYear() === CURRENT_YEAR).reduce((a, b) => a + b.amount, 0);
             const overduePast = overdueRows.filter(r => r.dueDate.getFullYear() < CURRENT_YEAR).reduce((a, b) => a + b.amount, 0);
             
@@ -272,15 +961,18 @@
             document.getElementById('overdue-past').innerText = formatCurrency(overduePast);
             document.getElementById('overdue-breakdown').classList.remove('hidden');
             
-            // עדכון KPI הכנסות במידה וקיים
             if (revenueDb.length > 0) {
                 const totalRevenueSum = revenueDb.filter(r => r.regDate.getFullYear() === CURRENT_YEAR && isTypeMatch(r)).reduce((acc, r) => acc + r.amount, 0);
                 document.getElementById('total-revenue-kpi').innerText = formatCurrency(totalRevenueSum);
                 document.getElementById('kpi-card-revenue').classList.remove('hidden');
                 document.getElementById('kpi-container').className = "grid grid-cols-1 md:grid-cols-3 gap-6";
+                document.getElementById('btn-goto-dashboard').classList.remove('hidden');
+                document.getElementById('btn-goto-dashboard').style.display = 'flex';
             } else {
                 document.getElementById('kpi-card-revenue').classList.add('hidden');
                 document.getElementById('kpi-container').className = "grid grid-cols-1 md:grid-cols-2 gap-6";
+                document.getElementById('btn-goto-dashboard').classList.add('hidden');
+                document.getElementById('btn-goto-dashboard').style.display = 'none';
             }
 
             renderView();
@@ -299,6 +991,7 @@
             const btnAnnualReport = document.getElementById('btn-annual-report');
             const sortTools = document.getElementById('sort-tools');
             const pctToggle = document.getElementById('pct-toggle-container');
+            const moraleToggle = document.getElementById('morale-toggle-container');
             const btnExportClients = document.getElementById('btn-export-clients');
             const listFilterContainer = document.getElementById('list-filter-container');
             const lvl2FilterContainer = document.getElementById('lvl2-filter-container');
@@ -310,17 +1003,16 @@
             const hasRevenue = revenueDb.length > 0;
 
             if (currentLevel === 0) {
-                back.classList.add('hidden'); btnLetter.classList.add('hidden'); btnAnnualReport.classList.add('hidden'); sortTools.classList.add('hidden'); pctToggle.classList.add('hidden'); btnExportClients.classList.add('hidden'); listFilterContainer.classList.add('hidden'); lvl2FilterContainer.classList.add('hidden');
+                back.classList.add('hidden'); btnLetter.classList.add('hidden'); btnAnnualReport.classList.add('hidden'); sortTools.classList.add('hidden'); pctToggle.classList.add('hidden'); moraleToggle.classList.add('hidden'); btnExportClients.classList.add('hidden'); listFilterContainer.classList.add('hidden'); lvl2FilterContainer.classList.add('hidden');
                 title.innerText = "סקטורים עיקריים";
+                
                 const sectors = [
                     { id: "ממשלתי", name: "לקוחות ממשלתיים", icon: "fa-building-columns" },
                     { id: "שלטון מקומי", name: "לקוחות שלטון מקומי", icon: "fa-city" },
                     { id: "פרטי/רשויות", name: "רשויות ממשלתיות ולקוחות פרטיים", icon: "fa-handshake" }
                 ];
                 
-                // חישוב הכנסה שנתית כוללת לשנה הנוכחית
                 const totalRevenueSum = hasRevenue ? revenueDb.filter(r => r.regDate.getFullYear() === CURRENT_YEAR && isTypeMatch(r)).reduce((acc, r) => acc + r.amount, 0) : 0;
-                // חישוב הסכום הכולל של החוב בסינון הנוכחי לצורך חישוב אחוזים
                 const totalDebtSum = data.reduce((acc, r) => acc + r.amount, 0);
 
                 let html = `<div class="grid grid-cols-1 md:grid-cols-3 gap-6">`;
@@ -336,18 +1028,18 @@
                             <div onclick="selectSector('${s.id}')" class="bg-white border border-slate-200 p-6 rounded-3xl hover:shadow-xl hover:border-blue-400 cursor-pointer transition-all flex flex-col justify-between h-full min-h-[220px]">
                                 <div class="text-center">
                                     <i class="fa-solid ${s.icon} text-3xl text-slate-200 mb-2"></i>
-                                    <h3 class="font-black text-base text-slate-800 leading-tight">${s.name}</h3>
+                                    <h3 class="font-bold text-base text-slate-800 leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">${s.name}</h3>
                                 </div>
                                 <div class="mt-4 space-y-3">
                                     <div class="text-right">
-                                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">הכנסות שנת ${CURRENT_YEAR}:</p>
-                                        <p class="text-lg font-black text-emerald-700 leading-none">${formatCurrency(sectorRevenue)}</p>
-                                        <p class="text-[10px] text-slate-400 font-bold mt-1">${sectorRevPct}% מסך ההכנסות</p>
+                                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider" style="font-family: Arial, Helvetica, sans-serif !important;">הכנסות שנת ${CURRENT_YEAR}:</p>
+                                        <p class="text-lg font-bold text-emerald-700 leading-none" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(sectorRevenue)}</p>
+                                        <p class="text-[10px] text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">${sectorRevPct}% מסך ההכנסות</p>
                                     </div>
                                     <div class="border-t border-slate-100 pt-2 text-right">
-                                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">חובות פתוחים:</p>
-                                        <p class="text-lg font-black text-red-700 leading-none">${formatCurrency(sectorDebt)}</p>
-                                        <p class="text-[10px] text-slate-400 font-bold mt-1">${sectorDebtPct}% מסך החובות</p>
+                                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider" style="font-family: Arial, Helvetica, sans-serif !important;">חובות פתוחים:</p>
+                                        <p class="text-lg font-bold text-red-700 leading-none" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(sectorDebt)}</p>
+                                        <p class="text-[10px] text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">${sectorDebtPct}% מסך החובות</p>
                                     </div>
                                 </div>
                             </div>
@@ -357,11 +1049,11 @@
                             <div onclick="selectSector('${s.id}')" class="bg-white border border-slate-200 p-8 rounded-3xl hover:shadow-xl hover:border-blue-400 cursor-pointer transition-all text-center flex flex-col justify-between h-full min-h-[200px]">
                                 <div>
                                     <i class="fa-solid ${s.icon} text-4xl text-slate-200 mb-4"></i>
-                                    <h3 class="font-black text-lg text-slate-800">${s.name}</h3>
+                                    <h3 class="font-bold text-lg text-slate-800" style="font-family: Arial, Helvetica, sans-serif !important;">${s.name}</h3>
                                 </div>
                                 <div class="mt-4">
-                                    <p class="text-2xl font-black text-blue-700">${formatCurrency(sectorDebt)}</p>
-                                    <p class="text-xs text-slate-400 font-bold mt-1">${sectorDebtPct}% מסך החוב</p>
+                                    <p class="text-2xl font-bold text-blue-700" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(sectorDebt)}</p>
+                                    <p class="text-xs text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">${sectorDebtPct}% מסך החוב</p>
                                 </div>
                             </div>
                         `;
@@ -371,8 +1063,9 @@
                 updateAnalytics(data);
             } 
             else if (currentLevel === 1) {
-                back.classList.remove('hidden'); btnLetter.classList.add('hidden'); btnAnnualReport.classList.add('hidden'); sortTools.classList.remove('hidden'); pctToggle.classList.remove('hidden'); btnExportClients.classList.remove('hidden'); lvl2FilterContainer.classList.add('hidden');
+                back.classList.remove('hidden'); btnLetter.classList.add('hidden'); btnAnnualReport.classList.add('hidden'); sortTools.classList.remove('hidden'); pctToggle.classList.remove('hidden'); moraleToggle.classList.remove('hidden'); btnExportClients.classList.remove('hidden'); lvl2FilterContainer.classList.add('hidden');
                 document.getElementById('chk-show-pct').checked = showClientPct;
+                document.getElementById('chk-show-morale').checked = showClientMorale;
                 title.innerText = "ארגונים בסקטור " + path.sector;
 
                 if (hasRevenue) {
@@ -407,15 +1100,16 @@
                 
                 if (sortMode === 'amount') {
                     orgList.sort((a, b) => {
-                        const valA = listFilter === 'revenue' ? (Number(a.revSum) || 0) : (listFilter === 'debts' ? (Number(a.debtSum) || 0) : ((Number(a.debtSum) || 0) + (Number(a.revSum) || 0)));
-                        const valB = listFilter === 'revenue' ? (Number(b.revSum) || 0) : (listFilter === 'debts' ? (Number(b.debtSum) || 0) : ((Number(b.debtSum) || 0) + (Number(b.revSum) || 0)));
+                        const valA = listFilter === 'revenue' ? (Number(a.revSum) || 0) : (listFilter === 'debts' ? (Number(a.debtSum) || 0) : ((Number(a.revSum) || 0)));
+                        const valB = listFilter === 'revenue' ? (Number(b.revSum) || 0) : (listFilter === 'debts' ? (Number(b.debtSum) || 0) : ((Number(b.revSum) || 0)));
                         return valB - valA;
                     });
+                } else if (sortMode === 'docs') {
+                    orgList.sort((a, b) => (b.count || 0) - (a.count || 0));
                 } else {
                     orgList.sort((a,b) => a.name.localeCompare(b.name, 'he'));
                 }
 
-                // שמירה במצב הגלובלי לצורך שימוש בפונקציית החיפוש החכם והממוקד
                 currentOrgList = orgList;
 
                 const sectorTotalDebt = sectorData.reduce((acc, r) => acc + r.amount, 0);
@@ -446,27 +1140,37 @@
                         displayDetails = showClientPct ? `${debtPct}% מסך החובות, ${org.count} מסמכים פתוחים` : `${org.count} מסמכים פתוחים`;
                     } else if (listFilter === 'revenue') {
                         displayDetails = showClientPct ? `${revPct}% מסך ההכנסות, ${org.count} מסמכי הכנסה` : `${org.count} מסמכי הכנסה`;
-                    } else { // "גם וגם" - מציג בנפרד את האחוז מסך החובות ואת האחוז מסך ההכנסות
+                    } else { 
                         displayDetails = showClientPct 
                             ? `חוב: ${debtPct}% מהסך, הכנסה: ${revPct}% מהסך, ${org.count} מסמכים` 
                             : `${org.count} מסמכים`;
                     }
 
+                    let moraleHtml = "";
+                    if (showClientMorale) {
+                        const morale = calculateMorale(org.name);
+                        moraleHtml = `
+                            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 mt-1.5 rounded-md text-xs font-bold ${morale.color}" style="font-family: Arial, Helvetica, sans-serif !important;">
+                                <i class="fa-solid fa-gauge-high text-[10px]"></i> מוסר תשלומים: ${morale.score} (${morale.label})
+                            </div>
+                        `;
+                    }
+
                     let sumDisplayHtml = "";
                     if (listFilter === 'debts') {
-                        sumDisplayHtml = `<span class="font-black text-xl text-red-700">${formatCurrency(dSum)}</span>`;
+                        sumDisplayHtml = `<span class="font-bold text-xl text-red-700" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(dSum)}</span>`;
                     } else if (listFilter === 'revenue') {
-                        sumDisplayHtml = `<span class="font-black text-xl text-emerald-700">${formatCurrency(rSum)}</span>`;
-                    } else { // מצג "גם וגם" אופקי זה לצד זה
+                        sumDisplayHtml = `<span class="font-bold text-xl text-emerald-700" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(rSum)}</span>`;
+                    } else { 
                         sumDisplayHtml = `
                             <div class="flex items-center gap-6 text-left">
                                 <div class="border-l border-slate-200 pl-6">
-                                    <p class="text-[10px] text-slate-400 font-bold">חוב פתוח</p>
-                                    <p class="font-black text-base text-red-700 leading-tight">${formatCurrency(dSum)}</p>
+                                    <p class="text-[10px] text-slate-400 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">חוב פתוח</p>
+                                    <p class="font-bold text-base text-red-700 leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(dSum)}</p>
                                 </div>
                                 <div>
-                                    <p class="text-[10px] text-slate-400 font-bold">הכנסות שוטפות</p>
-                                    <p class="font-black text-base text-emerald-700 leading-tight">${formatCurrency(rSum)}</p>
+                                    <p class="text-[10px] text-slate-400 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">הכנסות שוטפות</p>
+                                    <p class="font-bold text-base text-emerald-700 leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(rSum)}</p>
                                 </div>
                             </div>
                         `;
@@ -474,8 +1178,9 @@
 
                     html += `<div onclick="selectOrg('${safeName}')" class="flex justify-between items-center p-5 bg-white border border-slate-200 rounded-2xl hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all shadow-sm">
                         <div class="text-right">
-                            <p class="font-bold text-slate-700 text-base leading-tight">${org.name}</p>
-                            <p class="text-[11px] text-slate-400 font-bold mt-1">${displayDetails}</p>
+                            <p class="font-bold text-slate-700 text-base leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">${org.name}</p>
+                            <p class="text-[11px] text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">${displayDetails}</p>
+                            ${moraleHtml}
                         </div>
                         <div class="flex items-center gap-3">
                             ${sumDisplayHtml}
@@ -483,11 +1188,11 @@
                         </div>
                     </div>`;
                 });
-                view.innerHTML = html || `<p class="text-center py-10 font-bold">אין נתונים בסקטור זה</p>`;
+                view.innerHTML = html || `<p class="text-center py-10 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">אין נתונים בסקטור זה</p>`;
                 updateAnalytics(sectorData);
             }
             else if (currentLevel === 2) {
-                back.classList.remove('hidden'); sortTools.classList.add('hidden'); pctToggle.classList.add('hidden'); btnExportClients.classList.add('hidden'); listFilterContainer.classList.add('hidden');
+                back.classList.remove('hidden'); sortTools.classList.add('hidden'); pctToggle.classList.add('hidden'); moraleToggle.classList.add('hidden'); btnExportClients.classList.add('hidden'); listFilterContainer.classList.add('hidden');
                 title.innerText = path.orgName;
 
                 if (hasRevenue) {
@@ -501,48 +1206,41 @@
                     btnAnnualReport.classList.add('hidden');
                 }
 
-                // משיכת כלל החשבוניות המהוות את חוב הלקוח (הן אלו שבפיגור והן העתידיות)
                 const orgData = db.filter(r => r.name === path.orgName && isTypeMatch(r));
-                
-                // מיון לפי תאריך פירעון מהישן לחדש (סדר כרונולוגי עולה)
                 orgData.sort((a, b) => a.dueDate - b.dueDate);
 
                 let html = "";
 
                 if (lvl2View === 'debt') {
-                    // עימוד עם גודל גופן אחיד לטבלה וסימוני עמודה עתידיים
-                    html = `<div id="capture-area"><table class="w-full text-right border-collapse rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
-                        <thead class="bg-slate-100 text-xs font-black border-b text-slate-500 uppercase">
-                            <tr><th class="p-4">מספר מסמך</th><th class="p-4">מועד פירעון</th><th class="p-4">תיאור השירות</th><th class="p-4 text-left">סכום בש"ח</th></tr>
+                    html = `<div id="capture-area"><table class="w-full text-right border-collapse rounded-2xl overflow-hidden border border-slate-200 shadow-sm" style="font-family: Arial, Helvetica, sans-serif !important;">
+                        <thead class="bg-slate-100 text-xs font-bold border-b text-slate-500 uppercase">
+                            <tr><th class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">מספר מסמך</th><th class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">מועד פירעון</th><th class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">תיאור השירות</th><th class="p-4 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">סכום בש"ח</th></tr>
                         </thead><tbody class="divide-y divide-slate-100 bg-white">`;
                     orgData.forEach(r => {
                         const isFuture = !r.isOverdue;
                         const rowBg = isFuture ? 'bg-emerald-50/50 hover:bg-emerald-100/50 transition-all text-emerald-950' : 'hover:bg-blue-50 transition-colors';
                         const statusBadge = isFuture 
-                            ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2"><i class="fa-solid fa-clock ml-1"></i>עתידי</span>` 
-                            : `<span class="bg-red-100 text-red-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2"><i class="fa-solid fa-triangle-exclamation ml-1"></i>בפיגור</span>`;
+                            ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-clock ml-1"></i>עתידי</span>` 
+                            : `<span class="bg-red-100 text-red-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-triangle-exclamation ml-1"></i>בפיגור</span>`;
 
                         html += `<tr class="${rowBg}">
-                            <td class="p-4 font-bold text-slate-700">${r.doc} ${statusBadge}</td>
-                            <td class="p-4">${r.dueDate.toLocaleDateString('he-IL')}</td>
-                            <td class="p-4">${r.desc}</td>
-                            <td class="p-4 font-black text-left text-slate-900">${formatCurrency(r.amount)}</td>
+                            <td class="p-4 font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;">${r.doc} ${statusBadge}</td>
+                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.dueDate.toLocaleDateString('he-IL')}</td>
+                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.desc}</td>
+                            <td class="p-4 font-bold text-left text-slate-900" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(r.amount)}</td>
                         </tr>`;
                     });
                     html += `</tbody></table></div>`;
                     
-                    // תיקון הבאג: שליחת נתוני החוב האקטיביים של הארגון בלבד כדי שלוח השנה של החובות לא יינזק
                     const activeOrgDebts = data.filter(r => r.name === path.orgName);
                     updateAnalytics(activeOrgDebts);
                 } else {
                     const orgRevenues = revenueDb.filter(r => r.name === path.orgName && r.regDate.getFullYear() === CURRENT_YEAR && isTypeMatch(r));
-                    
-                    // מיון לפי תאריך פירעון מהישן לחדש (סדר כרונולוגי עולה)
                     orgRevenues.sort((a, b) => a.dueDate - b.dueDate);
 
-                    html = `<div id="capture-area"><table class="w-full text-right border-collapse rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
-                        <thead class="bg-slate-100 text-xs font-black border-b text-slate-500 uppercase">
-                            <tr><th class="p-4">מספר מסמך</th><th class="p-4">תאריך רישום</th><th>מועד פירעון</th><th class="p-4">תיאור השירות</th><th>סטטוס</th><th class="p-4 text-left">סכום בש"ח</th></tr>
+                    html = `<div id="capture-area"><table class="w-full text-right border-collapse rounded-2xl overflow-hidden border border-slate-200 shadow-sm" style="font-family: Arial, Helvetica, sans-serif !important;">
+                        <thead class="bg-slate-100 text-xs font-bold border-b text-slate-500 uppercase">
+                            <tr><th class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">מספר מסמך</th><th class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">תאריך רישום</th><th style="font-family: Arial, Helvetica, sans-serif !important;">מועד פירעון</th><th class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">תיאור השירות</th><th style="font-family: Arial, Helvetica, sans-serif !important;">סטטוס</th><th class="p-4 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">סכום בש"ח</th></tr>
                         </thead><tbody class="divide-y divide-slate-100 bg-white">`;
                     
                     orgRevenues.forEach(r => {
@@ -551,25 +1249,24 @@
 
                         const rowBg = isUnpaidDebt ? 'bg-red-50/70 hover:bg-red-100 transition-all text-red-900' : 'hover:bg-blue-50 transition-colors';
                         
-                        let statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2"><i class="fa-solid fa-circle-check ml-1"></i>שולם</span>`;
+                        let statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-circle-check ml-1"></i>שולם</span>`;
                         if (isUnpaidDebt) {
                             statusBadge = isFuture 
-                                ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2"><i class="fa-solid fa-clock ml-1"></i>עתידי (פתוח)</span>`
-                                : `<span class="bg-red-100 text-red-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2"><i class="fa-solid fa-triangle-exclamation ml-1"></i>פתוח</span>`;
+                                ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-clock ml-1"></i>עתידי (פתוח)</span>`
+                                : `<span class="bg-red-100 text-red-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-triangle-exclamation ml-1"></i>פתוח</span>`;
                         }
 
                         html += `<tr class="${rowBg}">
-                            <td class="p-4 font-bold text-slate-700">${r.doc}</td>
-                            <td class="p-4">${r.regDate.toLocaleDateString('he-IL')}</td>
-                            <td class="p-4">${r.dueDate.toLocaleDateString('he-IL')}</td>
-                            <td class="p-4">${r.desc}</td>
-                            <td class="p-4">${statusBadge}</td>
-                            <td class="p-4 font-black text-left">${formatCurrency(r.amount)}</td>
+                            <td class="p-4 font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;">${r.doc}</td>
+                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.regDate.toLocaleDateString('he-IL')}</td>
+                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.dueDate.toLocaleDateString('he-IL')}</td>
+                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.desc}</td>
+                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${statusBadge}</td>
+                            <td class="p-4 font-bold text-left" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(r.amount)}</td>
                         </tr>`;
                     });
                     html += `</tbody></table></div>`;
                     
-                    // תיקון הבאג: שליחת נתוני החוב האקטיביים של הארגון בלבד כדי שלוח השנה של החובות לא יינזק
                     const activeOrgDebts = data.filter(r => r.name === path.orgName);
                     updateAnalytics(activeOrgDebts);
                 }
@@ -578,7 +1275,6 @@
             }
         }
 
-        // חיפוש חכם וממוקד אך ורק מתוך הנתונים המוצגים כעת במסך (currentOrgList)
         function handleSearchInput(query) {
             const suggestionsBox = document.getElementById('search-suggestions');
             if (!query || query.trim() === '') {
@@ -591,7 +1287,7 @@
             const matches = currentOrgList.filter(org => org.name.toLowerCase().includes(normalizedQuery)).slice(0, 8);
 
             if (matches.length === 0) {
-                suggestionsBox.innerHTML = '<div class="p-3 text-xs text-slate-400 italic text-right">לא נמצאו לקוחות מתאימים</div>';
+                suggestionsBox.innerHTML = '<div class="p-3 text-xs text-slate-400 italic text-right" style="font-family: Arial, Helvetica, sans-serif !important;">לא נמצאו לקוחות מתאימים</div>';
                 suggestionsBox.classList.remove('hidden');
                 return;
             }
@@ -600,7 +1296,7 @@
             matches.forEach(org => {
                 const escapedName = org.name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
                 html += `
-                    <div onclick="selectSearchClient('${escapedName}')" class="p-3 text-sm hover:bg-blue-50 cursor-pointer transition-colors text-right font-medium text-slate-700">
+                    <div onclick="selectSearchClient('${escapedName}')" class="p-3 text-sm hover:bg-blue-50 cursor-pointer transition-colors text-right font-medium text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;">
                         ${org.name}
                     </div>
                 `;
@@ -617,12 +1313,9 @@
             }
             const input = document.getElementById('client-search-input');
             if (input) input.value = '';
-
-            // העברה ישירה למסך החשבוניות (Level 2)
             selectOrg(name);
         }
 
-        // סגירת התיבה בלחיצה מחוץ לתווח החיפוש
         document.addEventListener('click', function(e) {
             const box = document.getElementById('search-suggestions');
             const input = document.getElementById('client-search-input');
@@ -641,7 +1334,6 @@
             document.getElementById('lbl-years-pie').innerHTML = `<i class="fa-solid fa-chart-pie ml-2 text-blue-500"></i>${hasRevenue ? 'פילוח חובות לפי שנים' : 'פילוח חוב לפי שנים'}`;
             document.getElementById('lbl-years-table').innerHTML = `<i class="fa-solid fa-table ml-2 text-blue-500"></i>${hasRevenue ? 'ריכוז חובות לפי שנים' : 'ריכוז לפי שנים'}`;
 
-            // 1. פילוח לפי שנים
             const yearGroups = {};
             data.forEach(r => {
                 const yr = r.dueDate.getFullYear();
@@ -655,13 +1347,12 @@
             Object.entries(yearGroups).sort((a,b) => b[0] - a[0]).forEach(([yr, val]) => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-3 font-bold text-blue-900 cursor-pointer underline hover:text-blue-700" onclick="exportBreakdownPdf(${yr})">${yr}</td>
-                        <td class="p-3 text-slate-400 text-center">${val.count}</td>
-                        <td class="p-3 text-left font-black">${formatCurrency(val.sum)}</td>
+                        <td class="p-3 font-bold text-blue-900 cursor-pointer underline hover:text-blue-700" onclick="exportBreakdownPdf(${yr})" style="font-family: Arial, Helvetica, sans-serif !important;">${yr}</td>
+                        <td class="p-3 text-slate-400 text-center" style="font-family: Arial, Helvetica, sans-serif !important;">${val.count}</td>
+                        <td class="p-3 text-left font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(val.sum)}</td>
                     </tr>`;
             });
 
-            // 2. פילוח חודשי
             const revMonthlyContainer = document.getElementById('revenue-monthly-container');
             const yearsContainer = document.getElementById('yearly-monthly-grids-container');
             yearsContainer.innerHTML = '';
@@ -688,17 +1379,16 @@
                     const hasData = m.sum > 0;
                     revMonthGridHtml += `
                         <div class="p-3 rounded-2xl border ${hasData ? 'bg-emerald-50 border-emerald-100' : 'bg-white border-slate-100 opacity-40'}">
-                            <p class="text-[10px] font-bold text-slate-400">${MONTH_NAMES[idx]}</p>
-                            <p class="text-sm font-black ${hasData ? 'text-emerald-900' : 'text-slate-200'}">${formatCurrency(m.sum)}</p>
-                            <p class="text-[9px] text-slate-300 font-bold">${m.count} תקבולים</p>
+                            <p class="text-[10px] font-bold text-slate-400" style="font-family: Arial, Helvetica, sans-serif !important;">${MONTH_NAMES[idx]}</p>
+                            <p class="text-sm font-bold ${hasData ? 'text-emerald-900' : 'text-slate-200'}" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(m.sum)}</p>
+                            <p class="text-[9px] text-slate-300 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${m.count} תקבולים</p>
                         </div>
                     `;
                 });
 
-                // מיקום חדש: מסגרת ההכנסות ממוקמת לפני פילוח החוב (החל מ-Analytics)
                 revMonthlyContainer.innerHTML = `
                     <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 border-r-8 border-r-emerald-500">
-                        <h3 class="font-black text-slate-700 mb-4 border-b pb-2 tracking-tight">
+                        <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
                             <i class="fa-solid fa-money-bill-trend-up ml-2 text-emerald-600"></i>פירוט הכנסות שנת ${CURRENT_YEAR} לפי חודשים
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -711,7 +1401,6 @@
                 revMonthlyContainer.classList.add('hidden');
             }
 
-            // גריד חודשי של החובות
             const sortedYears = Object.keys(yearGroups).map(Number).sort((a, b) => b - a);
             sortedYears.forEach(year => {
                 const monthGroups = Array(12).fill(0).map(() => ({ sum: 0, count: 0 }));
@@ -732,16 +1421,16 @@
                     
                     monthGridHtml += `
                         <div ${clickAttr} class="p-3 rounded-2xl border ${hasData ? 'bg-slate-50 border-blue-100 ' + cursorClass : 'bg-white border-slate-100 opacity-40'}">
-                            <p class="text-[10px] font-bold text-slate-400">${MONTH_NAMES[idx]}</p>
-                            <p class="text-sm font-black ${hasData ? 'text-blue-900 underline' : 'text-slate-200'}">${formatCurrency(m.sum)}</p>
-                            <p class="text-[9px] text-slate-300 font-bold">${m.count} מסמכים</p>
+                            <p class="text-[10px] font-bold text-slate-400" style="font-family: Arial, Helvetica, sans-serif !important;">${MONTH_NAMES[idx]}</p>
+                            <p class="text-sm font-bold ${hasData ? 'text-blue-900 underline' : 'text-slate-200'}" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(m.sum)}</p>
+                            <p class="text-[9px] text-slate-300 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${m.count} מסמכים</p>
                         </div>
                     `;
                 });
 
                 yearsContainer.innerHTML += `
                     <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                        <h3 class="font-black text-slate-700 mb-4 border-b pb-2 tracking-tight">
+                        <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
                             <i class="fa-solid fa-calendar-days ml-2 text-[#D9B310]"></i>פירוט חובות שנת ${year} לפי חודשים
                         </h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -751,7 +1440,6 @@
                 `;
             });
 
-            // 3. עדכון גרף דונאט
             const ctx = document.getElementById('yearsChart').getContext('2d');
             if (myChart) myChart.destroy();
             myChart = new Chart(ctx, { 
@@ -785,7 +1473,6 @@
             document.getElementById('export-modal').style.display = show ? 'flex' : 'none'; 
         }
 
-        // פונקציית ייצוא לרשימת הלקוחות הנוכחית של הסקטור ל-PDF במיון הנוכחי
         function exportClientsPdf() {
             const data = db.filter(r => (kpiFilter === 'overdue' ? r.isOverdue : !r.isOverdue) && isTypeMatch(r));
             const sectorData = data.filter(r => r.sector === path.sector);
@@ -798,7 +1485,6 @@
             });
 
             let orgList = Object.entries(orgs).map(([name, val]) => ({ name, ...val }));
-            // ביצוע המיון התואם למיון הנוכחי במסך (ממוין כעת לפי תאריך פירעון כרונולוגי עולה)
             if (sortMode === 'amount') orgList.sort((a,b) => b.sum - a.sum); 
             else orgList.sort((a,b) => a.name.localeCompare(b.name, 'he'));
 
@@ -820,7 +1506,8 @@
             win.document.write(`
                 <html dir="rtl" lang="he"><head><title>ריכוז לקוחות סקטור ${path.sector}</title>
                 <style>
-                    body { font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; padding: 60px; line-height: 1.6; color: #333; }
+                    * { font-family: 'Arial', sans-serif !important; }
+                    body { font-family: 'Arial', sans-serif; padding: 60px; line-height: 1.6; color: #333; }
                     .header { display: flex; justify-content: space-between; border-bottom: 3px solid #0B3C5D; padding-bottom: 10px; }
                     table { width: 100%; border-collapse: collapse; margin-top: 30px; }
                     th, td { border: 1px solid #ddd; padding: 12px; text-align: right; }
@@ -854,7 +1541,7 @@
                             ${orgList.map(o => `
                                 <tr>
                                     <td>${o.code}</td>
-                                    <td>${o.name}</td> <!-- תאריך פירעון וגודל גופן אחיד -->
+                                    <td>${o.name}</td>
                                     <td style="text-align: center;">${o.count}</td>
                                     <td style="text-align: left; font-weight: bold;">${formatCurrency(o.sum)}</td>
                                 </tr>
@@ -867,7 +1554,6 @@
                         </tbody>
                     </table>
                     
-                    <!-- הוספת חתימת מחלקת שירות לקוחות וגבייה למסמכי ה-PDF של פירוט הסקטור (עם מנגנון מניעת שבירת עמוד) -->
                     <div class="signature-area">
                         <div class="signature-box">
                             <div style="font-weight: bold; text-align: right; padding-right: 40px;">בכבוד רב,</div>
@@ -885,7 +1571,6 @@
             win.document.close();
         }
 
-        // פונקציה לייצוא PDF מפורט של רשימת המסמכים המרכיבים סכום שנתי או חודשי
         function exportBreakdownPdf(year, month = null) {
             let data = db.filter(r => (kpiFilter === 'overdue' ? r.isOverdue : !r.isOverdue) && isTypeMatch(r));
             
@@ -906,7 +1591,6 @@
                 return;
             }
 
-            // מיון לפי תאריך פירעון מהישן לחדש (סדר כרונולוגי עולה)
             data.sort((a, b) => a.dueDate - b.dueDate);
             const totalSum = data.reduce((acc, r) => acc + r.amount, 0);
 
@@ -941,7 +1625,8 @@
             win.document.write(`
                 <html dir="rtl" lang="he"><head><title>${reportTitle}</title>
                 <style>
-                    body { font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; padding: 60px; line-height: 1.6; color: #333; }
+                    * { font-family: 'Arial', sans-serif !important; }
+                    body { font-family: 'Arial', sans-serif; padding: 60px; line-height: 1.6; color: #333; }
                     .header { display: flex; justify-content: space-between; border-bottom: 3px solid #0B3C5D; padding-bottom: 10px; }
                     table { width: 100%; border-collapse: collapse; margin-top: 30px; }
                     th, td { border: 1px solid #ddd; padding: 12px; text-align: right; }
@@ -978,7 +1663,7 @@
                                 return `
                                     <tr>
                                         <td>${r.name}</td>
-                                        <td>${r.doc}${futureLabel}</td> <!-- מזהה גופן אחיד וסימון חשבונית עתידית -->
+                                        <td>${r.doc}${futureLabel}</td>
                                         <td>${r.dueDate.toLocaleDateString('he-IL')}</td>
                                         <td>${r.desc}</td>
                                         <td style="text-align: left; font-weight: bold;">${formatCurrency(r.amount)}</td>
@@ -1012,25 +1697,17 @@
         async function generateAction(mode) {
             const clientCode = db.filter(r => r.name === path.orgName).length > 0 ? db.filter(r => r.name === path.orgName)[0].code : '-';
             const typeText = incomeFilter === 'all' ? 'כלל השירותים' : (incomeFilter === 'fees' ? 'אגרות העברת בעלות' : 'שירותי מידע');
-
-            // תיקון: הגדרת מותנות הקישור רק לקיום חובות בפיגור (isOverdue === true). לא לחובות עתידיים.
             const clientHasOverdueDebt = db.some(d => d.name === path.orgName && d.isOverdue && isTypeMatch(d));
 
-            // הפקת "דוח שנתי ללקוח"
             if (exportContext === 'annual') {
                 const currentYearInvoices = revenueDb.filter(r => r.name === path.orgName && r.regDate.getFullYear() === CURRENT_YEAR && isTypeMatch(r));
-                
-                // מיון חשבוניות הדוח לפי תאריך הפירעון מהישן לחדש (סדר כרונולוגי עולה)
                 currentYearInvoices.sort((a, b) => a.dueDate - b.dueDate);
-                
                 const currentTotal = currentYearInvoices.reduce((acc, r) => acc + r.amount, 0);
 
-                // שליפת חובות משנים קודמות ממוינות לפי תאריך פירעון
                 const pastYearsDebts = db.filter(r => r.name === path.orgName && r.dueDate.getFullYear() < CURRENT_YEAR && isTypeMatch(r));
                 pastYearsDebts.sort((a,b) => a.dueDate - b.dueDate);
                 const pastTotal = pastYearsDebts.reduce((acc, r) => acc + r.amount, 0);
 
-                // חישוב מורכב של הכנסות (ששולמו מול טרם שולמו) לשנת 2026 לגרף נערם
                 const monthlyPaid = Array(12).fill(0);
                 const monthlyUnpaid = Array(12).fill(0);
                 
@@ -1047,27 +1724,26 @@
                 const monthlyTotals = Array(12).fill(0).map((_, i) => monthlyPaid[i] + monthlyUnpaid[i]);
                 const maxVal = Math.max(...monthlyTotals, 1);
 
-                // בניית גרף עמודות HTML נערם מוגדר בצבעים אדום וירוק
                 const chartHtml = `
                     <div style="margin-top: 40px; page-break-inside: avoid; break-inside: avoid;">
-                        <h3 style="font-size: 15px; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 20px; color:#333;">ריכוז חיובים חודשי לשנת ${CURRENT_YEAR} (בש"ח)</h3>
+                        <h3 style="font-size: 15px; font-bold; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 20px; color:#333;">ריכוז חיובים חודשי לשנת ${CURRENT_YEAR} (בש"ח)</h3>
                         <div style="display: flex; justify-content: space-between; align-items: flex-end; height: 160px; padding: 20px; background: #f8f9fa; border-radius: 12px; border: 1px solid #ddd;">
                             ${MONTH_NAMES.map((mName, idx) => {
                                 const totalVal = monthlyPaid[idx] + monthlyUnpaid[idx];
-                                const barHeight = totalVal > 0 ? (totalVal / maxVal) * 110 : 0; // גובה מקסימלי 110px
+                                const barHeight = totalVal > 0 ? (totalVal / maxVal) * 110 : 0; 
                                 const paidHeightPct = totalVal > 0 ? (monthlyPaid[idx] / totalVal) * 100 : 0;
                                 const unpaidHeightPct = totalVal > 0 ? (monthlyUnpaid[idx] / totalVal) * 100 : 0;
 
                                 return `
                                     <div style="display: flex; flex-direction: column; align-items: center; flex: 1; margin: 0 4px;">
-                                        <div style="font-size: 9px; font-weight: bold; margin-bottom: 4px; color: #333; line-height:1;">
+                                        <div style="font-size: 9px; font-bold; margin-bottom: 4px; color: #333; line-height:1;">
                                             ${totalVal > 0 ? formatCurrency(totalVal) : ''}
                                         </div>
                                         <div style="width: 100%; height: ${barHeight}px; display: flex; flex-direction: column-reverse; border-radius: 4px 4px 0 0; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1;">
-                                            <div style="width: 100%; height: ${paidHeightPct}%; background: #10b981;"></div> <!-- שולם (ירוק) -->
-                                            <div style="width: 100%; height: ${unpaidHeightPct}%; background: #ef4444;"></div> <!-- טרם שולם (אדום) -->
+                                            <div style="width: 100%; height: ${paidHeightPct}%; background: #10b981;"></div>
+                                            <div style="width: 100%; height: ${unpaidHeightPct}%; background: #ef4444;"></div>
                                         </div>
-                                        <div style="font-size: 11px; font-weight: bold; margin-top: 8px; color: #555;">${mName.substring(0, 3)}</div>
+                                        <div style="font-size: 11px; font-bold; margin-top: 8px; color: #555;">${mName.substring(0, 3)}</div>
                                     </div>
                                 `;
                             }).join('')}
@@ -1075,12 +1751,11 @@
                     </div>
                 `;
 
-                // בניית ה-HTML עבור שנים קודמות (רק אם קיים חוב בפיגור)
                 let pastTableHtml = "";
                 if (clientHasOverdueDebt && pastYearsDebts.length > 0) {
                     pastTableHtml = `
                         <div style="page-break-inside: avoid; break-inside: avoid; margin-top: 45px;">
-                            <h3 style="border-bottom: 2px solid #ef4444; padding-bottom: 5px; font-size:15px; color:#b91c1c; font-weight:bold;">ריכוז חובות פתוחים משנים קודמות</h3>
+                            <h3 style="border-bottom: 2px solid #ef4444; padding-bottom: 5px; font-size:15px; color:#b91c1c; font-bold;">ריכוז חובות פתוחים משנים קודמות</h3>
                             <table>
                                 <thead>
                                     <tr><th>מספר מסמך</th><th>מועד פירעון</th><th>תיאור השירות</th><th style="text-align:left">סכום בש"ח</th></tr>
@@ -1091,10 +1766,10 @@
                                             <td>${r.doc}</td>
                                             <td>${r.dueDate.toLocaleDateString('he-IL')}</td>
                                             <td>${r.desc}</td>
-                                            <td style="text-align:left; font-weight:bold; color:#b91c1c;">${formatCurrency(r.amount)}</td>
+                                            <td style="text-align:left; font-bold; color:#b91c1c;">${formatCurrency(r.amount)}</td>
                                         </tr>
                                     `).join('')}
-                                    <tr style="font-weight:bold; background:#fee2e2">
+                                    <tr style="font-bold; background:#fee2e2">
                                         <td colspan="3">סה"כ חוב שנים קודמות</td>
                                         <td style="text-align:left; color:#b91c1c;">${formatCurrency(pastTotal)}</td>
                                     </tr>
@@ -1144,12 +1819,11 @@
                     <\/script>
                 `;
 
-                // תיקון: הצגת הקישור לתשלום והודעות מותנית אך ורק במידה וקיים חוב פתוח בפיגור ללקוח
                 let paymentLinkHtml = "";
                 if (clientHasOverdueDebt) {
                     paymentLinkHtml = `
                         <div style="margin-top: 30px; font-size: 14px; color: #333; line-height: 1.8;">
-                            <p style="margin-bottom: 8px;">להלן הקישור לתשלום החוב בשרת התשלומים: <a href="https://ecom.gov.il/voucherspa/input/414" target="_blank" style="color: #0B3C5D; font-weight: bold; text-decoration: underline;">https://ecom.gov.il/voucherspa/input/414</a></p>
+                            <p style="margin-bottom: 8px;">להלן הקישור לתשלום החוב בשרת התשלומים: <a href="https://ecom.gov.il/voucherspa/input/414" target="_blank" style="color: #0B3C5D; font-bold; text-decoration: underline;">https://ecom.gov.il/voucherspa/input/414</a></p>
                             <p style="margin-bottom: 16px;">מספר לקוח במרכבה: <b>${clientCode}</b></p>
                             
                             <p style="margin-top: 16px; margin-bottom: 8px;">השירות מותנה בתשלום. נבקשכם להסדיר את החוב בהקדם.</p>
@@ -1161,7 +1835,8 @@
                 win.document.write(`
                     <html dir="rtl" lang="he"><head><title>דוח שנתי ללקוח - ${path.orgName}</title>
                     <style>
-                        body { font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; padding: 60px; line-height: 1.6; color: #333; }
+                        * { font-family: 'Arial', sans-serif !important; }
+                        body { font-family: 'Arial', sans-serif; padding: 60px; line-height: 1.6; color: #333; }
                         .header { display: flex; justify-content: space-between; border-bottom: 3px solid #0B3C5D; padding-bottom: 10px; }
                         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
                         th, td { border: 1px solid #ddd; padding: 10px; text-align: right; }
@@ -1177,7 +1852,7 @@
                     <body>
                         <div class="header"><div><b style="font-size:18px">משרד התחבורה והבטיחות בדרכים</b><br>אגף טכנולוגיות דיגיטליות ומידע</div><div>${new Date().toLocaleDateString('he-IL')}</div></div>
                         <p style="margin-top:30px">לכבוד: <br><b style="font-size:18px">${path.orgName}</b></p>
-                        <h2 style="text-align:center; margin: 30px 0; font-size:18px; font-weight:bold;">דוח שנתי ללקוח - שנת ${CURRENT_YEAR}</h2>
+                        <h2 style="text-align:center; margin: 30px 0; font-size:18px; font-bold;">דוח שנתי ללקוח - שנת ${CURRENT_YEAR}</h2>
                         <p>אנו מתכבדים להציג לכם סיכום של החיובים לשנה זו:</p>
                         
                         <table>
@@ -1188,9 +1863,7 @@
                                 ${currentYearInvoices.map(r => {
                                     const isUnpaid = db.some(d => d.doc === r.doc && d.name === path.orgName);
                                     const isFuture = isUnpaid && !db.find(d => d.doc === r.doc).isOverdue;
-                                    
-                                    // הוספת מזהה (עתידי) לחשבוניות חוב עתידיות בתוך הטבלה
-                                    const futureLabel = isFuture ? ' <span style="color:#059669; font-size:11px; font-weight:bold;">(עתידי)</span>' : '';
+                                    const futureLabel = isFuture ? ' <span style="color:#059669; font-size:11px; font-bold;">(עתידי)</span>' : '';
                                     const statusText = isUnpaid 
                                         ? (isFuture ? '<b style="color:#059669;">עתידי (טרם שולם)</b>' : '<b style="color:#b91c1c;">טרם שולם</b>') 
                                         : 'שולם';
@@ -1200,11 +1873,11 @@
                                             <td>${r.regDate.toLocaleDateString('he-IL')}</td>
                                             <td>${r.desc}</td>
                                             <td>${statusText}</td>
-                                            <td style="text-align:left; font-weight:bold;">${formatCurrency(r.amount)}</td>
+                                            <td style="text-align:left; font-bold;">${formatCurrency(r.amount)}</td>
                                         </tr>
                                     `;
                                 }).join('')}
-                                <tr style="font-weight:bold; background:#eee">
+                                <tr style="font-bold; background:#eee">
                                     <td colspan="4">סה"כ חיובים שנת ${CURRENT_YEAR}</td>
                                     <td style="text-align:left;">${formatCurrency(currentTotal)}</td>
                                 </tr>
@@ -1212,13 +1885,10 @@
                         </table>
 
                         ${chartHtml}
-
                         ${pastTableHtml}
 
                         <div style="page-break-inside: avoid; break-inside: avoid; margin-top: 30px;">
-                            
                             ${paymentLinkHtml}
-
                             <div class="signature-area">
                                 <div class="signature-box">
                                     <div style="font-weight: bold; text-align: right; padding-right: 40px;">בכבוד רב,</div>
@@ -1239,7 +1909,6 @@
                 return;
             }
 
-            // הפקת מכתב חוב מסורתי (ממוין כעת לפי תאריך פירעון כרונולוגי עולה)
             const overdueRows = db.filter(r => r.isOverdue && r.name === path.orgName && isTypeMatch(r));
             overdueRows.sort((a, b) => a.dueDate - b.dueDate);
             const total = overdueRows.reduce((s, r) => s + r.amount, 0);
@@ -1262,8 +1931,9 @@
             win.document.write(`
                 <html dir="rtl" lang="he"><head><title>ריכוז חשבוניות פתוחות - ${path.orgName}</title>
                 <style>
-                    body { font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; padding: 60px; line-height: 1.6; color: #333; }
-                    .header { display: flex; justify-content: space-between; border-bottom: 3px solid #0B3C5D; padding-bottom: 10px; }
+                    * { font-family: 'Arial', sans-serif !important; }
+                    body { font-family: 'Arial', sans-serif; padding: 60px; line-height: 1.6; color: #333; }
+                    .header { display: flex; justify-content: space-between; border-bottom: 3px solid #0B3C5D; padding-bottom: 10px; margin-bottom: 25px; }
                     table { width: 100%; border-collapse: collapse; margin-top: 30px; }
                     th, td { border: 1px solid #ddd; padding: 12px; text-align: right; }
                     th { background: #f8f9fa; }
@@ -1283,11 +1953,11 @@
                     
                     <table><thead><tr><th>מספר מסמך</th><th>מועד פירעון</th><th>תיאור השירות</th><th style="text-align:left">סכום בש"ח</th></tr></thead>
                     <tbody>${overdueRows.map(r => `<tr><td>${r.doc}</td><td>${r.dueDate.toLocaleDateString('he-IL')}</td><td>${r.desc}</td><td style="text-align:left">${formatCurrency(r.amount)}</td></tr>`).join('')}
-                    <tr style="font-weight:bold; background:#eee"><td colspan="3">סה"כ לתשלום</td><td style="text-align:left">${formatCurrency(total)}</td></tr></tbody></table>
+                    <tr style="font-bold; background:#eee"><td colspan="3">סה"כ לתשלום</td><td style="text-align:left">${formatCurrency(total)}</td></tr></tbody></table>
                     
                     <div style="page-break-inside: avoid; break-inside: avoid; margin-top: 30px;">
                         <div style="font-size: 14px; color: #333; line-height: 1.8;">
-                            <p style="margin-bottom: 8px;">להלן הקישור לתשלום החוב בשרת התשלומים: <a href="https://ecom.gov.il/voucherspa/input/414" target="_blank" style="color: #0B3C5D; font-weight: bold; text-decoration: underline;">https://ecom.gov.il/voucherspa/input/414</a></p>
+                            <p style="margin-bottom: 8px;">להלן הקישור לתשלום החוב בשרת התשלומים: <a href="https://ecom.gov.il/voucherspa/input/414" target="_blank" style="color: #0B3C5D; font-bold; text-decoration: underline;">https://ecom.gov.il/voucherspa/input/414</a></p>
                             <p style="margin-bottom: 16px;">מספר לקוח במרכבה: <b>${clientCode}</b></p>
                             
                             <p style="margin-top: 16px; margin-bottom: 8px;">השירות מותנה בתשלום. נבקשכם להסדיר את החוב בהקדם.</p>
@@ -1338,7 +2008,6 @@
                     };
                 });
 
-                // הגבלת תאריך עדכניות הנתונים לתאריך הנוכחי הריאלי של היום (שמירה מתקרת התאריך של היום)
                 if (db.length > 0 && revenueDb.length === 0) {
                     const regDates = db.map(r => r.regDate).filter(d => d instanceof Date && !isNaN(d.getTime()));
                     if (regDates.length > 0) {
@@ -1357,7 +2026,6 @@
             reader.readAsArrayBuffer(e.target.files[0]);
         }
 
-        // פונקציית עיבוד קובץ הכנסות שנת 2026
         function processRevenueExcel(e) {
             const reader = new FileReader();
             reader.onload = (evt) => {
@@ -1386,7 +2054,6 @@
                     };
                 });
 
-                // הגבלת תאריך עדכניות נתוני התאמה לתאריך הנוכחי הריאלי של היום (שמירה מתקרת התאריך של היום)
                 if (revenueDb.length > 0) {
                     const matchDates = revenueDb.map(r => r.matchDate).filter(d => d instanceof Date && !isNaN(d.getTime()));
                     if (matchDates.length > 0) {
