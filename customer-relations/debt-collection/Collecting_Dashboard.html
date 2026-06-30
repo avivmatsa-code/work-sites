@@ -49,6 +49,7 @@
             body { background: white !important; font-size: 11px !important; }
             @page { size: portrait; margin: 1.5cm; }
             
+            /* עיצוב כרטיסי ה-KPIs בהדפסה למניעת חריגת מספרים מהמסגרות */
             .print-row-layout {
                 display: table !important;
                 width: 100% !important;
@@ -61,11 +62,28 @@
                 width: 25% !important;
                 background: white !important;
                 border: 1px solid #cbd5e1 !important;
-                padding: 10px !important;
+                padding: 8px !important;
                 border-radius: 8px !important;
                 vertical-align: top !important;
             }
-            .page-break { page-break-before: always; }
+            .print-col-layout p.text-3xl {
+                font-size: 16px !important; /* כיווץ גודל מספרים בדוח המודפס */
+                margin-bottom: 2px !important;
+            }
+            .print-col-layout p.text-slate-400 {
+                font-size: 10px !important; /* כיווץ כותרות מודפסות */
+            }
+            .print-col-layout div {
+                font-size: 8px !important; /* כיווץ הפירוט השנתי המפוצל */
+                margin-top: 2px !important;
+                padding-top: 2px !important;
+            }
+            
+            /* כפיית מעבר עמוד מסודר עבור כל טבלה וגרף בדוח */
+            .page-break {
+                page-break-before: always !important;
+                break-before: page !important;
+            }
         }
     </style>
 </head>
@@ -98,7 +116,7 @@
         <!-- Header -->
         <header class="bg-[#0B3C5D] text-white px-6 py-5 shadow-lg border-b-4 border-[#328CC1] no-print">
             <div class="max-w-[1600px] mx-auto flex flex-col xl:flex-row justify-between items-center gap-6">
-                <!-- שם משרד ואגף מוגדלים וממורכזים בגופן אריאל אחיד ישיר (בפקודה עצמה תוך שימוש ב-font-bold) -->
+                <!-- שם משרד ואגף מוגדלים וממורכזים בגופן אריאל אחיד ישיר -->
                 <div class="flex flex-col items-center justify-center text-center bg-white/10 px-8 py-3.5 rounded-2xl border border-white/15 shadow-inner">
                     <div class="text-xl md:text-2xl font-bold text-white leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">משרד התחבורה והבטיחות בדרכים</div>
                     <div class="text-sm md:text-base text-slate-300 font-bold mt-1.5" style="font-family: Arial, Helvetica, sans-serif !important;">אגף טכנולוגיות דיגיטליות ומידע</div>
@@ -279,7 +297,7 @@
         <!-- Header -->
         <header class="bg-[#0B3C5D] text-white px-6 py-5 shadow-lg border-b-4 border-[#328CC1] no-print">
             <div class="max-w-[1600px] mx-auto flex flex-col xl:flex-row justify-between items-center gap-6">
-                <!-- שם משרד ואגף מוגדלים וממורכזים בדשבורד בגופן אריאל אחיד ישיר (בפקודה עצמה תוך שימוש ב-font-bold) -->
+                <!-- שם משרד ואגף מוגדלים וממורכזים בדשבורד בגופן אריאל אחיד ישיר -->
                 <div class="flex flex-col items-center justify-center text-center bg-white/10 px-8 py-3.5 rounded-2xl border border-white/15 shadow-inner">
                     <div class="text-xl md:text-2xl font-bold text-white leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">משרד התחבורה והבטיחות בדרכים</div>
                     <div class="text-sm md:text-base text-slate-300 font-bold mt-1.5" style="font-family: Arial, Helvetica, sans-serif !important;">אגף טכנולוגיות דיגיטליות ומידע</div>
@@ -308,7 +326,7 @@
                     </div>
                 </div>
 
-                <!-- לחצני פעולה עליונים בדשבורד (גודל גופן אחיד לשתי השורות) ישיר (בפקודה עצמה) -->
+                <!-- לחצני פעולה עליונים בדשבורד (גודל גופן אחיד לשתי השורות) ישיר -->
                 <div class="flex items-center gap-3 flex-wrap">
                     <button onclick="printDashboardCurrent()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-bold shadow transition-all flex flex-col items-center justify-center text-center h-[52px] w-[120px] leading-tight">
                         <span class="text-xs opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;">הדפס דוח</span>
@@ -382,10 +400,10 @@
                     </div>
                 </div>
 
-                <!-- Monthly Chart Card -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col min-h-[480px]">
+                <!-- Monthly Chart Card (מעבר עמוד בהדפסה) -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col min-h-[480px] page-break">
                     <h3 class="font-bold text-slate-700 mb-3 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
-                        <i class="fa-solid fa-chart-column ml-2 text-emerald-600"></i>השוואת תקבולים מול יתרת חוב פתוחה (2026)
+                        <i class="fa-solid fa-chart-column ml-2 text-emerald-600"></i>הכנסות מול גבייה
                     </h3>
                     <div class="flex-grow relative h-[380px] min-h-[380px]">
                         <canvas id="dashChartCanvas"></canvas>
@@ -395,8 +413,8 @@
 
             <!-- Supporting Tables -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Table 1: Top Active Clients -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                <!-- Table 1: Top Active Clients (מעבר עמוד בהדפסה) -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 page-break">
                     <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
                         <i class="fa-solid fa-star ml-2 text-yellow-500"></i>עשרת הלקוחות הפעילים (שנת 2026)
                     </h3>
@@ -415,8 +433,8 @@
                     </div>
                 </div>
 
-                <!-- Table 2: Top Debtors -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                <!-- Table 2: Top Debtors (מעבר עמוד בהדפסה, חלוקה נפרדת לחוב בפיגור ותקבול עתידי) -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 page-break">
                     <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
                         <i class="fa-solid fa-hand-holding-dollar ml-2 text-red-500"></i>עשרת החייבים הגדולים (שנת 2026)
                     </h3>
@@ -424,8 +442,9 @@
                         <table class="w-full text-right text-xs" style="font-family: Arial, Helvetica, sans-serif !important;">
                             <thead>
                                 <tr class="text-slate-400 border-b">
-                                    <th class="p-3">שם הלקוח</th>
-                                    <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">יתרת חוב פתוחה (ש"ח)</th>
+                                    <th class="p-3" style="font-family: Arial, Helvetica, sans-serif !important;">שם הלקוח</th>
+                                    <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">חוב בפיגור (ש"ח)</th>
+                                    <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">תשלומים עתידיים (ש"ח)</th>
                                     <th class="p-3 text-center" style="font-family: Arial, Helvetica, sans-serif !important;">מספר מסמכים פתוחים</th>
                                 </tr>
                             </thead>
@@ -788,19 +807,28 @@
             }
             document.getElementById('db-active-clients-body').innerHTML = activeClientsHTML;
 
-            // טבלה 2: עשרת החייבים הגדולים (חוב פתוח שנת 2026)
+            // טבלה 2: עשרת החייבים הגדולים (חוב פתוח שנת 2026, פיצול לחוב בפיגור ותשלומים עתידיים)
             const debtorsData = {};
             dashDebts.forEach(d => {
-                if (!debtorsData[d.name]) debtorsData[d.name] = { debt: 0, count: 0 };
-                debtorsData[d.name].debt += d.amount;
+                if (!debtorsData[d.name]) {
+                    debtorsData[d.name] = { totalDebt: 0, overdue: 0, future: 0, count: 0 };
+                }
+                debtorsData[d.name].totalDebt += d.amount;
+                if (d.isOverdue) {
+                    debtorsData[d.name].overdue += d.amount;
+                } else {
+                    debtorsData[d.name].future += d.amount;
+                }
                 debtorsData[d.name].count++;
             });
 
             const debtorsList = Object.entries(debtorsData).map(([name, data]) => ({
                 name,
-                debt: data.debt,
+                totalDebt: data.totalDebt,
+                overdue: data.overdue,
+                future: data.future,
                 count: data.count
-            })).sort((a, b) => b.debt - a.debt).slice(0, 10);
+            })).sort((a, b) => b.totalDebt - a.totalDebt).slice(0, 10);
 
             let debtorsHTML = "";
             debtorsList.forEach(c => {
@@ -810,13 +838,14 @@
                         <td class="p-3 border-b" style="font-family: Arial, Helvetica, sans-serif !important;">
                             <a href="#" onclick="drillToClientDebtLetter('${safeName}'); return false;" class="text-blue-600 hover:underline font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${c.name}</a>
                         </td>
-                        <td class="p-3 border-b text-left text-red-700 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(c.debt)}</td>
+                        <td class="p-3 border-b text-left text-red-700 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(c.overdue)}</td>
+                        <td class="p-3 border-b text-left text-emerald-700 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(c.future)}</td>
                         <td class="p-3 border-b text-center font-semibold" style="font-family: Arial, Helvetica, sans-serif !important;">${c.count}</td>
                     </tr>
                 `;
             });
             if (debtorsList.length === 0) {
-                debtorsHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400" style="font-family: Arial, Helvetica, sans-serif !important;">אין נתונים זמינים</td></tr>`;
+                debtorsHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400" style="font-family: Arial, Helvetica, sans-serif !important;">אין נתונים זמינים</td></tr>`;
             }
             document.getElementById('db-debtors-body').innerHTML = debtorsHTML;
         }
@@ -1769,7 +1798,7 @@
                                             <td style="text-align:left; font-bold; color:#b91c1c;">${formatCurrency(r.amount)}</td>
                                         </tr>
                                     `).join('')}
-                                    <tr style="font-bold; background:#fee2e2">
+                                    <tr style="font-bold; background:#eee">
                                         <td colspan="3">סה"כ חוב שנים קודמות</td>
                                         <td style="text-align:left; color:#b91c1c;">${formatCurrency(pastTotal)}</td>
                                     </tr>
