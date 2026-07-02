@@ -7,390 +7,499 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { 
-            --gov-blue: #003366; 
-            --gov-accent: #2c679e; 
-            --gov-bg: #f3f6f9; 
-            --white: #ffffff;
-            --online-green: #1b5e20; 
-            --batch-blue: #0d47a1;   
+            --gov-blue: #003366; --gov-accent: #2c679e; --gov-bg: #f3f6f9; --white: #ffffff;
+            --online-green: #1b5e20; --batch-blue: #0d47a1; --peak-gold: #ffd700;
         }
-        
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--gov-bg); margin: 0; padding: 0; text-align: right; color: #333; }
-        header { background-color: var(--white); border-bottom: 4px solid var(--gov-blue); padding: 15px 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .titles h2 { margin: 0; font-size: 0.9rem; color: #666; font-weight: normal; }
-        .titles h1 { margin: 5px 0 0 0; font-size: 1.4rem; color: var(--gov-blue); }
-        .container { padding: 20px 40px; max-width: 1400px; margin: auto; }
+        header { background-color: var(--white); border-bottom: 4px solid var(--gov-blue); padding: 10px 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .titles h1 { margin: 2px 0 0 0; font-size: 1.2rem; color: var(--gov-blue); }
+        .container { padding: 20px 40px; max-width: 1700px; margin: auto; }
         
-        #uploadCard { background: var(--white); padding: 25px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr auto; gap: 20px; align-items: flex-end; }
-        .btn-gov { background-color: var(--gov-blue); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        .nav-tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #ccc; }
+        .nav-link { padding: 12px 25px; cursor: pointer; background: #e2e8f0; border: none; border-radius: 8px 8px 0 0; font-weight: bold; color: var(--gov-blue); }
+        .nav-link.active { background: var(--gov-blue); color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block !important; }
 
-        /* פאנל מסננים מעוצב */
-        .filter-container { background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #e0e6ed; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
-        .filter-row { display: flex; gap: 30px; align-items: flex-start; }
-        .filter-group { display: flex; flex-direction: column; gap: 8px; }
-        .filter-group label { font-weight: bold; font-size: 0.85rem; color: var(--gov-blue); }
-        
-        .month-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
-        .month-btn { padding: 6px 12px; border: 1px solid #d1d9e0; border-radius: 15px; background: #f9fbff; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
-        .month-btn.active { background-color: var(--gov-blue); color: white; border-color: var(--gov-blue); }
-        .all-btn { background: #e2e8f0; font-weight: bold; }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
         .stat-card { background: var(--white); padding: 15px; border-radius: 10px; border-right: 6px solid var(--gov-blue); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .stat-card .num { font-size: 1.8rem; font-weight: bold; color: var(--gov-blue); }
+        .stat-card.online { border-right-color: var(--online-green); }
+        .stat-card.batch { border-right-color: var(--batch-blue); }
+        .stat-card h3 { margin: 0; font-size: 0.9rem; color: #666; }
+        .stat-card .num { font-size: 1.8rem; font-weight: bold; color: var(--gov-blue); margin-top: 5px; }
+
+        #uploadCard { background: var(--white); padding: 20px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr auto; gap: 20px; align-items: flex-end; }
+        .btn-gov { background-color: var(--gov-blue); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-gov:hover { background: var(--gov-accent); }
         
-        .card { background: var(--white); padding: 25px; border-radius: 12px; border: 1px solid #e0e6ed; margin-bottom: 20px; }
-        .card h3 { margin-top: 0; color: var(--gov-blue); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        .card { background: var(--white); padding: 20px; border-radius: 12px; border: 1px solid #e0e6ed; margin-bottom: 20px; }
+        .filter-container { background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #e0e6ed; margin-bottom: 20px; }
+        .btn-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
+        .toggle-btn { padding: 5px 12px; border: 1px solid #d1d9e0; border-radius: 20px; background: #f9fbff; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+        .toggle-btn.active { background-color: var(--gov-blue); color: white; border-color: var(--gov-blue); }
 
         table { width: 100%; border-collapse: collapse; }
-        th { background: #f8fbff; padding: 12px; text-align: right; border-bottom: 2px solid var(--gov-blue); font-size: 0.85rem; color: var(--gov-blue); }
-        td { padding: 12px; border-bottom: 1px solid #eff2f5; font-size: 0.9rem; }
-        tr.clickable:hover { background: #f4f8ff; cursor: pointer; }
+        th { background: #f8fbff; padding: 10px; text-align: right; border-bottom: 2px solid var(--gov-blue); font-size: 0.85rem; }
+        td { padding: 10px; border-bottom: 1px solid #eff2f5; font-size: 0.85rem; }
+        tr.peak-row { background-color: #fff9e6; }
+        tfoot { background: #f1f3f5; font-weight: bold; }
 
-        /* מודאל תחקור - רכיבים אחד מתחת לשני */
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal { background: var(--white); width: 95%; height: 95%; border-radius: 12px; display: flex; flex-direction: column; padding: 30px; }
-        .modal-body { flex: 1; overflow-y: auto; padding-right: 10px; }
-        
-        .summary-banner { background: #f0f7ff; padding: 20px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 50px; border: 1px solid #c2d9ff; }
-        .banner-item b { font-size: 1.4rem; color: var(--gov-blue); display: block; }
+        /* פריסה: טבלה מימין, גרף משמאל */
+        .yearly-layout { display: grid; grid-template-columns: 1fr 1.3fr; gap: 50px; align-items: start; }
+        .chart-container { min-height: 400px; }
 
-        /* הגדרות הדפסה */
-        #printHeader { display: none; }
-        
+        .hidden { display: none !important; }
+        .peak-star { color: var(--peak-gold); margin-right: 5px; font-weight: bold; }
+
+        /* Report Styles */
         @media print {
-            @page { size: A4 portrait; margin: 15mm; }
             body * { visibility: hidden; }
-            #modalOverlay, #modalOverlay * { visibility: visible; }
-            #modalOverlay { position: absolute; left: 0; top: 0; width: 100%; background: white; }
-            .modal { position: absolute; top: 0; left: 0; width: 100%; border: none; padding: 0; box-shadow: none; display: block !important; }
-            .modal-header, .btn-print, .close-btn { display: none !important; }
-            #printHeader { display: block; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 10px; }
-            .print-filters { font-size: 0.8rem; color: #444; margin-top: 5px; }
-            .card { border: 1px solid #eee; break-inside: avoid; width: 100%; padding: 15px; margin-bottom: 20px; }
-            .page-break { display: block; page-break-before: always; height: 0; }
-            .modal-body { overflow: visible; }
-            table { font-size: 10pt; width: 100%; }
-            canvas { max-width: 100% !important; height: auto !important; }
+            #reportContainer, #reportContainer * { visibility: visible; }
+            #reportContainer { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
+            .page-break { page-break-after: always; padding-top: 20px; }
         }
-
-        .hidden { display: none; }
-        .online-text { color: var(--online-green); font-weight: bold; }
-        .batch-text { color: var(--batch-blue); font-weight: bold; }
     </style>
 </head>
 <body>
 
-<header>
+<header class="no-print">
     <div class="header-content">
         <div class="titles">
-            <h2>משרד התחבורה והבטיחות בדרכים | אגף טכנולוגיות דיגיטליות</h2>
+            <h2>משרד התחבורה והבטיחות בדרכים | אגף טכנולוגיות דיגיטליות ומידע</h2>
             <h1>מערכת לניתוח השימוש בשירותי המידע</h1>
         </div>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Seal_of_the_Ministry_of_Transport_%28Israel%29.svg/200px-Seal_of_the_Ministry_of_Transport_%28Israel%29.svg.png" height="60">
     </div>
 </header>
 
-<div class="container">
-    <!-- טעינה -->
+<div class="container no-print">
     <div id="uploadCard">
-        <div class="filter-group">
-            <label>שאילתות און-ליין (אקסל):</label>
-            <input type="file" id="fileOnline" accept=".xlsx, .xls">
-        </div>
-        <div class="filter-group">
-            <label>שאילתות אצווה (אקסל):</label>
-            <input type="file" id="fileBatch" accept=".xlsx, .xls">
-        </div>
-        <button class="btn-gov" onclick="processAllFiles()">עבד נתונים</button>
+        <div style="display:flex; flex-direction:column; gap:5px;"><label>שאילתות און-ליין:</label><input type="file" id="fileOnline" accept=".xlsx, .xls"></div>
+        <div style="display:flex; flex-direction:column; gap:5px;"><label>שאילתות אצווה:</label><input type="file" id="fileBatch" accept=".xlsx, .xls"></div>
+        <button class="btn-gov" onclick="processFiles()">עבד נתונים</button>
     </div>
 
-    <div id="mainDashboard" class="hidden">
-        <!-- מסננים -->
-        <div class="filter-container">
-            <div class="filter-row">
-                <div class="filter-group">
-                    <label>בחירת שנה:</label>
-                    <select id="selYear" onchange="refreshDashboard()" style="padding:10px; border-radius:8px; border:1px solid #ccc; width: 120px;"></select>
-                </div>
-                <div class="filter-group" style="flex:1">
-                    <label>חודשים (בחירה מרובה):</label>
-                    <div class="month-buttons" id="monthBtns">
-                        <button class="month-btn all-btn" onclick="toggleAllMonths(true)">בחר הכל</button>
-                        <button class="month-btn all-btn" onclick="toggleAllMonths(false)">נקה הכל</button>
-                    </div>
-                </div>
-                <div class="filter-group" style="flex:1">
-                    <label>חיפוש לקוח מהיר:</label>
-                    <input type="text" id="clientSearch" list="clientList" placeholder="הקלד שם או מספר לקוח..." onchange="handleSearch(this.value)" style="padding:10px; border:1px solid #ccc; border-radius:8px;">
-                    <datalist id="clientList"></datalist>
-                </div>
+    <div id="mainApp" class="hidden">
+        <div class="nav-tabs">
+            <button class="nav-link active" onclick="switchTab('tabDash', this)">דאשבורד ניהולי</button>
+            <button class="nav-link" onclick="switchTab('tabView', this)">מבט על לקוח</button>
+            <button class="nav-link" onclick="switchTab('tabComp', this)">מעבדת השוואה</button>
+        </div>
+
+        <div id="tabDash" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card"><h3>סה"כ שאילתות</h3><div class="num" id="dash-total">0</div></div>
+                <div class="stat-card online"><h3>און-ליין</h3><div class="num" id="dash-online">0</div></div>
+                <div class="stat-card batch"><h3>אצווה</h3><div class="num" id="dash-batch">0</div></div>
             </div>
-        </div>
 
-        <div class="stats-grid">
-            <div class="stat-card"><h3>סה"כ שאילתות</h3><div class="num" id="kpi-total">0</div></div>
-            <div class="stat-card" style="border-right-color: var(--online-green);"><h3>און-ליין</h3><div class="num" id="kpi-online">0</div></div>
-            <div class="stat-card" style="border-right-color: var(--batch-blue);"><h3>אצווה</h3><div class="num" id="kpi-batch">0</div></div>
-            <div class="stat-card"><h3>לקוחות פעילים</h3><div class="num" id="kpi-active">0</div></div>
-        </div>
-
-        <div class="card">
-            <h3>מגמת שימוש חודשית (און-ליין מול אצווה)</h3>
-            <div style="height: 300px;"><canvas id="mainMonthChart"></canvas></div>
-        </div>
-
-        <div class="card">
-            <h3>ניתוח לקוחות מלא</h3>
-            <table id="mainCustTable">
-                <thead>
-                    <tr>
-                        <th>שם הלקוח</th>
-                        <th>מספר לקוח</th>
-                        <th>סה"כ שאילתות</th>
-                        <th>אחוז מכלל השאילתות</th>
-                        <th>ממוצע לחודש</th>
-                        <th>צריכת שיא</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- מודאל תחקור -->
-<div id="modalOverlay" class="overlay">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 id="modalTitle">תחקור לקוח</h2>
-            <div>
-                <button class="btn-gov btn-print" onclick="window.print()" style="margin-left: 15px; background-color: var(--online-green);">הפק דוח להדפסה</button>
-                <span class="close-btn" onclick="closeModal()" style="font-size:2rem; cursor:pointer">✖</span>
+            <div class="filter-container">
+                <label><b>סנן שנים:</b></label>
+                <div id="dashYearFilters" class="btn-group"></div>
             </div>
-        </div>
-        
-        <div class="modal-body">
-            <!-- כותרת מיוחדת להדפסה בלבד -->
-            <div id="printHeader">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+
+            <div class="card">
+                <h3>סיכום השוואתי שנתי</h3>
+                <div class="yearly-layout">
                     <div>
-                        <h3 style="margin:0">משרד התחבורה והבטיחות בדרכים</h3>
-                        <h4 style="margin:0; font-weight:normal">אגף טכנולוגיות דיגיטליות ומידע</h4>
+                        <table>
+                            <thead><tr><th>שנה</th><th>און-ליין</th><th>אצווה</th><th>סה"כ</th><th>ממוצע חודשי</th></tr></thead>
+                            <tbody id="mainYearlyTableBody"></tbody>
+                        </table>
                     </div>
-                    <h2 style="margin:0; color:var(--gov-blue)">דוח צריכת שירותי מידע ללקוח</h2>
-                </div>
-                <div style="margin-top: 15px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd;">
-                    <b>לקוח:</b> <span id="pCustName"></span> | <b>מספר לקוח:</b> <span id="pCustId"></span> | <b>קוד מרכבה:</b> <span id="pMerkava"></span>
-                    <div class="print-filters" id="pFilters"></div>
+                    <div class="chart-container"><canvas id="mainYearlyChart"></canvas></div>
                 </div>
             </div>
 
-            <!-- תוכן תצוגה והדפסה - הכל מתחת לשני -->
-            <div class="card">
-                <div id="modalSummary" class="summary-banner"></div>
+            <div id="yearlyBlocks"></div>
+        </div>
+
+        <div id="tabView" class="tab-content">
+            <div id="clientListView">
+                <div class="filter-container">
+                    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px;">
+                        <div>
+                            <label><b>חיפוש לקוח:</b></label>
+                            <input type="text" id="clientSearch" placeholder="הקלד שם או מספר..." oninput="filterClientTable()" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc;">
+                        </div>
+                        <div>
+                            <label><b>סינון שנים (רב ברירה):</b></label>
+                            <div id="clientYearFilters" class="btn-group"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <table id="clientsTable">
+                        <thead><tr><th>שם הלקוח [מספר]</th><th>סה"כ שאילתות</th><th>נתח שוק</th><th>שיא צריכה</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="card">
-                <h3>גרף מגמה חודשית</h3>
-                <div style="height: 300px;"><canvas id="modalCustChart"></canvas></div>
-            </div>
+            <div id="clientProfileView" class="hidden">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+                        <h2 id="profName" style="margin:0; color:var(--gov-blue);"></h2>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-gov" onclick="generateClientDetailedReport()">דוח מפורט ללקוח</button>
+                            <button class="btn-gov" onclick="closeProfile()" style="background:#666;">חזרה לרשימה</button>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-container" style="background:#f4f7f9;">
+                        <label><b>סינון שנים לתחקור ודוח:</b></label>
+                        <div id="profYearFilters" class="btn-group"></div>
+                    </div>
 
-            <div class="card">
-                <h3>סיכום חודשי מרוכז</h3>
-                <table id="modalMonthlySummaryTable">
-                    <thead><tr><th>חודש</th><th class="online-text">און-ליין</th><th class="batch-text">אצווה</th><th>סה"כ כללי</th></tr></thead>
-                    <tbody></tbody>
-                </table>
+                    <div class="yearly-layout">
+                        <div>
+                            <table id="profTable">
+                                <thead><tr><th>חודש</th><th>און-ליין</th><th>אצווה</th><th>סה"כ</th></tr></thead>
+                                <tbody></tbody>
+                                <tfoot><tr id="profTotalRow"></tr></tfoot>
+                            </table>
+                        </div>
+                        <div class="chart-container"><canvas id="profChart"></canvas></div>
+                    </div>
+                </div>
             </div>
+        </div>
 
-            <!-- מעבר עמוד להדפסה לפני הטבלה הגולמית -->
-            <div class="page-break"></div>
-
-            <div class="card">
-                <h3>פירוט תנועות גולמיות (Drill Down)</h3>
-                <table id="detailsTable">
-                    <thead>
-                        <tr><th>שנה</th><th>חודש</th><th>סוג שירות</th><th>כמות</th><th>קוד תשובה</th></tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+        <div id="tabComp" class="tab-content">
+            <div id="labGrid" style="display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:20px;"></div>
+            <button class="btn-gov" onclick="updateLabChart()" style="width:100%; padding:15px; font-size: 1.1rem;">בצע השוואה</button>
+            <div class="card" style="margin-top:20px; height:500px;"><canvas id="labChart"></canvas></div>
         </div>
     </div>
 </div>
 
 <script>
-    let masterData = [];
-    let activeMonths = new Set([1,2,3,4,5,6,7,8,9,10,11,12]);
-    let charts = {};
-    const heMonths = ["", "ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
+    let rawData = [];
+    let years = [];
+    let state = {
+        dashYears: new Set(),
+        clientYears: new Set(),
+        profYears: new Set(),
+        currentClientId: null,
+        charts: {}
+    };
 
-    // בניית לחצני חודשים
-    const monthBox = document.getElementById('monthBtns');
-    for(let i=1; i<=12; i++) {
-        const b = document.createElement('button');
-        b.className = 'month-btn active'; b.innerText = heMonths[i]; b.id = `mBtn-${i}`;
-        b.onclick = () => { if(activeMonths.has(i)) activeMonths.delete(i); else activeMonths.add(i); b.classList.toggle('active'); refreshDashboard(); };
-        monthBox.appendChild(b);
-    }
+    const monthNames = ["", "ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
 
-    async function processAllFiles() {
-        const f1 = document.getElementById('fileOnline').files[0];
-        const f2 = document.getElementById('fileBatch').files[0];
-        if(!f1 && !f2) return alert("טען קבצים");
-        masterData = [];
-        if(f1) masterData = masterData.concat(await parseExcel(f1, "און-ליין"));
-        if(f2) masterData = masterData.concat(await parseExcel(f2, "Batch"));
+    async function processFiles() {
+        const fOn = document.getElementById('fileOnline').files[0];
+        const fBt = document.getElementById('fileBatch').files[0];
+        if(!fOn && !fBt) return alert("אנא בחר קובץ");
+
+        const d1 = fOn ? await parseExcel(fOn, "און-ליין") : [];
+        const d2 = fBt ? await parseExcel(fBt, "אצווה") : [];
+        rawData = [...d1, ...d2].filter(d => d.amount > 0 && d.year >= 2023 && d.year <= 2026);
+        
+        years = [...new Set(rawData.map(d => d.year))].sort();
+        state.dashYears = new Set(years);
+        state.clientYears = new Set([years[years.length-1]]);
+        state.profYears = new Set([years[years.length-1]]);
+
         document.getElementById('uploadCard').classList.add('hidden');
-        document.getElementById('mainDashboard').classList.remove('hidden');
-        const years = [...new Set(masterData.map(d => d.year))].sort();
-        document.getElementById('selYear').innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
-        setupAutocomplete();
-        refreshDashboard();
+        document.getElementById('mainApp').classList.remove('hidden');
+
+        initUI();
+        renderDashboard();
+        renderClientTable();
+        initLab();
     }
 
     function parseExcel(file, type) {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const wb = XLSX.read(e.target.result, { type: 'binary' });
-                const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 });
-                const hIdx = rows.findIndex(r => r.some(c => c && c.toString().includes("גורם")));
-                const h = rows[hIdx].map(v => v ? v.toString().trim() : "");
-                const map = {
-                    year: h.indexOf("שנה"), month: h.indexOf("חודש פעילות"), id: h.indexOf("קוד גורם משלם"),
-                    name: h.indexOf("גורם"), amt: h.indexOf("כמות חודשית"), res: h.indexOf("קוד תשובה"),
-                    merkava: h.indexOf("קוד מרכבה")
-                };
-                const results = [];
-                rows.slice(hIdx + 1).forEach(r => {
-                    if(!r[map.name] || r[map.name].toString().includes("סה\"כ") || isNaN(r[map.year])) return;
-                    results.push({
-                        year: r[map.year], month: parseInt(r[map.month]), clientName: r[map.name], clientId: r[map.id],
-                        amount: parseInt(r[map.amt]?.toString().replace(/,/g, '')) || 0, type: type, res: r[map.res], merkava: r[map.merkava] || "-"
-                    });
-                });
-                resolve(results);
+                const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 });
+                const hIdx = json.findIndex(r => r.some(c => c && c.toString().includes("גורם")));
+                const h = json[hIdx];
+                const col = { yr: h.indexOf("שנה"), m: h.indexOf("חודש פעילות"), id: h.indexOf("קוד גורם משלם"), name: h.indexOf("גורם"), amt: h.indexOf("כמות חודשית"), res: h.indexOf("קוד תשובה") };
+                
+                const rows = json.slice(hIdx + 1).map(r => ({
+                    year: parseInt(r[col.yr]),
+                    month: parseInt(r[col.m]),
+                    clientId: r[col.id]?.toString().trim(),
+                    clientName: r[col.name]?.toString().trim(),
+                    amount: parseInt(r[col.amt]) || 0,
+                    type: type,
+                    res: r[col.res] || ""
+                })).filter(r => r.year && r.clientName && !r.clientName.includes("סה\"כ"));
+                resolve(rows);
             };
             reader.readAsBinaryString(file);
         });
     }
 
-    function toggleAllMonths(state) {
-        for(let i=1; i<=12; i++) {
-            const b = document.getElementById(`mBtn-${i}`);
-            if(state) { activeMonths.add(i); b.classList.add('active'); }
-            else { activeMonths.delete(i); b.classList.remove('active'); }
+    function initUI() {
+        const updateBtns = (containerId, set) => {
+            document.getElementById(containerId).innerHTML = years.map(y => 
+                `<button class="toggle-btn ${set.has(y)?'active':''}" data-year="${y}" onclick="handleYearToggle('${containerId}', ${y})">${y}</button>`
+            ).join('');
+        };
+        updateBtns('dashYearFilters', state.dashYears);
+        updateBtns('clientYearFilters', state.clientYears);
+        updateBtns('profYearFilters', state.profYears);
+    }
+
+    function handleYearToggle(containerId, year) {
+        let set;
+        if (containerId === 'dashYearFilters') set = state.dashYears;
+        else if (containerId === 'clientYearFilters') set = state.clientYears;
+        else if (containerId === 'profYearFilters') set = state.profYears;
+
+        if (set.has(year)) {
+            if (set.size === 1) return;
+            set.delete(year);
+        } else {
+            set.add(year);
         }
-        refreshDashboard();
+
+        document.querySelectorAll(`#${containerId} [data-year="${year}"]`).forEach(b => b.classList.toggle('active'));
+        
+        if (containerId === 'dashYearFilters') renderDashboard();
+        else if (containerId === 'clientYearFilters') renderClientTable();
+        else if (containerId === 'profYearFilters') updateClientProfile();
     }
 
-    function refreshDashboard() {
-        const yr = document.getElementById('selYear').value;
-        const filtered = masterData.filter(d => d.year == yr && activeMonths.has(d.month));
-        const total = filtered.reduce((s, d) => s + d.amount, 0);
+    function renderDashboard() {
+        const filtered = rawData.filter(d => state.dashYears.has(d.year));
+        
+        const total = filtered.reduce((s,d)=>s+d.amount,0);
+        const online = filtered.filter(d=>d.type==="און-ליין").reduce((s,d)=>s+d.amount,0);
+        const batch = filtered.filter(d=>d.type==="אצווה").reduce((s,d)=>s+d.amount,0);
 
-        document.getElementById('kpi-total').innerText = total.toLocaleString();
-        document.getElementById('kpi-online').innerText = filtered.filter(d => d.type === "און-ליין").reduce((s,d)=>s+d.amount,0).toLocaleString();
-        document.getElementById('kpi-batch').innerText = filtered.filter(d => d.type === "Batch").reduce((s,d)=>s+d.amount,0).toLocaleString();
-        document.getElementById('kpi-active').innerText = new Set(filtered.map(d => d.clientId)).size;
+        document.getElementById('dash-total').innerText = total.toLocaleString();
+        document.getElementById('dash-online').innerText = online.toLocaleString();
+        document.getElementById('dash-batch').innerText = batch.toLocaleString();
 
-        const grouped = {};
+        const yMap = {};
+        years.forEach(y => { if(state.dashYears.has(y)) yMap[y] = { on: 0, bt: 0, activeMonths: new Set() }; });
+        filtered.forEach(d => { 
+            if(d.type === "און-ליין") yMap[d.year].on += d.amount; else yMap[d.year].bt += d.amount;
+            yMap[d.year].activeMonths.add(d.month);
+        });
+
+        document.getElementById('mainYearlyTableBody').innerHTML = Object.entries(yMap).map(([y, v]) => {
+            const sum = v.on + v.bt;
+            const count = v.activeMonths.size || 1;
+            return `<tr><td><b>${y}</b></td><td>${v.on.toLocaleString()}</td><td>${v.bt.toLocaleString()}</td><td><b>${sum.toLocaleString()}</b></td><td>${Math.round(sum/count).toLocaleString()}</td></tr>`;
+        }).join('');
+
+        if(state.charts.mainY) state.charts.mainY.destroy();
+        state.charts.mainY = new Chart(document.getElementById('mainYearlyChart'), {
+            type:'bar', data: { labels: Object.keys(yMap), datasets:[{label:'און-ליין', data:Object.values(yMap).map(v=>v.on), backgroundColor:'#1b5e20'},{label:'אצווה', data:Object.values(yMap).map(v=>v.bt), backgroundColor:'#0d47a1'}]},
+            options: { maintainAspectRatio: false, responsive: true }
+        });
+
+        const container = document.getElementById('yearlyBlocks');
+        container.innerHTML = '';
+        [...state.dashYears].sort().forEach(y => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            const mSum = Array.from({length:13}, () => ({on:0, bt:0}));
+            filtered.filter(d => d.year === y).forEach(d => mSum[d.month][d.type==="און-ליין"?'on':'bt'] += d.amount);
+            const peak = Math.max(...mSum.map(m => m.on + m.bt));
+
+            let rows = '';
+            for(let i=1; i<=12; i++) {
+                const t = mSum[i].on + mSum[i].bt;
+                rows += `<tr class="${t===peak && peak>0?'peak-row':''}"><td>${monthNames[i]} ${t===peak && peak>0?'⭐':''}</td><td>${mSum[i].on.toLocaleString()}</td><td>${mSum[i].bt.toLocaleString()}</td><td><b>${t.toLocaleString()}</b></td></tr>`;
+            }
+
+            card.innerHTML = `<h3>שנת ${y} - פירוט חודשי</h3><div class="yearly-layout">
+                <div>
+                    <table><thead><tr><th>חודש</th><th>און-ליין</th><th>אצווה</th><th>סה"כ</th></tr></thead><tbody>${rows}</tbody>
+                    <tfoot><tr><td>סה"כ</td><td>${mSum.reduce((a,b)=>a+b.on,0).toLocaleString()}</td><td>${mSum.reduce((a,b)=>a+b.bt,0).toLocaleString()}</td><td>${mSum.reduce((a,b)=>a+b.on+b.bt,0).toLocaleString()}</td></tr></tfoot>
+                    </table>
+                </div>
+                <div class="chart-container"><canvas id="ch-${y}"></canvas></div>
+            </div>`;
+            container.appendChild(card);
+            new Chart(document.getElementById(`ch-${y}`), { type:'bar', data: { labels: monthNames.slice(1), datasets:[{label:'און-ליין', data:mSum.slice(1).map(m=>m.on), backgroundColor:'#1b5e20'},{label:'אצווה', data:mSum.slice(1).map(m=>m.bt), backgroundColor:'#0d47a1'}]}, options:{maintainAspectRatio:false}});
+        });
+    }
+
+    function renderClientTable() {
+        const filtered = rawData.filter(d => state.clientYears.has(d.year));
+        const clients = {};
         filtered.forEach(d => {
-            if(!grouped[d.clientId]) grouped[d.clientId] = { name: d.clientName, total: 0, months: {} };
-            grouped[d.clientId].total += d.amount;
-            grouped[d.clientId].months[d.month] = (grouped[d.clientId].months[d.month] || 0) + d.amount;
+            if(!clients[d.clientId]) clients[d.clientId] = { name: d.clientName, total: 0, peaks: {} };
+            clients[d.clientId].total += d.amount;
+            const k = `${d.month}-${d.year}`; clients[d.clientId].peaks[k] = (clients[d.clientId].peaks[k]||0) + d.amount;
         });
 
-        const sorted = Object.entries(grouped).map(([id, data]) => {
-            const vals = Object.values(data.months);
-            const peak = Math.max(...vals, 0);
-            const peakMonthIdx = Object.keys(data.months).find(k => data.months[k] === peak);
-            return { id, name: data.name, total: data.total, peakStr: `${heMonths[peakMonthIdx]} (${peak.toLocaleString()})` };
-        }).sort((a,b) => b.total - a.total);
-
-        document.querySelector('#mainCustTable tbody').innerHTML = sorted.map(c => `
-            <tr class="clickable" onclick="openDrillDown('${c.id}')">
-                <td>${c.name}</td><td>${c.id}</td><td><b>${c.total.toLocaleString()}</b></td>
-                <td>${((c.total/total)*100 || 0).toFixed(2)}%</td>
-                <td>${(c.total / activeMonths.size || 1).toFixed(0)}</td><td>${c.peakStr}</td>
-            </tr>`).join('');
-
-        updateMainChart(filtered);
+        document.querySelector('#clientsTable tbody').innerHTML = Object.entries(clients).sort((a,b)=>b[1].total-a[1].total).map(([id, c]) => {
+            const pk = Object.keys(c.peaks).reduce((a,b)=>c.peaks[a]>c.peaks[b]?a:b);
+            const [m, y] = pk.split('-');
+            return `<tr style="cursor:pointer" onclick="openProfile('${id}')"><td>${c.name} [${id}]</td><td><b>${c.total.toLocaleString()}</b></td><td>${((c.total/filtered.reduce((s,d)=>s+d.amount,0))*100).toFixed(1)}%</td><td>${monthNames[m]} ${y}</td></tr>`;
+        }).join('');
     }
 
-    function updateMainChart(data) {
-        const ctx = document.getElementById('mainMonthChart').getContext('2d');
-        const onData = Array(13).fill(0), btData = Array(13).fill(0);
-        data.forEach(d => { if(d.type === "און-ליין") onData[d.month] += d.amount; else btData[d.month] += d.amount; });
-        if(charts.main) charts.main.destroy();
-        charts.main = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: heMonths.slice(1),
-                datasets: [
-                    { label: 'און-ליין', data: onData.slice(1), backgroundColor: '#1b5e20' },
-                    { label: 'אצווה', data: btData.slice(1), backgroundColor: '#0d47a1' }
-                ]
-            },
-            options: { maintainAspectRatio: false }
+    function openProfile(id) {
+        state.currentClientId = id;
+        document.getElementById('clientListView').classList.add('hidden');
+        document.getElementById('clientProfileView').classList.remove('hidden');
+        updateClientProfile();
+    }
+
+    function updateClientProfile() {
+        const id = state.currentClientId;
+        const data = rawData.filter(d => d.clientId === id && state.profYears.has(d.year));
+        document.getElementById('profName').innerText = `${data[0]?.clientName || 'לקוח'} [${id}]`;
+        
+        const mSum = Array.from({length:13}, () => ({on:0, bt:0}));
+        data.forEach(d => mSum[d.month][d.type==="און-ליין"?'on':'bt'] += d.amount);
+        const peak = Math.max(...mSum.map(m => m.on + m.bt));
+
+        document.querySelector('#profTable tbody').innerHTML = Array.from({length:12}, (_, i) => {
+            const v = mSum[i+1]; const t = v.on + v.bt;
+            return `<tr class="${t === peak && peak > 0 ? 'peak-row' : ''}"><td>${monthNames[i+1]} ${t === peak && peak > 0 ? '⭐' : ''}</td><td>${v.on.toLocaleString()}</td><td>${v.bt.toLocaleString()}</td><td><b>${t.toLocaleString()}</b></td></tr>`;
+        }).join('');
+
+        document.getElementById('profTotalRow').innerHTML = `<td>סה"כ</td><td>${mSum.reduce((a,b)=>a+b.on,0).toLocaleString()}</td><td>${mSum.reduce((a,b)=>a+b.bt,0).toLocaleString()}</td><td>${mSum.reduce((a,b)=>a+b.on+b.bt,0).toLocaleString()}</td>`;
+
+        if(state.charts.prof) state.charts.prof.destroy();
+        state.charts.prof = new Chart(document.getElementById('profChart'), { type:'bar', data: { labels: monthNames.slice(1), datasets:[{label:'און-ליין', data:mSum.slice(1).map(m=>m.on), backgroundColor:'#1b5e20'},{label:'אצווה', data:mSum.slice(1).map(m=>m.bt), backgroundColor:'#0d47a1'}]}, options:{maintainAspectRatio:false}});
+    }
+
+    function generateClientDetailedReport() {
+        const id = state.currentClientId;
+        const yearsStr = [...state.profYears].sort().join(', ');
+        const data = rawData.filter(d => d.clientId === id && state.profYears.has(d.year));
+        
+        // יצירת תמונת גרף מהקנבס הקיים
+        const chartBase64 = state.charts.prof.toDataURL('image/png');
+
+        const reportHtml = `
+            <div style="direction:rtl; font-family: 'Segoe UI', Tahoma, sans-serif; padding:20px;">
+                <!-- עמוד 1 -->
+                <div style="text-align:center; border-bottom:3px solid #003366; padding-bottom:15px; margin-bottom:30px;">
+                    <h2 style="margin:0;">משרד התחבורה והבטיחות בדרכים</h2>
+                    <h3 style="margin:5px 0;">אגף טכנולוגיות דיגיטליות ומידע</h3>
+                </div>
+                <h1 style="text-align:center; color:#003366;">דוח ריכוז צריכה - שנים: ${yearsStr}</h1>
+                <div style="background:#f4f4f4; padding:20px; border-radius:12px; margin:20px 0; border:1px solid #ddd;">
+                    <p style="font-size:1.2rem; margin:5px 0;"><b>שם הלקוח:</b> ${data[0]?.clientName || 'לקוח'}</p>
+                    <p style="font-size:1.2rem; margin:5px 0;"><b>מספר לקוח:</b> ${id}</p>
+                </div>
+                
+                <h3>סיכום צריכה חודשי</h3>
+                <table style="width:100%; border-collapse:collapse; margin-bottom:30px;">
+                    <thead><tr style="background:#f8fbff;"><th style="border:1px solid #ccc; padding:10px;">חודש</th><th style="border:1px solid #ccc; padding:10px;">און-ליין</th><th style="border:1px solid #ccc; padding:10px;">אצווה</th><th style="border:1px solid #ccc; padding:10px;">סה"כ</th></tr></thead>
+                    <tbody>${document.querySelector('#profTable tbody').innerHTML.replace(/<span.*?<\/span>/g, '')}</tbody>
+                    <tfoot style="background:#f1f3f5;">${document.getElementById('profTotalRow').innerHTML}</tfoot>
+                </table>
+
+                <h3 style="border-bottom:1px solid #ccc; padding-bottom:5px;">מגמת צריכה חודשית</h3>
+                <img src="${chartBase64}" style="width:100%; height:auto; border:1px solid #eee;">
+                
+                <div style="page-break-after: always;"></div>
+
+                <!-- עמוד 2 והלאה -->
+                <div style="text-align:center; border-bottom:1px solid #003366; margin-bottom:20px; padding-top:20px;">
+                    <h4>משרד התחבורה - נספח פירוט נתונים מלא</h4>
+                </div>
+                <h3>פירוט שורות נתונים גולמיות</h3>
+                <table style="width:100%; border-collapse:collapse; font-size:11px;">
+                    <thead><tr style="background:#eee;">
+                        <th style="border:1px solid #ccc; padding:5px;">שנה</th>
+                        <th style="border:1px solid #ccc; padding:5px;">חודש</th>
+                        <th style="border:1px solid #ccc; padding:5px;">סוג שירות</th>
+                        <th style="border:1px solid #ccc; padding:5px;">קוד תשובה</th>
+                        <th style="border:1px solid #ccc; padding:5px;">כמות</th>
+                    </tr></thead>
+                    <tbody>
+                        ${data.map(d => `<tr>
+                            <td style="border:1px solid #ccc; padding:5px; text-align:center;">${d.year}</td>
+                            <td style="border:1px solid #ccc; padding:5px; text-align:center;">${monthNames[d.month]}</td>
+                            <td style="border:1px solid #ccc; padding:5px; text-align:center;">${d.type}</td>
+                            <td style="border:1px solid #ccc; padding:5px; text-align:center;">${d.res}</td>
+                            <td style="border:1px solid #ccc; padding:5px; text-align:center;">${d.amount.toLocaleString()}</td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+
+        const printWin = window.open('', '_blank');
+        printWin.document.write(`<html><head><title>דוח לקוח - ${id}</title></head><body>${reportHtml}</body></html>`);
+        printWin.document.close();
+        
+        setTimeout(() => {
+            printWin.print();
+            printWin.close();
+        }, 500);
+    }
+
+    function initLab() {
+        const grid = document.getElementById('labGrid');
+        const scenarios = [
+            { active: true, year: 2025, months: new Set([1,2,3,4,5,6,7,8,9,10,11,12]) },
+            { active: true, year: 2026, months: new Set([1,2,3,4,5,6,7,8,9,10,11,12]) },
+            { active: false, year: null, months: new Set([1,2,3,4,5,6,7,8,9,10,11,12]) },
+            { active: false, year: null, months: new Set([1,2,3,4,5,6,7,8,9,10,11,12]) }
+        ];
+
+        window.updateLabUI = () => {
+            grid.innerHTML = scenarios.map((sc, i) => `
+                <div class="card" style="border:${sc.active?'2px solid var(--gov-blue)':'1px solid #ccc'}">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:10px;">
+                        <b style="color:var(--gov-blue)">תרחיש ${i+1}</b>
+                        <label style="cursor:pointer; display:flex; align-items:center; gap:5px; font-size:0.85rem;">
+                            <input type="checkbox" ${sc.active?'checked':''} onchange="scenarios[${i}].active=this.checked; updateLabUI()"> פעיל
+                        </label>
+                    </div>
+                    
+                    <div style="margin-bottom:10px;">
+                        <label style="font-size:0.85rem; display:block; margin-bottom:5px;">בחר שנה:</label>
+                        <div class="btn-group">
+                            ${years.map(y => `<button class="toggle-btn ${sc.year===y?'active':''}" onclick="scenarios[${i}].year=${y}; scenarios[${i}].active=true; updateLabUI()">${y}</button>`).join('')}
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:5px;">
+                        <label style="font-size:0.85rem; display:block; margin-bottom:5px;">חודשים:</label>
+                        <div class="btn-group">
+                            ${monthNames.slice(1).map((m, mi) => `<button class="toggle-btn ${sc.months.has(mi+1)?'active':''}" style="font-size:0.65rem; padding:3px 8px;" onclick="toggleLabMonth(${i},${mi+1})">${m}</button>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            window.scenarios = scenarios;
+        };
+
+        window.toggleLabMonth = (si, m) => {
+            if(scenarios[si].months.has(m)) scenarios[si].months.delete(m); else scenarios[si].months.add(m);
+            updateLabUI();
+        };
+
+        updateLabUI();
+    }
+
+    function updateLabChart() {
+        const datasets = [];
+        const colors = ['#003366', '#d32f2f', '#1b5e20', '#f9a825'];
+        window.scenarios.forEach((sc, i) => {
+            if(!sc.active || !sc.year) return;
+            const data = Array.from({length:12}, (_, mi) => sc.months.has(mi+1) ? rawData.filter(d => d.year === sc.year && d.month === mi+1).reduce((s,r)=>s+r.amount, 0) : 0);
+            datasets.push({ label: `תרחיש ${i+1} (${sc.year})`, data, backgroundColor: colors[i] });
         });
+        if(state.charts.lab) state.charts.lab.destroy();
+        state.charts.lab = new Chart(document.getElementById('labChart'), { type:'bar', data:{ labels:monthNames.slice(1), datasets }, options:{maintainAspectRatio:false}});
     }
 
-    function openDrillDown(cid) {
-        const filtered = masterData.filter(d => d.clientId === cid);
-        const name = filtered[0].clientName;
-        const merkava = filtered[0].merkava;
-        const onT = filtered.filter(d => d.type === "און-ליין").reduce((s,r)=>s+r.amount, 0);
-        const btT = filtered.filter(d => d.type === "Batch").reduce((s,r)=>s+r.amount, 0);
-
-        document.getElementById('modalTitle').innerText = `תחקור לקוח: ${name}`;
-        document.getElementById('modalSummary').innerHTML = `
-            <div class="banner-item"><span>לקוח</span><b>${name} [${cid}]</b></div>
-            <div class="banner-item"><span>סה"כ שאילתות</span><b>${(onT+btT).toLocaleString()}</b></div>
-            <div class="banner-item"><span>און-ליין</span><b>${onT.toLocaleString()}</b></div>
-            <div class="banner-item"><span>אצווה</span><b>${btT.toLocaleString()}</b></div>
-        `;
-
-        // פרטים להדפסה
-        document.getElementById('pCustName').innerText = name;
-        document.getElementById('pCustId').innerText = cid;
-        document.getElementById('pMerkava').innerText = merkava;
-        document.getElementById('pFilters').innerText = `מסננים חלים: שנה ${document.getElementById('selYear').value} | חודשים: ${[...activeMonths].map(m => heMonths[m]).join(', ')}`;
-
-        const mSum = {};
-        filtered.forEach(d => { if(!mSum[d.month]) mSum[d.month] = {on:0, bt:0}; if(d.type==="און-ליין") mSum[d.month].on+=d.amount; else mSum[d.month].bt+=d.amount; });
-        document.querySelector('#modalMonthlySummaryTable tbody').innerHTML = Object.entries(mSum).sort((a,b)=>a[0]-b[0]).map(([m,v]) => `
-            <tr><td>${heMonths[m]}</td><td class="online-text">${v.on.toLocaleString()}</td><td class="batch-text">${v.bt.toLocaleString()}</td><td><b>${(v.on+v.bt).toLocaleString()}</b></td></tr>
-        `).join('');
-
-        document.querySelector('#detailsTable tbody').innerHTML = filtered.sort((a,b)=>a.month-b.month).map(d => `
-            <tr><td>${d.year}</td><td>${heMonths[d.month]}</td><td>${d.type}</td><td>${d.amount.toLocaleString()}</td><td>${d.res}</td></tr>
-        `).join('');
-
-        const ctx = document.getElementById('modalCustChart').getContext('2d');
-        if(charts.cust) charts.cust.destroy();
-        charts.cust = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: heMonths.slice(1),
-                datasets: [
-                    { label: 'און-ליין', data: Array.from({length:12}, (_,i)=>mSum[i+1]?.on || 0), backgroundColor: '#1b5e20' },
-                    { label: 'אצווה', data: Array.from({length:12}, (_,i)=>mSum[i+1]?.bt || 0), backgroundColor: '#0d47a1' }
-                ]
-            },
-            options: { maintainAspectRatio: false }
-        });
-        document.getElementById('modalOverlay').style.display = 'flex';
+    function switchTab(id, btn) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.getElementById(id).classList.add('active'); btn.classList.add('active');
     }
-
-    function setupAutocomplete() {
-        const uClients = [...new Map(masterData.map(item => [item.clientId, item])).values()];
-        document.getElementById('clientList').innerHTML = uClients.map(c => `<option value="${c.clientId}">${c.clientName}</option>`).join('');
+    function filterClientTable() {
+        const t = document.getElementById('clientSearch').value.toLowerCase();
+        document.querySelectorAll('#clientsTable tbody tr').forEach(tr => tr.style.display = tr.innerText.toLowerCase().includes(t) ? '' : 'none');
     }
-    function handleSearch(v) { const f = masterData.find(d => d.clientId === v || d.clientName === v); if(f) openDrillDown(f.clientId); }
-    function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+    function closeProfile() { document.getElementById('clientListView').classList.remove('hidden'); document.getElementById('clientProfileView').classList.add('hidden'); }
 </script>
 </body>
 </html>
