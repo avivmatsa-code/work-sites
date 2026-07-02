@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>מערכת ניתוח צריכת מידע - משרד התחבורה</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { 
+            --gov-blue: #003366; 
+            --gov-accent: #2c679e; 
+            --gov-bg: #f3f6f9; 
+            --white: #ffffff;
+            --online-green: #1b5e20; 
+            --batch-blue: #0d47a1;   
+        }
+        
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--gov-bg); margin: 0; padding: 0; text-align: right; color: #333; }
+        header { background-color: var(--white); border-bottom: 4px solid var(--gov-blue); padding: 15px 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .titles h2 { margin: 0; font-size: 0.9rem; color: #666; font-weight: normal; }
+        .titles h1 { margin: 5px 0 0 0; font-size: 1.4rem; color: var(--gov-blue); }
+        .container { padding: 20px 40px; max-width: 1400px; margin: auto; }
+        
+        #uploadCard { background: var(--white); padding: 25px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr auto; gap: 20px; align-items: flex-end; }
+        .btn-gov { background-color: var(--gov-blue); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; }
+
+        /* פאנל מסננים מעוצב */
+        .filter-container { background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #e0e6ed; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .filter-row { display: flex; gap: 30px; align-items: flex-start; }
+        .filter-group { display: flex; flex-direction: column; gap: 8px; }
+        .filter-group label { font-weight: bold; font-size: 0.85rem; color: var(--gov-blue); }
+        
+        .month-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+        .month-btn { padding: 6px 12px; border: 1px solid #d1d9e0; border-radius: 15px; background: #f9fbff; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
+        .month-btn.active { background-color: var(--gov-blue); color: white; border-color: var(--gov-blue); }
+        .all-btn { background: #e2e8f0; font-weight: bold; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: var(--white); padding: 15px; border-radius: 10px; border-right: 6px solid var(--gov-blue); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .stat-card .num { font-size: 1.8rem; font-weight: bold; color: var(--gov-blue); }
+        
+        .card { background: var(--white); padding: 25px; border-radius: 12px; border: 1px solid #e0e6ed; margin-bottom: 20px; }
+        .card h3 { margin-top: 0; color: var(--gov-blue); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8fbff; padding: 12px; text-align: right; border-bottom: 2px solid var(--gov-blue); font-size: 0.85rem; color: var(--gov-blue); }
+        td { padding: 12px; border-bottom: 1px solid #eff2f5; font-size: 0.9rem; }
+        tr.clickable:hover { background: #f4f8ff; cursor: pointer; }
+
+        /* מודאל תחקור - רכיבים אחד מתחת לשני */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal { background: var(--white); width: 95%; height: 95%; border-radius: 12px; display: flex; flex-direction: column; padding: 30px; }
+        .modal-body { flex: 1; overflow-y: auto; padding-right: 10px; }
+        
+        .summary-banner { background: #f0f7ff; padding: 20px; border-radius: 10px; margin-bottom: 25px; display: flex; gap: 50px; border: 1px solid #c2d9ff; }
+        .banner-item b { font-size: 1.4rem; color: var(--gov-blue); display: block; }
+
+        /* הגדרות הדפסה */
+        #printHeader { display: none; }
+        
+        @media print {
+            @page { size: A4 portrait; margin: 15mm; }
+            body * { visibility: hidden; }
+            #modalOverlay, #modalOverlay * { visibility: visible; }
+            #modalOverlay { position: absolute; left: 0; top: 0; width: 100%; background: white; }
+            .modal { position: absolute; top: 0; left: 0; width: 100%; border: none; padding: 0; box-shadow: none; display: block !important; }
+            .modal-header, .btn-print, .close-btn { display: none !important; }
+            #printHeader { display: block; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 10px; }
+            .print-filters { font-size: 0.8rem; color: #444; margin-top: 5px; }
+            .card { border: 1px solid #eee; break-inside: avoid; width: 100%; padding: 15px; margin-bottom: 20px; }
+            .page-break { display: block; page-break-before: always; height: 0; }
+            .modal-body { overflow: visible; }
+            table { font-size: 10pt; width: 100%; }
+            canvas { max-width: 100% !important; height: auto !important; }
+        }
+
+        .hidden { display: none; }
+        .online-text { color: var(--online-green); font-weight: bold; }
+        .batch-text { color: var(--batch-blue); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-content">
+        <div class="titles">
+            <h2>משרד התחבורה והבטיחות בדרכים | אגף טכנולוגיות דיגיטליות</h2>
+            <h1>מערכת לניתוח השימוש בשירותי המידע</h1>
+        </div>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Seal_of_the_Ministry_of_Transport_%28Israel%29.svg/200px-Seal_of_the_Ministry_of_Transport_%28Israel%29.svg.png" height="60">
+    </div>
+</header>
+
+<div class="container">
+    <!-- טעינה -->
+    <div id="uploadCard">
+        <div class="filter-group">
+            <label>שאילתות און-ליין (אקסל):</label>
+            <input type="file" id="fileOnline" accept=".xlsx, .xls">
+        </div>
+        <div class="filter-group">
+            <label>שאילתות אצווה (אקסל):</label>
+            <input type="file" id="fileBatch" accept=".xlsx, .xls">
+        </div>
+        <button class="btn-gov" onclick="processAllFiles()">עבד נתונים</button>
+    </div>
+
+    <div id="mainDashboard" class="hidden">
+        <!-- מסננים -->
+        <div class="filter-container">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>בחירת שנה:</label>
+                    <select id="selYear" onchange="refreshDashboard()" style="padding:10px; border-radius:8px; border:1px solid #ccc; width: 120px;"></select>
+                </div>
+                <div class="filter-group" style="flex:1">
+                    <label>חודשים (בחירה מרובה):</label>
+                    <div class="month-buttons" id="monthBtns">
+                        <button class="month-btn all-btn" onclick="toggleAllMonths(true)">בחר הכל</button>
+                        <button class="month-btn all-btn" onclick="toggleAllMonths(false)">נקה הכל</button>
+                    </div>
+                </div>
+                <div class="filter-group" style="flex:1">
+                    <label>חיפוש לקוח מהיר:</label>
+                    <input type="text" id="clientSearch" list="clientList" placeholder="הקלד שם או מספר לקוח..." onchange="handleSearch(this.value)" style="padding:10px; border:1px solid #ccc; border-radius:8px;">
+                    <datalist id="clientList"></datalist>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card"><h3>סה"כ שאילתות</h3><div class="num" id="kpi-total">0</div></div>
+            <div class="stat-card" style="border-right-color: var(--online-green);"><h3>און-ליין</h3><div class="num" id="kpi-online">0</div></div>
+            <div class="stat-card" style="border-right-color: var(--batch-blue);"><h3>אצווה</h3><div class="num" id="kpi-batch">0</div></div>
+            <div class="stat-card"><h3>לקוחות פעילים</h3><div class="num" id="kpi-active">0</div></div>
+        </div>
+
+        <div class="card">
+            <h3>מגמת שימוש חודשית (און-ליין מול אצווה)</h3>
+            <div style="height: 300px;"><canvas id="mainMonthChart"></canvas></div>
+        </div>
+
+        <div class="card">
+            <h3>ניתוח לקוחות מלא</h3>
+            <table id="mainCustTable">
+                <thead>
+                    <tr>
+                        <th>שם הלקוח</th>
+                        <th>מספר לקוח</th>
+                        <th>סה"כ שאילתות</th>
+                        <th>אחוז מכלל השאילתות</th>
+                        <th>ממוצע לחודש</th>
+                        <th>צריכת שיא</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- מודאל תחקור -->
+<div id="modalOverlay" class="overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 id="modalTitle">תחקור לקוח</h2>
+            <div>
+                <button class="btn-gov btn-print" onclick="window.print()" style="margin-left: 15px; background-color: var(--online-green);">הפק דוח להדפסה</button>
+                <span class="close-btn" onclick="closeModal()" style="font-size:2rem; cursor:pointer">✖</span>
+            </div>
+        </div>
+        
+        <div class="modal-body">
+            <!-- כותרת מיוחדת להדפסה בלבד -->
+            <div id="printHeader">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 style="margin:0">משרד התחבורה והבטיחות בדרכים</h3>
+                        <h4 style="margin:0; font-weight:normal">אגף טכנולוגיות דיגיטליות ומידע</h4>
+                    </div>
+                    <h2 style="margin:0; color:var(--gov-blue)">דוח צריכת שירותי מידע ללקוח</h2>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd;">
+                    <b>לקוח:</b> <span id="pCustName"></span> | <b>מספר לקוח:</b> <span id="pCustId"></span> | <b>קוד מרכבה:</b> <span id="pMerkava"></span>
+                    <div class="print-filters" id="pFilters"></div>
+                </div>
+            </div>
+
+            <!-- תוכן תצוגה והדפסה - הכל מתחת לשני -->
+            <div class="card">
+                <div id="modalSummary" class="summary-banner"></div>
+            </div>
+
+            <div class="card">
+                <h3>גרף מגמה חודשית</h3>
+                <div style="height: 300px;"><canvas id="modalCustChart"></canvas></div>
+            </div>
+
+            <div class="card">
+                <h3>סיכום חודשי מרוכז</h3>
+                <table id="modalMonthlySummaryTable">
+                    <thead><tr><th>חודש</th><th class="online-text">און-ליין</th><th class="batch-text">אצווה</th><th>סה"כ כללי</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- מעבר עמוד להדפסה לפני הטבלה הגולמית -->
+            <div class="page-break"></div>
+
+            <div class="card">
+                <h3>פירוט תנועות גולמיות (Drill Down)</h3>
+                <table id="detailsTable">
+                    <thead>
+                        <tr><th>שנה</th><th>חודש</th><th>סוג שירות</th><th>כמות</th><th>קוד תשובה</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let masterData = [];
+    let activeMonths = new Set([1,2,3,4,5,6,7,8,9,10,11,12]);
+    let charts = {};
+    const heMonths = ["", "ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
+
+    // בניית לחצני חודשים
+    const monthBox = document.getElementById('monthBtns');
+    for(let i=1; i<=12; i++) {
+        const b = document.createElement('button');
+        b.className = 'month-btn active'; b.innerText = heMonths[i]; b.id = `mBtn-${i}`;
+        b.onclick = () => { if(activeMonths.has(i)) activeMonths.delete(i); else activeMonths.add(i); b.classList.toggle('active'); refreshDashboard(); };
+        monthBox.appendChild(b);
+    }
+
+    async function processAllFiles() {
+        const f1 = document.getElementById('fileOnline').files[0];
+        const f2 = document.getElementById('fileBatch').files[0];
+        if(!f1 && !f2) return alert("טען קבצים");
+        masterData = [];
+        if(f1) masterData = masterData.concat(await parseExcel(f1, "און-ליין"));
+        if(f2) masterData = masterData.concat(await parseExcel(f2, "Batch"));
+        document.getElementById('uploadCard').classList.add('hidden');
+        document.getElementById('mainDashboard').classList.remove('hidden');
+        const years = [...new Set(masterData.map(d => d.year))].sort();
+        document.getElementById('selYear').innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
+        setupAutocomplete();
+        refreshDashboard();
+    }
+
+    function parseExcel(file, type) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const wb = XLSX.read(e.target.result, { type: 'binary' });
+                const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 });
+                const hIdx = rows.findIndex(r => r.some(c => c && c.toString().includes("גורם")));
+                const h = rows[hIdx].map(v => v ? v.toString().trim() : "");
+                const map = {
+                    year: h.indexOf("שנה"), month: h.indexOf("חודש פעילות"), id: h.indexOf("קוד גורם משלם"),
+                    name: h.indexOf("גורם"), amt: h.indexOf("כמות חודשית"), res: h.indexOf("קוד תשובה"),
+                    merkava: h.indexOf("קוד מרכבה")
+                };
+                const results = [];
+                rows.slice(hIdx + 1).forEach(r => {
+                    if(!r[map.name] || r[map.name].toString().includes("סה\"כ") || isNaN(r[map.year])) return;
+                    results.push({
+                        year: r[map.year], month: parseInt(r[map.month]), clientName: r[map.name], clientId: r[map.id],
+                        amount: parseInt(r[map.amt]?.toString().replace(/,/g, '')) || 0, type: type, res: r[map.res], merkava: r[map.merkava] || "-"
+                    });
+                });
+                resolve(results);
+            };
+            reader.readAsBinaryString(file);
+        });
+    }
+
+    function toggleAllMonths(state) {
+        for(let i=1; i<=12; i++) {
+            const b = document.getElementById(`mBtn-${i}`);
+            if(state) { activeMonths.add(i); b.classList.add('active'); }
+            else { activeMonths.delete(i); b.classList.remove('active'); }
+        }
+        refreshDashboard();
+    }
+
+    function refreshDashboard() {
+        const yr = document.getElementById('selYear').value;
+        const filtered = masterData.filter(d => d.year == yr && activeMonths.has(d.month));
+        const total = filtered.reduce((s, d) => s + d.amount, 0);
+
+        document.getElementById('kpi-total').innerText = total.toLocaleString();
+        document.getElementById('kpi-online').innerText = filtered.filter(d => d.type === "און-ליין").reduce((s,d)=>s+d.amount,0).toLocaleString();
+        document.getElementById('kpi-batch').innerText = filtered.filter(d => d.type === "Batch").reduce((s,d)=>s+d.amount,0).toLocaleString();
+        document.getElementById('kpi-active').innerText = new Set(filtered.map(d => d.clientId)).size;
+
+        const grouped = {};
+        filtered.forEach(d => {
+            if(!grouped[d.clientId]) grouped[d.clientId] = { name: d.clientName, total: 0, months: {} };
+            grouped[d.clientId].total += d.amount;
+            grouped[d.clientId].months[d.month] = (grouped[d.clientId].months[d.month] || 0) + d.amount;
+        });
+
+        const sorted = Object.entries(grouped).map(([id, data]) => {
+            const vals = Object.values(data.months);
+            const peak = Math.max(...vals, 0);
+            const peakMonthIdx = Object.keys(data.months).find(k => data.months[k] === peak);
+            return { id, name: data.name, total: data.total, peakStr: `${heMonths[peakMonthIdx]} (${peak.toLocaleString()})` };
+        }).sort((a,b) => b.total - a.total);
+
+        document.querySelector('#mainCustTable tbody').innerHTML = sorted.map(c => `
+            <tr class="clickable" onclick="openDrillDown('${c.id}')">
+                <td>${c.name}</td><td>${c.id}</td><td><b>${c.total.toLocaleString()}</b></td>
+                <td>${((c.total/total)*100 || 0).toFixed(2)}%</td>
+                <td>${(c.total / activeMonths.size || 1).toFixed(0)}</td><td>${c.peakStr}</td>
+            </tr>`).join('');
+
+        updateMainChart(filtered);
+    }
+
+    function updateMainChart(data) {
+        const ctx = document.getElementById('mainMonthChart').getContext('2d');
+        const onData = Array(13).fill(0), btData = Array(13).fill(0);
+        data.forEach(d => { if(d.type === "און-ליין") onData[d.month] += d.amount; else btData[d.month] += d.amount; });
+        if(charts.main) charts.main.destroy();
+        charts.main = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: heMonths.slice(1),
+                datasets: [
+                    { label: 'און-ליין', data: onData.slice(1), backgroundColor: '#1b5e20' },
+                    { label: 'אצווה', data: btData.slice(1), backgroundColor: '#0d47a1' }
+                ]
+            },
+            options: { maintainAspectRatio: false }
+        });
+    }
+
+    function openDrillDown(cid) {
+        const filtered = masterData.filter(d => d.clientId === cid);
+        const name = filtered[0].clientName;
+        const merkava = filtered[0].merkava;
+        const onT = filtered.filter(d => d.type === "און-ליין").reduce((s,r)=>s+r.amount, 0);
+        const btT = filtered.filter(d => d.type === "Batch").reduce((s,r)=>s+r.amount, 0);
+
+        document.getElementById('modalTitle').innerText = `תחקור לקוח: ${name}`;
+        document.getElementById('modalSummary').innerHTML = `
+            <div class="banner-item"><span>לקוח</span><b>${name} [${cid}]</b></div>
+            <div class="banner-item"><span>סה"כ שאילתות</span><b>${(onT+btT).toLocaleString()}</b></div>
+            <div class="banner-item"><span>און-ליין</span><b>${onT.toLocaleString()}</b></div>
+            <div class="banner-item"><span>אצווה</span><b>${btT.toLocaleString()}</b></div>
+        `;
+
+        // פרטים להדפסה
+        document.getElementById('pCustName').innerText = name;
+        document.getElementById('pCustId').innerText = cid;
+        document.getElementById('pMerkava').innerText = merkava;
+        document.getElementById('pFilters').innerText = `מסננים חלים: שנה ${document.getElementById('selYear').value} | חודשים: ${[...activeMonths].map(m => heMonths[m]).join(', ')}`;
+
+        const mSum = {};
+        filtered.forEach(d => { if(!mSum[d.month]) mSum[d.month] = {on:0, bt:0}; if(d.type==="און-ליין") mSum[d.month].on+=d.amount; else mSum[d.month].bt+=d.amount; });
+        document.querySelector('#modalMonthlySummaryTable tbody').innerHTML = Object.entries(mSum).sort((a,b)=>a[0]-b[0]).map(([m,v]) => `
+            <tr><td>${heMonths[m]}</td><td class="online-text">${v.on.toLocaleString()}</td><td class="batch-text">${v.bt.toLocaleString()}</td><td><b>${(v.on+v.bt).toLocaleString()}</b></td></tr>
+        `).join('');
+
+        document.querySelector('#detailsTable tbody').innerHTML = filtered.sort((a,b)=>a.month-b.month).map(d => `
+            <tr><td>${d.year}</td><td>${heMonths[d.month]}</td><td>${d.type}</td><td>${d.amount.toLocaleString()}</td><td>${d.res}</td></tr>
+        `).join('');
+
+        const ctx = document.getElementById('modalCustChart').getContext('2d');
+        if(charts.cust) charts.cust.destroy();
+        charts.cust = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: heMonths.slice(1),
+                datasets: [
+                    { label: 'און-ליין', data: Array.from({length:12}, (_,i)=>mSum[i+1]?.on || 0), backgroundColor: '#1b5e20' },
+                    { label: 'אצווה', data: Array.from({length:12}, (_,i)=>mSum[i+1]?.bt || 0), backgroundColor: '#0d47a1' }
+                ]
+            },
+            options: { maintainAspectRatio: false }
+        });
+        document.getElementById('modalOverlay').style.display = 'flex';
+    }
+
+    function setupAutocomplete() {
+        const uClients = [...new Map(masterData.map(item => [item.clientId, item])).values()];
+        document.getElementById('clientList').innerHTML = uClients.map(c => `<option value="${c.clientId}">${c.clientName}</option>`).join('');
+    }
+    function handleSearch(v) { const f = masterData.find(d => d.clientId === v || d.clientName === v); if(f) openDrillDown(f.clientId); }
+    function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+</script>
+</body>
+</html>
