@@ -11,27 +11,45 @@
             --online-green: #1b5e20; --batch-blue: #0d47a1; --peak-gold: #ffd700;
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--gov-bg); margin: 0; padding: 0; text-align: right; color: #333; }
+        
+        /* Fixed Header & Tabs */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: var(--gov-bg);
+        }
         header { background-color: var(--white); border-bottom: 4px solid var(--gov-blue); padding: 10px 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .titles h1 { margin: 2px 0 0 0; font-size: 1.2rem; color: var(--gov-blue); }
+        
+        .nav-tabs { display: flex; gap: 5px; padding: 0 40px; background: var(--white); border-bottom: 2px solid #ccc; }
+        .nav-link { padding: 12px 25px; cursor: pointer; background: #e2e8f0; border: none; border-radius: 8px 8px 0 0; font-weight: bold; color: var(--gov-blue); font-size: 1rem; }
+        .nav-link.active { background: var(--gov-blue); color: white; }
+
         .container { padding: 20px 40px; max-width: 1700px; margin: auto; }
         
-        .nav-tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #ccc; }
-        .nav-link { padding: 12px 25px; cursor: pointer; background: #e2e8f0; border: none; border-radius: 8px 8px 0 0; font-weight: bold; color: var(--gov-blue); }
-        .nav-link.active { background: var(--gov-blue); color: white; }
+        /* Tab Logic */
         .tab-content { display: none; }
         .tab-content.active { display: block !important; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: var(--white); padding: 15px; border-radius: 10px; border-right: 6px solid var(--gov-blue); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        /* Upload Card Design */
+        #uploadCard { 
+            background: var(--white); padding: 40px; border-radius: 20px; border: 1px solid #ddd; 
+            max-width: 600px; margin: 100px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;
+        }
+        .upload-field { margin-bottom: 20px; text-align: right; }
+        .upload-field label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--gov-blue); }
+        .upload-field input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px; }
+        .stat-card { background: var(--white); padding: 15px; border-radius: 10px; border-right: 5px solid var(--gov-blue); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .stat-card.online { border-right-color: var(--online-green); }
         .stat-card.batch { border-right-color: var(--batch-blue); }
-        .stat-card h3 { margin: 0; font-size: 0.9rem; color: #666; }
-        .stat-card .num { font-size: 1.8rem; font-weight: bold; color: var(--gov-blue); margin-top: 5px; }
+        .stat-card.clients { border-right-color: var(--gov-accent); }
+        .stat-card h3 { margin: 0; font-size: 0.8rem; color: #666; height: 35px; }
+        .stat-card .num { font-size: 1.5rem; font-weight: bold; color: var(--gov-blue); margin-top: 5px; }
 
-        #uploadCard { background: var(--white); padding: 20px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr auto; gap: 20px; align-items: flex-end; }
-        .btn-gov { background-color: var(--gov-blue); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-gov:hover { background: var(--gov-accent); }
-        
         .card { background: var(--white); padding: 20px; border-radius: 12px; border: 1px solid #e0e6ed; margin-bottom: 20px; }
         .filter-container { background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #e0e6ed; margin-bottom: 20px; }
         .btn-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
@@ -44,52 +62,65 @@
         tr.peak-row { background-color: #fff9e6; }
         tfoot { background: #f1f3f5; font-weight: bold; }
 
-        /* פריסה: טבלה מימין, גרף משמאל */
         .yearly-layout { display: grid; grid-template-columns: 1fr 1.3fr; gap: 50px; align-items: start; }
         .chart-container { min-height: 400px; }
 
         .hidden { display: none !important; }
         .peak-star { color: var(--peak-gold); margin-right: 5px; font-weight: bold; }
 
-        /* Report Styles */
+        .btn-gov { background-color: var(--gov-blue); color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-gov:hover { background: var(--gov-accent); }
+
         @media print {
             body * { visibility: hidden; }
             #reportContainer, #reportContainer * { visibility: visible; }
             #reportContainer { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
-            .page-break { page-break-after: always; padding-top: 20px; }
         }
     </style>
 </head>
 <body>
 
-<header class="no-print">
-    <div class="header-content">
+<!-- Header & Nav Area -->
+<div id="stickyHeaderArea" class="sticky-header hidden">
+    <header>
         <div class="titles">
             <h2>משרד התחבורה והבטיחות בדרכים | אגף טכנולוגיות דיגיטליות ומידע</h2>
             <h1>מערכת לניתוח השימוש בשירותי המידע</h1>
         </div>
+    </header>
+    <div class="nav-tabs">
+        <button id="btnTabDash" class="nav-link active" onclick="switchTab('tabDash', this)">דאשבורד ניהולי</button>
+        <button id="btnTabView" class="nav-link" onclick="switchTab('tabView', this)">מבט על לקוח</button>
+        <button id="btnTabComp" class="nav-link" onclick="switchTab('tabComp', this)">מעבדת השוואה</button>
     </div>
-</header>
+</div>
 
-<div class="container no-print">
+<div class="container">
+    <!-- Initial Upload Screen -->
     <div id="uploadCard">
-        <div style="display:flex; flex-direction:column; gap:5px;"><label>שאילתות און-ליין:</label><input type="file" id="fileOnline" accept=".xlsx, .xls"></div>
-        <div style="display:flex; flex-direction:column; gap:5px;"><label>שאילתות אצווה:</label><input type="file" id="fileBatch" accept=".xlsx, .xls"></div>
-        <button class="btn-gov" onclick="processFiles()">עבד נתונים</button>
+        <h2 style="color:var(--gov-blue); margin-bottom:30px;">טעינת נתוני מערכת</h2>
+        <div class="upload-field">
+            <label>שאילתות און-ליין (Excel):</label>
+            <input type="file" id="fileOnline" accept=".xlsx, .xls">
+        </div>
+        <div class="upload-field">
+            <label>שאילתות אצווה (Excel):</label>
+            <input type="file" id="fileBatch" accept=".xlsx, .xls">
+        </div>
+        <button class="btn-gov" onclick="processFiles()" style="width:100%; font-size:1.1rem;">עבד נתונים והצג דאשבורד</button>
     </div>
 
     <div id="mainApp" class="hidden">
-        <div class="nav-tabs">
-            <button class="nav-link active" onclick="switchTab('tabDash', this)">דאשבורד ניהולי</button>
-            <button class="nav-link" onclick="switchTab('tabView', this)">מבט על לקוח</button>
-            <button class="nav-link" onclick="switchTab('tabComp', this)">מעבדת השוואה</button>
-        </div>
-
+        
+        <!-- טאב 1: דאשבורד -->
         <div id="tabDash" class="tab-content active">
             <div class="stats-grid">
                 <div class="stat-card"><h3>סה"כ שאילתות</h3><div class="num" id="dash-total">0</div></div>
-                <div class="stat-card online"><h3>און-ליין</h3><div class="num" id="dash-online">0</div></div>
-                <div class="stat-card batch"><h3>אצווה</h3><div class="num" id="dash-batch">0</div></div>
+                <div class="stat-card online"><h3>שאילתות און-ליין</h3><div class="num" id="dash-online">0</div></div>
+                <div class="stat-card batch"><h3>שאילתות אצווה</h3><div class="num" id="dash-batch">0</div></div>
+                <div class="stat-card clients"><h3>סה"כ לקוחות פעילים</h3><div class="num" id="active-total">0</div></div>
+                <div class="stat-card online"><h3>לקוחות פעילים און-ליין</h3><div class="num" id="active-online">0</div></div>
+                <div class="stat-card batch"><h3>לקוחות פעילים אצווה</h3><div class="num" id="active-batch">0</div></div>
             </div>
 
             <div class="filter-container">
@@ -113,6 +144,7 @@
             <div id="yearlyBlocks"></div>
         </div>
 
+        <!-- טאב 2: לקוחות -->
         <div id="tabView" class="tab-content">
             <div id="clientListView">
                 <div class="filter-container">
@@ -135,12 +167,13 @@
                 </div>
             </div>
 
+            <!-- תחקור לקוח (חלק מטאב לקוחות) -->
             <div id="clientProfileView" class="hidden">
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
                         <h2 id="profName" style="margin:0; color:var(--gov-blue);"></h2>
                         <div style="display:flex; gap:10px;">
-                            <button class="btn-gov" onclick="generateClientDetailedReport()">דוח מפורט ללקוח</button>
+                            <button class="btn-gov" onclick="generateClientDetailedReport()">הפק דוח</button>
                             <button class="btn-gov" onclick="closeProfile()" style="background:#666;">חזרה לרשימה</button>
                         </div>
                     </div>
@@ -164,11 +197,13 @@
             </div>
         </div>
 
+        <!-- טאב 3: מעבדה -->
         <div id="tabComp" class="tab-content">
             <div id="labGrid" style="display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-bottom:20px;"></div>
             <button class="btn-gov" onclick="updateLabChart()" style="width:100%; padding:15px; font-size: 1.1rem;">בצע השוואה</button>
             <div class="card" style="margin-top:20px; height:500px;"><canvas id="labChart"></canvas></div>
         </div>
+
     </div>
 </div>
 
@@ -185,10 +220,28 @@
 
     const monthNames = ["", "ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
 
+    // Tab Switching Logic
+    function switchTab(tabId, btn) {
+        // Hide all tab content
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        // Deactivate all tab links
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        
+        // Show selected tab
+        document.getElementById(tabId).classList.add('active');
+        // Activate selected link
+        btn.classList.add('active');
+
+        // Special case: if switching back to tabView, make sure list is shown if no profile is active
+        if(tabId === 'tabView' && !state.currentClientId) {
+            closeProfile();
+        }
+    }
+
     async function processFiles() {
         const fOn = document.getElementById('fileOnline').files[0];
         const fBt = document.getElementById('fileBatch').files[0];
-        if(!fOn && !fBt) return alert("אנא בחר קובץ");
+        if(!fOn && !fBt) return alert("אנא בחר קובץ אחד לפחות");
 
         const d1 = fOn ? await parseExcel(fOn, "און-ליין") : [];
         const d2 = fBt ? await parseExcel(fBt, "אצווה") : [];
@@ -200,6 +253,7 @@
         state.profYears = new Set([years[years.length-1]]);
 
         document.getElementById('uploadCard').classList.add('hidden');
+        document.getElementById('stickyHeaderArea').classList.remove('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
 
         initUI();
@@ -267,13 +321,18 @@
     function renderDashboard() {
         const filtered = rawData.filter(d => state.dashYears.has(d.year));
         
-        const total = filtered.reduce((s,d)=>s+d.amount,0);
-        const online = filtered.filter(d=>d.type==="און-ליין").reduce((s,d)=>s+d.amount,0);
-        const batch = filtered.filter(d=>d.type==="אצווה").reduce((s,d)=>s+d.amount,0);
+        document.getElementById('dash-total').innerText = filtered.reduce((s,d)=>s+d.amount,0).toLocaleString();
+        document.getElementById('dash-online').innerText = filtered.filter(d=>d.type==="און-ליין").reduce((s,d)=>s+d.amount,0).toLocaleString();
+        document.getElementById('dash-batch').innerText = filtered.filter(d=>d.type==="אצווה").reduce((s,d)=>s+d.amount,0).toLocaleString();
 
-        document.getElementById('dash-total').innerText = total.toLocaleString();
-        document.getElementById('dash-online').innerText = online.toLocaleString();
-        document.getElementById('dash-batch').innerText = batch.toLocaleString();
+        // Active Client Stats
+        const actTotal = new Set(filtered.map(d => d.clientId)).size;
+        const actOnline = new Set(filtered.filter(d => d.type === "און-ליין").map(d => d.clientId)).size;
+        const actBatch = new Set(filtered.filter(d => d.type === "אצווה").map(d => d.clientId)).size;
+
+        document.getElementById('active-total').innerText = actTotal.toLocaleString();
+        document.getElementById('active-online').innerText = actOnline.toLocaleString();
+        document.getElementById('active-batch').innerText = actBatch.toLocaleString();
 
         const yMap = {};
         years.forEach(y => { if(state.dashYears.has(y)) yMap[y] = { on: 0, bt: 0, activeMonths: new Set() }; });
@@ -296,7 +355,8 @@
 
         const container = document.getElementById('yearlyBlocks');
         container.innerHTML = '';
-        [...state.dashYears].sort().forEach(y => {
+        // Sort descending: newest to oldest
+        [...state.dashYears].sort((a,b) => b - a).forEach(y => {
             const card = document.createElement('div');
             card.className = 'card';
             const mSum = Array.from({length:13}, () => ({on:0, bt:0}));
@@ -365,17 +425,20 @@
         state.charts.prof = new Chart(document.getElementById('profChart'), { type:'bar', data: { labels: monthNames.slice(1), datasets:[{label:'און-ליין', data:mSum.slice(1).map(m=>m.on), backgroundColor:'#1b5e20'},{label:'אצווה', data:mSum.slice(1).map(m=>m.bt), backgroundColor:'#0d47a1'}]}, options:{maintainAspectRatio:false}});
     }
 
+    function closeProfile() { 
+        state.currentClientId = null;
+        document.getElementById('clientListView').classList.remove('hidden'); 
+        document.getElementById('clientProfileView').classList.add('hidden'); 
+    }
+
     function generateClientDetailedReport() {
         const id = state.currentClientId;
         const yearsStr = [...state.profYears].sort().join(', ');
         const data = rawData.filter(d => d.clientId === id && state.profYears.has(d.year));
-        
-        // יצירת תמונת גרף מהקנבס הקיים
         const chartBase64 = state.charts.prof.toDataURL('image/png');
 
         const reportHtml = `
             <div style="direction:rtl; font-family: 'Segoe UI', Tahoma, sans-serif; padding:20px;">
-                <!-- עמוד 1 -->
                 <div style="text-align:center; border-bottom:3px solid #003366; padding-bottom:15px; margin-bottom:30px;">
                     <h2 style="margin:0;">משרד התחבורה והבטיחות בדרכים</h2>
                     <h3 style="margin:5px 0;">אגף טכנולוגיות דיגיטליות ומידע</h3>
@@ -384,41 +447,24 @@
                 <div style="background:#f4f4f4; padding:20px; border-radius:12px; margin:20px 0; border:1px solid #ddd;">
                     <p style="font-size:1.2rem; margin:5px 0;"><b>שם הלקוח:</b> ${data[0]?.clientName || 'לקוח'}</p>
                     <p style="font-size:1.2rem; margin:5px 0;"><b>מספר לקוח:</b> ${id}</p>
+                    <p style="font-size:1.2rem; margin:5px 0;"><b>סה"כ שאילתות:</b> ${data.reduce((s,d)=>s+d.amount,0).toLocaleString()}</p>
                 </div>
-                
-                <h3>סיכום צריכה חודשי</h3>
+                <h3 style="border-bottom:1px solid #ccc; padding-bottom:5px;">סיכום צריכה חודשי</h3>
                 <table style="width:100%; border-collapse:collapse; margin-bottom:30px;">
                     <thead><tr style="background:#f8fbff;"><th style="border:1px solid #ccc; padding:10px;">חודש</th><th style="border:1px solid #ccc; padding:10px;">און-ליין</th><th style="border:1px solid #ccc; padding:10px;">אצווה</th><th style="border:1px solid #ccc; padding:10px;">סה"כ</th></tr></thead>
                     <tbody>${document.querySelector('#profTable tbody').innerHTML.replace(/<span.*?<\/span>/g, '')}</tbody>
                     <tfoot style="background:#f1f3f5;">${document.getElementById('profTotalRow').innerHTML}</tfoot>
                 </table>
-
-                <h3 style="border-bottom:1px solid #ccc; padding-bottom:5px;">מגמת צריכה חודשית</h3>
+                <h3>מגמת צריכה חודשית</h3>
                 <img src="${chartBase64}" style="width:100%; height:auto; border:1px solid #eee;">
-                
                 <div style="page-break-after: always;"></div>
-
-                <!-- עמוד 2 והלאה -->
                 <div style="text-align:center; border-bottom:1px solid #003366; margin-bottom:20px; padding-top:20px;">
                     <h4>משרד התחבורה - נספח פירוט נתונים מלא</h4>
                 </div>
-                <h3>פירוט שורות נתונים גולמיות</h3>
                 <table style="width:100%; border-collapse:collapse; font-size:11px;">
-                    <thead><tr style="background:#eee;">
-                        <th style="border:1px solid #ccc; padding:5px;">שנה</th>
-                        <th style="border:1px solid #ccc; padding:5px;">חודש</th>
-                        <th style="border:1px solid #ccc; padding:5px;">סוג שירות</th>
-                        <th style="border:1px solid #ccc; padding:5px;">קוד תשובה</th>
-                        <th style="border:1px solid #ccc; padding:5px;">כמות</th>
-                    </tr></thead>
+                    <thead><tr style="background:#eee;"><th style="border:1px solid #ccc; padding:5px;">שנה</th><th style="border:1px solid #ccc; padding:5px;">חודש</th><th style="border:1px solid #ccc; padding:5px;">סוג שירות</th><th style="border:1px solid #ccc; padding:5px;">קוד תשובה</th><th style="border:1px solid #ccc; padding:5px;">כמות</th></tr></thead>
                     <tbody>
-                        ${data.map(d => `<tr>
-                            <td style="border:1px solid #ccc; padding:5px; text-align:center;">${d.year}</td>
-                            <td style="border:1px solid #ccc; padding:5px; text-align:center;">${monthNames[d.month]}</td>
-                            <td style="border:1px solid #ccc; padding:5px; text-align:center;">${d.type}</td>
-                            <td style="border:1px solid #ccc; padding:5px; text-align:center;">${d.res}</td>
-                            <td style="border:1px solid #ccc; padding:5px; text-align:center;">${d.amount.toLocaleString()}</td>
-                        </tr>`).join('')}
+                        ${data.map(d => `<tr><td style="border:1px solid #ccc; padding:5px; text-align:center;">${d.year}</td><td style="border:1px solid #ccc; padding:5px; text-align:center;">${monthNames[d.month]}</td><td style="border:1px solid #ccc; padding:5px; text-align:center;">${d.type}</td><td style="border:1px solid #ccc; padding:5px; text-align:center;">${d.res}</td><td style="border:1px solid #ccc; padding:5px; text-align:center;">${d.amount.toLocaleString()}</td></tr>`).join('')}
                     </tbody>
                 </table>
             </div>`;
@@ -426,11 +472,7 @@
         const printWin = window.open('', '_blank');
         printWin.document.write(`<html><head><title>דוח לקוח - ${id}</title></head><body>${reportHtml}</body></html>`);
         printWin.document.close();
-        
-        setTimeout(() => {
-            printWin.print();
-            printWin.close();
-        }, 500);
+        setTimeout(() => { printWin.print(); printWin.close(); }, 500);
     }
 
     function initLab() {
@@ -490,16 +532,10 @@
         state.charts.lab = new Chart(document.getElementById('labChart'), { type:'bar', data:{ labels:monthNames.slice(1), datasets }, options:{maintainAspectRatio:false}});
     }
 
-    function switchTab(id, btn) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        document.getElementById(id).classList.add('active'); btn.classList.add('active');
-    }
     function filterClientTable() {
         const t = document.getElementById('clientSearch').value.toLowerCase();
         document.querySelectorAll('#clientsTable tbody tr').forEach(tr => tr.style.display = tr.innerText.toLowerCase().includes(t) ? '' : 'none');
     }
-    function closeProfile() { document.getElementById('clientListView').classList.remove('hidden'); document.getElementById('clientProfileView').classList.add('hidden'); }
 </script>
 </body>
 </html>
