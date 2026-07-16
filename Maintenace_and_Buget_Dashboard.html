@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת תחזוקות ותקציב - משרד התחבורה</title>
+    <!-- SheetJS for client-side Excel parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Tailwind CSS (Offline-safe standard utilities) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        govNavy: '#002244',
+                        govBlue: '#1e3a8a',
+                        govAzure: '#3b82f6',
+                        govGold: '#d97706',
+                        govLightBg: '#f3f4f6',
+                    },
+                    fontFamily: {
+                        sans: ['Segoe UI', 'Rubik', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom styled elements for governmental style look-and-feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .donut-segment {
+            transition: stroke-dasharray 0.6s ease;
+        }
+    </style>
+</head>
+<body class="bg-govLightBg text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- TOP HEADER LINE (GOV.IL STYLE) -->
+    <header class="bg-white border-b-4 border-govNavy shadow-sm sticky top-0 z-40">
+        <div class="max-w-[1600px] mx-auto px-6 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+            <!-- Right Aligned Identity -->
+            <div class="flex items-center gap-4">
+                <!-- State Emblem Accent Placeholder -->
+                <img src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" 
+     		class="h-14 w-auto object-contain max-w-[180px] select-none" 
+     		alt="לוגו משרד התחבורה">
+                <div>
+                    <h1 class="text-sm font-semibold text-slate-500 leading-none">משרד התחבורה והבטיחות בדרכים</h1>
+                    <h2 class="text-xs font-medium text-slate-400">אגף טכנולוגיות דיגיטליות ומידע</h2>
+                    <h3 class="text-xl font-bold text-govNavy mt-1">מערכת תחזוקות ותקציב</h3>
+                </div>
+            </div>
+
+            <!-- Left Aligned Ingestion & Controls -->
+            <div class="flex flex-wrap items-center gap-3">
+                <label class="flex items-center gap-2 bg-govBlue hover:bg-govNavy text-white px-5 py-2.5 rounded-md shadow cursor-pointer transition text-sm font-medium">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    <span>טעינת קובץ תקציב (XLSX)</span>
+                    <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="hidden" onchange="handleFileUpload(event)">
+                </label>
+                <div id="fileStatusIndicator" class="flex items-center gap-1.5 text-xs bg-slate-100 text-slate-600 border border-slate-200 rounded-md px-3 py-2.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                    <span id="fileStatusText">ממתין לטעינת קובץ אקסל ראשון</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN APP WRAPPER -->
+    <main class="flex-grow max-w-[1600px] w-full mx-auto p-6 flex flex-col gap-6">
+
+        <!-- INITIAL EMPTY STATE COVER (Displayed when no data is loaded) -->
+        <section id="emptyStatePlaceholder" class="bg-white border-2 border-dashed border-slate-300 rounded-xl p-12 text-center max-w-2xl mx-auto my-12 flex flex-col items-center gap-6 shadow-sm animate-fade-in">
+            <div class="w-20 h-20 bg-blue-50 text-govBlue rounded-full flex items-center justify-center">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-govNavy mb-2">ברוכים הבאים למערכת ניהול תחזוקות ותקציב</h3>
+                <p class="text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
+                    כדי להציג את הדשבורד האינטראקטיבי, נתוני המיפוי, פילוח חוזים ורמות התראה, יש להעלות את קובץ האקסל המקורי (<strong class="text-slate-700">"טבלת תחזוקות ותקציב"</strong>).
+                </p>
+            </div>
+            <div class="flex flex-col gap-2 w-full max-w-xs">
+                <label class="bg-govBlue hover:bg-govNavy text-white py-3 px-4 rounded-lg shadow font-semibold text-sm cursor-pointer transition flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    <span>בחר קובץ מהמחשב</span>
+                    <input type="file" accept=".xlsx, .xls" class="hidden" onchange="handleFileUpload(event)">
+                </label>
+                <span class="text-[11px] text-slate-400">הפענוח והצגת הנתונים מתבצעים באופן מקומי ומאובטח בדפדפן</span>
+            </div>
+        </section>
+
+        <!-- DASHBOARD CONTAINER (Initially hidden until first file upload) -->
+        <div id="dashboardGrid" class="hidden flex flex-col gap-6 animate-fade-in">
+            
+            <!-- BENCHMARK FRAMEWORK ALERT -->
+            <div class="bg-gradient-to-l from-govNavy to-blue-900 text-white rounded-lg p-4 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-white/10 rounded-lg">
+                        <svg class="w-6 h-6 text-govGold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-base">מסגרת תקציב בנצ'מארק שנתית (2025)</h4>
+                        <p class="text-sm text-slate-300">תקציב המסגרת המוכתב שהוגדר על סך <strong class="text-white text-base">₪ 74,400,000</strong> מהווה מדד ייחוס להשוואת דרישות התקציב לשנים הבאות.</p>
+                    </div>
+                </div>
+                <div class="flex gap-4 self-end md:self-center">
+                    <div class="text-left">
+                        <span class="text-xs text-slate-300 block">מסגרת 2025</span>
+                        <span class="text-lg font-bold text-govGold">₪ 74.4M</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXECUTIVE SUMMARY WIDGETS (KPI CARDS) -->
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- KPI 1 -->
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 block mb-1">סך דרישת תקציב</span>
+                        <span id="kpiRequested" class="text-2xl font-bold text-slate-800">₪ 0</span>
+                        <span class="text-xs text-slate-500 block mt-1" id="kpiReqVsBenchmark">מול מסגרת 2025</span>
+                    </div>
+                    <div class="p-3 bg-blue-50 text-govBlue rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                </div>
+                <!-- KPI 2 -->
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 block mb-1">תקציב שאושר / הוזמן</span>
+                        <span id="kpiApproved" class="text-2xl font-bold text-emerald-700">₪ 0</span>
+                        <span class="text-xs text-slate-500 block mt-1" id="kpiApprovedVsBenchmark">מול מסגרת 2025</span>
+                    </div>
+                    <div class="p-3 bg-emerald-50 text-emerald-700 rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                </div>
+                <!-- KPI 3 -->
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 block mb-1">אחוז ניצול / מימוש</span>
+                        <span id="kpiUtilization" class="text-2xl font-bold text-blue-600">0%</span>
+                        <div class="w-24 bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                            <div id="kpiUtilBar" class="bg-blue-600 h-full rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-purple-50 text-purple-700 rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/></svg>
+                    </div>
+                </div>
+                <!-- KPI 4 -->
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-100 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 block mb-1">פרויקטים ותחזוקות</span>
+                        <span id="kpiCount" class="text-2xl font-bold text-slate-800">0</span>
+                        <span class="text-xs text-slate-500 block mt-1" id="kpiActiveSplit">0 קבועים | 0 חדשים</span>
+                    </div>
+                    <div class="p-3 bg-amber-50 text-govGold rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FILTERS & SLICING SUITE -->
+            <section class="bg-white p-5 rounded-lg shadow-sm border border-slate-100">
+                <h3 class="text-sm font-bold text-govNavy mb-4 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                    סרגל סינון ופילוח תקציבי
+                </h3>
+
+                <!-- Row 1: Global Selectors -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <!-- Dynamic Year Toggle -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">שנת תקציב</label>
+                        <div class="flex rounded-md shadow-sm">
+                            <button onclick="setYear(2026)" id="btnYear2026" class="flex-1 text-center py-2 text-xs font-bold rounded-r-md transition border border-govBlue bg-govBlue text-white">2026</button>
+                            <button onclick="setYear(2027)" id="btnYear2027" class="flex-1 text-center py-2 text-xs font-bold rounded-l-md transition border border-slate-300 bg-white text-slate-700 hover:bg-slate-50">2027</button>
+                        </div>
+                    </div>
+
+                    <!-- Product Classification -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">סיווג מוצר IT</label>
+                        <select id="filterClassification" onchange="runFilter()" class="w-full bg-slate-50 border border-slate-300 rounded-md py-2 px-3 text-xs focus:ring-1 focus:ring-govBlue focus:border-govBlue">
+                            <option value="הכל">-- כל הסיווגים --</option>
+                        </select>
+                    </div>
+
+                    <!-- Owner / Supplier Search -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">שם ספק / טקסט חופשי</label>
+                        <input type="text" id="filterSearch" oninput="runFilter()" placeholder="חפש לפי ספק, מסמך או כותרת..." class="w-full bg-slate-50 border border-slate-300 rounded-md py-2 px-3 text-xs focus:ring-1 focus:ring-govBlue focus:border-govBlue">
+                    </div>
+
+                    <!-- Priority -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">רמת עדיפות</label>
+                        <div class="flex gap-2">
+                            <label class="flex-1 flex items-center justify-center gap-1 bg-red-50 text-red-700 border border-red-200 rounded py-1.5 text-xs font-medium cursor-pointer">
+                                <input type="checkbox" id="prioHigh" checked onchange="runFilter()" class="rounded text-red-600 focus:ring-red-500">
+                                <span>גבוהה</span>
+                            </label>
+                            <label class="flex-1 flex items-center justify-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 rounded py-1.5 text-xs font-medium cursor-pointer">
+                                <input type="checkbox" id="prioMed" checked onchange="runFilter()" class="rounded text-amber-600 focus:ring-amber-500">
+                                <span>בינונית</span>
+                            </label>
+                            <label class="flex-1 flex items-center justify-center gap-1 bg-blue-50 text-blue-700 border border-blue-200 rounded py-1.5 text-xs font-medium cursor-pointer">
+                                <input type="checkbox" id="prioLow" checked onchange="runFilter()" class="rounded text-blue-600 focus:ring-blue-500">
+                                <span>נמוכה</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Derived Project Category Filters (Toggles) -->
+                <div class="flex flex-wrap gap-2 border-t border-slate-100 pt-4">
+                    <span class="text-xs font-bold text-slate-500 flex items-center ml-2">קטגוריות ממוקדות:</span>
+                    <button id="tagAll" onclick="toggleCategoryFilter('הכל')" class="px-3 py-1.5 rounded-full text-xs font-medium transition bg-slate-800 text-white shadow-sm">הכל</button>
+                    <button id="tagTachKashih" onclick="toggleCategoryFilter('תחזוקה קשיח')" class="px-3 py-1.5 rounded-full text-xs font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200">תחזוקה קשיח</button>
+                    <button id="tagTachHadash" onclick="toggleCategoryFilter('תחזוקה חדשה')" class="px-3 py-1.5 rounded-full text-xs font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200">תחזוקה חדשה</button>
+                    <button id="tagProjMitmasheh" onclick="toggleCategoryFilter('פרויקטים מתמשכים')" class="px-3 py-1.5 rounded-full text-xs font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200">פרויקטים מתמשכים</button>
+                    <button id="tagProjHadash" onclick="toggleCategoryFilter('פרויקטים חדשים')" class="px-3 py-1.5 rounded-full text-xs font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200">פרויקטים חדשים</button>
+                </div>
+            </section>
+
+            <!-- TWO COLUMN DASHBOARD METRICS & VISUALS -->
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- COLUMN 1: Visual Allocation Progress & Statistics (Pure CSS Charts) -->
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-100 flex flex-col gap-5 lg:col-span-1">
+                    <h3 class="text-sm font-bold text-govNavy border-b border-slate-100 pb-2">חלוקת תקציב לפי סיווגי IT</h3>
+                    <div id="chartClassificationContainer" class="flex flex-col gap-4">
+                        <!-- Dynamic categories standard progress bars -->
+                    </div>
+
+                    <h3 class="text-sm font-bold text-govNavy border-b border-slate-100 pb-2 mt-2">השוואת מימון מול מסגרת 2025</h3>
+                    <div class="flex items-center justify-around gap-4 p-2 bg-slate-50 rounded-lg">
+                        <!-- Simple SVG Donut showing approved vs remaining of the 74.4M benchmark framework -->
+                        <div class="relative w-28 h-28 flex items-center justify-center">
+                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#e2e8f0" stroke-width="3"></circle>
+                                <circle id="donutValue" cx="18" cy="18" r="15.915" fill="transparent" stroke="#1e3a8a" stroke-width="3" stroke-dasharray="0 100" class="donut-segment"></circle>
+                            </svg>
+                            <div class="absolute text-center">
+                                <span id="donutPercentText" class="text-lg font-bold text-govNavy">0%</span>
+                                <span class="text-[9px] text-slate-400 block leading-none">מנוצל מהמסגרת</span>
+                            </div>
+                        </div>
+                        <div class="text-xs text-slate-600 space-y-1">
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                                <span>מסגרת: 74.4M ש"ח</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-govBlue"></span>
+                                <span>מאושר: <span id="donutApprovedText">0M ש"ח</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMN 2-3: Main Drill-down Interactive Table -->
+                <div class="bg-white rounded-lg shadow-sm border border-slate-100 lg:col-span-2 flex flex-col justify-between overflow-hidden">
+                    <div>
+                        <!-- Table Header Controls -->
+                        <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3 bg-slate-50/50">
+                            <h3 class="text-sm font-bold text-govNavy">רשומות תחזוקות ופרוייקטים</h3>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-slate-500" id="tableResultCount">מציג 0 מתוך 0 רשומות</span>
+                                <select id="pageSize" onchange="changePageSize()" class="bg-white border border-slate-300 rounded text-xs px-2 py-1">
+                                    <option value="5">5 שורות</option>
+                                    <option value="10" selected>10 שורות</option>
+                                    <option value="25">25 שורות</option>
+                                    <option value="50">50 שורות</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Responsive Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-xs">
+                                <thead>
+                                    <tr class="bg-slate-100 border-b border-slate-200 text-slate-600 font-bold select-none">
+                                        <th class="p-3 cursor-pointer hover:bg-slate-200 transition" onclick="sortTable('מסמך רכישה')">מסמך רכישה <span id="sort_מסמך_רכישה"></span></th>
+                                        <th class="p-3 cursor-pointer hover:bg-slate-200 transition" onclick="sortTable('סוג')">סוג <span id="sort_סוג"></span></th>
+                                        <th class="p-3 cursor-pointer hover:bg-slate-200 transition" onclick="sortTable('שם הספק')">ספק <span id="sort_שם_הספק"></span></th>
+                                        <th class="p-3 cursor-pointer hover:bg-slate-200 transition" onclick="sortTable('סיווג מוצר IT')">סיווג IT <span id="sort_סיווג_מוצר_IT"></span></th>
+                                        <th class="p-3 text-left cursor-pointer hover:bg-slate-200 transition" onclick="sortTable('דרישה')">דרישת תקציב <span id="sort_דרישה"></span></th>
+                                        <th class="p-3 text-left cursor-pointer hover:bg-slate-200 transition" onclick="sortTable('תוקצב')">תקציב מאושר <span id="sort_תוקצב"></span></th>
+                                        <th class="p-3 text-center">ניצול</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody" class="divide-y divide-slate-100">
+                                    <!-- Rows populated by parsing -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Table Pagination Footer -->
+                    <div class="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+                        <button onclick="prevPage()" id="btnPrevPage" class="border border-slate-300 hover:bg-slate-100 text-slate-600 px-3 py-1.5 rounded-md text-xs font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">הקודם</button>
+                        <span class="text-xs text-slate-600 font-semibold" id="paginationInfo">עמוד 1 מתוך 1</span>
+                        <button onclick="nextPage()" id="btnNextPage" class="border border-slate-300 hover:bg-slate-100 text-slate-600 px-3 py-1.5 rounded-md text-xs font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">הבא</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SYSTEM INFORMATION & OTHER TABS -->
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Mainframe comparative info (mf) -->
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-100">
+                    <h4 class="text-sm font-bold text-govNavy mb-3 border-b border-slate-100 pb-2">תקציב מפתחות מיינפרים (MF)</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-xs">
+                            <thead>
+                                <tr class="text-slate-500 font-bold border-b border-slate-200">
+                                    <th class="pb-2">ספק / ייעוד</th>
+                                    <th class="pb-2 text-left">2024</th>
+                                    <th class="pb-2 text-left">2025</th>
+                                    <th class="pb-2 text-left">2026 משוער</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mfTableBody" class="divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Delayed/Expired orders (הזמנות שלא הוארכו) -->
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-100">
+                    <h4 class="text-sm font-bold text-red-800 mb-3 border-b border-red-100 pb-2 flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                        הזמנות פתוחות שלא הוארכו
+                    </h4>
+                    <div class="overflow-y-auto max-h-[220px]">
+                        <table class="w-full text-right text-xs">
+                            <thead>
+                                <tr class="text-slate-500 font-bold border-b border-slate-200">
+                                    <th class="pb-2">ספק</th>
+                                    <th class="pb-2">מסמך רכישה</th>
+                                    <th class="pb-2 text-left">ערך כולל מע"מ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expiredTableBody" class="divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Cancellations & Contract Alerts (חוזים מיוחדים) -->
+                <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-100">
+                    <h4 class="text-sm font-bold text-slate-800 mb-3 border-b border-slate-100 pb-2 flex items-center justify-between">
+                        <span>מעקב חוזים ורמות התראה</span>
+                        <span class="bg-blue-100 text-govBlue px-2 py-0.5 rounded text-[10px] font-bold" id="contractAlertCount">0 התראות</span>
+                    </h4>
+                    <div class="overflow-y-auto max-h-[220px]">
+                        <div id="contractsContainer" class="space-y-3">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- DRILL DOWN ROW MODAL / DRAWER -->
+    <div id="drillDownDrawer" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-end invisible opacity-0 transition-all duration-300">
+        <!-- Close overlay -->
+        <div class="flex-grow h-full" onclick="closeDrawer()"></div>
+        <!-- Drawer Panel -->
+        <div class="w-full max-w-xl bg-white h-full shadow-2xl p-6 flex flex-col justify-between transform translate-x-full transition-transform duration-300 overflow-y-auto" id="drawerPanel">
+            <div>
+                <!-- Header -->
+                <div class="flex justify-between items-start border-b border-slate-100 pb-4 mb-5">
+                    <div>
+                        <span id="drawerBadge" class="bg-govBlue text-white text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded">פרויקט</span>
+                        <h2 id="drawerTitle" class="text-lg font-bold text-govNavy mt-1.5">שם הרשומה / הפרויקט</h2>
+                        <span class="text-xs text-slate-400 mt-1 block">מזהה רכש: <strong id="drawerPurchaseDoc">000000</strong></span>
+                    </div>
+                    <button onclick="closeDrawer()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg border border-slate-100 hover:bg-slate-50 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <!-- Deep Data Parameters Grid -->
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-50 p-3 rounded-lg">
+                            <span class="text-[10px] text-slate-400 font-bold block mb-0.5">סוג תקציבי</span>
+                            <span id="drawerType" class="text-xs font-semibold text-slate-700">-</span>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-lg">
+                            <span class="text-[10px] text-slate-400 font-bold block mb-0.5">ספק אחראי</span>
+                            <span id="drawerSupplier" class="text-xs font-semibold text-slate-700">-</span>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-lg">
+                            <span class="text-[10px] text-slate-400 font-bold block mb-0.5">סיווג מוצר IT</span>
+                            <span id="drawerItClassification" class="text-xs font-semibold text-slate-700">-</span>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-lg">
+                            <span class="text-[10px] text-slate-400 font-bold block mb-0.5">רמת עדיפות</span>
+                            <span id="drawerPriority" class="text-xs font-semibold text-slate-700">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Budget Detail Box -->
+                    <div class="border border-slate-100 rounded-lg p-4 space-y-3">
+                        <h4 class="text-xs font-bold text-govNavy border-b border-slate-100 pb-1.5">השוואת נתוני תקציב לשנת <span id="drawerYearHeader">2026</span></h4>
+                        <div class="grid grid-cols-3 gap-2 text-center">
+                            <div class="bg-blue-50/50 p-2.5 rounded">
+                                <span class="text-[10px] text-slate-500 block">דרישה מבוקשת</span>
+                                <span id="drawerValReq" class="text-xs font-bold text-slate-800">₪ 0</span>
+                            </div>
+                            <div class="bg-emerald-50/50 p-2.5 rounded">
+                                <span class="text-[10px] text-slate-500 block">תוקצב / אושר</span>
+                                <span id="drawerValApp" class="text-xs font-bold text-emerald-800">₪ 0</span>
+                            </div>
+                            <div class="bg-purple-50 p-2.5 rounded">
+                                <span class="text-[10px] text-slate-500 block">סה"כ ערך הזמנה</span>
+                                <span id="drawerValOrder" class="text-xs font-bold text-purple-800">₪ 0</span>
+                            </div>
+                        </div>
+
+                        <!-- Progress visual -->
+                        <div class="space-y-1 pt-1.5">
+                            <div class="flex justify-between text-[10px] text-slate-500">
+                                <span>ניצול הדרישה בפועל</span>
+                                <span id="drawerUtilizationPercent">0%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                <div id="drawerUtilizationBar" class="bg-govBlue h-full rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mapping Joint info from IT Classification sheet -->
+                    <div class="bg-blue-50/40 border border-blue-100 rounded-lg p-4 space-y-2">
+                        <h4 class="text-xs font-bold text-govBlue flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            מיפוי וייעוד מוצר במשרד
+                        </h4>
+                        <p id="drawerItPurpose" class="text-xs text-slate-600 leading-relaxed">
+                            טרם שויך מוצר IT מוגדר במאגר המיפוי עבור רשומה זו.
+                        </p>
+                    </div>
+
+                    <!-- Contract Tracking Status Joint Info -->
+                    <div id="drawerContractStatusBox" class="p-3.5 rounded-lg border flex items-center justify-between text-xs">
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold block mb-0.5">סטטוס חוזה ומעקב</span>
+                            <span id="drawerContractTitle" class="font-semibold text-slate-700">לא זוהה חוזה קשור</span>
+                        </div>
+                        <span id="drawerContractBadge" class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-[10px] font-bold">ללא מידע</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Drawer Footer controls -->
+            <div class="border-t border-slate-100 pt-4 flex gap-3 mt-6">
+                <button onclick="closeDrawer()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded text-xs transition">סגור חלון פירוט</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN SYSTEM FOOTER -->
+    <footer class="bg-govNavy text-slate-400 text-center py-4 text-xs mt-auto">
+        <p>© כל הזכויות שמורות למשרד התחבורה והבטיחות בדרכים - אגף טכנולוגיות דיגיטליות ומידע</p>
+        <p class="mt-1 text-slate-500 text-[10px]">גרסת מערכת: 1.4.1 (תלת-שנתית משולבת) • פלטפורמת ניהול תקציבי מבוססת לקוח</p>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <script>
+        const STATICS = {
+            framework2025: 74400000 // 74.4M ILS
+        };
+
+        // DATABASE starts completely empty
+        let db = {
+            budget2026: [],
+            budget2027: [],
+            itMapping: [],
+            expiredOrders: [],
+            mf: [],
+            contracts: []
+        };
+
+        // State control UI variables
+        let selectedYear = 2026;
+        let selectedCategoryFilter = "הכל";
+        let activeSortColumn = "";
+        let activeSortDirection = "asc";
+        let currentPage = 1;
+        let pageSize = 10;
+        let filteredBudgetList = [];
+
+        // ONLOAD INITIALIZATION - Do not load mock data, system starts clean and empty.
+        window.onload = function() {
+            // Verify and keep initial states empty
+            document.getElementById('emptyStatePlaceholder').classList.remove('hidden');
+            document.getElementById('dashboardGrid').classList.add('hidden');
+        };
+
+        // HANDLE XLSX FILE UPLOAD
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('fileStatusText').innerText = "טוען ומעבד קובץ...";
+            document.getElementById('fileStatusIndicator').className = "flex items-center gap-1.5 text-xs bg-blue-50 text-blue-700 border border-blue-200 rounded-md px-3 py-2";
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    parseExcelWorkbook(workbook);
+
+                    document.getElementById('fileStatusText').innerText = "קובץ נטען בהצלחה: " + file.name;
+                    document.getElementById('fileStatusIndicator').className = "flex items-center gap-1.5 text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md px-3 py-2";
+                    
+                    // Switch views: Hide placeholder, Show dashboard
+                    document.getElementById('emptyStatePlaceholder').classList.add('hidden');
+                    document.getElementById('dashboardGrid').classList.remove('hidden');
+
+                } catch (error) {
+                    console.error(error);
+                    alert("שגיאה בפענוח קובץ האקסל. אנא ודא שהקובץ תקין ובפורמט הנדרש.");
+                    document.getElementById('fileStatusText').innerText = "שגיאה בפענוח קובץ האקסל";
+                    document.getElementById('fileStatusIndicator').className = "flex items-center gap-1.5 text-xs bg-red-50 text-red-700 border border-red-200 rounded-md px-3 py-2";
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // PARSE EXCEL SHEETS DYNAMICALLY
+        function parseExcelWorkbook(workbook) {
+            db.budget2026 = [];
+            db.budget2027 = [];
+            db.itMapping = [];
+            db.expiredOrders = [];
+            db.mf = [];
+            db.contracts = [];
+
+            workbook.SheetNames.forEach(sheetName => {
+                const sheet = workbook.Sheets[sheetName];
+                const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+
+                if (sheetName.includes("תקציב 2026") || sheetName === "2026") {
+                    const parsed = extractStackedBudgetTables(rawRows, 2026);
+                    db.budget2026 = parsed.main;
+                } else if (sheetName.includes("תקציב 2027") || sheetName === "2027") {
+                    const parsed = extractStackedBudgetTables(rawRows, 2027);
+                    db.budget2027 = parsed.main;
+                } else if (sheetName.includes("מיפוי מוצרים") || sheetName.includes("IT")) {
+                    db.itMapping = parseGenericSheet(rawRows, ['שם מוצר', 'סיווג', 'תיאור/ייעוד מוצר']);
+                } else if (sheetName.includes("לא הוארכו") || sheetName.includes("הזמנות שלא")) {
+                    db.expiredOrders = parseGenericSheet(rawRows, ['מסמך רכישה', 'שם הספק', 'ערך הזמנה כולל מע"מ']);
+                } else if (sheetName.toLowerCase() === "mf" || sheetName.includes("מיינפריים")) {
+                    db.mf = parseMfSheet(rawRows);
+                } else if (sheetName.includes("חוזים") || sheetName.includes("מעקב")) {
+                    db.contracts = parseGenericSheet(rawRows, ['שם חוזה', 'ספק', 'סיום חוזה', 'סטטוס', 'רמת_סיכון']);
+                }
+            });
+
+            // Backups in case sheet names don't match exactly
+            if (db.budget2026.length === 0) {
+                const fallbackSheet = workbook.SheetNames.find(n => n.includes("2026") || n.includes("26"));
+                if (fallbackSheet) {
+                    const rawRows = XLSX.utils.sheet_to_json(workbook.Sheets[fallbackSheet], { header: 1, defval: "" });
+                    db.budget2026 = extractStackedBudgetTables(rawRows, 2026).main;
+                }
+            }
+            if (db.budget2027.length === 0) {
+                const fallbackSheet = workbook.SheetNames.find(n => n.includes("2027") || n.includes("27"));
+                if (fallbackSheet) {
+                    const rawRows = XLSX.utils.sheet_to_json(workbook.Sheets[fallbackSheet], { header: 1, defval: "" });
+                    db.budget2027 = extractStackedBudgetTables(rawRows, 2027).main;
+                }
+            }
+
+            initFiltersAndRerender();
+        }
+
+        // SPECIAL PARSING LOGIC: EXTRACT PRIMARY & STACKED TABLES FROM SHEET
+        function extractStackedBudgetTables(rawRows, year) {
+            let main = [];
+            let cancellations = [];
+            let headerIndex = -1;
+            let headers = [];
+            let inCancellationSection = false;
+
+            for (let i = 0; i < rawRows.length; i++) {
+                const row = rawRows[i];
+                if (!row || row.length === 0) continue;
+
+                const rowStr = row.join(" ").trim();
+
+                // Detect cancellation section marker
+                if (rowStr.includes("ביטול") || rowStr.includes("הזמנות לביטול")) {
+                    inCancellationSection = true;
+                    headerIndex = -1;
+                    continue;
+                }
+
+                // Detect headers
+                if (headerIndex === -1 && (row.includes("מסמך רכישה") || row.includes("שם הספק") || row.includes("סוג"))) {
+                    headerIndex = i;
+                    headers = row.map(cell => String(cell || "").trim());
+                    continue;
+                }
+
+                if (headerIndex !== -1 && i > headerIndex) {
+                    if (rowStr.startsWith("סה\"כ") || rowStr.startsWith("סהכ") || rowStr.includes("סה\"כ") || (row[0] === "" && row[1] === "" && row[2] === "")) {
+                        continue;
+                    }
+
+                    let record = {};
+                    headers.forEach((hdr, colIdx) => {
+                        if (hdr) {
+                            record[hdr] = row[colIdx] !== undefined ? row[colIdx] : "";
+                        }
+                    });
+
+                    const pOrder = record['מסמך רכישה'] || "";
+                    if (!pOrder && !record['שם הספק']) continue;
+
+                    let requestedVal = 0;
+                    let approvedVal = 0;
+
+                    Object.keys(record).forEach(k => {
+                        const cleanK = k.replace(/\s+/g, '');
+                        if (cleanK.includes("דרישה") && (cleanK.includes(String(year)) || cleanK.includes(String(year).slice(-2)))) {
+                            requestedVal = parseNumeric(record[k]);
+                        }
+                        if ((cleanK.includes("תוקצב") || cleanK.includes("אושר")) && (cleanK.includes(String(year)) || cleanK.includes(String(year).slice(-2)))) {
+                            approvedVal = parseNumeric(record[k]);
+                        }
+                    });
+
+                    if (requestedVal === 0) requestedVal = parseNumeric(record['דרישה לשנת ' + year] || record['דרישה'] || 0);
+                    if (approvedVal === 0) approvedVal = parseNumeric(record['תוקצב לשנת ' + year] || record['תוקצב'] || 0);
+
+                    const orderVal = parseNumeric(record['ערך הזמנה כולל מע"מ'] || record['ערך הזמנה'] || approvedVal);
+
+                    const typeStr = String(record['סוג'] || "");
+                    const titleStr = String(record['טקסט כותרת'] || "");
+                    const catDerived = deriveTypeCategory(typeStr, titleStr);
+                    const isCancellationRow = inCancellationSection;
+
+                    const cleanRecord = {
+                        'מסמך רכישה': String(pOrder).trim(),
+                        'סוג': typeStr.trim() || "פרויקטים מתמשכים",
+                        'סיווג מוצר IT': (record['סיווג מוצר IT'] || record['סיווג'] || 'אחר').trim(),
+                        'שם הספק': String(record['שם הספק'] || 'כללי').trim(),
+                        'טקסט כותרת': titleStr.trim() || 'ללא תיאור',
+                        'ערך הזמנה כולל מע"מ': orderVal,
+                        'דרישה': requestedVal || approvedVal || orderVal,
+                        'תוקצב': approvedVal,
+                        'סוג_קטגוריה': catDerived,
+                        'עדיפות': record['עדיפות'] || (approvedVal > 5000000 ? 'גבוהה' : (approvedVal > 1000000 ? 'בינונית' : 'נמוכה')),
+                        'אחראי': record['אחראי'] || 'מערכות מידע'
+                    };
+
+                    if (isCancellationRow) {
+                        cancellations.push(cleanRecord);
+                    } else {
+                        main.push(cleanRecord);
+                    }
+                }
+            }
+
+            return { main, cancellations };
+        }
+
+        // PARSE MF (MAINFRAME) SPECIFIC LOGIC TO SEPARATE EXPLANATIONS FROM DATA ROWS
+        function parseMfSheet(rawRows) {
+            let records = [];
+            let headerFound = false;
+            let headers = [];
+
+            for (let i = 0; i < rawRows.length; i++) {
+                const row = rawRows[i];
+                if (!row || row.length === 0) continue;
+
+                const rowStr = row.join(" ").trim();
+                if (rowStr.startsWith("*") || rowStr.includes("הסברים") || rowStr.includes("הערות")) {
+                    continue;
+                }
+
+                if (!headerFound && (row.includes("ספק") || row.includes("שם הספק"))) {
+                    headers = row.map(c => String(c || "").trim());
+                    headerFound = true;
+                    continue;
+                }
+
+                if (headerFound && row[0]) {
+                    let rec = {};
+                    headers.forEach((hdr, idx) => {
+                        if (hdr) rec[hdr] = row[idx] !== undefined ? row[idx] : "";
+                    });
+                    records.push(rec);
+                }
+            }
+            return records;
+        }
+
+        // GENERIC SHEET PARSER FOR SIMPLE TABS
+        function parseGenericSheet(rawRows, expectedFields) {
+            let list = [];
+            let headers = [];
+            let headerFound = false;
+
+            for (let i = 0; i < rawRows.length; i++) {
+                const row = rawRows[i];
+                if (!row || row.length === 0) continue;
+
+                if (!headerFound) {
+                    const matchCount = row.filter(cell => expectedFields.includes(String(cell).trim())).length;
+                    if (matchCount >= 1 || row.includes(expectedFields[0])) {
+                        headers = row.map(c => String(c || "").trim());
+                        headerFound = true;
+                    }
+                    continue;
+                }
+
+                if (headerFound && (row[0] || row[1])) {
+                    let item = {};
+                    headers.forEach((hdr, idx) => {
+                        if (hdr) item[hdr] = row[idx] !== undefined ? row[idx] : "";
+                    });
+                    list.push(item);
+                }
+            }
+            return list;
+        }
+
+        // NUMERIC PARSING HELPERS
+        function parseNumeric(val) {
+            if (!val) return 0;
+            if (typeof val === 'number') return val;
+            const cleaned = String(val).replace(/[^0-9.-]/g, '');
+            return parseFloat(cleaned) || 0;
+        }
+
+        // DERIVE TARGET SYSTEM CATEGORIES FROM ARBITRARY STRINGS
+        function deriveTypeCategory(typeStr, titleStr) {
+            const combined = (typeStr + " " + titleStr).toLowerCase();
+            if (combined.includes("קשיח") || combined.includes("קשיחה")) {
+                return "תחזוקה קשיח";
+            } else if (combined.includes("תחזוקה") && (combined.includes("חדש") || combined.includes("חדשה"))) {
+                return "תחזוקה חדשה";
+            } else if (combined.includes("פרוייקט") || combined.includes("פרויקט")) {
+                if (combined.includes("חדש") || combined.includes("חדשה")) {
+                    return "פרויקטים חדשים";
+                } else {
+                    return "פרויקטים מתמשכים";
+                }
+            }
+            return combined.includes("תחזוקה") ? "תחזוקה קשיח" : "פרויקטים מתמשכים";
+        }
+
+        // RE-POPULATE DINAMIC DROPDOWNS AND RESET TO FIRST PAGE
+        function initFiltersAndRerender() {
+            currentPage = 1;
+            const currentYearList = (selectedYear === 2026) ? db.budget2026 : db.budget2027;
+            
+            // Extract distinct classifications
+            const classifications = new Set();
+            currentYearList.forEach(item => {
+                if (item['סיווג מוצר IT']) classifications.add(item['סיווג מוצר IT']);
+            });
+
+            const ddlClass = document.getElementById('filterClassification');
+            ddlClass.innerHTML = `<option value="הכל">-- כל הסיווגים --</option>`;
+            classifications.forEach(cls => {
+                ddlClass.innerHTML += `<option value="${cls}">${cls}</option>`;
+            });
+
+            runFilter();
+            renderAuxTables();
+        }
+
+        // SET SELECTED YEAR
+        function setYear(year) {
+            selectedYear = year;
+            const btn2026 = document.getElementById('btnYear2026');
+            const btn2027 = document.getElementById('btnYear2027');
+
+            if (year === 2026) {
+                btn2026.className = "flex-1 text-center py-2 text-xs font-bold rounded-r-md transition border border-govBlue bg-govBlue text-white";
+                btn2027.className = "flex-1 text-center py-2 text-xs font-bold rounded-l-md transition border border-slate-300 bg-white text-slate-700 hover:bg-slate-50";
+            } else {
+                btn2027.className = "flex-1 text-center py-2 text-xs font-bold rounded-l-md transition border border-govBlue bg-govBlue text-white";
+                btn2026.className = "flex-1 text-center py-2 text-xs font-bold rounded-r-md transition border border-slate-300 bg-white text-slate-700 hover:bg-slate-50";
+            }
+            initFiltersAndRerender();
+        }
+
+        // TOGGLE DETAILED CATEGORY SELECTION BUTTONS
+        function toggleCategoryFilter(cat) {
+            selectedCategoryFilter = cat;
+            const buttons = {
+                'הכל': document.getElementById('tagAll'),
+                'תחזוקה קשיח': document.getElementById('tagTachKashih'),
+                'תחזוקה חדשה': document.getElementById('tagTachHadash'),
+                'פרויקטים מתמשכים': document.getElementById('tagProjMitmasheh'),
+                'פרויקטים חדשים': document.getElementById('tagProjHadash')
+            };
+
+            Object.keys(buttons).forEach(key => {
+                if (!buttons[key]) return;
+                if (key === cat) {
+                    buttons[key].className = "px-3 py-1.5 rounded-full text-xs font-medium transition bg-slate-800 text-white shadow-sm";
+                } else {
+                    buttons[key].className = "px-3 py-1.5 rounded-full text-xs font-medium transition bg-slate-100 text-slate-600 hover:bg-slate-200";
+                }
+            });
+
+            currentPage = 1;
+            runFilter();
+        }
+
+        // EXECUTE MULTI-PARAM FILTERING (SLICER SUITE)
+        function runFilter() {
+            const currentYearList = (selectedYear === 2026) ? db.budget2026 : db.budget2027;
+            const classVal = document.getElementById('filterClassification').value;
+            const searchVal = document.getElementById('filterSearch').value.toLowerCase().trim();
+
+            const pHigh = document.getElementById('prioHigh').checked;
+            const pMed = document.getElementById('prioMed').checked;
+            const pLow = document.getElementById('prioLow').checked;
+
+            filteredBudgetList = currentYearList.filter(item => {
+                if (classVal !== "הכל" && item['סיווג מוצר IT'] !== classVal) return false;
+                if (selectedCategoryFilter !== "הכל" && item['סוג_קטגוריה'] !== selectedCategoryFilter) return false;
+
+                if (searchVal) {
+                    const docMatch = String(item['מסמך רכישה'] || "").toLowerCase().includes(searchVal);
+                    const supMatch = String(item['שם הספק'] || "").toLowerCase().includes(searchVal);
+                    const titleMatch = String(item['טקסט כותרת'] || "").toLowerCase().includes(searchVal);
+                    const typeMatch = String(item['סוג'] || "").toLowerCase().includes(searchVal);
+                    if (!docMatch && !supMatch && !titleMatch && !typeMatch) return false;
+                }
+
+                const prio = String(item['עדיפות'] || "");
+                if (prio.includes("גבוהה") && !pHigh) return false;
+                if (prio.includes("בינונית") && !pMed) return false;
+                if (prio.includes("נמוכה") && !pLow) return false;
+
+                return true;
+            });
+
+            if (activeSortColumn) {
+                filteredBudgetList.sort((a, b) => {
+                    let valA = a[activeSortColumn];
+                    let valB = b[activeSortColumn];
+
+                    if (typeof valA === 'string') {
+                        return activeSortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                    } else {
+                        return activeSortDirection === 'asc' ? valA - valB : valB - valA;
+                    }
+                });
+            }
+
+            renderDashboard();
+        }
+
+        // COMPUTE GENERAL STATS AND RE-RENDER COMPONENT PANELS
+        function renderDashboard() {
+            let totalRequested = 0;
+            let totalApproved = 0;
+            let countNew = 0;
+            let countFixed = 0;
+
+            filteredBudgetList.forEach(item => {
+                totalRequested += item['דרישה'] || 0;
+                totalApproved += item['תוקצב'] || 0;
+
+                if (item['סוג_קטגוריה'].includes("חדש") || item['סוג_קטגוריה'].includes("חדשה")) {
+                    countNew++;
+                } else {
+                    countFixed++;
+                }
+            });
+
+            const utilizationRate = totalRequested > 0 ? Math.round((totalApproved / totalRequested) * 100) : 0;
+
+            document.getElementById('kpiRequested').innerText = formatCurrency(totalRequested);
+            document.getElementById('kpiApproved').innerText = formatCurrency(totalApproved);
+            document.getElementById('kpiUtilization').innerText = utilizationRate + "%";
+            document.getElementById('kpiUtilBar').style.width = Math.min(utilizationRate, 100) + "%";
+            document.getElementById('kpiCount').innerText = filteredBudgetList.length;
+            document.getElementById('kpiActiveSplit').innerText = `${countFixed} קבועים ומתוכננים | ${countNew} חדשים`;
+
+            const reqDiffPercent = STATICS.framework2025 > 0 ? Math.round((totalRequested / STATICS.framework2025) * 100) : 0;
+            document.getElementById('kpiReqVsBenchmark').innerHTML = `מול מסגרת 2025: <strong class="${totalRequested > STATICS.framework2025 ? 'text-red-600' : 'text-emerald-700'}">${reqDiffPercent}%</strong>`;
+
+            const appDiffPercent = STATICS.framework2025 > 0 ? Math.round((totalApproved / STATICS.framework2025) * 100) : 0;
+            document.getElementById('kpiApprovedVsBenchmark').innerHTML = `מול מסגרת 2025: <strong class="text-slate-700">${appDiffPercent}%</strong>`;
+
+            renderClassificationChart();
+            renderDonutChart(totalApproved);
+            renderMainTable();
+        }
+
+        // RENDER SVG DONUT CHART (74.4M BENCHMARK UTILIZATION)
+        function renderDonutChart(totalApproved) {
+            const pct = Math.min(Math.round((totalApproved / STATICS.framework2025) * 100), 100);
+            const strokeDash = `${pct}, 100`;
+
+            const donutSegment = document.getElementById('donutValue');
+            donutSegment.setAttribute('stroke-dasharray', strokeDash);
+            
+            if (pct > 100) {
+                donutSegment.setAttribute('stroke', '#ef4444');
+            } else if (pct > 80) {
+                donutSegment.setAttribute('stroke', '#d97706');
+            } else {
+                donutSegment.setAttribute('stroke', '#1e3a8a');
+            }
+
+            document.getElementById('donutPercentText').innerText = pct + "%";
+            document.getElementById('donutApprovedText').innerText = (totalApproved / 1000000).toFixed(1) + "M ש\"ח";
+        }
+
+        // RENDER PURE-CSS CLASSIFICATION BARS
+        function renderClassificationChart() {
+            const container = document.getElementById('chartClassificationContainer');
+            container.innerHTML = "";
+
+            const classMap = {};
+            let maxVal = 0;
+
+            filteredBudgetList.forEach(item => {
+                const cls = item['סיווג מוצר IT'] || 'אחר';
+                if (!classMap[cls]) {
+                    classMap[cls] = { requested: 0, approved: 0 };
+                }
+                classMap[cls].requested += item['דרישה'] || 0;
+                classMap[cls].approved += item['תוקצב'] || 0;
+                
+                if (classMap[cls].requested > maxVal) maxVal = classMap[cls].requested;
+            });
+
+            const sortedKeys = Object.keys(classMap).sort((a,b) => classMap[b].requested - classMap[a].requested);
+
+            if (sortedKeys.length === 0) {
+                container.innerHTML = `<div class="text-xs text-slate-400 text-center py-6">אין נתונים זמינים להצגת תרשים</div>`;
+                return;
+            }
+
+            sortedKeys.forEach(cls => {
+                const req = classMap[cls].requested;
+                const app = classMap[cls].approved;
+                const widthReqPct = maxVal > 0 ? (req / maxVal) * 100 : 0;
+                const widthAppPct = req > 0 ? (app / req) * 100 : 0;
+
+                const cardHtml = `
+                    <div class="space-y-1.5 animate-fade-in">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <span class="text-slate-700">${cls}</span>
+                            <span class="text-slate-500">${formatCurrencyShort(app)} מתוך ${formatCurrencyShort(req)}</span>
+                        </div>
+                        <div class="relative w-full bg-slate-100 h-3 rounded overflow-hidden">
+                            <div class="absolute right-0 top-0 bg-blue-100 h-full rounded" style="width: ${widthReqPct}%"></div>
+                            <div class="absolute right-0 top-0 bg-govBlue h-full rounded transition-all duration-500" style="width: ${widthReqPct * (widthAppPct/100)}%"></div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        // RENDER MAIN PAGINATED DATA GRID
+        function renderMainTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = "";
+
+            if (filteredBudgetList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="p-8 text-center text-slate-400 text-sm">
+                            לא נמצאו רשומות תקציביות תואמות.
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('tableResultCount').innerText = "מציג 0 מתוך 0 רשומות";
+                document.getElementById('paginationInfo').innerText = "עמוד 1 מתוך 1";
+                document.getElementById('btnPrevPage').disabled = true;
+                document.getElementById('btnNextPage').disabled = true;
+                return;
+            }
+
+            const totalRecords = filteredBudgetList.length;
+            const totalPages = Math.ceil(totalRecords / pageSize);
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = Math.min(startIndex + pageSize, totalRecords);
+            const pageItems = filteredBudgetList.slice(startIndex, endIndex);
+
+            document.getElementById('tableResultCount').innerText = `מציג ${startIndex + 1}-${endIndex} מתוך ${totalRecords} רשומות`;
+            document.getElementById('paginationInfo').innerText = `עמוד ${currentPage} מתוך ${totalPages}`;
+            
+            document.getElementById('btnPrevPage').disabled = (currentPage === 1);
+            document.getElementById('btnNextPage').disabled = (currentPage === totalPages);
+
+            pageItems.forEach((item) => {
+                const req = item['דרישה'] || 0;
+                const app = item['תוקצב'] || 0;
+                const uPct = req > 0 ? Math.round((app / req) * 100) : 0;
+                
+                let progressColorClass = "bg-govBlue";
+                if (uPct < 50) progressColorClass = "bg-amber-500";
+                if (uPct === 0) progressColorClass = "bg-slate-300";
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 cursor-pointer transition border-b border-slate-100";
+                tr.onclick = () => openDrawer(item);
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-800">${item['מסמך רכישה'] || '<span class="text-slate-300">טרם הוקצה</span>'}</td>
+                    <td class="p-3">
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold ${getCategoryClass(item['סוג_קטגוריה'])}">
+                            ${item['סוג_קטגוריה']}
+                        </span>
+                    </td>
+                    <td class="p-3 font-medium text-slate-700 max-w-[150px] truncate" title="${item['שם הספק']}">${item['שם הספק']}</td>
+                    <td class="p-3 text-slate-500">${item['סיווג מוצר IT']}</td>
+                    <td class="p-3 text-left font-medium text-slate-600">${formatCurrency(req)}</td>
+                    <td class="p-3 text-left font-bold text-slate-800">${formatCurrency(app)}</td>
+                    <td class="p-3">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <span class="text-[10px] font-bold text-slate-500 w-8 text-left">${uPct}%</span>
+                            <div class="w-12 bg-slate-100 h-1.5 rounded-full overflow-hidden hidden sm:block">
+                                <div class="${progressColorClass} h-full rounded-full" style="width: ${Math.min(uPct, 100)}%"></div>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // COLOR ASSIGNMENT UTILITY FOR PROJECT TYPES
+        function getCategoryClass(cat) {
+            switch(cat) {
+                case "תחזוקה קשיח": return "bg-blue-50 text-govBlue border border-blue-200";
+                case "תחזוקה חדשה": return "bg-amber-50 text-amber-700 border border-amber-200";
+                case "פרויקטים מתמשכים": return "bg-purple-50 text-purple-700 border border-purple-200";
+                case "פרויקטים חדשים": return "bg-red-50 text-red-700 border border-red-200";
+                default: return "bg-slate-100 text-slate-700";
+            }
+        }
+
+        // RENDER SECONDARY COMPANION TABLES
+        function renderAuxTables() {
+            // Mainframe comparison
+            const mfTbody = document.getElementById('mfTableBody');
+            mfTbody.innerHTML = "";
+            db.mf.slice(0, 5).forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="py-2 font-medium text-slate-700">${row['ספק'] || row['ספק / ייעוד'] || '-'}</td>
+                    <td class="py-2 text-left text-slate-600">${row['2024'] || '-'}</td>
+                    <td class="py-2 text-left text-slate-600 font-semibold">${row['2025'] || '-'}</td>
+                    <td class="py-2 text-left text-govBlue font-bold">${row['המשוער 2026'] || row['המשוער 2026'] || '-'}</td>
+                `;
+                mfTbody.appendChild(tr);
+            });
+
+            // Delayed / Expired orders
+            const expiredTbody = document.getElementById('expiredTableBody');
+            expiredTbody.innerHTML = "";
+            db.expiredOrders.slice(0, 5).forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="py-2 text-slate-700 font-semibold truncate max-w-[100px]">${row['שם הספק'] || '-'}</td>
+                    <td class="py-2 text-slate-500">${row['מסמך רכישה'] || '-'}</td>
+                    <td class="py-2 text-left text-red-600 font-bold">${formatCurrency(parseNumeric(row['ערך הזמנה כולל מע"מ']))}</td>
+                `;
+                expiredTbody.appendChild(tr);
+            });
+
+            // Contract Status tracking
+            const contractContainer = document.getElementById('contractsContainer');
+            contractContainer.innerHTML = "";
+            let alertCount = 0;
+
+            db.contracts.slice(0, 5).forEach(c => {
+                const isCritical = c['סטטוס']?.includes("קריטי") || c['רמת_סיכון']?.includes("גבוהה");
+                if (isCritical) alertCount++;
+
+                const html = `
+                    <div class="p-2.5 rounded border ${isCritical ? 'border-red-100 bg-red-50/50' : 'border-slate-100 bg-slate-50/50'} flex justify-between items-center text-xs font-sans">
+                        <div>
+                            <span class="font-bold text-slate-700 block">${c['שם חוזה'] || 'חוזה רכש'}</span>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">ספק: ${c['ספק'] || '-'} • סיום: ${c['סיום חוזה'] || '-'}</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[9px] font-bold ${isCritical ? 'bg-red-100 text-red-700' : 'bg-slate-200 text-slate-600'}">
+                            ${c['סטטוס'] || 'מבוקר'}
+                        </span>
+                    </div>
+                `;
+                contractContainer.innerHTML += html;
+            });
+            document.getElementById('contractAlertCount').innerText = `${alertCount} התראות קריטיות`;
+        }
+
+        // PAGINATION CONTROLS
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderMainTable();
+            }
+        }
+        function nextPage() {
+            const totalPages = Math.ceil(filteredBudgetList.length / pageSize);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderMainTable();
+            }
+        }
+        function changePageSize() {
+            pageSize = parseInt(document.getElementById('pageSize').value);
+            currentPage = 1;
+            renderMainTable();
+        }
+
+        // SORT COLUMNS
+        function sortTable(columnName) {
+            if (activeSortColumn) {
+                const prevIndicator = document.getElementById('sort_' + activeSortColumn.replace(/\s+/g, '_'));
+                if (prevIndicator) prevIndicator.innerText = "";
+            }
+
+            if (activeSortColumn === columnName) {
+                activeSortDirection = activeSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                activeSortColumn = columnName;
+                activeSortDirection = 'asc';
+            }
+
+            const currentIndicator = document.getElementById('sort_' + columnName.replace(/\s+/g, '_'));
+            if (currentIndicator) {
+                currentIndicator.innerHTML = activeSortDirection === 'asc' ? ' &uarr;' : ' &darr;';
+            }
+
+            runFilter();
+        }
+
+        // DRILL-DOWN MODAL / DRAWER CONTROLS
+        function openDrawer(item) {
+            const drawer = document.getElementById('drillDownDrawer');
+            const panel = document.getElementById('drawerPanel');
+
+            document.getElementById('drawerYearHeader').innerText = selectedYear;
+            document.getElementById('drawerTitle').innerText = item['טקסט כותרת'] || 'ללא כותרת מוגדרת';
+            document.getElementById('drawerPurchaseDoc').innerText = item['מסמך רכישה'] || 'טרם שויך';
+            document.getElementById('drawerType').innerText = item['סוג'] || '-';
+            document.getElementById('drawerSupplier').innerText = item['שם הספק'] || '-';
+            document.getElementById('drawerItClassification').innerText = item['סיווג מוצר IT'] || 'אחר';
+            document.getElementById('drawerPriority').innerText = item['עדיפות'] || 'בינונית';
+            document.getElementById('drawerBadge').innerText = item['סוג_קטגוריה'] || 'פרויקטים';
+
+            const req = item['דרישה'] || 0;
+            const app = item['תוקצב'] || 0;
+            const uPct = req > 0 ? Math.round((app / req) * 100) : 0;
+
+            document.getElementById('drawerValReq').innerText = formatCurrency(req);
+            document.getElementById('drawerValApp').innerText = formatCurrency(app);
+            document.getElementById('drawerValOrder').innerText = formatCurrency(item['ערך הזמנה כולל מע"מ']);
+            document.getElementById('drawerUtilizationPercent').innerText = uPct + "%";
+            document.getElementById('drawerUtilizationBar').style.width = Math.min(uPct, 100) + "%";
+
+            // LOOKUP JOINT INFORMATION - IT MAPPING SHEET
+            const matchedItProduct = db.itMapping.find(prod => 
+                String(prod['סיווג']).toLowerCase() === String(item['סיווג מוצר IT']).toLowerCase() ||
+                String(item['טקסט כותרת']).toLowerCase().includes(String(prod['שם מוצר']).toLowerCase())
+            );
+
+            if (matchedItProduct) {
+                document.getElementById('drawerItPurpose').innerHTML = `
+                    <strong>מוצר מזוהה במאגר: ${matchedItProduct['שם מוצר']}</strong><br/>
+                    <span class="block mt-1 text-slate-500 font-medium">${matchedItProduct['תיאור/ייעוד מוצר']}</span>
+                `;
+            } else {
+                document.getElementById('drawerItPurpose').innerText = `טרם שויך מוצר מוגדר ספציפי עבור פרויקט זה. משויך קטגורית תחת סיווג ${item['סיווג מוצר IT']}.`;
+            }
+
+            // LOOKUP JOINT INFORMATION - CONTRACTS TRACKING SHEET
+            const matchedContract = db.contracts.find(c => 
+                String(item['שם הספק']).toLowerCase().includes(String(c['ספק']).toLowerCase()) ||
+                String(c['ספק']).toLowerCase().includes(String(item['שם הספק']).toLowerCase())
+            );
+
+            const contractStatusBox = document.getElementById('drawerContractStatusBox');
+            if (matchedContract) {
+                const isCrit = matchedContract['סטטוס']?.includes("קריטי") || matchedContract['רמת_סיכון']?.includes("גבוהה");
+                document.getElementById('drawerContractTitle').innerText = `${matchedContract['שם חוזה']} (סיום: ${matchedContract['סיום חוזה']})`;
+                document.getElementById('drawerContractBadge').innerText = matchedContract['סטטוס'] || 'תקין';
+                
+                if (isCrit) {
+                    contractStatusBox.className = "p-3.5 rounded-lg border border-red-100 bg-red-50 text-red-800 flex items-center justify-between text-xs";
+                    document.getElementById('drawerContractBadge').className = "bg-red-200 text-red-800 px-2 py-0.5 rounded text-[10px] font-bold";
+                } else {
+                    contractStatusBox.className = "p-3.5 rounded-lg border border-emerald-100 bg-emerald-50 text-emerald-800 flex items-center justify-between text-xs";
+                    document.getElementById('drawerContractBadge').className = "bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold";
+                }
+            } else {
+                document.getElementById('drawerContractTitle').innerText = "לא זוהה חוזה פתוח מקושר במערכת";
+                document.getElementById('drawerContractBadge').innerText = "ללא מידע";
+                document.getElementById('drawerContractBadge').className = "bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-[10px] font-bold";
+                contractStatusBox.className = "p-3.5 rounded-lg border border-slate-100 bg-slate-50/50 flex items-center justify-between text-xs";
+            }
+
+            drawer.classList.remove('invisible');
+            drawer.classList.add('opacity-100');
+            panel.classList.remove('translate-x-full');
+        }
+
+        function closeDrawer() {
+            const drawer = document.getElementById('drillDownDrawer');
+            const panel = document.getElementById('drawerPanel');
+
+            panel.classList.add('translate-x-full');
+            drawer.classList.remove('opacity-100');
+            setTimeout(() => {
+                drawer.classList.add('invisible');
+            }, 300);
+        }
+
+        // CURRENCY FORMATTING UTILITIES (HEBREW COMPLIANT)
+        function formatCurrency(val) {
+            if (val === 0) return '₪ -';
+            return '₪ ' + Number(val).toLocaleString('he-IL', { maximumFractionDigits: 0 });
+        }
+
+        function formatCurrencyShort(val) {
+            if (val === 0) return '₪ 0';
+            if (val >= 1000000) {
+                return (val / 1000000).toFixed(1) + "M ₪";
+            } else if (val >= 1000) {
+                return (val / 1000).toFixed(0) + "K ₪";
+            }
+            return '₪ ' + val;
+        }
+    </script>
+</body>
+</html>
