@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מערכת לניהול מידע על תשלומים - משרד התחבורה</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Font - Heebo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Stable External CDNs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- Chart.js UMD Build -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Heebo', sans-serif;
+    }
+    
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    @media print {
+      .no-print, nav, #uploadSection, button, input, select, .pagination-controls, #activeFiltersBanner {
+        display: none !important;
+      }
+      
+      body, main, .tab-content, .bg-white {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        color: #000 !important;
+      }
+
+      .overflow-x-auto, .max-h-96 {
+        overflow: visible !important;
+        max-height: none !important;
+      }
+
+      table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+      }
+
+      th, td {
+        border: 1px solid #cbd5e1 !important;
+        padding: 8px !important;
+        font-size: 10pt !important;
+        color: #000 !important;
+      }
+
+      #printHeader {
+        display: block !important;
+        margin-bottom: 2rem !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-900 flex flex-col">
+
+  <!-- Print Header -->
+  <div id="printHeader" class="hidden w-full border-b-2 border-slate-900 pb-4 mb-6">
+    <div class="flex justify-between items-center">
+      <div class="text-right">
+        <h1 class="text-xl font-black text-slate-900">מדינת ישראל</h1>
+        <h2 class="text-lg font-bold text-slate-800">משרד התחבורה והבטיחות בדרכים</h2>
+        <h3 class="text-sm text-slate-600">אגף טכנולוגיות דיגיטליות ומידע</h3>
+      </div>
+      <img src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" class="h-16 w-auto" alt="סמל משרד התחבורה">
+    </div>
+    <div class="mt-6 text-center">
+      <h2 id="printReportTitle" class="text-xl font-bold underline">דוח מערכת מידע על תשלומים</h2>
+      <p id="printReportDate" class="text-xs text-slate-500 mt-1">תאריך הפקה: 17/07/2026</p>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingSpinner" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex flex-col justify-center items-center hidden">
+    <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center max-w-sm w-full mx-4 border border-slate-150">
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-[#002C54] border-t-transparent mb-4"></div>
+      <p id="spinnerMessage" class="text-slate-800 font-medium text-center text-lg">מעבד נתונים...</p>
+      <div class="w-full bg-slate-100 rounded-full h-1.5 mt-4 overflow-hidden">
+        <div class="bg-[#002C54] h-1.5 rounded-full animate-pulse" style="width: 100%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Web View Header (Sticky top configuration active) -->
+  <header class="bg-[#002C54] text-white shadow-md no-print sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-4">
+        <div class="bg-white p-1.5 rounded-lg shadow-sm">
+          <img src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" 
+               onerror="logoError(this)" 
+               alt="סמל משרד התחבורה" 
+               class="h-14 w-auto object-contain select-none" />
+        </div>
+        <div class="text-right">
+          <h1 class="text-lg font-bold tracking-tight leading-tight">משרד התחבורה והבטיחות בדרכים</h1>
+          <p class="text-xs text-slate-300 font-medium">אגף טכנולוגיות דיגיטליות ומידע</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <span class="bg-blue-900/40 px-4 py-2 rounded-lg border border-blue-400/20 font-extrabold text-sm tracking-wide block text-sky-100 shadow-inner">
+          מערכת לניהול מידע על תשלומים
+        </span>
+        <button id="reuploadBtn" onclick="resetAllData()" class="hidden px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-lg transition-all border border-white/25 flex items-center gap-1">
+          <i class="fas fa-cloud-upload-alt"></i>
+          טען קבצים מחדש
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="max-w-7xl w-full mx-auto px-4 py-6 flex-1">
+    
+    <!-- Upload Section -->
+    <div id="uploadSection" class="bg-white rounded-xl shadow-sm border border-slate-200/80 p-5 mb-6 no-print">
+      <div class="mb-4">
+        <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+          <i class="fas fa-file-import text-[#002C54]"></i>
+          טעינת קבצי מקור לניתוח
+        </h2>
+        <p class="text-xs text-slate-550 leading-relaxed">
+          אנא בחרו את קובץ התקבולים (TXT) ואת קובץ המחירונים וההמרות (Excel). 
+          <span class="text-indigo-600 font-bold block mt-1"><i class="fas fa-bolt"></i> המערכת עודכנה למנוע הזרמה (Streaming) המסוגל לעבד עשרות מיליוני שורות ישירות בדפדפן ללא קריסות זיכרון!</span>
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- TXT Payments Container -->
+        <div id="dropzoneTxt" class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center">
+          <div class="h-10 w-10 bg-blue-50 text-[#002C54] rounded-full flex items-center justify-center mb-2 shadow-sm">
+            <i class="fas fa-file-alt text-base"></i>
+          </div>
+          <p class="text-sm font-bold text-slate-700 mb-2">קובץ תשלומים (TXT | Pipe-delimited)</p>
+          <input type="file" id="txtFileInput" accept=".txt,.csv" onchange="triggerTxtFile(this)" class="block w-full text-xs text-slate-500
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-lg file:border-0
+            file:text-xs file:font-semibold
+            file:bg-[#002C54]/10 file:text-[#002C54]
+            hover:file:bg-[#002C54]/20
+            cursor-pointer" />
+          <div id="txtStatus" class="mt-2 text-xs text-slate-500 font-semibold font-mono w-full text-center">טרם נבחר קובץ</div>
+        </div>
+
+        <!-- XLSX Conversion Container -->
+        <div id="dropzoneXlsx" class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center">
+          <div class="h-10 w-10 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mb-2 shadow-sm">
+            <i class="fas fa-file-excel text-base"></i>
+          </div>
+          <p class="text-sm font-bold text-slate-700 mb-2">טבלאות המרה (XLSX)</p>
+          <input type="file" id="xlsxFileInput" accept=".xlsx,.xls" onchange="triggerXlsxFile(this)" class="block w-full text-xs text-slate-500
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-lg file:border-0
+            file:text-xs file:font-semibold
+            file:bg-emerald-50 file:text-emerald-700
+            hover:file:bg-emerald-100
+            cursor-pointer" />
+          <div id="xlsxStatus" class="mt-2 text-xs text-slate-500 font-semibold font-mono w-full text-center">טרם נטען קובץ המרה</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tab Bar -->
+    <div class="border-b border-slate-200 mb-6 no-print">
+      <nav class="flex -mb-px space-x-reverse space-x-2 overflow-x-auto select-none" aria-label="Tabs">
+        <button id="tabDashboard" onclick="switchTab('dashboard')" class="py-3.5 px-5 font-semibold text-sm transition-all border-b-2 border-[#002C54] text-[#002C54] flex items-center gap-2 bg-[#002C54]/5 rounded-t-lg">
+          <i class="fas fa-chart-pie"></i>
+          דשבורד מנהלים
+        </button>
+        <button id="tabCustomer" onclick="switchTab('customer')" class="py-3.5 px-5 font-medium text-sm transition-all border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 flex items-center gap-2">
+          <i class="fas fa-user-tag"></i>
+          איתור לקוח
+        </button>
+        <button id="tabSearch" onclick="switchTab('search')" class="py-3.5 px-5 font-medium text-sm transition-all border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 flex items-center gap-2">
+          <i class="fas fa-search"></i>
+          איתור תשלום פרטני
+        </button>
+        <button id="tabAbout" onclick="switchTab('about')" class="py-3.5 px-5 font-medium text-sm transition-all border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 flex items-center gap-2">
+          <i class="fas fa-info-circle"></i>
+          אודות המערכת
+        </button>
+      </nav>
+    </div>
+
+    <!-- SCREENS -->
+
+    <!-- Tab 1: Dashboard -->
+    <div id="dashboardScreen" class="tab-content transition-opacity duration-200">
+      
+      <!-- Placeholder -->
+      <div id="dashboardPlaceholder" class="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center flex flex-col items-center justify-center my-6">
+        <div class="bg-blue-50 text-[#002C54] h-16 w-16 rounded-full flex items-center justify-center mb-4 shadow-sm">
+          <i class="fas fa-file-invoice-dollar text-2xl"></i>
+        </div>
+        <h4 class="text-base font-bold text-slate-850 mb-2">ממתין לטעינת קבצי מקור</h4>
+        <p id="dashPlaceholderText" class="text-xs text-slate-500 max-w-md leading-relaxed">אנא העלה את קובץ התשלומים (TXT) ואת קובץ ההמרות (XLSX) בתיבות למעלה.</p>
+      </div>
+
+      <!-- Real Content -->
+      <div id="dashboardContent" class="hidden">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 no-print">
+          <div class="flex items-center gap-3">
+            <h3 class="text-lg font-extrabold text-slate-800">סיכום תנועות תשלומים - חתכים ומנהלים</h3>
+            <span class="px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-slate-100 text-slate-700 border border-slate-200/60 font-mono">מנוע Stream-Engine פעיל</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="printReport('דוח דשבורד מנהלים - מערכת תשלומים')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5">
+              <i class="fas fa-print"></i>
+              הדפס דוח
+            </button>
+          </div>
+        </div>
+
+        <!-- Dashboard Dynamic Quick Filters Section -->
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200/80 mb-6 no-print">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+              <i class="fas fa-filter text-[#002C54]"></i>
+              מסנני דשבורד מהירים (על בסיס מדגם הזיכרון)
+            </h4>
+            <button onclick="resetDashboardFilters()" class="text-[11px] text-indigo-600 hover:text-indigo-800 font-bold transition-all">נקה מסננים</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+            <div>
+              <label for="dashFilterClass" class="block text-[11px] font-bold text-slate-500 mb-1">סיווג לקוח:</label>
+              <select id="dashFilterClass" onchange="applyDashboardFilters()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 outline-none focus:ring-1 focus:ring-[#002C54]">
+                <option value="">הכל</option>
+              </select>
+            </div>
+            <div>
+              <label for="dashFilterMethod" class="block text-[11px] font-bold text-slate-500 mb-1">אמצעי תשלום:</label>
+              <select id="dashFilterMethod" onchange="applyDashboardFilters()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 outline-none focus:ring-1 focus:ring-[#002C54]">
+                <option value="">הכל</option>
+              </select>
+            </div>
+            <div>
+              <label for="dashFilterDateFrom" class="block text-[11px] font-bold text-slate-500 mb-1">מתאריך:</label>
+              <input type="date" id="dashFilterDateFrom" onchange="applyDashboardFilters()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 outline-none focus:ring-1 focus:ring-[#002C54]">
+            </div>
+            <div>
+              <label for="dashFilterDateTo" class="block text-[11px] font-bold text-slate-500 mb-1">עד תאריך:</label>
+              <input type="date" id="dashFilterDateTo" onchange="applyDashboardFilters()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 outline-none focus:ring-1 focus:ring-[#002C54]">
+            </div>
+          </div>
+          <!-- Active filters notification banner -->
+          <div id="activeFiltersBanner" class="hidden mt-3 p-2 bg-indigo-50 border border-indigo-100 rounded-lg text-indigo-850 text-xs flex items-center justify-between">
+            <span class="font-medium"><i class="fas fa-info-circle"></i> שימו לב: המסננים פעילים. הנתונים המוצגים בדשבורד מחושבים כעת מתוך מדגם של <span id="dashFilteredCount" class="font-bold">0</span> תנועות תואמות.</span>
+            <button onclick="resetDashboardFilters()" class="bg-indigo-200/50 hover:bg-indigo-200 px-2 py-0.5 rounded text-[10px] font-bold transition-all">בטל סינון</button>
+          </div>
+        </div>
+
+        <!-- KPI Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200/70 hover:shadow-md transition-all">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-xs font-semibold text-slate-450 uppercase tracking-wider">סך הכל תקבולים</p>
+                <h3 id="statTotalAmount" class="text-xl font-black text-slate-900 mt-1 font-mono">₪0.00</h3>
+              </div>
+              <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg text-sm">
+                <i class="fas fa-shekel-sign"></i>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200/70 hover:shadow-md transition-all">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-xs font-semibold text-slate-450 uppercase tracking-wider">כמות מסמכים מעובדת</p>
+                <h3 id="statRecordCount" class="text-xl font-black text-slate-900 mt-1 font-mono">0</h3>
+              </div>
+              <div class="p-2 bg-blue-50 text-[#002C54] rounded-lg text-sm">
+                <i class="fas fa-receipt"></i>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200/70 hover:shadow-md transition-all">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-xs font-semibold text-slate-450 uppercase tracking-wider">סיווג מוביל</p>
+                <h3 id="statTopCategory" class="text-base font-bold text-slate-800 mt-1.5">-</h3>
+              </div>
+              <div class="p-2 bg-purple-50 text-purple-600 rounded-lg text-sm">
+                <i class="fas fa-tag"></i>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200/70 hover:shadow-md transition-all">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-xs font-semibold text-slate-450 uppercase tracking-wider">אמצעי תשלום נפוץ</p>
+                <h3 id="statTopMethod" class="text-sm font-bold text-slate-800 mt-2 truncate max-w-[180px]">-</h3>
+              </div>
+              <div class="p-2 bg-amber-50 text-amber-600 rounded-lg text-sm">
+                <i class="fas fa-credit-card"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200/80 lg:col-span-2">
+            <h3 class="text-xs font-bold text-slate-800 mb-4 flex items-center gap-1.5 uppercase tracking-wide">
+              <i class="fas fa-chart-line text-blue-600"></i>
+              מגמת תנועות יומית לאורך זמן (סכום תקבולים)
+            </h3>
+            <div class="relative h-64">
+              <canvas id="trendChartCanvas"></canvas>
+            </div>
+          </div>
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200/80">
+            <h3 class="text-xs font-bold text-slate-800 mb-4 flex items-center gap-1.5 uppercase tracking-wide">
+              <i class="fas fa-chart-pie text-indigo-600"></i>
+              התפלגות לפי אמצעי תשלום (סכום תקבולים)
+            </h3>
+            <div class="relative h-64">
+              <canvas id="methodChartCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Executive Summary Slices Section (Extended with Monthly Performance Table) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          
+          <!-- 1. Table Summary: Payment Methods -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200/80 overflow-hidden">
+            <div class="p-4 border-b border-slate-200/60 bg-slate-50/50">
+              <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase">
+                <i class="fas fa-credit-card text-indigo-600"></i>
+                סיכום לפי אמצעי תשלום וסליקה
+              </h4>
+            </div>
+            <div class="overflow-x-auto max-h-60 overflow-y-auto">
+              <table class="w-full text-right border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] font-bold sticky top-0 bg-slate-50 z-10">
+                    <th class="px-4 py-2.5">אמצעי תשלום</th>
+                    <th class="px-4 py-2.5 text-center">כמות תנועות</th>
+                    <th class="px-4 py-2.5 text-left">סכום מצטבר</th>
+                    <th class="px-4 py-2.5 text-left">% מהסך הכל</th>
+                  </tr>
+                </thead>
+                <tbody id="summaryMethodsTableBody" class="divide-y divide-slate-150 text-xs">
+                  <!-- JS Injected Rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 2. Table Summary: Classifications -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200/80 overflow-hidden">
+            <div class="p-4 border-b border-slate-200/60 bg-slate-50/50">
+              <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <i class="fas fa-tags text-[#002C54]"></i>
+                סיכום לפי סיווג תקציבי (ייעוד)
+              </h4>
+            </div>
+            <div class="overflow-x-auto max-h-60 overflow-y-auto">
+              <table class="w-full text-right border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] font-bold sticky top-0 bg-slate-50 z-10">
+                    <th class="px-4 py-2.5">סיווג לקוח</th>
+                    <th class="px-4 py-2.5 text-center">כמות תנועות</th>
+                    <th class="px-4 py-2.5 text-left">סכום מצטבר</th>
+                    <th class="px-4 py-2.5 text-left">% מהסך הכל</th>
+                  </tr>
+                </thead>
+                <tbody id="summaryClassesTableBody" class="divide-y divide-slate-150 text-xs">
+                  <!-- JS Injected Rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 3. Table Summary: Monthly Performance -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200/80 overflow-hidden">
+            <div class="p-4 border-b border-slate-200/60 bg-slate-50/50">
+              <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <i class="fas fa-calendar-alt text-[#002C54]"></i>
+                סיכום לפי חודשים
+              </h4>
+            </div>
+            <div class="overflow-x-auto max-h-60 overflow-y-auto">
+              <table class="w-full text-right border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] font-bold sticky top-0 bg-slate-50 z-10">
+                    <th class="px-4 py-2.5">חודש</th>
+                    <th class="px-4 py-2.5 text-left">סכום מצטבר</th>
+                    <th class="px-4 py-2.5 text-left">% מהסך הכל</th>
+                  </tr>
+                </thead>
+                <tbody id="summaryMonthsTableBody" class="divide-y divide-slate-150 text-xs">
+                  <!-- JS Injected Rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 4. Top 10 High-Volume Customers -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200/80 overflow-hidden mb-8">
+          <div class="p-4 border-b border-slate-200/60 bg-slate-50/50 flex justify-between items-center">
+            <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <i class="fas fa-crown text-amber-500"></i>
+              עשרת הלקוחות המובילים בהיקף התשלומים
+            </h4>
+            <span class="text-[10px] text-slate-400">מבוסס על סכימה מכלל קובץ המקור</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-right border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-slate-550 text-[11px] font-bold">
+                  <th class="px-6 py-3">מזהה לקוח</th>
+                  <th class="px-6 py-3">שם לקוח</th>
+                  <th class="px-6 py-3">סיווג לקוח</th>
+                  <th class="px-6 py-3 text-center">כמות תנועות</th>
+                  <th class="px-6 py-3 text-left">סך הכל שולם (₪)</th>
+                </tr>
+              </thead>
+              <tbody id="topCustomersTableBody" class="divide-y divide-slate-100 text-xs text-slate-800">
+                <!-- JS Injected Rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Tab 2: Customer Locator -->
+    <div id="customerScreen" class="tab-content hidden transition-opacity duration-200">
+      
+      <!-- Placeholder -->
+      <div id="customerPlaceholder" class="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center flex flex-col items-center justify-center my-6">
+        <div class="bg-indigo-50 text-indigo-700 h-16 w-16 rounded-full flex items-center justify-center mb-4 shadow-sm">
+          <i class="fas fa-user-search text-2xl"></i>
+        </div>
+        <h4 class="text-base font-bold text-slate-850 mb-2">ממתין לטעינת קבצי מקור</h4>
+        <p id="custPlaceholderText" class="text-xs text-slate-500 max-w-md leading-relaxed">אנא העלה את קובץ התשלומים (TXT) ואת קובץ ההמרות (XLSX) בתיבות למעלה.</p>
+      </div>
+
+      <!-- Real Content -->
+      <div id="customerContent" class="hidden">
+        <div class="flex justify-between items-center mb-6 no-print">
+          <h3 class="text-lg font-extrabold text-slate-800">איתור וניתוח לקוח מורחב</h3>
+          <button onclick="printReport('דוח לקוח מפורט - מערכת תשלומים')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5">
+            <i class="fas fa-print"></i>
+            הדפס דוח לקוח
+          </button>
+        </div>
+
+        <!-- Search input & Select container -->
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200/80 mb-6 no-print">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="customerSearchInput" class="block text-xs font-bold text-slate-500 mb-2">
+                <i class="fas fa-search text-slate-400 mr-1"></i> הקלד מזהה או שם לקוח לחיפוש מהיר:
+              </label>
+              <input type="text" id="customerSearchInput" oninput="filterCustomerDropdown()" placeholder="הקלד שם או מספר לקוח..." class="w-full bg-slate-50 border border-slate-300 rounded-lg py-2 px-3 text-sm text-slate-800 focus:ring-2 focus:ring-[#002C54] transition-all outline-none">
+            </div>
+            <div>
+              <label for="customerSelect" class="block text-xs font-bold text-slate-500 mb-2">בחר לקוח מהרשימה המסוננת:</label>
+              <select id="customerSelect" onchange="onCustomerSelected()" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-lg py-2 px-3 text-sm text-slate-850 font-medium focus:ring-2 focus:ring-[#002C54] transition-all outline-none">
+                <option value="">-- הקלד בשדה החיפוש מימין --</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="customerProfileCard" class="hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200/80 flex flex-col justify-between">
+              <div>
+                <div class="border-b border-slate-100 pb-4 mb-4">
+                  <span class="px-2.5 py-0.5 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-full border border-indigo-200" id="profClass">-</span>
+                  <h4 class="text-lg font-black text-slate-900 mt-2.5" id="profName">-</h4>
+                  <p class="text-xs text-slate-400 font-mono mt-1">מזהה לקוח: <span id="profId"></span></p>
+                </div>
+                
+                <div class="space-y-4">
+                  <div class="flex justify-between border-b border-slate-50 pb-2">
+                    <span class="text-xs text-slate-400 font-medium">סך הכל תקבולים:</span>
+                    <span class="text-xs font-bold text-slate-900 font-mono" id="profTotal">₪0.00</span>
+                  </div>
+                  <div class="flex justify-between border-b border-slate-50 pb-2">
+                    <span class="text-xs text-slate-400 font-medium">מספר תנועות:</span>
+                    <span class="text-xs font-bold text-slate-900 font-mono" id="profCount">0</span>
+                  </div>
+                  <div class="flex justify-between border-b border-slate-50 pb-2">
+                    <span class="text-xs text-slate-400 font-medium">ממוצע לתנועה:</span>
+                    <span class="text-xs font-bold text-slate-900 font-mono" id="profAvg">₪0.00</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6 pt-4 border-t border-slate-100">
+                <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">אמצעי תשלום נפוץ:</p>
+                <div class="flex items-center gap-2 mt-1.5 text-[#002C54] font-semibold text-xs">
+                  <i class="fas fa-credit-card"></i>
+                  <span id="profTopMethod">-</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Customer's Historical sample -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200/80 lg:col-span-2 overflow-hidden flex flex-col">
+              <div class="flex justify-between items-center mb-4">
+                <h4 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                  <i class="fas fa-history text-indigo-600"></i>
+                  פירוט היסטורי של תקבולים ללקוח (מדגם)
+                </h4>
+                <span class="text-[10px] text-slate-400">תצוגה עד ל-500 התנועות הראשונות במפתח הזיכרון</span>
+              </div>
+              
+              <div class="overflow-x-auto flex-1 max-h-96">
+                <table class="w-full text-right border-collapse">
+                  <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-650 text-[11px] font-bold sticky top-0 bg-slate-50 z-10">
+                      <th class="px-6 py-3">מספר מסמך</th>
+                      <th class="px-6 py-3">תאריך מסמך</th>
+                      <th class="px-6 py-3">שנה/חודש</th>
+                      <th class="px-6 py-3">אמצעי תשלום</th>
+                      <th class="px-6 py-3 text-left">סכום</th>
+                    </tr>
+                  </thead>
+                  <tbody id="customerHistoryTableBody" class="divide-y divide-slate-100 text-slate-800 text-xs">
+                    <!-- Dynamic -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Tab 3: Payment Search (Capped Safety Limit) -->
+    <div id="searchScreen" class="tab-content hidden transition-opacity duration-200">
+      
+      <!-- Placeholder -->
+      <div id="searchPlaceholder" class="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center flex flex-col items-center justify-center my-6">
+        <div class="bg-emerald-50 text-emerald-600 h-16 w-16 rounded-full flex items-center justify-center mb-4 shadow-sm">
+          <i class="fas fa-search-dollar text-2xl"></i>
+        </div>
+        <h4 class="text-base font-bold text-slate-850 mb-2">ממתין לטעינת קבצי מקור</h4>
+        <p id="searchPlaceholderText" class="text-xs text-slate-500 max-w-md leading-relaxed">אנא העלה את קובץ התשלומים (TXT) ואת קובץ ההמרות (XLSX) בתיבות למעלה.</p>
+      </div>
+
+      <!-- Real Content -->
+      <div id="searchContent" class="hidden">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 no-print">
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-800">מסנני איתור תשלומים פרטניים</h3>
+            <p class="text-xs text-slate-500 mt-1">
+              למען יציבות הדפדפן, החיפוש מתבצע על פני מדגם זיכרון מייצג של עד 150,000 תנועות ראשונות.
+            </p>
+          </div>
+          <button onclick="printReport('דוח איתור תשלומים - מערכת תשלומים')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 self-end">
+            <i class="fas fa-print"></i>
+            הדפס דוח חיפוש
+          </button>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200/80 mb-6 no-print">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div>
+              <label for="searchDocNum" class="block text-xs font-bold text-slate-500 mb-1">מספר מסמך:</label>
+              <input type="text" id="searchDocNum" placeholder="הקלד מספר מסמך..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 font-mono focus:ring-1 focus:ring-[#002C54] outline-none">
+            </div>
+            <div>
+              <label for="searchDateFrom" class="block text-xs font-bold text-slate-500 mb-1">מתאריך מסמך:</label>
+              <input type="date" id="searchDateFrom" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 focus:ring-1 focus:ring-[#002C54] outline-none">
+            </div>
+            <div>
+              <label for="searchDateTo" class="block text-xs font-bold text-slate-500 mb-1">עד תאריך מסמך:</label>
+              <input type="date" id="searchDateTo" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 focus:ring-1 focus:ring-[#002C54] outline-none">
+            </div>
+            <div>
+              <label for="searchAmountMin" class="block text-xs font-bold text-slate-500 mb-1">מינימום סכום (₪):</label>
+              <input type="number" id="searchAmountMin" placeholder="0" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 font-mono focus:ring-1 focus:ring-[#002C54] outline-none">
+            </div>
+            <div>
+              <label for="searchAmountMax" class="block text-xs font-bold text-slate-500 mb-1">מקסימום סכום (₪):</label>
+              <input type="number" id="searchAmountMax" placeholder="ללא הגבלה" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 font-mono focus:ring-1 focus:ring-[#002C54] outline-none">
+            </div>
+            <div>
+              <label for="searchBankAcc" class="block text-xs font-bold text-slate-500 mb-1">חשבון נגדי:</label>
+              <input type="text" id="searchBankAcc" placeholder="מזהה חשבון נגדי..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 font-mono focus:ring-1 focus:ring-[#002C54] outline-none">
+            </div>
+            <div>
+              <label for="searchPaymentMethod" class="block text-xs font-bold text-slate-500 mb-1">אמצעי תשלום:</label>
+              <select id="searchPaymentMethod" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 focus:ring-1 focus:ring-[#002C54] outline-none">
+                <option value="">הכל</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="flex justify-end gap-2 border-t border-slate-100 pt-4">
+            <button onclick="resetPaymentSearch()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition-all">
+              נקה הכל
+            </button>
+            <button onclick="searchPayments()" class="px-5 py-2 bg-[#002C54] hover:bg-[#002C54]/95 text-white rounded-lg text-xs font-semibold transition-all shadow-sm">
+              <i class="fas fa-search ml-1"></i> חפש רשומות
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200/80 overflow-hidden">
+          <div class="p-4 border-b border-slate-200/60 flex justify-between items-center">
+            <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wide">
+              <i class="fas fa-list-ul text-slate-500"></i>
+              רשומות תואמות חיפוש (מתוך הזיכרון הפעיל)
+            </h4>
+            <span id="searchResultCount" class="text-xs font-semibold text-slate-500 font-mono bg-slate-100 border border-slate-200 px-3 py-0.5 rounded-full">נמצאו 0 תנועות</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-right border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs font-bold">
+                  <th class="px-6 py-3">מספר מסמך</th>
+                  <th class="px-6 py-3">תאריך מסמך</th>
+                  <th class="px-6 py-3">שנה/חודש</th>
+                  <th class="px-6 py-3">שם לקוח</th>
+                  <th class="px-6 py-3">אמצעי תשלום</th>
+                  <th class="px-6 py-3 font-mono">חשבון נגדי</th>
+                  <th class="px-6 py-3 text-left">סכום</th>
+                </tr>
+              </thead>
+              <tbody id="searchResultsTableBody" class="divide-y divide-slate-100 text-slate-800 text-xs">
+                <!-- Dynamic Search Rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: About -->
+    <div id="aboutScreen" class="tab-content hidden transition-opacity duration-200">
+      <div class="max-w-2xl mx-auto bg-white border border-slate-200/80 rounded-xl shadow-sm p-8 text-center flex flex-col items-center">
+        <div class="bg-indigo-50/60 p-4 rounded-full mb-4">
+          <i class="fas fa-info-circle text-4xl text-[#002C54]"></i>
+        </div>
+        
+        <h3 class="text-xl font-black text-slate-900 mb-1">מערכת לניהול מידע על תשלומים</h3>
+        <p class="text-xs text-slate-400 font-semibold uppercase tracking-widest mb-6 font-mono">גרסה <span id="aboutVersion">1.0</span></p>
+        
+        <!-- Strict requirement text (Google AI Studio fixed layout) -->
+        <div class="bg-slate-50 p-6 rounded-xl border border-slate-100 w-full mb-6">
+          <p class="text-slate-700 text-sm leading-relaxed">
+            המערכת פותחה בשיתוף אביב מצא וג'מיני מצא באמצעות Google AI Studio.
+          </p>
+        </div>
+
+        <!-- Beta banner -->
+        <div class="bg-amber-50 border border-amber-200/60 rounded-xl p-4 flex gap-3 text-right text-amber-800 w-full">
+          <div class="text-lg">
+            <i class="fas fa-exclamation-triangle text-amber-600"></i>
+          </div>
+          <div>
+            <h5 class="font-bold text-xs text-amber-900">הצהרת בטא וכתב ויתור</h5>
+            <p class="text-[11px] mt-1 leading-relaxed text-amber-800">
+              גרסת בטא (Beta). חלה חובה על המשתמש לבדוק ולאמת את הנתונים. המידע המוצג מבוסס על קבצים מקומיים שהועלו ואינו מהווה אסמכתה משפטית סופית.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Drill Down Dialog Drawer -->
+  <div id="drillDownModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center hidden no-print">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-150 max-w-2xl w-full mx-4 flex flex-col max-h-[85vh]">
+      <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+        <h3 class="font-extrabold text-slate-800 flex items-center gap-2 text-sm">
+          <i class="fas fa-info-circle text-[#002C54]"></i>
+          פרטי תנועה ותקבול מורחבים
+        </h3>
+        <button onclick="closeDrillDownModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+          <i class="fas fa-times text-base"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto flex-1">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="modalDetailsGrid">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <div class="p-3 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end gap-2">
+        <button onclick="window.print()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-all">
+          <i class="fas fa-print mr-1"></i> הדפס כרטיס תנועה
+        </button>
+        <button onclick="closeDrillDownModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold transition-all">
+          סגור
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-400 text-xs py-4 mt-12 border-t border-slate-800 no-print">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2">
+      <p>המערכת פותחה בשיתוף אביב מצא וג'מיני מצא באמצעות Google AI Studio.</p>
+      <p class="font-mono text-[10px]">גרסת מערכת: 1.0 (Beta-Streamer)</p>
+    </div>
+  </footer>
+
+  <!-- Core App JS Logic with Stream Aggregator Engine -->
+  <script>
+    const VERSION = "1.0";
+    const MAX_DETAILED_RECORDS = 150000; // Memory safety cap for detailed transaction lists
+
+    // Raw File References
+    let paymentsFile = null;
+
+    // Dictionaries from XLSX
+    let conversionNames = {};   
+    let conversionBanks = {};   
+
+    // Aggregators (Aggregated across ALL millions of rows!)
+    let totalAmount = 0;
+    let totalRecordCount = 0;
+    let classificationSums = {};
+    let classificationCounts = {};
+    let methodSums = {};
+    let methodCounts = {};
+    let monthlySums = {};
+    let dailySums = {}; // Holds chronological aggregations for line chart
+    let customerSums = {}; // Caches sum, count, class, name per customer ID
+
+    // Capped arrays for Search / Customer views to prevent browser OOM
+    let detailedRecordsSample = [];
+    let uniqueCustomersCached = []; 
+
+    // Chart.js global instances
+    let trendChart = null;
+    let methodChart = null;
+
+    window.addEventListener('load', () => {
+      try {
+        const versionEl = document.getElementById('aboutVersion');
+        if (versionEl) versionEl.innerText = VERSION;
+        setupDragAndDrop();
+      } catch (err) {
+        console.error("Initialization Error: ", err);
+      }
+    });
+
+    function resetAllData() {
+      try {
+        paymentsFile = null;
+        conversionNames = {};
+        conversionBanks = {};
+        
+        // Reset aggregates
+        totalAmount = 0;
+        totalRecordCount = 0;
+        classificationSums = {};
+        classificationCounts = {};
+        methodSums = {};
+        methodCounts = {};
+        monthlySums = {};
+        dailySums = {};
+        customerSums = {};
+        detailedRecordsSample = [];
+        uniqueCustomersCached = [];
+
+        // Clear file inputs
+        document.getElementById('txtFileInput').value = '';
+        document.getElementById('xlsxFileInput').value = '';
+
+        document.getElementById('txtStatus').innerText = "טרם נבחר קובץ";
+        document.getElementById('xlsxStatus').innerText = "טרם נטען קובץ המרה";
+
+        // Reset and clear dashboard filter dropdown options
+        const dashClass = document.getElementById('dashFilterClass');
+        if (dashClass) dashClass.innerHTML = '<option value="">הכל</option>';
+        const dashMethod = document.getElementById('dashFilterMethod');
+        if (dashMethod) dashMethod.innerHTML = '<option value="">הכל</option>';
+        document.getElementById('dashFilterDateFrom').value = '';
+        document.getElementById('dashFilterDateTo').value = '';
+        document.getElementById('activeFiltersBanner').classList.add('hidden');
+
+        // Toggle visibility back to empty state
+        document.getElementById('dashboardContent').classList.add('hidden');
+        document.getElementById('dashboardPlaceholder').classList.remove('hidden');
+
+        document.getElementById('customerContent').classList.add('hidden');
+        document.getElementById('customerPlaceholder').classList.remove('hidden');
+
+        document.getElementById('searchContent').classList.add('hidden');
+        document.getElementById('searchPlaceholder').classList.remove('hidden');
+
+        document.getElementById('uploadSection').classList.remove('hidden');
+        document.getElementById('reuploadBtn').classList.add('hidden');
+
+        switchTab('dashboard');
+      } catch (err) {
+        console.error("Reset failed: ", err);
+      }
+    }
+    window.resetAllData = resetAllData;
+
+    function switchTab(tabId) {
+      try {
+        const screens = ['dashboard', 'customer', 'search', 'about'];
+        screens.forEach(s => {
+          const screenEl = document.getElementById(s + 'Screen');
+          if (screenEl) screenEl.classList.add('hidden');
+        });
+
+        screens.forEach(t => {
+          const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+          if (btn) {
+            btn.className = "py-3.5 px-5 font-medium text-sm transition-all border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 flex items-center gap-2";
+          }
+        });
+
+        const targetScreen = document.getElementById(tabId + 'Screen');
+        if (targetScreen) targetScreen.classList.remove('hidden');
+        
+        const activeBtn = document.getElementById('tab' + tabId.charAt(0).toUpperCase() + tabId.slice(1));
+        if (activeBtn) {
+          activeBtn.className = "py-3.5 px-5 font-semibold text-sm transition-all border-b-2 border-[#002C54] text-[#002C54] flex items-center gap-2 bg-[#002C54]/5 rounded-t-lg";
+        }
+
+        if (tabId === 'dashboard' && totalRecordCount > 0) {
+          setTimeout(() => {
+            if (trendChart) trendChart.resize();
+            if (methodChart) methodChart.resize();
+          }, 50);
+        }
+      } catch (err) {
+        console.error("Navigation error: ", err);
+      }
+    }
+    window.switchTab = switchTab;
+
+    function triggerTxtFile(inputElement) {
+      if (inputElement.files && inputElement.files.length > 0) {
+        paymentsFile = inputElement.files[0];
+        document.getElementById('txtStatus').innerHTML = `
+          <span class="text-[#002C54] font-bold text-xs flex items-center justify-center gap-1">
+            <i class="fas fa-clock"></i> קובץ מוכן לעיבוד (${(paymentsFile.size / 1024 / 1024).toFixed(1)} MB)
+          </span>`;
+        checkAndEnrichIfReady();
+      }
+    }
+    window.triggerTxtFile = triggerTxtFile;
+
+    function triggerXlsxFile(inputElement) {
+      if (inputElement.files && inputElement.files.length > 0) {
+        handleXlsxFile(inputElement.files[0]);
+      }
+    }
+    window.triggerXlsxFile = triggerXlsxFile;
+
+    function showSpinner(msg = "מעבד נתונים...") {
+      const el = document.getElementById('spinnerMessage');
+      if (el) el.innerText = msg;
+      const spinner = document.getElementById('loadingSpinner');
+      if (spinner) spinner.classList.remove('hidden');
+    }
+
+    function hideSpinner() {
+      const spinner = document.getElementById('loadingSpinner');
+      if (spinner) spinner.classList.add('hidden');
+    }
+
+    function logoError(img) {
+      img.onerror = null;
+      img.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Coat_of_arms_of_Israel.svg/200px-Coat_of_arms_of_Israel.svg.png";
+    }
+
+    function cleanKey(val) {
+      if (val === undefined || val === null) return '';
+      return String(val).replace(/^\uFEFF/, '').trim().replace(/^0+/, '');
+    }
+
+    // Drag & Drop Setup
+    function setupDragAndDrop() {
+      const dropzoneTxt = document.getElementById('dropzoneTxt');
+      const dropzoneXlsx = document.getElementById('dropzoneXlsx');
+      if (!dropzoneTxt || !dropzoneXlsx) return;
+
+      const preventDefaults = (e) => { e.preventDefault(); e.stopPropagation(); };
+
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => {
+        dropzoneTxt.addEventListener(ev, preventDefaults, false);
+        dropzoneXlsx.addEventListener(ev, preventDefaults, false);
+      });
+
+      dropzoneTxt.addEventListener('drop', e => {
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          const input = document.getElementById('txtFileInput');
+          if (input) {
+            input.files = files;
+            window.triggerTxtFile(input);
+          }
+        }
+      });
+
+      dropzoneXlsx.addEventListener('drop', e => {
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          const input = document.getElementById('xlsxFileInput');
+          if (input) {
+            input.files = files;
+            window.triggerXlsxFile(input);
+          }
+        }
+      });
+    }
+
+    function showFileError(type, message) {
+      const statusId = type === 'txt' ? 'txtStatus' : 'xlsxStatus';
+      const statusEl = document.getElementById(statusId);
+      if (statusEl) {
+        statusEl.innerHTML = `
+          <div class="mt-2 p-2 bg-red-50 border border-red-200 rounded text-red-800 text-xs text-right flex items-start gap-1 justify-center">
+            <i class="fas fa-exclamation-circle mt-0.5"></i>
+            <div>${message}</div>
+          </div>`;
+      }
+    }
+
+    // Process conversion files (Excel)
+    function handleXlsxFile(file) {
+      showSpinner("קורא קובץ המרות Excel...");
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, {type: 'array'});
+          
+          let nameSheetKey = workbook.SheetNames.find(n => n.trim() === 'שם וסיווג');
+          let bankSheetKey = workbook.SheetNames.find(n => n.trim() === 'חשבונות בנק לסליקת אשראי');
+
+          if (!nameSheetKey) nameSheetKey = workbook.SheetNames.find(n => n.includes('סיווג') || n.includes('שם'));
+          if (!bankSheetKey) bankSheetKey = workbook.SheetNames.find(n => n.includes('חשבון') || n.includes('סליק'));
+
+          if (!nameSheetKey || !bankSheetKey) {
+            showFileError('xlsx', "לא נמצאו הגיליונות 'שם וסיווג' ו/או 'חשבונות בנק לסליקת אשראי'.");
+            hideSpinner();
+            return;
+          }
+
+          conversionNames = {};
+          conversionBanks = {};
+
+          // Sheet 1: Names and Classifications
+          const namesJson = XLSX.utils.sheet_to_json(workbook.Sheets[nameSheetKey]);
+          namesJson.forEach(row => {
+            const keyClient = Object.keys(row).find(k => k.replace(/^\uFEFF/, '').trim().includes('לקוח'));
+            const keyName = Object.keys(row).find(k => {
+              const ck = k.replace(/^\uFEFF/, '').trim();
+              return ck === 'שם' || ck.includes('שם לקוח');
+            });
+            const keyDest = Object.keys(row).find(k => {
+              const ck = k.replace(/^\uFEFF/, '').trim();
+              return ck.includes('ייעוד') || ck.includes('סיווג') || ck.includes('יעוד');
+            });
+
+            const id = keyClient ? cleanKey(row[keyClient]) : null;
+            if (id) {
+              conversionNames[id] = {
+                name: keyName ? row[keyName] : '',
+                classification: keyDest ? row[keyDest] : 'אחר'
+              };
+            }
+          });
+
+          // Sheet 2: Bank Accounts
+          const banksJson = XLSX.utils.sheet_to_json(workbook.Sheets[bankSheetKey]);
+          banksJson.forEach(row => {
+            const keyAcc = Object.keys(row).find(k => k.replace(/^\uFEFF/, '').trim().includes('חשבון') || k.includes('מספר'));
+            const keyClass = Object.keys(row).find(k => k.replace(/^\uFEFF/, '').trim().includes('סיווג') || k.includes('אמצעי'));
+            const keyNotes = Object.keys(row).find(k => k.replace(/^\uFEFF/, '').trim().includes('הערה') || k.includes('הערות'));
+
+            const acc = keyAcc ? cleanKey(row[keyAcc]) : null;
+            if (acc) {
+              conversionBanks[acc] = {
+                classification: keyClass ? row[keyClass] : 'אחר',
+                remarks: keyNotes ? row[keyNotes] : ''
+              };
+            }
+          });
+
+          document.getElementById('xlsxStatus').innerHTML = `
+            <span class="text-emerald-600 flex items-center justify-center gap-1 text-xs font-bold">
+              <i class="fas fa-check-circle"></i> מילון מרה נטען (${Object.keys(conversionNames).length} לקוחות)
+            </span>`;
+          
+          hideSpinner();
+          checkAndEnrichIfReady();
+        } catch (err) {
+          hideSpinner();
+          showFileError('xlsx', `שגיאת פענוח אקסל: ${err.message || err}`);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function checkAndEnrichIfReady() {
+      const hasTxt = paymentsFile !== null;
+      const hasXlsx = Object.keys(conversionNames).length > 0;
+
+      if (hasTxt && hasXlsx) {
+        processEnrichmentStream();
+      } else {
+        let statusMsg = "אנא העלה את קובץ התשלומים (TXT) ואת קובץ ההמרות (XLSX) בתיבות למעלה.";
+        if (hasTxt && !hasXlsx) {
+          statusMsg = "קובץ תשלומים מוכן לניתוח. כעת יש להעלות את קובץ ההמרות (XLSX) כדי להתחיל בעיבוד.";
+        } else if (!hasTxt && hasXlsx) {
+          statusMsg = "קובץ ההמרות נקרא בהצלחה. כעת העלה את קובץ ה-TXT כדי להתחיל בעיבוד הנתונים.";
+        }
+        document.getElementById('dashPlaceholderText').innerText = statusMsg;
+        document.getElementById('custPlaceholderText').innerText = statusMsg;
+        document.getElementById('searchPlaceholderText').innerText = statusMsg;
+      }
+    }
+
+    // 3. Dynamic Streaming Parsing Engine to Handle Millions of Rows
+    function processEnrichmentStream() {
+      showSpinner("מעבד ומזרים מיליוני תנועות... נא להמתין");
+
+      // Reset aggregates
+      totalAmount = 0;
+      totalRecordCount = 0;
+      classificationSums = {};
+      classificationCounts = {};
+      methodSums = {};
+      methodCounts = {};
+      monthlySums = {};
+      dailySums = {};
+      customerSums = {};
+      detailedRecordsSample = [];
+      uniqueCustomersCached = [];
+
+      Papa.parse(paymentsFile, {
+        delimiter: "|",
+        header: true,
+        skipEmptyLines: true,
+        fastMode: false, // Ensures accurate processing
+        chunkSize: 1024 * 1024 * 10, // 10MB chunks for optimal streaming performance
+        chunk: function(results, parser) {
+          const chunkData = results.data;
+          
+          for (let i = 0; i < chunkData.length; i++) {
+            const row = chunkData[i];
+            
+            // Clean up keys to ignore BOM markers and whitespaces
+            const keyClient = Object.keys(row).find(k => k.replace(/^\uFEFF/, '').trim() === 'לקוח');
+            const keyBank = Object.keys(row).find(k => k.replace(/^\uFEFF/, '').trim() === 'חשבון נגדי');
+            const keyAmount = Object.keys(row).find(k => k.replace(/^\uFEFF/, '').trim().includes('סכום במט"מ'));
+            const keyDoc = Object.keys(row).find(k => k.replace(/^\uFEFF/, '').trim() === 'מספר מסמך');
+            const keyDate = Object.keys(row).find(k => k.replace(/^\uFEFF/, '').trim() === 'תאריך מסמך');
+            const keyYM = Object.keys(row).find(k => k.replace(/^\uFEFF/, '').trim() === 'שנה/חודש');
+            const keyCurrency = Object.keys(row).find(k => k.replace(/^\uFEFF/, '').trim() === 'מטבע');
+            const keyAccount = Object.keys(row).find(k => k.replace(/^\uFEFF/, '').trim() === 'חשבון');
+            const keyType = Object.keys(row).find(k => k.replace(/^\uFEFF/, '').trim() === 'סוג');
+            const keyText = Object.keys(row).find(k => k.replace(/^\uFEFF/, '').trim() === 'טקסט');
+            const keyMatch = Object.keys(row).find(k => k.replace(/^\uFEFF/, '').trim() === 'מסמך התאמה');
+
+            const custId = keyClient ? cleanKey(row[keyClient]) : '';
+            const bankAcc = keyBank ? cleanKey(row[keyBank]) : '';
+            const amount = keyAmount ? parseFloat(row[keyAmount]) || 0 : 0;
+            const ym = keyYM ? row[keyYM] : 'לא מוגדר';
+            const docNum = keyDoc ? row[keyDoc] : '';
+            const docDate = keyDate ? row[keyDate] : '';
+            const currency = keyCurrency ? row[keyCurrency] : 'ILS';
+
+            const custObj = conversionNames[custId] || { name: "לא נמצא במילון", classification: "לא מוגדר" };
+            const bankObj = conversionBanks[bankAcc] || { classification: "לא מוגדר (סליקה חלופית)", remarks: "" };
+
+            const method = bankObj.classification || "לא מוגדר";
+            const classification = custObj.classification || "לא מוגדר";
+
+            // Tally global summaries (across ALL millions of records)
+            totalRecordCount++;
+            totalAmount += amount;
+
+            monthlySums[ym] = (monthlySums[ym] || 0) + amount;
+            
+            // Accumulate daily chronological sums for line chart
+            const dayKey = docDate || 'לא ידוע';
+            dailySums[dayKey] = (dailySums[dayKey] || 0) + amount;
+
+            methodSums[method] = (methodSums[method] || 0) + amount;
+            methodCounts[method] = (methodCounts[method] || 0) + 1;
+            classificationSums[classification] = (classificationSums[classification] || 0) + amount;
+            classificationCounts[classification] = (classificationCounts[classification] || 0) + 1;
+
+            if (custId) {
+              if (!customerSums[custId]) {
+                customerSums[custId] = {
+                  name: custObj.name,
+                  classification: classification,
+                  sum: 0,
+                  count: 0
+                };
+              }
+              customerSums[custId].sum += amount;
+              customerSums[custId].count += 1;
+            }
+
+            // Populate sample for Detailed Search without breaking memory limits
+            if (detailedRecordsSample.length < MAX_DETAILED_RECORDS) {
+              detailedRecordsSample.push({
+                "מספר מסמך": docNum,
+                "תאריך מסמך": docDate,
+                "שנה/חודש": ym,
+                "לקוח": custId,
+                "שם לקוח": custObj.name,
+                "סיווג": classification,
+                "חשבון נגדי": bankAcc,
+                "אמצעי תשלום": method,
+                "סכום_מספרי": amount,
+                "מטבע": currency,
+                "חשבון": keyAccount ? row[keyAccount] : '',
+                "סוג": keyType ? row[keyType] : '',
+                "טקסט": keyText ? row[keyText] : '',
+                "מסמך התאמה": keyMatch ? row[keyMatch] : '',
+                "הערות חשבון": bankObj.remarks
+              });
+            }
+          }
+        },
+        complete: function() {
+          hideSpinner();
+          // Convert customer statistics dictionary to an optimized flat cache list
+          uniqueCustomersCached = Object.keys(customerSums).map(id => ({
+            id: id,
+            name: customerSums[id].name,
+            classification: customerSums[id].classification,
+            sum: customerSums[id].sum,
+            count: customerSums[id].count
+          }));
+
+          // Hide upload section & show reset triggers
+          document.getElementById('uploadSection').classList.add('hidden');
+          document.getElementById('reuploadBtn').classList.remove('hidden');
+
+          // Unhide workspaces
+          document.getElementById('dashboardPlaceholder').classList.add('hidden');
+          document.getElementById('dashboardContent').classList.remove('hidden');
+
+          document.getElementById('customerPlaceholder').classList.add('hidden');
+          document.getElementById('customerContent').classList.remove('hidden');
+
+          document.getElementById('searchPlaceholder').classList.add('hidden');
+          document.getElementById('searchContent').classList.remove('hidden');
+
+          buildDashboardKPIsAndCharts();
+          initDashboardFilters();
+          initCustomerFilters();
+          initPaymentSearchFilters();
+        },
+        error: function(err) {
+          hideSpinner();
+          alert("אירעה שגיאה בעיבוד הזרמת קובץ התשלומים: " + err.message);
+        }
+      });
+    }
+
+    function formatCurrency(amount, currency = "ILS") {
+      const symbol = currency === "USD" ? "$" : currency === "EUR" ? "€" : "₪";
+      return `${symbol}${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    // Process global summaries and render interactive visuals
+    function buildDashboardKPIsAndCharts() {
+      // Find top classifications and methods
+      let topCat = "-";
+      let maxCatAmt = 0;
+      Object.keys(classificationSums).forEach(k => {
+        if (classificationSums[k] > maxCatAmt) {
+          maxCatAmt = classificationSums[k];
+          topCat = k;
+        }
+      });
+
+      let topMethod = "-";
+      let maxMethodAmt = 0;
+      Object.keys(methodSums).forEach(k => {
+        if (methodSums[k] > maxMethodAmt) {
+          maxMethodAmt = methodSums[k];
+          topMethod = k;
+        }
+      });
+
+      // Populate KPIs
+      document.getElementById('statTotalAmount').innerText = formatCurrency(totalAmount);
+      document.getElementById('statRecordCount').innerText = totalRecordCount.toLocaleString();
+      document.getElementById('statTopCategory').innerText = topCat;
+      document.getElementById('statTopMethod').innerText = topMethod;
+
+      // Render Dashboard Executive Summary Slices (Both initial and reset state)
+      renderSummaryTables();
+
+      // Render Charts (Line Daily Trend + Methods Doughnut)
+      renderTrendAndMethodCharts();
+    }
+
+    // Set up options inside the dashboard filters dropdowns
+    function initDashboardFilters() {
+      const classSelect = document.getElementById('dashFilterClass');
+      const methodSelect = document.getElementById('dashFilterMethod');
+      if (!classSelect || !methodSelect) return;
+
+      classSelect.innerHTML = '<option value="">הכל</option>';
+      methodSelect.innerHTML = '<option value="">הכל</option>';
+
+      const classes = new Set();
+      const methods = new Set();
+
+      detailedRecordsSample.forEach(row => {
+        if (row["סיווג"]) classes.add(row["סיווג"]);
+        if (row["אמצעי תשלום"]) methods.add(row["אמצעי תשלום"]);
+      });
+
+      classes.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.innerText = c;
+        classSelect.appendChild(opt);
+      });
+
+      methods.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.innerText = m;
+        methodSelect.appendChild(opt);
+      });
+
+      // Clear filter selection values
+      document.getElementById('dashFilterClass').value = '';
+      document.getElementById('dashFilterMethod').value = '';
+      document.getElementById('dashFilterDateFrom').value = '';
+      document.getElementById('dashFilterDateTo').value = '';
+      document.getElementById('activeFiltersBanner').classList.add('hidden');
+    }
+
+    // Dynamic filtering for the Dashboard screen elements
+    function applyDashboardFilters() {
+      const filterClass = document.getElementById('dashFilterClass').value;
+      const filterMethod = document.getElementById('dashFilterMethod').value;
+      const filterDateFrom = document.getElementById('dashFilterDateFrom').value;
+      const filterDateTo = document.getElementById('dashFilterDateTo').value;
+
+      const hasFilters = filterClass || filterMethod || filterDateFrom || filterDateTo;
+
+      if (!hasFilters) {
+        document.getElementById('activeFiltersBanner').classList.add('hidden');
+        buildDashboardKPIsAndCharts();
+        return;
+      }
+
+      // Filter local sample dataset
+      const filtered = detailedRecordsSample.filter(row => {
+        if (filterClass && row["סיווג"] !== filterClass) return false;
+        if (filterMethod && row["אמצעי תשלום"] !== filterMethod) return false;
+        if (filterDateFrom && row["תאריך מסמך"] < filterDateFrom) return false;
+        if (filterDateTo && row["תאריך מסמך"] > filterDateTo) return false;
+        return true;
+      });
+
+      document.getElementById('dashFilteredCount').innerText = filtered.length.toLocaleString();
+      document.getElementById('activeFiltersBanner').classList.remove('hidden');
+
+      // Accumulate aggregates from the filtered dataset
+      let localTotalAmount = 0;
+      let localRecordCount = 0;
+      let localClassificationSums = {};
+      let localClassificationCounts = {};
+      let localMethodSums = {};
+      let localMethodCounts = {};
+      let localMonthlySums = {};
+      let localDailySums = {};
+      let localCustomerSums = {};
+
+      filtered.forEach(row => {
+        const amount = row["סכום_מספרי"] || 0;
+        const ym = row["שנה/חודש"] || 'לא מוגדר';
+        const dayKey = row["תאריך מסמך"] || 'לא ידוע';
+        const method = row["אמצעי תשלום"] || 'לא מוגדר';
+        const classification = row["סיווג"] || 'לא מוגדר';
+        const custId = row["לקוח"];
+
+        localTotalAmount += amount;
+        localRecordCount++;
+
+        localMonthlySums[ym] = (localMonthlySums[ym] || 0) + amount;
+        localDailySums[dayKey] = (localDailySums[dayKey] || 0) + amount;
+        localMethodSums[method] = (localMethodSums[method] || 0) + amount;
+        localMethodCounts[method] = (localMethodCounts[method] || 0) + 1;
+        localClassificationSums[classification] = (localClassificationSums[classification] || 0) + amount;
+        localClassificationCounts[classification] = (localClassificationCounts[classification] || 0) + 1;
+
+        if (custId) {
+          if (!localCustomerSums[custId]) {
+            localCustomerSums[custId] = {
+              name: row["שם לקוח"],
+              classification: classification,
+              sum: 0,
+              count: 0
+            };
+          }
+          localCustomerSums[custId].sum += amount;
+          localCustomerSums[custId].count += 1;
+        }
+      });
+
+      // Calculate dynamic top values for KPIs
+      let topCat = "-";
+      let maxCatAmt = 0;
+      Object.keys(localClassificationSums).forEach(k => {
+        if (localClassificationSums[k] > maxCatAmt) {
+          maxCatAmt = localClassificationSums[k];
+          topCat = k;
+        }
+      });
+
+      let topMethod = "-";
+      let maxMethodAmt = 0;
+      Object.keys(localMethodSums).forEach(k => {
+        if (localMethodSums[k] > maxMethodAmt) {
+          maxMethodAmt = localMethodSums[k];
+          topMethod = k;
+        }
+      });
+
+      // Render KPIs
+      document.getElementById('statTotalAmount').innerText = formatCurrency(localTotalAmount);
+      document.getElementById('statRecordCount').innerText = localRecordCount.toLocaleString();
+      document.getElementById('statTopCategory').innerText = topCat;
+      document.getElementById('statTopMethod').innerText = topMethod;
+
+      // Render tables and charts with filtered data aggregates
+      renderSummaryTablesWithData(localTotalAmount, localMethodSums, localMethodCounts, localClassificationSums, localClassificationCounts, localMonthlySums, localCustomerSums);
+      renderChartsWithData(localDailySums, localMethodSums);
+    }
+
+    function resetDashboardFilters() {
+      document.getElementById('dashFilterClass').value = '';
+      document.getElementById('dashFilterMethod').value = '';
+      document.getElementById('dashFilterDateFrom').value = '';
+      document.getElementById('dashFilterDateTo').value = '';
+      applyDashboardFilters();
+    }
+
+    function renderSummaryTables() {
+      renderSummaryTablesWithData(totalAmount, methodSums, methodCounts, classificationSums, classificationCounts, monthlySums, customerSums);
+    }
+
+    // Unified summary renderer to prevent duplication
+    function renderSummaryTablesWithData(tAmount, mSums, mCounts, cSums, cCounts, monSums, custSums) {
+      // 1. Render Methods Summary
+      const methodTbody = document.getElementById('summaryMethodsTableBody');
+      if (methodTbody) {
+        methodTbody.innerHTML = '';
+        Object.keys(mSums).sort((a,b) => mSums[b] - mSums[a]).forEach(m => {
+          const sum = mSums[m];
+          const count = mCounts[m] || 0;
+          const percentage = tAmount > 0 ? ((sum / tAmount) * 100).toFixed(1) : '0.0';
+          
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-50 border-b border-slate-100 transition-colors";
+          tr.innerHTML = `
+            <td class="px-4 py-3 font-medium text-slate-800">${m}</td>
+            <td class="px-4 py-3 text-center font-mono text-slate-600">${count.toLocaleString()}</td>
+            <td class="px-4 py-3 text-left font-mono font-bold text-slate-900">${formatCurrency(sum)}</td>
+            <td class="px-4 py-3 text-left font-mono text-indigo-600 font-semibold">${percentage}%</td>
+          `;
+          methodTbody.appendChild(tr);
+        });
+      }
+
+      // 2. Render Classification Summary
+      const classTbody = document.getElementById('summaryClassesTableBody');
+      if (classTbody) {
+        classTbody.innerHTML = '';
+        Object.keys(cSums).sort((a,b) => cSums[b] - cSums[a]).forEach(c => {
+          const sum = cSums[c];
+          const count = cCounts[c] || 0;
+          const percentage = tAmount > 0 ? ((sum / tAmount) * 100).toFixed(1) : '0.0';
+          
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-50 border-b border-slate-100 transition-colors";
+          tr.innerHTML = `
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${
+                c === 'מדינה' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+                c === 'מיועדות' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                'bg-slate-100 text-slate-700 border border-slate-200'
+              }">${c}</span>
+            </td>
+            <td class="px-4 py-3 text-center font-mono text-slate-600">${count.toLocaleString()}</td>
+            <td class="px-4 py-3 text-left font-mono font-bold text-slate-900">${formatCurrency(sum)}</td>
+            <td class="px-4 py-3 text-left font-mono text-indigo-600 font-semibold">${percentage}%</td>
+          `;
+          classTbody.appendChild(tr);
+        });
+      }
+
+      // 2.5 Render Months Summary (Strict Requirement)
+      const monthsTbody = document.getElementById('summaryMonthsTableBody');
+      if (monthsTbody) {
+        monthsTbody.innerHTML = '';
+        Object.keys(monSums).sort().forEach(m => {
+          const sum = monSums[m];
+          const percentage = tAmount > 0 ? ((sum / tAmount) * 100).toFixed(1) : '0.0';
+          
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-50 border-b border-slate-100 transition-colors";
+          tr.innerHTML = `
+            <td class="px-4 py-3 font-medium text-slate-800 font-mono">${m}</td>
+            <td class="px-4 py-3 text-left font-mono font-bold text-slate-900">${formatCurrency(sum)}</td>
+            <td class="px-4 py-3 text-left font-mono text-indigo-600 font-semibold">${percentage}%</td>
+          `;
+          monthsTbody.appendChild(tr);
+        });
+      }
+
+      // 3. Render Top 10 High-Volume Customers Table
+      const topCustTbody = document.getElementById('topCustomersTableBody');
+      if (topCustTbody) {
+        topCustTbody.innerHTML = '';
+        
+        // Convert dynamic custSums to list and sort chronologically/heuristically
+        const top10 = Object.keys(custSums).map(id => ({
+          id: id,
+          name: custSums[id].name,
+          classification: custSums[id].classification,
+          sum: custSums[id].sum,
+          count: custSums[id].count
+        })).sort((a,b) => b.sum - a.sum).slice(0, 10);
+        
+        top10.forEach((cust, index) => {
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-50/50 border-b border-slate-100 transition-colors cursor-pointer";
+          tr.onclick = () => viewCustomerFromTable(cust.id);
+          tr.innerHTML = `
+            <td class="px-6 py-3 font-mono font-semibold text-[#002C54]">
+              <span class="inline-block w-5 text-slate-400 font-normal">#${index+1}</span>
+              ${cust.id}
+            </td>
+            <td class="px-6 py-3 font-bold text-slate-900">${cust.name}</td>
+            <td class="px-6 py-3">
+              <span class="px-2 py-0.5 text-[10px] rounded bg-indigo-50 text-indigo-700 border border-indigo-100">${cust.classification}</span>
+            </td>
+            <td class="px-6 py-3 text-center font-mono text-slate-600">${cust.count.toLocaleString()}</td>
+            <td class="px-6 py-3 text-left font-mono font-black text-slate-950">${formatCurrency(cust.sum)}</td>
+          `;
+          topCustTbody.appendChild(tr);
+        });
+      }
+    }
+
+    function viewCustomerFromTable(custId) {
+      switchTab('customer');
+      const searchInput = document.getElementById('customerSearchInput');
+      if (searchInput) {
+        searchInput.value = custId;
+        filterCustomerDropdown();
+        const select = document.getElementById('customerSelect');
+        if (select) {
+          select.value = custId;
+          onCustomerSelected();
+        }
+      }
+    }
+
+    function renderTrendAndMethodCharts() {
+      renderChartsWithData(dailySums, methodSums);
+    }
+
+    // Unified charts rendering code supporting dynamic line-daily plot
+    function renderChartsWithData(dSums, mSums) {
+      if (typeof Chart === 'undefined') return;
+
+      const days = Object.keys(dSums).filter(d => d !== 'לא ידוע' && d !== '').sort();
+      const dayAmounts = days.map(d => dSums[d]);
+
+      const methods = Object.keys(mSums);
+      const methodAmounts = methods.map(m => mSums[m]);
+
+      try {
+        const ctx1 = document.getElementById('trendChartCanvas').getContext('2d');
+        if (trendChart) trendChart.destroy();
+        trendChart = new Chart(ctx1, {
+          type: 'line',
+          data: {
+            labels: days,
+            datasets: [{
+              label: 'סך הכל תשלומים (₪)',
+              data: dayAmounts,
+              borderColor: '#002C54',
+              backgroundColor: 'rgba(0, 44, 84, 0.1)',
+              borderWidth: 2,
+              pointRadius: days.length > 50 ? 1 : 3,
+              tension: 0.15,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                rtl: true,
+                callbacks: {
+                  label: (ctx) => ` סך הכל: ${formatCurrency(ctx.raw)}`
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: (val) => '₪' + val.toLocaleString()
+                }
+              },
+              x: {
+                ticks: {
+                  maxTicksLimit: 12,
+                  font: { family: 'Heebo', size: 10 }
+                }
+              }
+            }
+          }
+        });
+      } catch (err) {
+        console.error("Daily trend chart rendering error: ", err);
+      }
+
+      try {
+        const ctx2 = document.getElementById('methodChartCanvas').getContext('2d');
+        if (methodChart) methodChart.destroy();
+        methodChart = new Chart(ctx2, {
+          type: 'doughnut',
+          data: {
+            labels: methods,
+            datasets: [{
+              data: methodAmounts,
+              backgroundColor: ['#002C54', '#10B981', '#F59E0B', '#38BDF8', '#EC4899', '#8B5CF6']
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right',
+                rtl: true,
+                labels: { boxWidth: 12, font: { family: 'Heebo', size: 11 } }
+              },
+              tooltip: {
+                rtl: true,
+                callbacks: {
+                  label: (ctx) => {
+                    const sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                    const pct = sum > 0 ? ((ctx.raw / sum) * 100).toFixed(1) : '0.0';
+                    return ` ${ctx.label}: ${formatCurrency(ctx.raw)} (${pct}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      } catch (err) {
+        console.error("Method chart rendering error: ", err);
+      }
+    }
+
+    // Tab 2: Customer Locator with Fast Searchable Dropdown
+    function initCustomerFilters() {
+      const select = document.getElementById('customerSelect');
+      const searchInput = document.getElementById('customerSearchInput');
+      if (!select || !searchInput) return;
+
+      searchInput.value = '';
+      select.innerHTML = '<option value="">-- הקלד בשדה החיפוש מימין --</option>';
+      document.getElementById('customerProfileCard').classList.add('hidden');
+    }
+
+    function filterCustomerDropdown() {
+      const query = document.getElementById('customerSearchInput').value.trim().toLowerCase();
+      const select = document.getElementById('customerSelect');
+      if (!select) return;
+
+      select.innerHTML = '<option value="">-- בחר לקוח מהרשימה --</option>';
+
+      if (query.length < 1) {
+        select.innerHTML = '<option value="">-- הקלד בשדה החיפוש מימין --</option>';
+        return;
+      }
+
+      // Filter and limit to avoid UI freezing
+      const matches = uniqueCustomersCached.filter(c => 
+        String(c.id).includes(query) || String(c.name).toLowerCase().includes(query)
+      ).slice(0, 300); // UI Safety Cap
+
+      if (matches.length === 0) {
+        select.innerHTML = '<option value="">לא נמצאו לקוחות תואמים</option>';
+        return;
+      }
+
+      matches.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.innerText = `${c.name} (מזהה: ${c.id}) - ${formatCurrency(c.sum)}`;
+        select.appendChild(opt);
+      });
+    }
+
+    function onCustomerSelected() {
+      const id = document.getElementById('customerSelect').value;
+      if (!id) {
+        document.getElementById('customerProfileCard').classList.add('hidden');
+        return;
+      }
+
+      const clientSummary = customerSums[id];
+      if (!clientSummary) return;
+
+      const avg = clientSummary.sum / clientSummary.count;
+
+      // Extract matching detailed sample transactions to avoid rendering millions of rows
+      const customerRows = detailedRecordsSample.filter(r => r["לקוח"] === id).slice(0, 500);
+
+      let topMethod = "לא נמצאו רשומות במדגם";
+      if (customerRows.length > 0) {
+        const methodCountsLocal = {};
+        customerRows.forEach(r => {
+          const m = r["אמצעי תשלום"] || "לא ידוע";
+          methodCountsLocal[m] = (methodCountsLocal[m] || 0) + 1;
+        });
+        let maxCount = 0;
+        Object.keys(methodCountsLocal).forEach(m => {
+          if (methodCountsLocal[m] > maxCount) {
+            maxCount = methodCountsLocal[m];
+            topMethod = m;
+          }
+        });
+      }
+
+      document.getElementById('profName').innerText = clientSummary.name;
+      document.getElementById('profId').innerText = id;
+      document.getElementById('profClass').innerText = clientSummary.classification;
+      document.getElementById('profTotal').innerText = formatCurrency(clientSummary.sum);
+      document.getElementById('profCount').innerText = clientSummary.count.toLocaleString();
+      document.getElementById('profAvg').innerText = formatCurrency(avg);
+      document.getElementById('profTopMethod').innerText = topMethod;
+
+      // Render customer transaction history table (Capped sample)
+      const tbody = document.getElementById('customerHistoryTableBody');
+      if (tbody) {
+        tbody.innerHTML = '';
+        if (customerRows.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400">לא קיימות תנועות מדגמיות תואמות במפתח הזיכרון הנוכחי</td></tr>`;
+        } else {
+          customerRows.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-slate-50 border-b border-slate-100 transition-colors cursor-pointer";
+            tr.onclick = () => openDrillDownModal(row);
+            tr.innerHTML = `
+              <td class="px-6 py-3 font-mono font-semibold text-[#002C54]">${row["מספר מסמך"]}</td>
+              <td class="px-6 py-3 text-slate-700">${row["תאריך מסמך"]}</td>
+              <td class="px-6 py-3 font-mono text-slate-500">${row["שנה/חודש"]}</td>
+              <td class="px-6 py-3 text-slate-700">${row["אמצעי תשלום"]}</td>
+              <td class="px-6 py-3 text-left font-bold text-slate-900 font-mono">${formatCurrency(row["סכום_מספרי"], row["מטבע"])}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      }
+
+      document.getElementById('customerProfileCard').classList.remove('hidden');
+    }
+
+    // Tab 3: Payment Search
+    function initPaymentSearchFilters() {
+      const select = document.getElementById('searchPaymentMethod');
+      if (!select) return;
+      select.innerHTML = '<option value="">הכל</option>';
+      
+      const methods = new Set();
+      detailedRecordsSample.forEach(row => {
+        if (row["אמצעי תשלום"]) methods.add(row["אמצעי תשלום"]);
+      });
+
+      methods.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.innerText = m;
+        select.appendChild(opt);
+      });
+
+      renderSearchResults(detailedRecordsSample);
+    }
+
+    function searchPayments() {
+      const docNum = document.getElementById('searchDocNum').value.trim();
+      const dateFrom = document.getElementById('searchDateFrom').value;
+      const dateTo = document.getElementById('searchDateTo').value;
+      const amtMin = parseFloat(document.getElementById('searchAmountMin').value) || null;
+      const amtMax = parseFloat(document.getElementById('searchAmountMax').value) || null;
+      const bankAcc = document.getElementById('searchBankAcc').value.trim();
+      const payMethod = document.getElementById('searchPaymentMethod').value;
+
+      const results = detailedRecordsSample.filter(row => {
+        if (docNum && !String(row["מספר מסמך"]).includes(docNum)) return false;
+        if (dateFrom && row["תאריך מסמך"] < dateFrom) return false;
+        if (dateTo && row["תאריך מסמך"] > dateTo) return false;
+        if (amtMin !== null && row["סכום_מספרי"] < amtMin) return false;
+        if (amtMax !== null && row["סכום_מספרי"] > amtMax) return false;
+        if (bankAcc && !String(row["חשבון נגדי"]).includes(bankAcc)) return false;
+        if (payMethod && row["אמצעי תשלום"] !== payMethod) return false;
+        return true;
+      });
+
+      renderSearchResults(results);
+    }
+
+    function resetPaymentSearch() {
+      document.getElementById('searchDocNum').value = '';
+      document.getElementById('searchDateFrom').value = '';
+      document.getElementById('searchDateTo').value = '';
+      document.getElementById('searchAmountMin').value = '';
+      document.getElementById('searchAmountMax').value = '';
+      document.getElementById('searchBankAcc').value = '';
+      document.getElementById('searchPaymentMethod').value = '';
+      renderSearchResults(detailedRecordsSample);
+    }
+
+    function renderSearchResults(results) {
+      const tbody = document.getElementById('searchResultsTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      
+      document.getElementById('searchResultCount').innerText = `נמצאו ${results.length.toLocaleString()} תנועות`;
+
+      if (results.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-500">לא נמצאו תוצאות העונות לקריטריונים אלו.</td></tr>`;
+        return;
+      }
+
+      results.slice(0, 1000).forEach(row => { // Performance safeguard limit for DOM rendering
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 border-b border-slate-100 transition-colors cursor-pointer";
+        tr.onclick = () => openDrillDownModal(row);
+        tr.innerHTML = `
+          <td class="px-6 py-3 font-mono font-semibold text-[#002C54]">${row["מספר מסמך"]}</td>
+          <td class="px-6 py-3 text-slate-700">${row["תאריך מסמך"]}</td>
+          <td class="px-6 py-3 text-slate-650 font-mono">${row["שנה/חודש"]}</td>
+          <td class="px-6 py-3 font-medium text-slate-900">${row["שם לקוח"]}</td>
+          <td class="px-6 py-3 text-slate-700">${row["אמצעי תשלום"]}</td>
+          <td class="px-6 py-3 text-slate-500 font-mono">${row["חשבון נגדי"]}</td>
+          <td class="px-6 py-3 text-left font-bold text-slate-900 font-mono">${formatCurrency(row["סכום_מספרי"], row["מטבע"])}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Modal view details drilldown
+    function openDrillDownModal(row) {
+      const modal = document.getElementById('drillDownModal');
+      const detailsGrid = document.getElementById('modalDetailsGrid');
+      
+      if (!detailsGrid || !modal) return;
+      detailsGrid.innerHTML = '';
+      
+      const fields = [
+        { label: "מספר מסמך", value: row["מספר מסמך"], font: "font-mono font-semibold text-[#002C54]" },
+        { label: "תאריך מסמך", value: row["תאריך מסמך"] },
+        { label: "שנה / חודש", value: row["שנה/חודש"] },
+        { label: "מזהה לקוח", value: row["לקוח"], font: "font-mono" },
+        { label: "שם לקוח במערכת", value: row["שם לקוח"], font: "font-semibold text-slate-900" },
+        { label: "סיווג לקוח", value: row["סיווג"], font: "font-semibold text-slate-800" },
+        { label: "חשבון נגדי", value: row["חשבון נגדי"], font: "font-mono" },
+        { label: "אמצעי תשלום", value: row["אמצעי תשלום"], font: "font-semibold text-indigo-700" },
+        { label: "סכום", value: formatCurrency(row["סכום_מספרי"], row["מטבע"]), font: "font-bold text-emerald-700" },
+        { label: "מטבע", value: row["מטבע"], font: "font-mono font-semibold" },
+        { label: "חשבון כללי", value: row["חשבון"] },
+        { label: "סוג מסמך", value: row["סוג"] },
+        { label: "טקסט תנועה", value: row["טקסט"] || "-" },
+        { label: "מסמך התאמה", value: row["מסמך התאמה"] || "-" }
+      ];
+
+      fields.forEach(f => {
+        const div = document.createElement('div');
+        div.className = "p-3 bg-slate-50 rounded-lg border border-slate-100 flex flex-col gap-0.5";
+        div.innerHTML = `
+          <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wide">${f.label}</span>
+          <span class="text-xs text-slate-800 ${f.font || ''}">${f.value || '-'}</span>
+        `;
+        detailsGrid.appendChild(div);
+      });
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeDrillDownModal() {
+      const modal = document.getElementById('drillDownModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function printReport(title) {
+      const titleEl = document.getElementById('printReportTitle');
+      if (titleEl) titleEl.innerText = title;
+      const now = new Date();
+      const dateEl = document.getElementById('printReportDate');
+      if (dateEl) dateEl.innerText = `תאריך הפקה: ${now.toLocaleDateString('he-IL')} בשעה ${now.toLocaleTimeString('he-IL')}`;
+      window.print();
+    }
+  </script>
+</body>
+</html>
