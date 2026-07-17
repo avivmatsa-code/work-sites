@@ -109,7 +109,7 @@
     </div>
   </div>
 
-  <!-- Web View Header (Sticky top configuration active) -->
+  <!-- Web View Header -->
   <header class="bg-[#002C54] text-white shadow-md no-print sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
       <div class="flex items-center gap-4">
@@ -677,7 +677,7 @@
         <h3 class="text-xl font-black text-slate-900 mb-1">מערכת לניהול מידע על תשלומים</h3>
         <p class="text-xs text-slate-400 font-semibold uppercase tracking-widest mb-6 font-mono">גרסה <span id="aboutVersion">1.0</span></p>
         
-        <!-- Strict requirement text (Google AI Studio fixed layout) -->
+        <!-- Strict requirement text -->
         <div class="bg-slate-50 p-6 rounded-xl border border-slate-100 w-full mb-6">
           <p class="text-slate-700 text-sm leading-relaxed">
             המערכת פותחה בשיתוף אביב מצא וג'מיני מצא באמצעות Google AI Studio.
@@ -759,7 +759,7 @@
     let methodSums = {};
     let methodCounts = {};
     let monthlySums = {};
-    let dailySums = {}; // Holds chronological aggregations for line chart
+    let dailySums = {};
     let customerSums = {}; // Caches sum, count, class, name per customer ID
 
     // Capped arrays for Search / Customer views to prevent browser OOM
@@ -1398,7 +1398,9 @@
         Object.keys(mSums).sort((a,b) => mSums[b] - mSums[a]).forEach(m => {
           const sum = mSums[m];
           const count = mCounts[m] || 0;
-          const percentage = tAmount > 0 ? ((sum / tAmount) * 100).toFixed(1) : '0.0';
+          
+          // Safety logic for negative totals (Math.abs ensures accurate dynamic percentages)
+          const percentage = Math.abs(tAmount) > 0 ? (Math.abs(sum / tAmount) * 100).toFixed(1) : '0.0';
           
           const tr = document.createElement('tr');
           tr.className = "hover:bg-slate-50 border-b border-slate-100 transition-colors";
@@ -1419,7 +1421,9 @@
         Object.keys(cSums).sort((a,b) => cSums[b] - cSums[a]).forEach(c => {
           const sum = cSums[c];
           const count = cCounts[c] || 0;
-          const percentage = tAmount > 0 ? ((sum / tAmount) * 100).toFixed(1) : '0.0';
+          
+          // Safety logic for negative totals (Math.abs ensures accurate dynamic percentages)
+          const percentage = Math.abs(tAmount) > 0 ? (Math.abs(sum / tAmount) * 100).toFixed(1) : '0.0';
           
           const tr = document.createElement('tr');
           tr.className = "hover:bg-slate-50 border-b border-slate-100 transition-colors";
@@ -1439,13 +1443,15 @@
         });
       }
 
-      // 2.5 Render Months Summary (Strict Requirement)
+      // 2.5 Render Months Summary
       const monthsTbody = document.getElementById('summaryMonthsTableBody');
       if (monthsTbody) {
         monthsTbody.innerHTML = '';
         Object.keys(monSums).sort().forEach(m => {
           const sum = monSums[m];
-          const percentage = tAmount > 0 ? ((sum / tAmount) * 100).toFixed(1) : '0.0';
+          
+          // Safety logic for negative totals (Math.abs ensures accurate dynamic percentages)
+          const percentage = Math.abs(tAmount) > 0 ? (Math.abs(sum / tAmount) * 100).toFixed(1) : '0.0';
           
           const tr = document.createElement('tr');
           tr.className = "hover:bg-slate-50 border-b border-slate-100 transition-colors";
@@ -1463,7 +1469,7 @@
       if (topCustTbody) {
         topCustTbody.innerHTML = '';
         
-        // Convert dynamic custSums to list and sort chronologically/heuristically
+        // Convert dynamic custSums to list and sort
         const top10 = Object.keys(custSums).map(id => ({
           id: id,
           name: custSums[id].name,
@@ -1597,7 +1603,8 @@
                 callbacks: {
                   label: (ctx) => {
                     const sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                    const pct = sum > 0 ? ((ctx.raw / sum) * 100).toFixed(1) : '0.0';
+                    // Use Math.abs for accurate dynamic percentage tooltips
+                    const pct = Math.abs(sum) > 0 ? (Math.abs(ctx.raw / sum) * 100).toFixed(1) : '0.0';
                     return ` ${ctx.label}: ${formatCurrency(ctx.raw)} (${pct}%)`;
                   }
                 }
