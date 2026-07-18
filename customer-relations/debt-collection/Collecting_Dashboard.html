@@ -142,6 +142,11 @@
                     </button>
                 </div>
 
+                <div class="flex items-center gap-2 bg-black/20 px-3 py-2 rounded-xl border border-white/10">
+                    <label for="report-year-select" class="text-xs text-slate-300 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">שנת עבודה:</label>
+                    <select id="report-year-select" onchange="setReportYear(this.value)" class="bg-white text-slate-800 text-xs font-bold rounded-lg px-2 py-1.5 border-0 outline-none" style="font-family: Arial, Helvetica, sans-serif !important;"></select>
+                </div>
+
                 <!-- לחצני פעולה עליונים מעוצבים כפתורים בני 2 שורות בגודל גופן אחיד ישיר -->
                 <div class="flex items-center gap-3 flex-wrap">
                     <!-- קליטת קובץ חובות -->
@@ -173,7 +178,7 @@
                 <!-- סה"כ הכנסות (מופיע בצד ימין קיצוני בטעינת קובץ) -->
                 <div id="kpi-card-revenue" class="bg-white p-6 rounded-2xl border-2 border-transparent transition-all shadow-sm hidden">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="text-slate-400 font-bold text-xs uppercase tracking-widest" style="font-family: Arial, Helvetica, sans-serif !important;">סה"כ הכנסות שנת 2026</span>
+                        <span class="text-slate-400 font-bold text-xs uppercase tracking-widest" style="font-family: Arial, Helvetica, sans-serif !important;">סה"כ הכנסות שנת <span class="report-year-label"></span></span>
                         <i class="fa-solid fa-money-bill-wave text-emerald-500"></i>
                     </div>
                     <div class="text-4xl font-bold text-emerald-700" id="total-revenue-kpi" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</div>
@@ -188,7 +193,7 @@
                     <div class="text-4xl font-bold text-red-700" id="total-overdue" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</div>
                     <!-- פירוט חובות בפיגור לשנה הנוכחית ולשנים קודמות -->
                     <div id="overdue-breakdown" class="text-xs text-red-600 font-bold mt-2 flex gap-4 hidden border-t border-red-50 pt-1.5" style="font-family: Arial, Helvetica, sans-serif !important;">
-                        <span style="font-family: Arial, Helvetica, sans-serif !important;">שנה נוכחית (2026): <span id="overdue-current" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</span></span>
+                        <span style="font-family: Arial, Helvetica, sans-serif !important;">שנה נוכחית (<span class="report-year-label"></span>): <span id="overdue-current" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</span></span>
                         <span style="font-family: Arial, Helvetica, sans-serif !important;">שנים קודמות: <span id="overdue-past" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</span></span>
                     </div>
                 </div>
@@ -350,7 +355,7 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 print-row-layout">
                 <!-- KPI 1 -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
-                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">סה"כ הכנסות (שנת 2026)</p>
+                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">סה"כ הכנסות (שנת <span class="report-year-label"></span>)</p>
                     <p id="db-kpi-billed" class="text-3xl font-bold text-blue-900 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</p>
                 </div>
                 <!-- KPI 2 -->
@@ -361,7 +366,7 @@
                 <!-- KPI 3 -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
                     <div>
-                        <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">יתרת חוב פתוחה (שנת 2026)</p>
+                        <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">יתרת חוב פתוחה (שנת <span class="report-year-label"></span>)</p>
                         <p id="db-kpi-debt" class="text-3xl font-bold text-red-700 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</p>
                     </div>
                     <div class="text-[11px] text-slate-500 font-bold mt-2 pt-1.5 border-t border-slate-100 flex justify-between" style="font-family: Arial, Helvetica, sans-serif !important;">
@@ -381,7 +386,7 @@
                 <!-- Monthly Table Card (הסרת fixed height וביטול פסי הגלילה להתארכות טבעית) -->
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col h-auto">
                     <h3 class="font-bold text-slate-700 mb-3 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
-                        <i class="fa-solid fa-calendar-days ml-2 text-indigo-600"></i>פילוח חודשי שנת 2026
+                        <i class="fa-solid fa-calendar-days ml-2 text-indigo-600"></i>פילוח חודשי שנת <span class="report-year-label"></span>
                     </h3>
                     <div class="pr-1">
                         <table class="w-full text-right text-xs" style="font-family: Arial, Helvetica, sans-serif !important;">
@@ -416,7 +421,7 @@
                 <!-- Table 1: Top Active Clients (מעבר עמוד בהדפסה) -->
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 page-break">
                     <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
-                        <i class="fa-solid fa-star ml-2 text-yellow-500"></i>עשרת הלקוחות הפעילים (שנת 2026)
+                        <i class="fa-solid fa-star ml-2 text-yellow-500"></i>עשרת הלקוחות הפעילים (שנת <span class="report-year-label"></span>)
                     </h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-right text-xs" style="font-family: Arial, Helvetica, sans-serif !important;">
@@ -436,7 +441,7 @@
                 <!-- Table 2: Top Debtors (מעבר עמוד בהדפסה, חלוקה נפרדת לחוב בפיגור ותקבול עתידי) -->
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 page-break">
                     <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
-                        <i class="fa-solid fa-hand-holding-dollar ml-2 text-red-500"></i>עשרת החייבים הגדולים (שנת 2026)
+                        <i class="fa-solid fa-hand-holding-dollar ml-2 text-red-500"></i>עשרת החייבים הגדולים (שנת <span class="report-year-label"></span>)
                     </h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-right text-xs" style="font-family: Arial, Helvetica, sans-serif !important;">
@@ -479,9 +484,62 @@
         let dashStageB = 'all-sectors'; 
         let dashChart = null;
 
-        const TODAY = new Date(2026, 5, 22);
-        const CURRENT_YEAR = 2026;
+        const TODAY = new Date();
+        TODAY.setHours(0, 0, 0, 0);
+        let CURRENT_YEAR = TODAY.getFullYear();
         const FEE_KEYWORDS = ['אגרה', 'אגרות', 'בעלות', 'רישיון'];
+
+        function isValidDate(value) {
+            return value instanceof Date && !isNaN(value.getTime());
+        }
+
+        function getRevenueYear(row) {
+            return isValidDate(row.invoiceDate) ? row.invoiceDate.getFullYear() : null;
+        }
+
+        function syncReportYearLabels() {
+            document.querySelectorAll('.report-year-label').forEach(el => {
+                el.textContent = CURRENT_YEAR;
+            });
+        }
+
+        function updateReportYearOptions() {
+            const select = document.getElementById('report-year-select');
+            if (!select) return;
+            const years = new Set([TODAY.getFullYear()]);
+            revenueDb.forEach(row => {
+                const year = getRevenueYear(row);
+                if (year) years.add(year);
+            });
+            select.innerHTML = [...years]
+                .sort((a, b) => b - a)
+                .map(year => `<option value="${year}">${year}</option>`)
+                .join('');
+            select.value = String(CURRENT_YEAR);
+            syncReportYearLabels();
+        }
+
+        function setReportYear(value) {
+            const year = Number(value);
+            if (!Number.isInteger(year)) return;
+            CURRENT_YEAR = year;
+            syncReportYearLabels();
+            if (isDashboardActive) {
+                renderDashboard();
+            } else if (db.length > 0) {
+                refresh();
+            }
+        }
+
+        function hasDirectDebit(orgName) {
+            return db.some(row => row.name === orgName && row.isDirectDebit);
+        }
+
+        function directDebitBadge(orgName) {
+            return hasDirectDebit(orgName)
+                ? `<span class="inline-flex items-center bg-sky-100 text-sky-800 border border-sky-200 text-[10px] px-2 py-0.5 rounded-full font-bold mr-2" style="font-family: Arial, Helvetica, sans-serif !important;">הו"ק</span>`
+                : '';
+        }
         const MONTH_NAMES = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
 
         function setIncomeFilter(f) {
@@ -667,7 +725,7 @@
 
         // --- Render Dashboard ---
         function renderDashboard() {
-            const dashRevenues = revenueDb.filter(r => r.regDate.getFullYear() === CURRENT_YEAR && isDashboardMatch(r));
+            const dashRevenues = revenueDb.filter(r => getRevenueYear(r) === CURRENT_YEAR && isDashboardMatch(r));
             const dashDebts = db.filter(r => r.dueDate.getFullYear() === CURRENT_YEAR && isDashboardMatch(r));
 
             const totalBilled = dashRevenues.reduce((acc, r) => acc + r.amount, 0);
@@ -687,11 +745,11 @@
             document.getElementById('db-sub-future').innerText = formatCurrency(debtFuture);
             document.getElementById('db-kpi-rate').innerText = collectionRate + "%";
 
-            // פילוח חודשי שנת 2026
+            // פילוח חודשי לפי שנת העבודה
             const monthlyBilled = Array(12).fill(0);
             const monthlyUnpaid = Array(12).fill(0);
 
-            dashRevenues.forEach(r => monthlyBilled[r.regDate.getMonth()] += r.amount);
+            dashRevenues.forEach(r => monthlyBilled[r.invoiceDate.getMonth()] += r.amount);
             
             dashDebts.forEach(d => {
                 const m = (d.regDate && !isNaN(d.regDate.getTime())) ? d.regDate.getMonth() : d.dueDate.getMonth();
@@ -769,7 +827,7 @@
                 }
             });
 
-            // טבלה 1: עשרת הלקוחות הפעילים (הכנסות שנת 2026)
+            // טבלה 1: עשרת הלקוחות הפעילים בשנת העבודה
             const activeClientsData = {};
             dashRevenues.forEach(r => {
                 if (!activeClientsData[r.name]) activeClientsData[r.name] = { billed: 0, unpaid: 0 };
@@ -794,7 +852,7 @@
                 activeClientsHTML += `
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="p-3 border-b" style="font-family: Arial, Helvetica, sans-serif !important;">
-                            <a href="#" onclick="drillToClientAnnualReport('${safeName}'); return false;" class="text-blue-600 hover:underline font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${c.name}</a>
+                            <a href="#" onclick="drillToClientAnnualReport('${safeName}'); return false;" class="text-blue-600 hover:underline font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${c.name}</a> ${directDebitBadge(c.name)}
                         </td>
                         <td class="p-3 border-b text-left" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(c.billed)}</td>
                         <td class="p-3 border-b text-left text-emerald-700 font-semibold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(c.collected)}</td>
@@ -807,7 +865,7 @@
             }
             document.getElementById('db-active-clients-body').innerHTML = activeClientsHTML;
 
-            // טבלה 2: עשרת החייבים הגדולים (חוב פתוח שנת 2026, פיצול לחוב בפיגור ותשלומים עתידיים)
+            // טבלה 2: עשרת החייבים הגדולים בשנת העבודה, בפיצול לחוב בפיגור ולתשלומים עתידיים
             const debtorsData = {};
             dashDebts.forEach(d => {
                 if (!debtorsData[d.name]) {
@@ -836,7 +894,7 @@
                 debtorsHTML += `
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="p-3 border-b" style="font-family: Arial, Helvetica, sans-serif !important;">
-                            <a href="#" onclick="drillToClientDebtLetter('${safeName}'); return false;" class="text-blue-600 hover:underline font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${c.name}</a>
+                            <a href="#" onclick="drillToClientDebtLetter('${safeName}'); return false;" class="text-blue-600 hover:underline font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${c.name}</a> ${directDebitBadge(c.name)}
                         </td>
                         <td class="p-3 border-b text-left text-red-700 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(c.overdue)}</td>
                         <td class="p-3 border-b text-left text-emerald-700 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(c.future)}</td>
@@ -870,7 +928,7 @@
             ];
 
             let documentHTML = `
-                <html dir="rtl" lang="he"><head><title>דוח מאוחד - הכנסות וגבייה 2026</title>
+                <html dir="rtl" lang="he"><head><title>דוח מאוחד - הכנסות וגבייה ${CURRENT_YEAR}</title>
                 <style>
                     * { font-family: 'Arial', sans-serif !important; }
                     body { font-family: 'Arial', sans-serif; padding: 40px; color: #333; }
@@ -895,7 +953,7 @@
                 dashStageA = config.stageA;
                 dashStageB = config.stageB;
 
-                const rRows = revenueDb.filter(r => r.regDate.getFullYear() === CURRENT_YEAR && isDashboardMatch(r));
+                const rRows = revenueDb.filter(r => getRevenueYear(r) === CURRENT_YEAR && isDashboardMatch(r));
                 const dRows = db.filter(r => r.dueDate.getFullYear() === CURRENT_YEAR && isDashboardMatch(r));
 
                 const totalBilled = rRows.reduce((acc, r) => acc + r.amount, 0);
@@ -905,7 +963,7 @@
 
                 const monthlyBilled = Array(12).fill(0);
                 const monthlyUnpaid = Array(12).fill(0);
-                rRows.forEach(r => monthlyBilled[r.regDate.getMonth()] += r.amount);
+                rRows.forEach(r => monthlyBilled[r.invoiceDate.getMonth()] += r.amount);
                 dRows.forEach(d => {
                     const m = (d.regDate && !isNaN(d.regDate.getTime())) ? d.regDate.getMonth() : d.dueDate.getMonth();
                     monthlyUnpaid[m] += d.amount;
@@ -991,7 +1049,7 @@
             document.getElementById('overdue-breakdown').classList.remove('hidden');
             
             if (revenueDb.length > 0) {
-                const totalRevenueSum = revenueDb.filter(r => r.regDate.getFullYear() === CURRENT_YEAR && isTypeMatch(r)).reduce((acc, r) => acc + r.amount, 0);
+                const totalRevenueSum = revenueDb.filter(r => getRevenueYear(r) === CURRENT_YEAR && isTypeMatch(r)).reduce((acc, r) => acc + r.amount, 0);
                 document.getElementById('total-revenue-kpi').innerText = formatCurrency(totalRevenueSum);
                 document.getElementById('kpi-card-revenue').classList.remove('hidden');
                 document.getElementById('kpi-container').className = "grid grid-cols-1 md:grid-cols-3 gap-6";
@@ -1041,7 +1099,7 @@
                     { id: "פרטי/רשויות", name: "רשויות ממשלתיות ולקוחות פרטיים", icon: "fa-handshake" }
                 ];
                 
-                const totalRevenueSum = hasRevenue ? revenueDb.filter(r => r.regDate.getFullYear() === CURRENT_YEAR && isTypeMatch(r)).reduce((acc, r) => acc + r.amount, 0) : 0;
+                const totalRevenueSum = hasRevenue ? revenueDb.filter(r => getRevenueYear(r) === CURRENT_YEAR && isTypeMatch(r)).reduce((acc, r) => acc + r.amount, 0) : 0;
                 const totalDebtSum = data.reduce((acc, r) => acc + r.amount, 0);
 
                 let html = `<div class="grid grid-cols-1 md:grid-cols-3 gap-6">`;
@@ -1050,7 +1108,7 @@
                     const sectorDebtPct = totalDebtSum > 0 ? (sectorDebt / totalDebtSum * 100).toFixed(1) : "0.0";
                     
                     if (hasRevenue) {
-                        const sectorRevenue = revenueDb.filter(r => r.sector === s.id && r.regDate.getFullYear() === CURRENT_YEAR && isTypeMatch(r)).reduce((acc, r) => acc + r.amount, 0);
+                        const sectorRevenue = revenueDb.filter(r => r.sector === s.id && getRevenueYear(r) === CURRENT_YEAR && isTypeMatch(r)).reduce((acc, r) => acc + r.amount, 0);
                         const sectorRevPct = totalRevenueSum > 0 ? (sectorRevenue / totalRevenueSum * 100).toFixed(1) : "0.0";
 
                         html += `
@@ -1207,7 +1265,7 @@
 
                     html += `<div onclick="selectOrg('${safeName}')" class="flex justify-between items-center p-5 bg-white border border-slate-200 rounded-2xl hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all shadow-sm">
                         <div class="text-right">
-                            <p class="font-bold text-slate-700 text-base leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">${org.name}</p>
+                            <p class="font-bold text-slate-700 text-base leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">${org.name} ${directDebitBadge(org.name)}</p>
                             <p class="text-[11px] text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">${displayDetails}</p>
                             ${moraleHtml}
                         </div>
@@ -1222,7 +1280,7 @@
             }
             else if (currentLevel === 2) {
                 back.classList.remove('hidden'); sortTools.classList.add('hidden'); pctToggle.classList.add('hidden'); moraleToggle.classList.add('hidden'); btnExportClients.classList.add('hidden'); listFilterContainer.classList.add('hidden');
-                title.innerText = path.orgName;
+                title.innerHTML = `${path.orgName} ${directDebitBadge(path.orgName)}`;
 
                 if (hasRevenue) {
                     lvl2FilterContainer.classList.remove('hidden');
@@ -1264,7 +1322,7 @@
                     const activeOrgDebts = data.filter(r => r.name === path.orgName);
                     updateAnalytics(activeOrgDebts);
                 } else {
-                    const orgRevenues = revenueDb.filter(r => r.name === path.orgName && r.regDate.getFullYear() === CURRENT_YEAR && isTypeMatch(r));
+                    const orgRevenues = revenueDb.filter(r => r.name === path.orgName && getRevenueYear(r) === CURRENT_YEAR && isTypeMatch(r));
                     orgRevenues.sort((a, b) => a.dueDate - b.dueDate);
 
                     html = `<div id="capture-area"><table class="w-full text-right border-collapse rounded-2xl overflow-hidden border border-slate-200 shadow-sm" style="font-family: Arial, Helvetica, sans-serif !important;">
@@ -1326,7 +1384,7 @@
                 const escapedName = org.name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
                 html += `
                     <div onclick="selectSearchClient('${escapedName}')" class="p-3 text-sm hover:bg-blue-50 cursor-pointer transition-colors text-right font-medium text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;">
-                        ${org.name}
+                        ${org.name} ${directDebitBadge(org.name)}
                     </div>
                 `;
             });
@@ -1389,7 +1447,7 @@
 
             if (hasRevenue) {
                 const revMonthGroups = Array(12).fill(0).map(() => ({ sum: 0, count: 0 }));
-                let currentScopeRevenues = revenueDb.filter(r => r.regDate.getFullYear() === CURRENT_YEAR && isTypeMatch(r));
+                let currentScopeRevenues = revenueDb.filter(r => getRevenueYear(r) === CURRENT_YEAR && isTypeMatch(r));
                 
                 if (currentLevel === 1) {
                     currentScopeRevenues = currentScopeRevenues.filter(r => r.sector === path.sector);
@@ -1398,7 +1456,7 @@
                 }
 
                 currentScopeRevenues.forEach(r => {
-                    const m = r.regDate.getMonth();
+                    const m = r.invoiceDate.getMonth();
                     revMonthGroups[m].sum += r.amount;
                     revMonthGroups[m].count++;
                 });
@@ -1729,7 +1787,7 @@
             const clientHasOverdueDebt = db.some(d => d.name === path.orgName && d.isOverdue && isTypeMatch(d));
 
             if (exportContext === 'annual') {
-                const currentYearInvoices = revenueDb.filter(r => r.name === path.orgName && r.regDate.getFullYear() === CURRENT_YEAR && isTypeMatch(r));
+                const currentYearInvoices = revenueDb.filter(r => r.name === path.orgName && getRevenueYear(r) === CURRENT_YEAR && isTypeMatch(r));
                 currentYearInvoices.sort((a, b) => a.dueDate - b.dueDate);
                 const currentTotal = currentYearInvoices.reduce((acc, r) => acc + r.amount, 0);
 
@@ -1741,7 +1799,7 @@
                 const monthlyUnpaid = Array(12).fill(0);
                 
                 currentYearInvoices.forEach(r => {
-                    const m = r.regDate.getMonth();
+                    const m = r.invoiceDate.getMonth();
                     const isUnpaid = db.some(d => d.doc === r.doc && d.name === path.orgName);
                     if (isUnpaid) {
                         monthlyUnpaid[m] += r.amount;
@@ -2023,6 +2081,7 @@
                     const regDate = parseExcelDate(r['תאריך רישום'] || r['תאריך מסמך'] || r['תאריך תנועה'] || r['תאריך הזנה'] || r['תאריך ערך']);
                     const desc = r['טקסט'] || '';
                     const counterAccount = String(r['שם חשבון נגדי'] || '').trim();
+                    const paymentMethod = String(r['שיטת תשלום'] || '').trim().toUpperCase();
                     return {
                         code, name: String(r['שם חשבון'] || 'לקוח').trim(),
                         doc: r['מספר מסמך'] || '-',
@@ -2031,6 +2090,8 @@
                         amount: parseFloat(String(r['סכום במטבע מסמך'] || 0).replace(/,/g, '')),
                         desc,
                         counterAccount,
+                        paymentMethod,
+                        isDirectDebit: paymentMethod === 'M',
                         isFee: FEE_KEYWORDS.some(kw => counterAccount.includes(kw)),
                         isOverdue: dueDate < TODAY,
                         sector: code.startsWith('1') ? "ממשלתי" : code.startsWith('2') ? "שלטון מקומי" : "פרטי/רשויות"
@@ -2065,6 +2126,7 @@
                     const code = String(r['לקוח']);
                     const dueDate = parseExcelDate(r['מועד פרעון נטו'] || r['תאריך תשלום'] || r['מועד פירעון']);
                     const regDate = parseExcelDate(r['תאריך רישום'] || r['תאריך מסמך'] || r['תאריך ערך']);
+                    const invoiceDate = parseExcelDateOrNull(r['תאריך חשבונית']);
                     const matchDateVal = r['תאריך התאמה'] || r['תאריך התאמה נטו'] || r['תאריך תשלום'];
                     const matchDate = matchDateVal ? parseExcelDate(matchDateVal) : null;
                     const desc = r['טקסט'] || '';
@@ -2074,6 +2136,7 @@
                         doc: r['מספר מסמך'] || '-',
                         dueDate,
                         regDate,
+                        invoiceDate,
                         matchDate,
                         amount: parseFloat(String(r['סכום במטבע מסמך'] || r['סכום'] || 0).replace(/,/g, '')),
                         desc,
@@ -2082,6 +2145,8 @@
                         sector: code.startsWith('1') ? "ממשלתי" : code.startsWith('2') ? "שלטון מקומי" : "פרטי/רשויות"
                     };
                 });
+
+                updateReportYearOptions();
 
                 if (revenueDb.length > 0) {
                     const matchDates = revenueDb.map(r => r.matchDate).filter(d => d instanceof Date && !isNaN(d.getTime()));
@@ -2101,6 +2166,12 @@
             reader.readAsArrayBuffer(e.target.files[0]);
         }
 
+        function parseExcelDateOrNull(val) {
+            if (val === undefined || val === null || String(val).trim() === '') return null;
+            const date = parseExcelDate(val);
+            return isValidDate(date) ? date : null;
+        }
+
         function parseExcelDate(val) {
             if (!val) return new Date();
             if (!isNaN(val)) return new Date(Math.round((val - 25569) * 86400 * 1000));
@@ -2109,6 +2180,8 @@
         }
 
         function formatCurrency(v) { return "₪" + Math.round(v).toLocaleString('he-IL'); }
+
+        updateReportYearOptions();
     </script>
 </body>
 </html>
