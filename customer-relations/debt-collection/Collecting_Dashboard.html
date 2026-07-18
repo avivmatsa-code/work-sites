@@ -298,6 +298,7 @@
             width: min(1600px, calc(100% - 40px));
             margin-inline: auto;
             display: flex;
+            flex-wrap: wrap;
             align-items: stretch;
             gap: var(--space-5);
             padding-block: var(--space-4);
@@ -430,13 +431,32 @@
         #btn-goto-dashboard small { font-size: 11px; font-weight: 400; }
 
         .data-currency {
-            flex-basis: 100%;
+            flex: 0 0 100%;
+            width: 100%;
             margin: 0;
             padding-block-start: var(--space-2);
             border-block-start: 1px solid var(--color-border);
             color: var(--color-text-muted);
             font-size: var(--font-size-xs);
         }
+
+        .data-load-message {
+            flex: 0 0 100%;
+            width: 100%;
+            min-height: 42px;
+            margin: 0;
+            border: 1px solid #e4a3a8;
+            border-radius: var(--radius-md);
+            background: var(--color-danger-bg);
+            color: var(--color-danger);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--font-size-sm);
+            font-weight: 700;
+        }
+        .data-load-message.hidden { display: none !important; }
 
         .dashboard-toolbar__inner { align-items: flex-end; flex-wrap: wrap; }
         .dashboard-toolbar__actions {
@@ -810,6 +830,10 @@
                     </div>
                 </div>
                 <p id="data-currency-date" class="data-currency hidden"></p>
+                <p id="data-load-message" class="data-load-message hidden" role="alert" aria-live="assertive">
+                    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                    <span id="data-load-message-text"></span>
+                </p>
             </div>
         </section>
 
@@ -2750,107 +2774,180 @@
             );
         }
 
+        function getSpreadsheetRows(arrayBuffer) {
+            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+            if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
+                throw new Error('הקובץ אינו מכיל גיליון נתונים.');
+            }
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            if (!sheet) throw new Error('לא ניתן לקרוא את הגיליון הראשון בקובץ.');
+
+            const rows = XLSX.utils.sheet_to_json(sheet).map(normalizeRowHeaders);
+            if (rows.length === 0) throw new Error('הקובץ ריק או שאינו מכיל שורות נתונים.');
+            return rows;
+        }
+
+        function validateSpreadsheetColumns(rows, columnGroups) {
+            const availableColumns = new Set(rows.flatMap(row => Object.keys(row)));
+            const missing = columnGroups
+                .filter(group => !group.names.some(name => availableColumns.has(name)))
+                .map(group => group.label);
+            if (missing.length > 0) {
+                throw new Error('חסרות עמודות נדרשות: ' + missing.join(', ') + '.');
+            }
+        }
+
+        function showFileLoadError(fileType, message) {
+            const sourceName = fileType === 'debt' ? 'קובץ החובות' : 'קובץ ההכנסות';
+            const container = document.getElementById('data-load-message');
+            const text = document.getElementById('data-load-message-text');
+            if (text) text.textContent = 'שגיאה בטעינת ' + sourceName + ': ' + message;
+            if (container) container.classList.remove('hidden');
+        }
+
+        function clearFileLoadError() {
+            const container = document.getElementById('data-load-message');
+            if (container) container.classList.add('hidden');
+        }
+
         function processExcel(e) {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            clearFileLoadError();
+
             const reader = new FileReader();
             reader.onload = (evt) => {
-                const wb = XLSX.read(evt.target.result, { type: 'array' });
-                const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]])
-                    .map(normalizeRowHeaders);
-                
-                db = rows.filter(r => String(r['לקוח'] || '').length === 8).map(r => {
-                    const code = String(r['לקוח']);
-                    const dueDate = parseExcelDate(r['מועד פרעון נטו'] || r['תאריך תשלום']);
-                    const regDate = parseExcelDate(r['תאריך רישום'] || r['תאריך מסמך'] || r['תאריך תנועה'] || r['תאריך הזנה'] || r['תאריך ערך']);
-                    const desc = r['טקסט'] || '';
-                    const counterAccount = String(r['שם חשבון נגדי'] || '').trim();
-                    const paymentMethod = String(r['שיטת תשלום'] || '').trim().toUpperCase();
-                    return {
-                        code, name: String(r['שם חשבון'] || 'לקוח').trim(),
-                        doc: r['מספר מסמך'] || '-',
-                        dueDate,
-                        regDate,
-                        amount: parseFloat(String(r['סכום במטבע מסמך'] || 0).replace(/,/g, '')),
-                        desc,
-                        counterAccount,
-                        paymentMethod,
-                        isDirectDebit: paymentMethod === 'M',
-                        isFee: FEE_KEYWORDS.some(kw => counterAccount.includes(kw)),
-                        isOverdue: dueDate < TODAY,
-                        sector: code.startsWith('1') ? "ממשלתי" : code.startsWith('2') ? "שלטון מקומי" : "פרטי/רשויות"
-                    };
-                });
+                try {
+                    const rows = getSpreadsheetRows(evt.target.result);
+                    validateSpreadsheetColumns(rows, [
+                        { names: ['לקוח'], label: '"לקוח"' },
+                        { names: ['שם חשבון'], label: '"שם חשבון"' },
+                        { names: ['מועד פרעון נטו', 'תאריך תשלום'], label: '"מועד פרעון נטו" או "תאריך תשלום"' },
+                        { names: ['סכום במטבע מסמך'], label: '"סכום במטבע מסמך"' }
+                    ]);
 
-                if (db.length > 0 && revenueDb.length === 0) {
-                    const regDates = db.map(r => r.regDate).filter(d => d instanceof Date && !isNaN(d.getTime()));
-                    if (regDates.length > 0) {
-                        const realToday = new Date();
-                        const validDates = regDates.filter(d => d <= realToday);
-                        const targetDate = validDates.length > 0 ? new Date(Math.max(...validDates)) : realToday;
-                        const formattedDate = targetDate.toLocaleDateString('he-IL');
-                        const currencyEl = document.getElementById('data-currency-date');
-                        currencyEl.innerText = `תאריך עדכניות הנתונים: ${formattedDate}`;
-                        currencyEl.classList.remove('hidden');
+                    const parsedDebts = rows.filter(r => String(r['לקוח'] || '').length === 8).map(r => {
+                        const code = String(r['לקוח']);
+                        const dueDate = parseExcelDate(r['מועד פרעון נטו'] || r['תאריך תשלום']);
+                        const regDate = parseExcelDate(r['תאריך רישום'] || r['תאריך מסמך'] || r['תאריך תנועה'] || r['תאריך הזנה'] || r['תאריך ערך']);
+                        const desc = r['טקסט'] || '';
+                        const counterAccount = String(r['שם חשבון נגדי'] || '').trim();
+                        const paymentMethod = String(r['שיטת תשלום'] || '').trim().toUpperCase();
+                        return {
+                            code, name: String(r['שם חשבון'] || 'לקוח').trim(),
+                            doc: r['מספר מסמך'] || '-',
+                            dueDate,
+                            regDate,
+                            amount: parseFloat(String(r['סכום במטבע מסמך'] || 0).replace(/,/g, '')),
+                            desc,
+                            counterAccount,
+                            paymentMethod,
+                            isDirectDebit: paymentMethod === 'M',
+                            isFee: FEE_KEYWORDS.some(kw => counterAccount.includes(kw)),
+                            isOverdue: dueDate < TODAY,
+                            sector: code.startsWith('1') ? "ממשלתי" : code.startsWith('2') ? "שלטון מקומי" : "פרטי/רשויות"
+                        };
+                    });
+
+                    if (parsedDebts.length === 0) {
+                        throw new Error('לא נמצאו רשומות חוב עם מספר לקוח תקין בן 8 ספרות.');
                     }
-                }
+                    if (!parsedDebts.some(row => isValidDate(row.dueDate))) {
+                        throw new Error('לא נמצאו בקובץ תאריכי פירעון תקינים.');
+                    }
 
-                markDataSourceLoaded('debt', e.target.files[0]?.name);
-                currentLevel = 0; refresh();
+                    db = parsedDebts;
+
+                    if (revenueDb.length === 0) {
+                        const regDates = db.map(r => r.regDate).filter(d => d instanceof Date && !isNaN(d.getTime()));
+                        if (regDates.length > 0) {
+                            const realToday = new Date();
+                            const validDates = regDates.filter(d => d <= realToday);
+                            const targetDate = validDates.length > 0 ? new Date(Math.max(...validDates)) : realToday;
+                            const formattedDate = targetDate.toLocaleDateString('he-IL');
+                            const currencyEl = document.getElementById('data-currency-date');
+                            currencyEl.innerText = 'תאריך עדכניות הנתונים: ' + formattedDate;
+                            currencyEl.classList.remove('hidden');
+                        }
+                    }
+
+                    clearFileLoadError();
+                    markDataSourceLoaded('debt', file.name);
+                    currentLevel = 0;
+                    refresh();
+                } catch (error) {
+                    showFileLoadError('debt', error?.message || 'מבנה הקובץ אינו תקין או שלא ניתן לקרוא אותו.');
+                    e.target.value = '';
+                }
             };
-            reader.readAsArrayBuffer(e.target.files[0]);
+            reader.onerror = () => {
+                showFileLoadError('debt', 'לא ניתן לקרוא את הקובץ שנבחר.');
+                e.target.value = '';
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         function processRevenueExcel(e) {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            clearFileLoadError();
+
             const reader = new FileReader();
             reader.onload = (evt) => {
-                const wb = XLSX.read(evt.target.result, { type: 'array' });
-                const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]])
-                    .map(normalizeRowHeaders);
-                
-                revenueDb = rows.filter(r => String(r['לקוח'] || '').length === 8).map(r => {
-                    const code = String(r['לקוח']);
-                    const dueDate = parseExcelDate(r['מועד פרעון נטו'] || r['תאריך תשלום'] || r['מועד פירעון']);
-                    const regDate = parseExcelDate(r['תאריך רישום'] || r['תאריך מסמך'] || r['תאריך ערך']);
-                    const reportingPeriod = parseYearMonth(r['שנה/חודש']);
-                    const fiscalYear = parseFiscalYear(r['שנת כספים']);
-                    const reportYear = fiscalYear
-                        ?? reportingPeriod?.year
-                        ?? (isValidDate(regDate) ? regDate.getFullYear() : null);
-                    const reportMonth = reportingPeriod?.month
-                        ?? (isValidDate(regDate) ? regDate.getMonth() : null);
-                    const matchDateVal = r['תאריך התאמה'] || r['תאריך התאמה נטו'] || r['תאריך תשלום'];
-                    const matchDate = matchDateVal ? parseExcelDate(matchDateVal) : null;
-                    const desc = r['טקסט'] || '';
-                    const counterAccount = String(r['שם חשבון נגדי'] || '').trim();
-                    return {
-                        code, name: String(r['שם חשבון'] || r['שם לקוח'] || 'לקוח').trim(),
-                        doc: r['מספר מסמך'] || '-',
-                        dueDate,
-                        regDate,
-                        reportYear, reportMonth,
-                        matchDate,
-                        amount: parseFloat(String(r['סכום במטבע מסמך'] || r['סכום'] || 0).replace(/,/g, '')),
-                        desc,
-                        counterAccount,
-                        isFee: FEE_KEYWORDS.some(kw => counterAccount.includes(kw)),
-                        sector: code.startsWith('1') ? "ממשלתי" : code.startsWith('2') ? "שלטון מקומי" : "פרטי/רשויות"
-                    };
-                });
+                try {
+                    const rows = getSpreadsheetRows(evt.target.result);
+                    validateSpreadsheetColumns(rows, [
+                        { names: ['לקוח'], label: '"לקוח"' },
+                        { names: ['שם חשבון', 'שם לקוח'], label: '"שם חשבון" או "שם לקוח"' },
+                        { names: ['מועד פרעון נטו', 'תאריך תשלום', 'מועד פירעון'], label: 'עמודת מועד פירעון' },
+                        { names: ['סכום במטבע מסמך', 'סכום'], label: '"סכום במטבע מסמך" או "סכום"' },
+                        { names: ['שנה/חודש', 'תאריך רישום'], label: '"שנה/חודש" או "תאריך רישום"' }
+                    ]);
 
-                const validReportingRows = revenueDb.filter(row =>
-                    Number.isInteger(getRevenueYear(row)) && Number.isInteger(getRevenueMonth(row))
-                );
-                if (revenueDb.length > 0 && validReportingRows.length === 0) {
-                    revenueDb = [];
+                    const parsedRevenues = rows.filter(r => String(r['לקוח'] || '').length === 8).map(r => {
+                        const code = String(r['לקוח']);
+                        const dueDate = parseExcelDate(r['מועד פרעון נטו'] || r['תאריך תשלום'] || r['מועד פירעון']);
+                        const regDate = parseExcelDate(r['תאריך רישום'] || r['תאריך מסמך'] || r['תאריך ערך']);
+                        const reportingPeriod = parseYearMonth(r['שנה/חודש']);
+                        const fiscalYear = parseFiscalYear(r['שנת כספים']);
+                        const reportYear = fiscalYear
+                            ?? reportingPeriod?.year
+                            ?? (isValidDate(regDate) ? regDate.getFullYear() : null);
+                        const reportMonth = reportingPeriod?.month
+                            ?? (isValidDate(regDate) ? regDate.getMonth() : null);
+                        const matchDateVal = r['תאריך התאמה'] || r['תאריך התאמה נטו'] || r['תאריך תשלום'];
+                        const matchDate = matchDateVal ? parseExcelDate(matchDateVal) : null;
+                        const desc = r['טקסט'] || '';
+                        const counterAccount = String(r['שם חשבון נגדי'] || '').trim();
+                        return {
+                            code, name: String(r['שם חשבון'] || r['שם לקוח'] || 'לקוח').trim(),
+                            doc: r['מספר מסמך'] || '-',
+                            dueDate,
+                            regDate,
+                            reportYear, reportMonth,
+                            matchDate,
+                            amount: parseFloat(String(r['סכום במטבע מסמך'] || r['סכום'] || 0).replace(/,/g, '')),
+                            desc,
+                            counterAccount,
+                            isFee: FEE_KEYWORDS.some(kw => counterAccount.includes(kw)),
+                            sector: code.startsWith('1') ? "ממשלתי" : code.startsWith('2') ? "שלטון מקומי" : "פרטי/רשויות"
+                        };
+                    });
+
+                    if (parsedRevenues.length === 0) {
+                        throw new Error('לא נמצאו רשומות הכנסה עם מספר לקוח תקין בן 8 ספרות.');
+                    }
+
+                    const validReportingRows = parsedRevenues.filter(row =>
+                        Number.isInteger(getRevenueYear(row)) && Number.isInteger(getRevenueMonth(row))
+                    );
+                    if (validReportingRows.length === 0) {
+                        throw new Error('לא נמצאו ערכי תקופת דיווח תקינים. יש לבדוק את העמודות "שנת כספים", "שנה/חודש" או "תאריך רישום".');
+                    }
+
+                    revenueDb = parsedRevenues;
                     updateReportYearOptions();
-                    alert('לא נמצאו בקובץ ערכי תקופת דיווח תקינים. יש לוודא שקיימות העמודות "שנת כספים" ו-"שנה/חודש", או עמודת "תאריך רישום" תקינה.');
-                    currentLevel = 0;
-                    refresh();
-                    return;
-                }
 
-                updateReportYearOptions();
-
-                if (revenueDb.length > 0) {
                     const matchDates = revenueDb.map(r => r.matchDate).filter(d => d instanceof Date && !isNaN(d.getTime()));
                     if (matchDates.length > 0) {
                         const realToday = new Date();
@@ -2858,15 +2955,24 @@
                         const targetDate = validDates.length > 0 ? new Date(Math.max(...validDates)) : realToday;
                         const formattedDate = targetDate.toLocaleDateString('he-IL');
                         const currencyEl = document.getElementById('data-currency-date');
-                        currencyEl.innerText = `תאריך עדכניות הנתונים (התאמה): ${formattedDate}`;
+                        currencyEl.innerText = 'תאריך עדכניות הנתונים (התאמה): ' + formattedDate;
                         currencyEl.classList.remove('hidden');
                     }
-                }
 
-                markDataSourceLoaded('revenue', e.target.files[0]?.name);
-                currentLevel = 0; refresh();
+                    clearFileLoadError();
+                    markDataSourceLoaded('revenue', file.name);
+                    currentLevel = 0;
+                    refresh();
+                } catch (error) {
+                    showFileLoadError('revenue', error?.message || 'מבנה הקובץ אינו תקין או שלא ניתן לקרוא אותו.');
+                    e.target.value = '';
+                }
             };
-            reader.readAsArrayBuffer(e.target.files[0]);
+            reader.onerror = () => {
+                showFileLoadError('revenue', 'לא ניתן לקרוא את הקובץ שנבחר.');
+                e.target.value = '';
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         function parseExcelDateOrNull(val) {
