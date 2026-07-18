@@ -2069,11 +2069,21 @@
             toggleExportModal(false);
         }
 
+        function normalizeRowHeaders(row) {
+            return Object.fromEntries(
+                Object.entries(row).map(([key, value]) => [
+                    String(key).replace(/\u00a0/g, ' ').trim(),
+                    value
+                ])
+            );
+        }
+
         function processExcel(e) {
             const reader = new FileReader();
             reader.onload = (evt) => {
                 const wb = XLSX.read(evt.target.result, { type: 'array' });
-                const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+                const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]])
+                    .map(normalizeRowHeaders);
                 
                 db = rows.filter(r => String(r['לקוח'] || '').length === 8).map(r => {
                     const code = String(r['לקוח']);
@@ -2120,13 +2130,14 @@
             const reader = new FileReader();
             reader.onload = (evt) => {
                 const wb = XLSX.read(evt.target.result, { type: 'array' });
-                const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+                const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]])
+                    .map(normalizeRowHeaders);
                 
                 revenueDb = rows.filter(r => String(r['לקוח'] || '').length === 8).map(r => {
                     const code = String(r['לקוח']);
                     const dueDate = parseExcelDate(r['מועד פרעון נטו'] || r['תאריך תשלום'] || r['מועד פירעון']);
                     const regDate = parseExcelDate(r['תאריך רישום'] || r['תאריך מסמך'] || r['תאריך ערך']);
-                    const invoiceDate = parseExcelDateOrNull(r['תאריך חשבונית']);
+                    const invoiceDate = parseExcelDateOrNull(r['תאריך חשבונית'] || r['תאריך מסמך']);
                     const matchDateVal = r['תאריך התאמה'] || r['תאריך התאמה נטו'] || r['תאריך תשלום'];
                     const matchDate = matchDateVal ? parseExcelDate(matchDateVal) : null;
                     const desc = r['טקסט'] || '';
@@ -2145,6 +2156,16 @@
                         sector: code.startsWith('1') ? "ממשלתי" : code.startsWith('2') ? "שלטון מקומי" : "פרטי/רשויות"
                     };
                 });
+
+                const validInvoiceDates = revenueDb.filter(row => isValidDate(row.invoiceDate));
+                if (revenueDb.length > 0 && validInvoiceDates.length === 0) {
+                    revenueDb = [];
+                    updateReportYearOptions();
+                    alert('לא נמצאה בקובץ עמודת תאריך חשבונית תקינה. יש לוודא שקיימת עמודה בשם "תאריך חשבונית" או "תאריך מסמך".');
+                    currentLevel = 0;
+                    refresh();
+                    return;
+                }
 
                 updateReportYearOptions();
 
