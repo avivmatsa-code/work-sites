@@ -745,7 +745,7 @@
             document.getElementById('db-sub-future').innerText = formatCurrency(debtFuture);
             document.getElementById('db-kpi-rate').innerText = collectionRate + "%";
 
-            // פילוח חודשי שנת <span class="report-year-label"></span>
+            // פילוח חודשי לפי שנת העבודה
             const monthlyBilled = Array(12).fill(0);
             const monthlyUnpaid = Array(12).fill(0);
 
@@ -827,7 +827,7 @@
                 }
             });
 
-            // טבלה 1: עשרת הלקוחות הפעילים (הכנסות שנת 2026)
+            // טבלה 1: עשרת הלקוחות הפעילים בשנת העבודה
             const activeClientsData = {};
             dashRevenues.forEach(r => {
                 if (!activeClientsData[r.name]) activeClientsData[r.name] = { billed: 0, unpaid: 0 };
@@ -865,7 +865,7 @@
             }
             document.getElementById('db-active-clients-body').innerHTML = activeClientsHTML;
 
-            // טבלה 2: עשרת החייבים הגדולים (חוב פתוח שנת 2026, פיצול לחוב בפיגור ותשלומים עתידיים)
+            // טבלה 2: עשרת החייבים הגדולים בשנת העבודה, בפיצול לחוב בפיגור ולתשלומים עתידיים
             const debtorsData = {};
             dashDebts.forEach(d => {
                 if (!debtorsData[d.name]) {
