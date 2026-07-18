@@ -493,8 +493,30 @@
             return value instanceof Date && !isNaN(value.getTime());
         }
 
+        function parseFiscalYear(value) {
+            const year = Number(String(value ?? '').trim());
+            return Number.isInteger(year) && year >= 1900 && year <= 2200 ? year : null;
+        }
+
+        function parseYearMonth(value) {
+            const normalized = String(value ?? '').trim();
+            const match = normalized.match(/^(\d{4})[\/-](\d{1,2})$/);
+            if (!match) return null;
+
+            const year = Number(match[1]);
+            const month = Number(match[2]);
+            if (year < 1900 || year > 2200 || month < 1 || month > 12) return null;
+            return { year, month: month - 1 };
+        }
+
         function getRevenueYear(row) {
-            return isValidDate(row.invoiceDate) ? row.invoiceDate.getFullYear() : null;
+            return Number.isInteger(row.reportYear) ? row.reportYear : null;
+        }
+
+        function getRevenueMonth(row) {
+            return Number.isInteger(row.reportMonth) && row.reportMonth >= 0 && row.reportMonth <= 11
+                ? row.reportMonth
+                : null;
         }
 
         function syncReportYearLabels() {
@@ -749,7 +771,7 @@
             const monthlyBilled = Array(12).fill(0);
             const monthlyUnpaid = Array(12).fill(0);
 
-            dashRevenues.forEach(r => monthlyBilled[r.invoiceDate.getMonth()] += r.amount);
+            dashRevenues.forEach(r => monthlyBilled[getRevenueMonth(r)] += r.amount);
             
             dashDebts.forEach(d => {
                 const m = (d.regDate && !isNaN(d.regDate.getTime())) ? d.regDate.getMonth() : d.dueDate.getMonth();
@@ -963,7 +985,7 @@
 
                 const monthlyBilled = Array(12).fill(0);
                 const monthlyUnpaid = Array(12).fill(0);
-                rRows.forEach(r => monthlyBilled[r.invoiceDate.getMonth()] += r.amount);
+                rRows.forEach(r => monthlyBilled[getRevenueMonth(r)] += r.amount);
                 dRows.forEach(d => {
                     const m = (d.regDate && !isNaN(d.regDate.getTime())) ? d.regDate.getMonth() : d.dueDate.getMonth();
                     monthlyUnpaid[m] += d.amount;
@@ -1456,7 +1478,7 @@
                 }
 
                 currentScopeRevenues.forEach(r => {
-                    const m = r.invoiceDate.getMonth();
+                    const m = getRevenueMonth(r);
                     revMonthGroups[m].sum += r.amount;
                     revMonthGroups[m].count++;
                 });
@@ -1799,7 +1821,7 @@
                 const monthlyUnpaid = Array(12).fill(0);
                 
                 currentYearInvoices.forEach(r => {
-                    const m = r.invoiceDate.getMonth();
+                    const m = getRevenueMonth(r);
                     const isUnpaid = db.some(d => d.doc === r.doc && d.name === path.orgName);
                     if (isUnpaid) {
                         monthlyUnpaid[m] += r.amount;
@@ -2137,7 +2159,13 @@
                     const code = String(r['לקוח']);
                     const dueDate = parseExcelDate(r['מועד פרעון נטו'] || r['תאריך תשלום'] || r['מועד פירעון']);
                     const regDate = parseExcelDate(r['תאריך רישום'] || r['תאריך מסמך'] || r['תאריך ערך']);
-                    const invoiceDate = parseExcelDateOrNull(r['תאריך חשבונית'] || r['תאריך מסמך']);
+                    const reportingPeriod = parseYearMonth(r['שנה/חודש']);
+                    const fiscalYear = parseFiscalYear(r['שנת כספים']);
+                    const reportYear = fiscalYear
+                        ?? reportingPeriod?.year
+                        ?? (isValidDate(regDate) ? regDate.getFullYear() : null);
+                    const reportMonth = reportingPeriod?.month
+                        ?? (isValidDate(regDate) ? regDate.getMonth() : null);
                     const matchDateVal = r['תאריך התאמה'] || r['תאריך התאמה נטו'] || r['תאריך תשלום'];
                     const matchDate = matchDateVal ? parseExcelDate(matchDateVal) : null;
                     const desc = r['טקסט'] || '';
@@ -2147,7 +2175,7 @@
                         doc: r['מספר מסמך'] || '-',
                         dueDate,
                         regDate,
-                        invoiceDate,
+                        reportYear, reportMonth,
                         matchDate,
                         amount: parseFloat(String(r['סכום במטבע מסמך'] || r['סכום'] || 0).replace(/,/g, '')),
                         desc,
@@ -2157,11 +2185,13 @@
                     };
                 });
 
-                const validInvoiceDates = revenueDb.filter(row => isValidDate(row.invoiceDate));
-                if (revenueDb.length > 0 && validInvoiceDates.length === 0) {
+                const validReportingRows = revenueDb.filter(row =>
+                    Number.isInteger(getRevenueYear(row)) && Number.isInteger(getRevenueMonth(row))
+                );
+                if (revenueDb.length > 0 && validReportingRows.length === 0) {
                     revenueDb = [];
                     updateReportYearOptions();
-                    alert('לא נמצאה בקובץ עמודת תאריך חשבונית תקינה. יש לוודא שקיימת עמודה בשם "תאריך חשבונית" או "תאריך מסמך".');
+                    alert('לא נמצאו בקובץ ערכי תקופת דיווח תקינים. יש לוודא שקיימות העמודות "שנת כספים" ו-"שנה/חודש", או עמודת "תאריך רישום" תקינה.');
                     currentLevel = 0;
                     refresh();
                     return;
