@@ -1,4 +1,4 @@
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" data-theme="azure">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -86,8 +86,644 @@
             }
         }
     </style>
+
+    <style id="amis-redesign">
+        :root {
+            --font-family-base: Arial, "Noto Sans Hebrew", sans-serif;
+            --font-size-xs: 13px;
+            --font-size-sm: 14px;
+            --font-size-md: 16px;
+            --font-size-lg: 17px;
+            --font-size-xl: 20px;
+            --font-size-2xl: 28px;
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-10: 40px;
+            --space-12: 48px;
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-pill: 999px;
+            --color-bg: #f5f7f9;
+            --color-surface: #ffffff;
+            --color-surface-subtle: #f9fafb;
+            --color-text: #1f2933;
+            --color-text-muted: #607080;
+            --color-border: #d5dee6;
+            --color-border-strong: #aebdca;
+            --color-success: #16834f;
+            --color-success-bg: #edf7f1;
+            --color-warning: #a86400;
+            --color-warning-bg: #fff7e6;
+            --color-danger: #c0363f;
+            --color-danger-bg: #fff0f0;
+            --color-info: #176fa5;
+            --color-info-bg: #edf6fb;
+            --shadow-panel: 0 2px 8px rgba(15, 35, 55, 0.06);
+            --shadow-floating: 0 8px 24px rgba(15, 35, 55, 0.12);
+            --control-height: 44px;
+            --button-height: 44px;
+            --table-row-height: 50px;
+            --header-primary-button-border: rgba(255, 255, 255, 0.78);
+            --header-primary-button-inner-outline: rgba(255, 255, 255, 0.18);
+        }
+
+        :root,
+        [data-theme="azure"] {
+            --brand-primary: #0969c3;
+            --brand-hover: #075aa8;
+            --brand-active: #064b8d;
+            --brand-accent: #35a3ff;
+            --brand-subtle: #eaf5ff;
+            --brand-border: #93c8f2;
+            --focus-color: #0969c3;
+        }
+
+        [data-theme="emerald"] {
+            --brand-primary: #00875a;
+            --brand-hover: #00724c;
+            --brand-active: #005e3e;
+            --brand-accent: #29bd83;
+            --brand-subtle: #e9f8f1;
+            --brand-border: #8bd4b6;
+            --focus-color: #00875a;
+        }
+
+        [data-theme="violet"] {
+            --brand-primary: #7047c8;
+            --brand-hover: #6039b1;
+            --brand-active: #502f95;
+            --brand-accent: #a27aff;
+            --brand-subtle: #f2edff;
+            --brand-border: #c0adf0;
+            --focus-color: #7047c8;
+        }
+
+        [data-theme="graphite"] {
+            --brand-primary: #536676;
+            --brand-hover: #445563;
+            --brand-active: #35434f;
+            --brand-accent: #8395a3;
+            --brand-subtle: #eef2f5;
+            --brand-border: #b7c3cc;
+            --focus-color: #536676;
+        }
+
+        html, body {
+            background: var(--color-bg) !important;
+            color: var(--color-text);
+            font-family: var(--font-family-base) !important;
+        }
+
+        body { min-width: 320px; }
+        button, label[for], select { -webkit-tap-highlight-color: transparent; }
+        button:focus-visible, select:focus-visible, label[for]:focus-visible, input:focus-visible {
+            outline: 3px solid color-mix(in srgb, var(--focus-color) 28%, transparent);
+            outline-offset: 2px;
+        }
+
+        .app-header {
+            background: var(--brand-active);
+            color: #fff;
+            border-block-end: 4px solid var(--brand-border);
+            box-shadow: none;
+        }
+
+        .app-header__inner {
+            width: min(1600px, calc(100% - 40px));
+            min-height: 88px;
+            margin-inline: auto;
+            display: grid;
+            grid-template-columns: minmax(350px, 1fr) minmax(280px, auto) minmax(240px, 1fr);
+            align-items: center;
+            gap: var(--space-8);
+            padding-block: var(--space-3);
+        }
+
+        .government-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            min-width: 0;
+        }
+
+        .government-logo {
+            width: 56px;
+            height: 56px;
+            flex: 0 0 56px;
+            object-fit: contain;
+            background: #fff;
+            border: 1px solid rgba(255,255,255,.75);
+            border-radius: var(--radius-md);
+            padding: 5px;
+        }
+
+        .ministry-name {
+            font-size: var(--font-size-lg);
+            line-height: 1.35;
+            font-weight: 700;
+        }
+
+        .department-name {
+            margin-block-start: var(--space-1);
+            color: rgba(255,255,255,.78);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+        }
+
+        .app-identity { text-align: center; }
+        .app-title-row {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+        }
+        .app-title {
+            margin: 0;
+            font-size: var(--font-size-2xl);
+            line-height: 1.25;
+            font-weight: 700;
+        }
+        .beta-badge {
+            display: inline-flex;
+            align-items: center;
+            min-height: 22px;
+            padding-inline: 8px;
+            border: 1px solid rgba(255,255,255,.42);
+            border-radius: var(--radius-pill);
+            background: rgba(255,255,255,.12);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .04em;
+        }
+        .system-date {
+            margin-block-start: var(--space-1);
+            color: rgba(255,255,255,.78);
+            font-size: var(--font-size-xs);
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-2);
+        }
+
+        .header-action {
+            min-height: var(--button-height);
+            border: 1px solid rgba(255,255,255,.34);
+            border-radius: var(--radius-md);
+            background: transparent;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding-inline: var(--space-3);
+            font-size: var(--font-size-sm);
+            font-weight: 700;
+            transition: background .15s ease, border-color .15s ease;
+        }
+        .header-action:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.62); }
+
+        .workspace-toolbar {
+            background: var(--color-surface);
+            border-block-end: 1px solid var(--color-border);
+        }
+        .workspace-toolbar__inner {
+            width: min(1600px, calc(100% - 40px));
+            margin-inline: auto;
+            display: flex;
+            align-items: stretch;
+            gap: var(--space-5);
+            padding-block: var(--space-4);
+        }
+        .workspace-control {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: var(--space-2);
+        }
+        .workspace-control--grow { flex: 1 1 auto; }
+        .control-label {
+            color: var(--color-text-muted);
+            font-size: var(--font-size-xs);
+            font-weight: 700;
+        }
+        .segmented-control {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-1);
+            width: fit-content;
+            min-height: var(--control-height);
+            padding: var(--space-1);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface-subtle);
+        }
+        .segmented-control button {
+            min-height: 34px;
+            border: 0;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            color: var(--color-text-muted);
+            padding-inline: var(--space-3);
+            font-size: var(--font-size-sm);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .segmented-control button:hover { color: var(--brand-primary); background: var(--brand-subtle); }
+        .segmented-control button.active-filter,
+        .segmented-control button.bg-white {
+            background: #fff !important;
+            color: var(--brand-primary) !important;
+            box-shadow: 0 1px 3px rgba(15,35,55,.1) !important;
+        }
+
+        .year-control {
+            min-height: var(--control-height);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: #fff;
+            color: var(--color-text);
+            padding-inline: var(--space-3);
+            font-size: var(--font-size-sm);
+            font-weight: 700;
+        }
+
+        .data-source-actions {
+            width: 100%;
+            min-width: 560px;
+            display: grid;
+            grid-template-columns: minmax(170px, 1fr) minmax(190px, 1fr) minmax(180px, auto);
+            gap: var(--space-2);
+            align-items: end;
+        }
+        .file-action {
+            min-height: 58px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface);
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-2) var(--space-3);
+            cursor: pointer;
+            transition: border-color .15s ease, background .15s ease;
+        }
+        .file-action:hover { border-color: var(--brand-primary); background: var(--brand-subtle); }
+        .file-action__icon {
+            width: 34px;
+            height: 34px;
+            flex: 0 0 34px;
+            border-radius: var(--radius-md);
+            background: var(--brand-subtle);
+            color: var(--brand-primary);
+            display: grid;
+            place-items: center;
+        }
+        .file-action strong { display: block; font-size: var(--font-size-sm); }
+        .file-action small {
+            display: block;
+            max-width: 165px;
+            margin-block-start: 2px;
+            overflow: hidden;
+            color: var(--color-text-muted);
+            font-size: 12px;
+            font-weight: 400;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .file-action.is-loaded { border-color: #86c5a6; background: var(--color-success-bg); }
+        .file-action.is-loaded .file-action__icon { color: var(--color-success); background: #dff1e7; }
+
+        .button-primary,
+        #btn-goto-dashboard {
+            min-height: 58px;
+            border: 1px solid var(--brand-hover);
+            border-radius: var(--radius-md);
+            background: var(--brand-primary);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            padding-inline: var(--space-4);
+            font-size: var(--font-size-sm);
+            font-weight: 700;
+            box-shadow: none;
+        }
+        .button-primary:hover, #btn-goto-dashboard:hover { background: var(--brand-hover); }
+        #btn-goto-dashboard:disabled {
+            border-color: var(--color-border);
+            background: #e8edf1;
+            color: #7b8996;
+            cursor: not-allowed;
+        }
+        #btn-goto-dashboard .button-copy { display: flex; flex-direction: column; gap: 2px; }
+        #btn-goto-dashboard small { font-size: 11px; font-weight: 400; }
+
+        .data-currency {
+            flex-basis: 100%;
+            margin: 0;
+            padding-block-start: var(--space-2);
+            border-block-start: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            font-size: var(--font-size-xs);
+        }
+
+        .dashboard-toolbar__inner { align-items: flex-end; flex-wrap: wrap; }
+        .dashboard-toolbar__actions {
+            margin-inline-start: auto;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        .button-secondary {
+            min-height: var(--button-height);
+            border: 1px solid var(--color-border-strong);
+            border-radius: var(--radius-md);
+            background: #fff;
+            color: var(--color-text);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            padding-inline: var(--space-4);
+            font-size: var(--font-size-sm);
+            font-weight: 700;
+        }
+        .button-secondary:hover { border-color: var(--brand-primary); color: var(--brand-primary); background: var(--brand-subtle); }
+        .button-secondary--brand { border-color: var(--brand-border); color: var(--brand-primary); }
+        .year-context {
+            min-height: var(--control-height);
+            border: 1px solid var(--brand-border);
+            border-radius: var(--radius-md);
+            background: var(--brand-subtle);
+            color: var(--brand-active);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding-inline: var(--space-3);
+            font-size: var(--font-size-sm);
+            font-weight: 700;
+        }
+
+        main.max-w-\[1600px\] { max-width: 1600px !important; }
+        #main-app-container > main,
+        #dashboard-container > main {
+            padding: var(--space-6) var(--space-5) var(--space-10) !important;
+            gap: var(--space-6);
+        }
+
+        .rounded-3xl, .rounded-2xl, .rounded-xl { border-radius: var(--radius-md) !important; }
+        .shadow-xl, .shadow-lg, .shadow-md, .shadow-sm, .shadow { box-shadow: var(--shadow-panel) !important; }
+        .shadow-inner { box-shadow: none !important; }
+
+        .active-kpi {
+            border-color: var(--brand-primary) !important;
+            background: var(--brand-subtle) !important;
+            box-shadow: none !important;
+        }
+        .text-blue-600, .text-blue-500, .text-blue-900,
+        .text-indigo-600, .text-indigo-700, .text-indigo-500 {
+            color: var(--brand-primary) !important;
+        }
+        .bg-blue-600, .bg-indigo-600, .bg-sky-500 {
+            background-color: var(--brand-primary) !important;
+        }
+
+        #main-app-container main > div.bg-white,
+        #dashboard-container main > div.bg-white,
+        #analytics-area .bg-white,
+        #dashboard-container .grid > .bg-white {
+            border-color: var(--color-border) !important;
+            box-shadow: var(--shadow-panel) !important;
+        }
+
+        table thead th {
+            background: var(--color-surface-subtle);
+            color: var(--color-text-muted) !important;
+            font-size: var(--font-size-xs);
+            font-weight: 700;
+        }
+        table tbody tr { min-height: var(--table-row-height); border-color: #e8edf1 !important; }
+        table tbody tr:hover { background: var(--brand-subtle); }
+
+        .ui-dialog-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 80;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-4);
+            background: rgba(19, 31, 42, .52);
+        }
+        .ui-dialog-backdrop.hidden { display: none !important; }
+        .ui-dialog-backdrop.flex { display: flex !important; }
+        .ui-dialog {
+            width: min(520px, 100%);
+            max-height: calc(100vh - 32px);
+            overflow-y: auto;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            background: var(--color-surface);
+            color: var(--color-text);
+            box-shadow: var(--shadow-floating);
+        }
+        .ui-dialog__header {
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-4);
+            padding-inline: var(--space-5);
+            border-block-end: 1px solid var(--color-border);
+        }
+        .ui-dialog__header h2 { margin: 0; font-size: var(--font-size-xl); }
+        .dialog-close {
+            width: 36px;
+            height: 36px;
+            border: 0;
+            border-radius: var(--radius-md);
+            background: transparent;
+            color: var(--color-text-muted);
+        }
+        .dialog-close:hover { background: var(--color-surface-subtle); color: var(--color-text); }
+        .ui-dialog__body { padding: var(--space-5); }
+        .ui-dialog__footer {
+            display: flex;
+            justify-content: flex-end;
+            padding: 0 var(--space-5) var(--space-5);
+        }
+        .theme-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-2); }
+        .theme-option {
+            min-height: 54px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: #fff;
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding-inline: var(--space-3);
+            text-align: right;
+            font-size: var(--font-size-sm);
+            font-weight: 700;
+        }
+        .theme-option:hover { border-color: var(--theme-color); background: var(--color-surface-subtle); }
+        .theme-option[aria-checked="true"] {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 2px var(--brand-subtle);
+        }
+        .theme-swatch {
+            width: 20px;
+            height: 20px;
+            flex: 0 0 20px;
+            border: 1px solid rgba(0,0,0,.16);
+            border-radius: var(--radius-pill);
+            background: var(--theme-color);
+        }
+        .theme-check { margin-inline-start: auto; color: var(--brand-primary); opacity: 0; }
+        .theme-option[aria-checked="true"] .theme-check { opacity: 1; }
+
+        .about-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-4);
+            border-radius: var(--radius-md);
+            background: var(--brand-subtle);
+        }
+        .about-brand img { width: 54px; height: 54px; object-fit: contain; }
+        .about-copy { margin-block-start: var(--space-5); display: grid; gap: var(--space-3); color: var(--color-text-muted); font-size: var(--font-size-sm); line-height: 1.6; }
+        .about-copy p { margin: 0; }
+
+        @media (max-width: 1023px) {
+            .app-header__inner {
+                grid-template-columns: minmax(300px, 1fr) auto;
+                gap: var(--space-5);
+            }
+            .app-identity { text-align: right; }
+            .header-actions { grid-column: 1 / -1; justify-content: flex-start; padding-block-end: var(--space-2); }
+            .workspace-toolbar__inner { flex-wrap: wrap; }
+            .data-source-actions { width: 100%; min-width: 0; }
+            .dashboard-toolbar__actions { margin-inline-start: 0; }
+        }
+
+        @media (max-width: 767px) {
+            .app-header__inner {
+                width: min(100% - 24px, 1600px);
+                grid-template-columns: 1fr auto;
+                gap: var(--space-3);
+                padding-block: var(--space-3);
+            }
+            .government-logo { width: 46px; height: 46px; flex-basis: 46px; }
+            .ministry-name { font-size: var(--font-size-sm); }
+            .department-name { font-size: 12px; }
+            .app-identity { grid-column: 1 / -1; grid-row: 2; text-align: right; }
+            .app-title-row { justify-content: flex-start; }
+            .app-title { font-size: 22px; }
+            .header-actions { grid-column: 2; grid-row: 1; align-self: start; padding: 0; }
+            .header-action { width: 42px; padding: 0; justify-content: center; }
+            .header-action span { display: none; }
+
+            .workspace-toolbar__inner { width: min(100% - 24px, 1600px); gap: var(--space-4); }
+            .workspace-control { flex: 1 1 100%; }
+            .segmented-control { width: 100%; overflow-x: auto; }
+            .segmented-control button { flex: 1 0 auto; }
+            .year-control { width: 100%; }
+            .data-source-actions { grid-template-columns: 1fr; }
+            .file-action small { max-width: 240px; }
+            #btn-goto-dashboard { width: 100%; }
+            .dashboard-toolbar__actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
+            .dashboard-toolbar__actions .button-secondary:last-child { grid-column: 1 / -1; }
+            .theme-options { grid-template-columns: 1fr; }
+
+            #main-app-container > main,
+            #dashboard-container > main { padding-inline: var(--space-3) !important; }
+        }
+
+        @media (max-width: 389px) {
+            .government-brand { gap: var(--space-2); }
+            .government-logo { width: 40px; height: 40px; flex-basis: 40px; }
+            .header-actions { gap: var(--space-1); }
+            .header-action { width: 38px; min-height: 38px; }
+        }
+
+        @media print {
+            .app-header { background: #fff !important; color: #000 !important; border-bottom: 1px solid #aaa !important; }
+            .app-header__inner { min-height: auto; }
+            .government-logo { border-color: #ddd; }
+            .department-name, .system-date { color: #555 !important; }
+            .workspace-toolbar, .header-actions, .beta-badge { display: none !important; }
+        }
+    </style>
+
 </head>
 <body class="min-h-screen flex flex-col text-slate-800" style="font-family: Arial, Helvetica, sans-serif !important;">
+
+
+    <!-- Display settings dialog -->
+    <div id="display-settings-dialog" class="ui-dialog-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="display-settings-title" onclick="closeDialogFromBackdrop(event, 'display-settings-dialog')">
+        <section class="ui-dialog">
+            <div class="ui-dialog__header">
+                <h2 id="display-settings-title">הגדרות תצוגה</h2>
+                <button type="button" class="dialog-close" onclick="closeUiDialog('display-settings-dialog')" aria-label="סגירת הגדרות תצוגה"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+            </div>
+            <div class="ui-dialog__body">
+                <p class="control-label" style="margin:0 0 12px;">ערכת צבעים</p>
+                <div class="theme-options" role="radiogroup" aria-label="בחירת ערכת צבעים">
+                    <button type="button" class="theme-option" data-theme-choice="azure" role="radio" aria-checked="true" style="--theme-color:#0969c3" onclick="setAppTheme('azure')">
+                        <span class="theme-swatch" aria-hidden="true"></span><span>כחול ממלכתי</span><i class="fa-solid fa-check theme-check" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="theme-option" data-theme-choice="emerald" role="radio" aria-checked="false" style="--theme-color:#00875a" onclick="setAppTheme('emerald')">
+                        <span class="theme-swatch" aria-hidden="true"></span><span>ירוק צמיחה</span><i class="fa-solid fa-check theme-check" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="theme-option" data-theme-choice="violet" role="radio" aria-checked="false" style="--theme-color:#7047c8" onclick="setAppTheme('violet')">
+                        <span class="theme-swatch" aria-hidden="true"></span><span>סגול תבונה</span><i class="fa-solid fa-check theme-check" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="theme-option" data-theme-choice="graphite" role="radio" aria-checked="false" style="--theme-color:#536676" onclick="setAppTheme('graphite')">
+                        <span class="theme-swatch" aria-hidden="true"></span><span>אפור גרפיט</span><i class="fa-solid fa-check theme-check" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="ui-dialog__footer">
+                <button type="button" class="button-secondary" onclick="closeUiDialog('display-settings-dialog')">סגור</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- About dialog -->
+    <div id="about-dialog" class="ui-dialog-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="about-title" onclick="closeDialogFromBackdrop(event, 'about-dialog')">
+        <section class="ui-dialog">
+            <div class="ui-dialog__header">
+                <h2 id="about-title">אודות המערכת</h2>
+                <button type="button" class="dialog-close" onclick="closeUiDialog('about-dialog')" aria-label="סגירת חלון אודות"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+            </div>
+            <div class="ui-dialog__body">
+                <div class="about-brand">
+                    <img src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה והבטיחות בדרכים">
+                    <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
+                </div>
+                <div class="about-copy">
+                    <p><strong>גרסת מערכת: 1.4.0 · 19 ביולי 2026</strong> · BETA</p>
+                    <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
+                    <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
+                    <p>© 2026 אביב מצא</p>
+                </div>
+            </div>
+            <div class="ui-dialog__footer">
+                <button type="button" class="button-secondary" onclick="closeUiDialog('about-dialog')">סגור</button>
+            </div>
+        </section>
+    </div>
 
     <!-- Export Modal -->
     <div id="export-modal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
@@ -113,63 +749,69 @@
 
     <!-- MAIN APP CONTAINER -->
     <div id="main-app-container" class="flex flex-col flex-grow">
-        <!-- Header -->
-        <header class="bg-[#0B3C5D] text-white px-6 py-5 shadow-lg border-b-4 border-[#328CC1] no-print">
-            <div class="max-w-[1600px] mx-auto flex flex-col xl:flex-row justify-between items-center gap-6">
-                <!-- שם משרד ואגף מוגדלים וממורכזים בגופן אריאל אחיד ישיר -->
-                <div class="flex flex-col items-center justify-center text-center bg-white/10 px-8 py-3.5 rounded-2xl border border-white/15 shadow-inner">
-                    <div class="text-xl md:text-2xl font-bold text-white leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">משרד התחבורה והבטיחות בדרכים</div>
-                    <div class="text-sm md:text-base text-slate-300 font-bold mt-1.5" style="font-family: Arial, Helvetica, sans-serif !important;">אגף טכנולוגיות דיגיטליות ומידע</div>
-                </div>
 
-                <div class="flex flex-col items-center">
-                    <h1 class="text-2xl md:text-3xl font-bold leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">ניהול הכנסות וגבייה</h1>
-                    <!-- תאריך עדכניות הנתונים יוצג כאן לאחר טעינת הקובץ -->
-                    <p id="data-currency-date" class="text-xs text-slate-300 font-medium mt-0.5 hidden" style="font-family: Arial, Helvetica, sans-serif !important;"></p>
+        <header class="app-header no-print">
+            <div class="app-header__inner">
+                <div class="government-brand">
+                    <img class="government-logo" src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה והבטיחות בדרכים">
+                    <div>
+                        <div class="ministry-name">משרד התחבורה והבטיחות בדרכים</div>
+                        <div class="department-name">אגף טכנולוגיות דיגיטליות ומידע</div>
+                    </div>
                 </div>
-
-                <!-- מסנני המערכת הראשית - גופנים אחידים בגודלם ישיר -->
-                <div class="flex items-center bg-black/20 p-1.5 rounded-xl border border-white/10 shadow-inner">
-                    <span class="text-xs text-slate-300 font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;">סנן לפי:</span>
-                    <button onclick="setIncomeFilter('info')" id="f-info" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all active-filter leading-tight">
-                        <span class="block text-xs font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">שירותי</span><span class="block text-xs font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">מידע</span>
+                <div class="app-identity">
+                    <div class="app-title-row">
+                        <h1 class="app-title">ניהול הכנסות וגבייה</h1>
+                        <span class="beta-badge">BETA</span>
+                    </div>
+                    <div class="system-date"></div>
+                </div>
+                <div class="header-actions">
+                    <button type="button" class="header-action" onclick="openUiDialog('display-settings-dialog')" aria-label="הגדרות תצוגה">
+                        <i class="fa-solid fa-palette" aria-hidden="true"></i><span>תצוגה</span>
                     </button>
-                    <button onclick="setIncomeFilter('fees')" id="f-fees" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all hover:bg-white/5 leading-tight">
-                        <span class="block text-xs font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">אגרות העברת</span><span class="block text-xs font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">בעלות</span>
-                    </button>
-                    <button onclick="setIncomeFilter('all')" id="f-all" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all hover:bg-white/5 leading-tight">
-                        <span class="block text-xs font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">הכל</span>
-                    </button>
-                </div>
-
-                <div class="flex items-center gap-2 bg-black/20 px-3 py-2 rounded-xl border border-white/10">
-                    <label for="report-year-select" class="text-xs text-slate-300 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">שנת עבודה:</label>
-                    <select id="report-year-select" onchange="setReportYear(this.value)" class="bg-white text-slate-800 text-xs font-bold rounded-lg px-2 py-1.5 border-0 outline-none" style="font-family: Arial, Helvetica, sans-serif !important;"></select>
-                </div>
-
-                <!-- לחצני פעולה עליונים מעוצבים כפתורים בני 2 שורות בגודל גופן אחיד ישיר -->
-                <div class="flex items-center gap-3 flex-wrap">
-                    <!-- קליטת קובץ חובות -->
-                    <input type="file" id="excel-uploader" class="hidden" onchange="processExcel(event)">
-                    <label for="excel-uploader" class="cursor-pointer bg-[#D9B310] hover:bg-yellow-500 text-black px-4 py-2 rounded-xl font-bold shadow-md transition-all flex flex-col items-center justify-center text-center h-[52px] w-[130px] leading-tight">
-                        <span class="text-xs font-bold opacity-80" style="font-family: Arial, Helvetica, sans-serif !important;">טעינת קובץ</span>
-                        <span class="text-xs font-bold opacity-80" style="font-family: Arial, Helvetica, sans-serif !important;">חובות</span>
-                    </label>
-                    
-                    <input type="file" id="revenue-uploader" class="hidden" onchange="processRevenueExcel(event)">
-                    <label for="revenue-uploader" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-bold shadow-md transition-all flex flex-col items-center justify-center text-center h-[52px] w-[130px] leading-tight">
-                        <span class="text-xs font-bold opacity-80" style="font-family: Arial, Helvetica, sans-serif !important;">טעינת קובץ</span>
-                        <span class="text-xs font-bold opacity-80" style="font-family: Arial, Helvetica, sans-serif !important;">הכנסות שוטפות</span>
-                    </label>
-
-                    <!-- לחצן דינמי למעבר לדשבורד -->
-                    <button id="btn-goto-dashboard" onclick="enterDashboard()" class="hidden bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-xl font-bold shadow-md transition-all flex-col items-center justify-center text-center h-[52px] w-[130px] leading-tight">
-                        <span class="text-xs font-bold opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;">מעבר לדשבורד</span>
-                        <span class="text-xs font-bold opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;">סיכום שנה</span>
+                    <button type="button" class="header-action" onclick="openUiDialog('about-dialog')" aria-label="אודות המערכת">
+                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>אודות</span>
                     </button>
                 </div>
             </div>
         </header>
+        <section class="workspace-toolbar no-print" aria-label="כלי עבודה וטעינת נתונים">
+            <div class="workspace-toolbar__inner">
+                <div class="workspace-control">
+                    <span class="control-label">חתך פעילות</span>
+                    <div class="segmented-control" role="group" aria-label="סינון לפי סוג פעילות">
+                        <button type="button" onclick="setIncomeFilter('info')" id="f-info" class="active-filter">שירותי מידע</button>
+                        <button type="button" onclick="setIncomeFilter('fees')" id="f-fees">אגרות העברת בעלות</button>
+                        <button type="button" onclick="setIncomeFilter('all')" id="f-all">הכול</button>
+                    </div>
+                </div>
+                <div class="workspace-control">
+                    <label for="report-year-select" class="control-label">שנת עבודה</label>
+                    <select id="report-year-select" onchange="setReportYear(this.value)" class="year-control"></select>
+                </div>
+                <div class="workspace-control workspace-control--grow">
+                    <span class="control-label">מקורות נתונים</span>
+                    <div class="data-source-actions">
+                        <input type="file" id="excel-uploader" class="hidden" onchange="processExcel(event)">
+                        <label for="excel-uploader" id="debt-file-action" class="file-action" tabindex="0">
+                            <span class="file-action__icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></span>
+                            <span><strong>קובץ חובות</strong><small id="debt-file-status">טרם נטען</small></span>
+                        </label>
+                        <input type="file" id="revenue-uploader" class="hidden" onchange="processRevenueExcel(event)">
+                        <label for="revenue-uploader" id="revenue-file-action" class="file-action" tabindex="0">
+                            <span class="file-action__icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></span>
+                            <span><strong>הכנסות שנה נוכחית</strong><small id="revenue-file-status">טרם נטען</small></span>
+                        </label>
+                        <button id="btn-goto-dashboard" type="button" onclick="enterDashboard()" disabled aria-disabled="true" title="הדשבורד זמין לאחר טעינת שני הקבצים">
+                            <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+                            <span class="button-copy"><span>מעבר לדשבורד</span><small>נדרש לטעון שני קבצים</small></span>
+                        </button>
+                    </div>
+                </div>
+                <p id="data-currency-date" class="data-currency hidden"></p>
+            </div>
+        </section>
 
         <main class="max-w-[1600px] w-full mx-auto p-6 space-y-6 flex-grow no-print">
             
@@ -299,55 +941,60 @@
 
     <!-- DASHBOARD CONTAINER (חלק 2) -->
     <div id="dashboard-container" class="hidden flex-col flex-grow bg-[#f3f4f6]" style="font-family: Arial, Helvetica, sans-serif !important;">
-        <!-- Header -->
-        <header class="bg-[#0B3C5D] text-white px-6 py-5 shadow-lg border-b-4 border-[#328CC1] no-print">
-            <div class="max-w-[1600px] mx-auto flex flex-col xl:flex-row justify-between items-center gap-6">
-                <!-- שם משרד ואגף מוגדלים וממורכזים בדשבורד בגופן אריאל אחיד ישיר -->
-                <div class="flex flex-col items-center justify-center text-center bg-white/10 px-8 py-3.5 rounded-2xl border border-white/15 shadow-inner">
-                    <div class="text-xl md:text-2xl font-bold text-white leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">משרד התחבורה והבטיחות בדרכים</div>
-                    <div class="text-sm md:text-base text-slate-300 font-bold mt-1.5" style="font-family: Arial, Helvetica, sans-serif !important;">אגף טכנולוגיות דיגיטליות ומידע</div>
-                </div>
 
-                <div class="flex flex-col items-center">
-                    <h1 class="text-2xl md:text-3xl font-bold leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">דשבורד הכנסות וגבייה</h1>
-                </div>
-
-                <!-- מסננים היררכיים דו-שלביים -->
-                <div class="flex flex-col gap-2 bg-black/15 p-2.5 rounded-2xl border border-white/5 shadow-inner">
-                    <!-- שלב א' -->
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-slate-300 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">סנן לפי (שלב א'):</span>
-                        <button id="db-sa-info" onclick="setDashStageA('info')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">שירותי מידע</button>
-                        <button id="db-sa-fees" onclick="setDashStageA('fees')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">אגרות העברת בעלות</button>
-                        <button id="db-sa-all" onclick="setDashStageA('all')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">הכל</button>
-                    </div>
-                    <!-- שלב ב' -->
-                    <div id="dash-stage-b-container" class="flex items-center gap-2 border-t border-white/10 pt-1.5 transition-all">
-                        <span class="text-xs text-slate-300 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">סקטור (שלב ב'):</span>
-                        <button id="db-sb-all-sectors" onclick="setDashStageB('all-sectors')" class="px-2.5 py-0.5 rounded-md text-[11px] font-bold transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">כלל הסקטורים</button>
-                        <button id="db-sb-gov" onclick="setDashStageB('gov')" class="px-2.5 py-0.5 rounded-md text-[11px] font-bold transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">סקטור ממשלה</button>
-                        <button id="db-sb-local" onclick="setDashStageB('local')" class="px-2.5 py-0.5 rounded-md text-[11px] font-bold transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">שלטון מקומי</button>
-                        <button id="db-sb-private" onclick="setDashStageB('private')" class="px-2.5 py-0.5 rounded-md text-[11px] font-bold transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">רשויות ופרטיים</button>
+        <header class="app-header no-print">
+            <div class="app-header__inner">
+                <div class="government-brand">
+                    <img class="government-logo" src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה והבטיחות בדרכים">
+                    <div>
+                        <div class="ministry-name">משרד התחבורה והבטיחות בדרכים</div>
+                        <div class="department-name">אגף טכנולוגיות דיגיטליות ומידע</div>
                     </div>
                 </div>
-
-                <!-- לחצני פעולה עליונים בדשבורד (גודל גופן אחיד לשתי השורות) ישיר -->
-                <div class="flex items-center gap-3 flex-wrap">
-                    <button onclick="printDashboardCurrent()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-bold shadow transition-all flex flex-col items-center justify-center text-center h-[52px] w-[120px] leading-tight">
-                        <span class="text-xs opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;">הדפס דוח</span>
-                        <span class="text-xs font-normal opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;">נוכחי</span>
+                <div class="app-identity">
+                    <div class="app-title-row">
+                        <h1 class="app-title">דשבורד הכנסות וגבייה</h1>
+                        <span class="beta-badge">BETA</span>
+                    </div>
+                    <div class="system-date"></div>
+                </div>
+                <div class="header-actions">
+                    <button type="button" class="header-action" onclick="openUiDialog('display-settings-dialog')" aria-label="הגדרות תצוגה">
+                        <i class="fa-solid fa-palette" aria-hidden="true"></i><span>תצוגה</span>
                     </button>
-                    <button onclick="printDashboardAll()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold shadow transition-all flex flex-col items-center justify-center text-center h-[52px] w-[120px] leading-tight">
-                        <span class="text-xs opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;">הדפס דוח</span>
-                        <span class="text-xs font-normal opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;">מאוחד הכל</span>
-                    </button>
-                    <button onclick="exitDashboard()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-xl font-bold shadow transition-all flex flex-col items-center justify-center text-center h-[52px] w-[120px] leading-tight">
-                        <span class="text-xs opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;">חזרה למערכת</span>
-                        <span class="text-xs font-normal opacity-90" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-door-open ml-1"></i>הראשית</span>
+                    <button type="button" class="header-action" onclick="openUiDialog('about-dialog')" aria-label="אודות המערכת">
+                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>אודות</span>
                     </button>
                 </div>
             </div>
         </header>
+        <section class="workspace-toolbar no-print" aria-label="מסנני הדשבורד ופעולות">
+            <div class="workspace-toolbar__inner dashboard-toolbar__inner">
+                <div class="workspace-control">
+                    <span class="control-label">תחום פעילות</span>
+                    <div class="segmented-control" role="group" aria-label="סינון תחום פעילות">
+                        <button type="button" id="db-sa-info" onclick="setDashStageA('info')">שירותי מידע</button>
+                        <button type="button" id="db-sa-fees" onclick="setDashStageA('fees')">אגרות העברת בעלות</button>
+                        <button type="button" id="db-sa-all" onclick="setDashStageA('all')">הכול</button>
+                    </div>
+                </div>
+                <div id="dash-stage-b-container" class="workspace-control">
+                    <span class="control-label">סקטור</span>
+                    <div class="segmented-control" role="group" aria-label="סינון לפי סקטור">
+                        <button type="button" id="db-sb-all-sectors" onclick="setDashStageB('all-sectors')">כל הסקטורים</button>
+                        <button type="button" id="db-sb-gov" onclick="setDashStageB('gov')">ממשלה</button>
+                        <button type="button" id="db-sb-local" onclick="setDashStageB('local')">שלטון מקומי</button>
+                        <button type="button" id="db-sb-private" onclick="setDashStageB('private')">רשויות ופרטיים</button>
+                    </div>
+                </div>
+                <div class="year-context"><i class="fa-regular fa-calendar" aria-hidden="true"></i>שנת <span class="report-year-label"></span></div>
+                <div class="dashboard-toolbar__actions">
+                    <button type="button" onclick="printDashboardCurrent()" class="button-secondary button-secondary--brand"><i class="fa-solid fa-print" aria-hidden="true"></i>הדפסת תצוגה</button>
+                    <button type="button" onclick="printDashboardAll()" class="button-secondary"><i class="fa-solid fa-layer-group" aria-hidden="true"></i>דוח מאוחד</button>
+                    <button type="button" onclick="exitDashboard()" class="button-secondary"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>חזרה למערכת</button>
+                </div>
+            </div>
+        </section>
 
         <!-- Main Dashboard content -->
         <main class="max-w-[1600px] w-full mx-auto p-6 space-y-6 flex-grow">
@@ -632,6 +1279,10 @@
 
         // --- Dashboard Navigation & Control ---
         function enterDashboard() {
+            if (db.length === 0 || revenueDb.length === 0) {
+                updateDashboardAccessState();
+                return;
+            }
             isDashboardActive = true;
             document.getElementById('main-app-container').classList.add('hidden');
             document.getElementById('dashboard-container').classList.remove('hidden');
@@ -1055,6 +1706,7 @@
         // --- End of Dashboard Functions ---
 
         function refresh() {
+            updateDashboardAccessState();
             if (db.length === 0) return;
             const overdueRows = db.filter(r => r.isOverdue && isTypeMatch(r));
             const overdue = overdueRows.reduce((a, b) => a + b.amount, 0);
@@ -1075,13 +1727,11 @@
                 document.getElementById('total-revenue-kpi').innerText = formatCurrency(totalRevenueSum);
                 document.getElementById('kpi-card-revenue').classList.remove('hidden');
                 document.getElementById('kpi-container').className = "grid grid-cols-1 md:grid-cols-3 gap-6";
-                document.getElementById('btn-goto-dashboard').classList.remove('hidden');
-                document.getElementById('btn-goto-dashboard').style.display = 'flex';
+                updateDashboardAccessState();
             } else {
                 document.getElementById('kpi-card-revenue').classList.add('hidden');
                 document.getElementById('kpi-container').className = "grid grid-cols-1 md:grid-cols-2 gap-6";
-                document.getElementById('btn-goto-dashboard').classList.add('hidden');
-                document.getElementById('btn-goto-dashboard').style.display = 'none';
+                updateDashboardAccessState();
             }
 
             renderView();
@@ -2143,6 +2793,7 @@
                     }
                 }
 
+                markDataSourceLoaded('debt', e.target.files[0]?.name);
                 currentLevel = 0; refresh();
             };
             reader.readAsArrayBuffer(e.target.files[0]);
@@ -2212,6 +2863,7 @@
                     }
                 }
 
+                markDataSourceLoaded('revenue', e.target.files[0]?.name);
                 currentLevel = 0; refresh();
             };
             reader.readAsArrayBuffer(e.target.files[0]);
@@ -2231,6 +2883,95 @@
         }
 
         function formatCurrency(v) { return "₪" + Math.round(v).toLocaleString('he-IL'); }
+
+
+        const APP_THEME_STORAGE_KEY = 'mot-debt-collection-theme';
+        const APP_THEMES = ['azure', 'emerald', 'violet', 'graphite'];
+        const APP_THEME_MIGRATIONS = { ocean: 'azure', forest: 'emerald', plum: 'violet' };
+        let lastUiDialogTrigger = null;
+
+        function normalizeAppTheme(value) {
+            const migrated = APP_THEME_MIGRATIONS[value] || value;
+            return APP_THEMES.includes(migrated) ? migrated : 'azure';
+        }
+
+        function setAppTheme(themeId, persist = true) {
+            const normalized = normalizeAppTheme(themeId);
+            document.documentElement.dataset.theme = normalized;
+            if (persist) {
+                try { localStorage.setItem(APP_THEME_STORAGE_KEY, normalized); } catch (error) {}
+            }
+            document.querySelectorAll('[data-theme-choice]').forEach(option => {
+                option.setAttribute('aria-checked', String(option.dataset.themeChoice === normalized));
+            });
+        }
+
+        function openUiDialog(id) {
+            const dialog = document.getElementById(id);
+            if (!dialog) return;
+            lastUiDialogTrigger = document.activeElement;
+            dialog.classList.remove('hidden');
+            dialog.classList.add('flex');
+            const closeButton = dialog.querySelector('.dialog-close');
+            if (closeButton) closeButton.focus();
+        }
+
+        function closeUiDialog(id) {
+            const dialog = document.getElementById(id);
+            if (!dialog) return;
+            dialog.classList.remove('flex');
+            dialog.classList.add('hidden');
+            if (lastUiDialogTrigger && typeof lastUiDialogTrigger.focus === 'function') lastUiDialogTrigger.focus();
+        }
+
+        function closeDialogFromBackdrop(event, id) {
+            if (event.target === event.currentTarget) closeUiDialog(id);
+        }
+
+        function markDataSourceLoaded(type, fileName) {
+            const isDebt = type === 'debt';
+            const action = document.getElementById(isDebt ? 'debt-file-action' : 'revenue-file-action');
+            const status = document.getElementById(isDebt ? 'debt-file-status' : 'revenue-file-status');
+            if (action) action.classList.add('is-loaded');
+            if (status) status.textContent = fileName || 'הקובץ נטען';
+            updateDashboardAccessState();
+        }
+
+        function updateDashboardAccessState() {
+            const button = document.getElementById('btn-goto-dashboard');
+            if (!button) return;
+            const ready = db.length > 0 && revenueDb.length > 0;
+            button.disabled = !ready;
+            button.setAttribute('aria-disabled', String(!ready));
+            button.title = ready ? 'מעבר לדשבורד סיכום שנה' : 'הדשבורד זמין לאחר טעינת קובץ חובות וקובץ הכנסות';
+            const helper = button.querySelector('small');
+            if (helper) helper.textContent = ready ? 'שני מקורות הנתונים נטענו' : 'נדרש לטעון שני קבצים';
+        }
+
+        function initializeRedesignedInterface() {
+            let savedTheme = 'azure';
+            try { savedTheme = localStorage.getItem(APP_THEME_STORAGE_KEY) || 'azure'; } catch (error) {}
+            setAppTheme(savedTheme, false);
+
+            const formattedDate = new Intl.DateTimeFormat('he-IL', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }).format(new Date());
+            document.querySelectorAll('.system-date').forEach(element => {
+                element.textContent = formattedDate;
+            });
+
+            updateDashboardAccessState();
+
+            document.addEventListener('keydown', event => {
+                if (event.key !== 'Escape') return;
+                document.querySelectorAll('.ui-dialog-backdrop.flex').forEach(dialog => closeUiDialog(dialog.id));
+            });
+        }
+
+        initializeRedesignedInterface();
 
         updateReportYearOptions();
     </script>
