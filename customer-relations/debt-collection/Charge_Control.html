@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" data-theme="azure">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בקרת חיוב שאילתות - אגף טכנולוגיות דיגיטליות ומידע</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: { fontFamily: { sans: ['Arial', 'Helvetica', 'sans-serif'] } }
+        }
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer base {
+            html, body, button, select, input, textarea, label, span, p, div, table, tr, th, td, h1, h2, h3, h4, a, b, strong {
+                font-family: Arial, Helvetica, sans-serif !important;
+            }
+        }
+    </style>
+
+    <style>
+        html, body, html *, body * { font-family: Arial, Helvetica, sans-serif !important; }
+        .fa, .fas, .far, .fa-solid, i, i * { font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "FontAwesome" !important; }
+
+        /* Theming */
+        :root, [data-theme="azure"] {
+            --brand-primary: #0969c3;
+            --brand-hover: #075aa8;
+            --brand-active: #064b8d;
+            --brand-subtle: #eaf5ff;
+            --brand-border: #93c8f2;
+        }
+        [data-theme="emerald"] {
+            --brand-primary: #00875a;
+            --brand-hover: #00724c;
+            --brand-active: #005e3e;
+            --brand-subtle: #e9f8f1;
+            --brand-border: #8bd4b6;
+        }
+        [data-theme="violet"] {
+            --brand-primary: #7047c8;
+            --brand-hover: #6039b1;
+            --brand-active: #502f95;
+            --brand-subtle: #f2edff;
+            --brand-border: #c0adf0;
+        }
+        [data-theme="graphite"] {
+            --brand-primary: #536676;
+            --brand-hover: #445563;
+            --brand-active: #35434f;
+            --brand-subtle: #eef2f5;
+            --brand-border: #b7c3cc;
+        }
+
+        :root {
+            --color-bg: #f5f7f9;
+            --color-surface: #ffffff;
+            --color-surface-subtle: #f9fafb;
+            --color-text: #1f2933;
+            --color-text-muted: #607080;
+            --color-border: #d5dee6;
+            --color-border-strong: #aebdca;
+        }
+
+        body { background-color: var(--color-bg) !important; color: var(--color-text); min-width: 320px; transition: background-color 0.3s; }
+
+        /* Header */
+        .app-header { background: var(--brand-active); color: #fff; border-bottom: 4px solid var(--brand-border); transition: all 0.3s; }
+        .app-header__inner { width: min(1600px, calc(100% - 40px)); min-height: 88px; margin: 0 auto; display: grid; grid-template-columns: minmax(350px, 1fr) minmax(280px, auto) minmax(240px, 1fr); align-items: center; gap: 32px; padding: 12px 0; }
+        .government-brand { display: flex; align-items: center; gap: 16px; min-width: 0; }
+        .government-logo { width: 56px; height: 56px; object-fit: contain; background: #fff; border: 1px solid rgba(255,255,255,.75); border-radius: 6px; padding: 5px; }
+        .app-title-row { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .app-title { margin: 0; font-size: 28px; font-weight: 700; line-height: 1.25; }
+        .system-date { margin-top: 4px; color: rgba(255,255,255,.78); font-size: 13px; text-align: center; }
+        
+        .header-actions { display: flex; justify-content: flex-end; gap: 8px; }
+        .header-action { min-height: 44px; border: 1px solid rgba(255,255,255,.34); border-radius: 6px; background: transparent; color: #fff; display: inline-flex; align-items: center; gap: 8px; padding: 0 12px; font-size: 14px; font-weight: 700; transition: background .15s ease, border-color .15s ease; cursor: pointer; }
+        .header-action:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.62); }
+
+        /* Toolbar */
+        .workspace-toolbar { background: var(--color-surface); border-bottom: 1px solid var(--color-border); padding: 16px 0; transition: border-color 0.3s; }
+        .workspace-toolbar__inner { width: min(1600px, calc(100% - 40px)); margin: 0 auto; display: flex; flex-direction: column; lg:flex-row; justify-content: space-between; gap: 16px; }
+        
+        .file-action { flex: 1; min-width: 250px; min-height: 58px; border: 1px solid var(--color-border); border-radius: 6px; background: var(--color-surface); display: flex; align-items: center; gap: 12px; padding: 8px 12px; cursor: pointer; transition: all 0.15s; }
+        .file-action:hover { border-color: var(--brand-primary); background: var(--brand-subtle); }
+        .file-action.is-loaded { border-color: #86c5a6; background: #edf7f1; }
+        .file-action.is-loaded .file-action__icon { color: #16834f; background: #dff1e7; }
+        .file-action__icon { width: 34px; height: 34px; border-radius: 6px; background: var(--brand-subtle); color: var(--brand-primary); display: grid; place-items: center; flex-shrink: 0; transition: all 0.3s; }
+
+        /* Controls */
+        .control-height { height: 60px; }
+        
+        .btn-primary { min-height: 58px; border: 1px solid var(--brand-hover); border-radius: 6px; background: var(--brand-primary); color: #fff; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 20px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .btn-primary:hover { background: var(--brand-hover); }
+        .btn-primary:disabled { background: #e8edf1; border-color: var(--color-border); color: #7b8996; cursor: not-allowed; }
+
+        .control-box { min-height: 58px; display: flex; justify-content: center; background: var(--color-surface-subtle); border: 1px solid var(--color-border); border-radius: 6px; padding: 8px 12px; transition: border-color 0.3s; }
+        .control-input { border: 1px solid var(--color-border-strong); border-radius: 4px; padding: 4px 8px; text-align: center; font-weight: bold; color: var(--brand-primary); outline: none; transition: border-color 0.2s; }
+        .control-input:focus { border-color: var(--brand-primary); }
+
+        /* Tables & Sorting */
+        table thead th { background: var(--color-surface-subtle); color: var(--color-text-muted); font-size: 13px; font-weight: 700; cursor: pointer; user-select: none; transition: background 0.2s; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--color-border); }
+        table thead th:hover { background: #e2e8f0; color: var(--brand-primary); }
+        table tbody tr { min-height: 50px; border-color: #e8edf1 !important; transition: background 0.15s; }
+        table tbody tr:hover { background: var(--brand-subtle); }
+        
+        .loader-spinner { border: 4px solid rgba(0,0,0,0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: var(--brand-primary); animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Theme Option Cards */
+        .theme-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px; }
+        .theme-option { min-height: 54px; border: 1px solid var(--color-border); border-radius: 6px; background: #fff; color: var(--color-text); display: flex; align-items: center; gap: 12px; padding: 0 12px; text-align: right; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .theme-option:hover { border-color: var(--brand-primary); background: var(--color-surface-subtle); }
+        .theme-option[aria-checked="true"] { border-color: var(--brand-primary); box-shadow: 0 0 0 2px var(--brand-subtle); }
+        .theme-swatch { width: 20px; height: 20px; flex: 0 0 20px; border: 1px solid rgba(0,0,0,.16); border-radius: 50%; background: var(--theme-color); }
+        .theme-check { margin-inline-start: auto; color: var(--brand-primary); opacity: 0; transition: opacity 0.2s; }
+        .theme-option[aria-checked="true"] .theme-check { opacity: 1; }
+
+        /* Modals */
+        .ui-dialog-backdrop { position: fixed; inset: 0; z-index: 80; align-items: center; justify-content: center; padding: 16px; background: rgba(19, 31, 42, .52); display: none; }
+        .ui-dialog-backdrop.flex { display: flex; }
+        .ui-dialog { width: min(520px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-surface); color: var(--color-text); box-shadow: 0 8px 24px rgba(15, 35, 55, 0.12); }
+        .ui-dialog__header { min-height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid var(--color-border); }
+        .ui-dialog__header h2 { margin: 0; font-size: 20px; font-weight: bold; }
+        .dialog-close { width: 36px; height: 36px; border: 0; border-radius: 6px; background: transparent; color: var(--color-text-muted); cursor: pointer; transition: background 0.2s; }
+        .dialog-close:hover { background: var(--color-surface-subtle); color: var(--color-text); }
+        .ui-dialog__body { padding: 20px; line-height: 1.6; }
+        .ui-dialog__footer { display: flex; justify-content: flex-end; padding: 0 20px 20px; }
+        
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; padding: 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="app-header no-print">
+        <div class="app-header__inner">
+            <div class="government-brand">
+                <img class="government-logo" src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה">
+                <div>
+                    <div class="text-[17px] font-bold leading-tight">משרד התחבורה והבטיחות בדרכים</div>
+                    <div class="text-[14px] font-semibold text-white/80 mt-1">אגף טכנולוגיות דיגיטליות ומידע</div>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="app-title-row">
+                    <h1 class="app-title">בקרת חיוב שאילתות</h1>
+                </div>
+                <div class="system-date" id="sys-date"></div>
+            </div>
+            <div class="header-actions">
+                <button type="button" class="header-action" onclick="openDialog('display-settings-dialog')">
+                    <i class="fa-solid fa-palette"></i><span>הגדרות תצוגה</span>
+                </button>
+                <button type="button" class="header-action" onclick="openDialog('about-dialog')">
+                    <i class="fa-solid fa-circle-info"></i><span>אודות</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Toolbar -->
+    <section class="workspace-toolbar no-print">
+        <div class="workspace-toolbar__inner flex-col xl:flex-row xl:items-end justify-between">
+            
+            <!-- Uploads Group -->
+            <div id="upload-group" class="flex flex-wrap gap-4 w-full xl:w-auto transition-all duration-300">
+                <input type="file" id="file-invoices" class="hidden" accept=".xlsx, .xls">
+                <label for="file-invoices" id="lbl-inv" class="file-action">
+                    <div class="file-action__icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                    <div><strong class="text-sm block">קובץ חשבוניות (מרכבה)</strong><small class="text-xs text-slate-500 block">טרם נטען</small></div>
+                </label>
+
+                <input type="file" id="file-online" class="hidden" accept=".xlsx, .xls">
+                <label for="file-online" id="lbl-onl" class="file-action">
+                    <div class="file-action__icon"><i class="fa-solid fa-desktop"></i></div>
+                    <div><strong class="text-sm block">קובץ שאילתות און-ליין</strong><small class="text-xs text-slate-500 block">טרם נטען</small></div>
+                </label>
+
+                <input type="file" id="file-batch" class="hidden" accept=".xlsx, .xls">
+                <label for="file-batch" id="lbl-bat" class="file-action">
+                    <div class="file-action__icon"><i class="fa-solid fa-server"></i></div>
+                    <div><strong class="text-sm block">קובץ שאילתות אצווה</strong><small class="text-xs text-slate-500 block">טרם נטען</small></div>
+                </label>
+            </div>
+
+            <div class="flex items-end gap-3 mt-2 xl:mt-0 w-full xl:w-auto ml-auto">
+                <button id="btn-edit-files" class="hidden text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors ml-4 mb-4" onclick="toggleUploads()">
+                    <i class="fa-solid fa-file-pen ml-1"></i>החלף קבצים
+                </button>
+                
+                <div class="flex flex-wrap gap-3 items-stretch w-full xl:w-auto">
+                    <!-- Dates Box -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-md px-4 flex items-center gap-4 control-height shadow-sm">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-slate-500">מחודש שירות:</span>
+                            <input type="month" id="filter-from" value="2025-12" class="bg-transparent border-none text-sm font-bold text-blue-900 outline-none cursor-pointer p-0">
+                        </div>
+                        <div class="w-px h-8 bg-slate-300"></div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold text-slate-500">עד חודש שירות:</span>
+                            <input type="month" id="filter-to" class="bg-transparent border-none text-sm font-bold text-blue-900 outline-none cursor-pointer p-0">
+                        </div>
+                    </div>
+
+                    <!-- Threshold Box -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-md px-4 flex flex-col justify-center control-height shadow-sm">
+                        <span class="text-[10px] font-bold text-slate-500">הצג פער מסכום (ש"ח):</span>
+                        <input type="number" id="gap-threshold" value="500" min="0" class="bg-transparent border-none text-sm font-bold text-blue-900 outline-none text-center w-24 p-0">
+                    </div>
+
+                    <!-- Run Button -->
+                    <button id="btn-run" class="btn-primary w-full md:w-auto shadow-sm" onclick="runAnalysis()" disabled>
+                        <i class="fa-solid fa-gears text-lg"></i>
+                        <div class="flex flex-col items-start leading-tight">
+                            <span class="text-sm">בקרת חיובים</span>
+                            <span class="text-[10px] font-normal text-white/80">לפי חתך ופער</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading State -->
+    <div id="loading-area" class="hidden flex-grow flex flex-col items-center justify-center py-20 text-blue-900 no-print">
+        <div class="loader-spinner mb-4"></div>
+        <h2 class="text-xl font-bold">מנתח ומצליב נתונים...</h2>
+        <p class="text-sm text-slate-500 mt-2">מפעיל מחירון אגרות (ללא מע"מ) לפי שנת שירות...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-area" class="hidden max-w-[1600px] w-full mx-auto mt-6 px-5 no-print">
+        <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md font-bold flex items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation text-xl"></i>
+            <span id="error-text"></span>
+        </div>
+    </div>
+
+    <!-- Results Dashboard -->
+    <main id="dashboard-area" class="hidden max-w-[1600px] w-full mx-auto p-5 space-y-6 flex-grow">
+        
+        <!-- KPIs -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 no-print">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between border-b-4 border-b-blue-600">
+                <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1">סה"כ שאילתות שאותרו</p>
+                <p id="kpi-queries" class="text-3xl font-bold text-blue-900">0</p>
+                <p class="text-[11px] text-slate-500 font-bold mt-2 pt-1 border-t border-slate-100" id="kpi-date-label">בטווח הנבחר</p>
+            </div>
+            
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between border-b-4 border-b-rose-500">
+                <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1">הכנסה אבודה (חסר + פערים)</p>
+                <p id="kpi-lost-filtered" class="text-3xl font-bold text-rose-700">₪0</p>
+                <div class="mt-2 pt-1 border-t border-slate-100 text-[11px] font-bold">
+                    <span class="text-slate-500">סך הכנסה אבודה בתקופה: <span id="kpi-lost-absolute">₪0</span></span>
+                </div>
+            </div>
+            
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between border-b-4 border-b-red-500 bg-red-50/30">
+                <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1 text-red-800">חשבוניות חסרות לחלוטין</p>
+                <p id="kpi-missing" class="text-3xl font-bold text-red-700">0</p>
+                <div class="mt-2 pt-1 border-t border-red-200 text-[12px] font-bold">
+                    <span class="text-red-700">הכנסה אבודה: <span id="kpi-missing-lost">₪0</span></span>
+                </div>
+            </div>
+            
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between border-b-4 border-b-amber-500 bg-amber-50/30">
+                <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1 text-amber-800">אי-התאמות בסכום חיוב</p>
+                <p id="kpi-mismatch" class="text-3xl font-bold text-amber-600">0</p>
+                <div class="mt-2 pt-1 border-t border-amber-200 flex justify-between items-center text-[11px] font-bold">
+                    <span class="text-red-600">הכנסה אבודה: <span id="kpi-mismatch-lost" class="text-sm">₪0</span></span>
+                    <span class="text-emerald-700">החזרים: <span id="kpi-mismatch-refund" class="text-sm">₪0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabbed Tables Area -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden printable-section">
+            <div class="bg-slate-50 p-4 border-b border-slate-200 flex justify-between items-center flex-wrap gap-3">
+                <div class="flex gap-4">
+                    <button id="btn-tab-missing" class="text-lg font-bold text-red-800 border-b-4 border-red-800 pb-1 transition-all" onclick="switchTab('missing')">
+                        <i class="fa-solid fa-file-circle-xmark ml-2"></i>חשבוניות חסרות
+                    </button>
+                    <button id="btn-tab-mismatch" class="text-lg font-bold text-slate-400 border-b-4 border-transparent hover:text-amber-800 pb-1 transition-all" onclick="switchTab('mismatch')">
+                        <i class="fa-solid fa-scale-unbalanced ml-2"></i>אי-התאמה בסכומים
+                    </button>
+                </div>
+                <div class="flex gap-2 no-print">
+                    <button onclick="exportActiveTab()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded flex items-center gap-2 text-sm font-bold transition shadow-sm">
+                        <i class="fa-solid fa-file-excel"></i> יצוא לאקסל
+                    </button>
+                    <button onclick="printActiveTab()" class="bg-slate-600 hover:bg-slate-700 text-white px-3 py-1.5 rounded flex items-center gap-2 text-sm font-bold transition shadow-sm">
+                        <i class="fa-solid fa-print"></i> הדפסה / PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Missing Tab Content -->
+            <div id="container-missing" class="overflow-x-auto max-h-[600px]">
+                <table class="w-full text-right text-sm">
+                    <thead>
+                        <tr>
+                            <th class="p-3" onclick="sortTable('missing', 'displayMonth')">חודש פעילות <i class="fa-solid fa-sort text-slate-300 ml-1"></i></th>
+                            <th class="p-3" onclick="sortTable('missing', 'kod')">קוד מרכבה (לקוח) <i class="fa-solid fa-sort text-slate-300 ml-1"></i></th>
+                            <th class="p-3" onclick="sortTable('missing', 'name')">שם הלקוח <i class="fa-solid fa-sort text-slate-300 ml-1"></i></th>
+                            <th class="p-3 text-center" onclick="sortTable('missing', 'qType')">סוג שאילתות <i class="fa-solid fa-sort text-slate-300 ml-1"></i></th>
+                            <th class="p-3 text-center" onclick="sortTable('missing', 'sumQty')">סה"כ כמות בחודש <i class="fa-solid fa-sort text-slate-300 ml-1"></i></th>
+                            <th class="p-3" onclick="sortTable('missing', 'expectedBase')">חיוב חסר (בש"ח) <i class="fa-solid fa-sort text-slate-300 ml-1"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbl-missing" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+
+            <!-- Mismatch Tab Content -->
+            <div id="container-mismatch" class="hidden overflow-x-auto max-h-[600px]">
+                <table class="w-full text-right text-sm">
+                    <thead>
+                        <tr>
+                            <th class="p-3" onclick="sortTable('mismatch', 'displayMonth')">חודש <i class="fa-solid fa-sort text-slate-300 ml-1"></i></th>
+                            <th class="p-3" onclick="sortTable('mismatch', 'name')">לקוח <i class="fa-solid fa-sort text-slate-300 ml-1"></i></th>
+                            <th class="p-3">מספר חשבונית</th>
+                            <th class="p-3 text-center" onclick="sortTable('mismatch', 'sumQty')">כמות <i class="fa-solid fa-sort text-slate-300 ml-1"></i></th>
+                            <th class="p-3 bg-slate-50 border-r border-slate-200" onclick="sortTable('mismatch', 'expectedBase')">סכום צפוי <i class="fa-solid fa-sort text-slate-300 ml-1"></i></th>
+                            <th class="p-3 bg-amber-50/50 border-r border-amber-100" onclick="sortTable('mismatch', 'invoicedAmount')">חויב בפועל <i class="fa-solid fa-sort text-slate-300 ml-1"></i></th>
+                            <th class="p-3 bg-amber-50/50" onclick="sortTable('mismatch', 'displayGap')">סכום חסר לחיוב <i class="fa-solid fa-sort text-slate-300 ml-1"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbl-mismatch" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="display-settings-dialog" class="ui-dialog-backdrop" onclick="closeDialogOutside(event, 'display-settings-dialog')">
+        <div class="ui-dialog">
+            <div class="ui-dialog__header">
+                <h2>הגדרות תצוגה</h2>
+                <button class="dialog-close" onclick="closeDialog('display-settings-dialog')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="ui-dialog__body text-slate-600">
+                <p class="text-sm font-bold text-slate-500 mb-3">בחירת ערכת צבעים למערכת</p>
+                <div class="theme-options" role="radiogroup" aria-label="בחירת ערכת צבעים">
+                    <button type="button" class="theme-option" data-theme-choice="azure" role="radio" aria-checked="true" style="--theme-color:#0969c3" onclick="setAppTheme('azure')">
+                        <span class="theme-swatch" aria-hidden="true"></span><span>כחול ממלכתי</span><i class="fa-solid fa-check theme-check" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="theme-option" data-theme-choice="emerald" role="radio" aria-checked="false" style="--theme-color:#00875a" onclick="setAppTheme('emerald')">
+                        <span class="theme-swatch" aria-hidden="true"></span><span>ירוק צמיחה</span><i class="fa-solid fa-check theme-check" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="theme-option" data-theme-choice="violet" role="radio" aria-checked="false" style="--theme-color:#7047c8" onclick="setAppTheme('violet')">
+                        <span class="theme-swatch" aria-hidden="true"></span><span>סגול תבונה</span><i class="fa-solid fa-check theme-check" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="theme-option" data-theme-choice="graphite" role="radio" aria-checked="false" style="--theme-color:#536676" onclick="setAppTheme('graphite')">
+                        <span class="theme-swatch" aria-hidden="true"></span><span>אפור גרפיט</span><i class="fa-solid fa-check theme-check" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="ui-dialog__footer">
+                <button class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-4 py-2 rounded-md font-bold transition" onclick="closeDialog('display-settings-dialog')">סגור</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="about-dialog" class="ui-dialog-backdrop" onclick="closeDialogOutside(event, 'about-dialog')">
+        <div class="ui-dialog">
+            <div class="ui-dialog__header">
+                <h2>אודות המערכת</h2>
+                <button class="dialog-close" onclick="closeDialog('about-dialog')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="ui-dialog__body">
+                <div class="flex items-center gap-4 bg-blue-50 p-4 rounded-lg mb-4">
+                    <img src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה" class="w-12">
+                    <div>
+                        <strong class="text-blue-900 block">מודול בקרת חיוב שאילתות</strong>
+                        <span class="text-sm text-slate-600">משרד התחבורה והבטיחות בדרכים</span>
+                    </div>
+                </div>
+                <div class="text-sm text-slate-600 space-y-2">
+                    <p><strong>גרסת מערכת:</strong> 1.9.0 · יולי 2026</p>
+                    <p>המערכת תוכננה לבצע הצלבה חכמה בין קבצי צריכת המידע למערכות הנהלת החשבונות. תומכת בחישוב אגרות (ללא מע"מ) לפי מחירון דינמי משתנה (2023: 4.69₪, 2024: 4.78₪, 2025: 6.10₪, 2026: 6.93₪).</p>
+                    <p class="mt-4 pt-4 border-t border-slate-200 font-bold">פותח ע"י אביב מצא בעזרת בינה מלאכותית (AI).</p>
+                </div>
+            </div>
+            <div class="ui-dialog__footer">
+                <button class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-4 py-2 rounded-md font-bold transition" onclick="closeDialog('about-dialog')">סגור</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Themes Logic
+        function setAppTheme(themeId) {
+            document.documentElement.dataset.theme = themeId;
+            document.querySelectorAll('[data-theme-choice]').forEach(option => {
+                option.setAttribute('aria-checked', String(option.dataset.themeChoice === themeId));
+            });
+            try { localStorage.setItem('mot-theme-pref', themeId); } catch(e) {}
+        }
+        
+        try { 
+            const savedTheme = localStorage.getItem('mot-theme-pref') || 'azure';
+            setAppTheme(savedTheme);
+        } catch(e) {}
+
+        // קביעת חודש נוכחי כברירת מחדל לשדה "עד חודש שירות"
+        const today = new Date();
+        const currentMonthString = today.toISOString().substring(0, 7);
+        document.getElementById('filter-to').value = currentMonthString;
+        document.getElementById('sys-date').innerText = new Intl.DateTimeFormat('he-IL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(today);
+
+        const EXCLUDED_WORDS = ['רכב', 'נגרר', 'כתובות', 'בעלות', 'צמ"ה', 'הסעים', 'שיט', 'איתור', 'רישוי'];
+
+        function getRateByYear(year) {
+            const y = parseInt(year);
+            if (y >= 2026) return 6.93;
+            if (y === 2025) return 6.10;
+            if (y === 2024) return 4.78;
+            if (y <= 2023) return 4.69;
+            return 6.93;
+        }
+
+        let filesState = { inv: false, onl: false, bat: false };
+        let missingData = [];
+        let mismatchData = [];
+        let currentTab = 'missing';
+        
+        let sortState = {
+            missing: { key: 'expectedBase', asc: false },
+            mismatch: { key: 'displayGap', asc: false }
+        };
+
+        function setupUploader(inputId, lblId, stateKey) {
+            document.getElementById(inputId).addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    const lbl = document.getElementById(lblId);
+                    lbl.classList.add('is-loaded');
+                    lbl.querySelector('small').innerText = e.target.files[0].name;
+                    filesState[stateKey] = true;
+                }
+                checkAllFilesLoaded();
+            });
+        }
+        setupUploader('file-invoices', 'lbl-inv', 'inv');
+        setupUploader('file-online', 'lbl-onl', 'onl');
+        setupUploader('file-batch', 'lbl-bat', 'bat');
+
+        function checkAllFilesLoaded() {
+            document.getElementById('btn-run').disabled = !(filesState.inv && filesState.onl && filesState.bat);
+        }
+
+        function formatCurrency(n) { return new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS' }).format(n || 0); }
+        function cleanId(id) { return id ? String(id).trim().replace('.0', '') : null; }
+
+        function openDialog(id) { document.getElementById(id).classList.add('flex'); }
+        function closeDialog(id) { document.getElementById(id).classList.remove('flex'); }
+        function closeDialogOutside(e, id) { if (e.target === e.currentTarget) closeDialog(id); }
+
+        function showError(msg) {
+            document.getElementById('error-area').classList.remove('hidden');
+            document.getElementById('error-text').innerHTML = msg;
+            document.getElementById('loading-area').classList.add('hidden');
+        }
+
+        function toggleUploads() {
+            const grp = document.getElementById('upload-group');
+            const btn = document.getElementById('btn-edit-files');
+            if (grp.classList.contains('hidden')) {
+                grp.classList.remove('hidden');
+                btn.innerHTML = '<i class="fa-solid fa-chevron-up ml-1"></i>הסתר קבצים';
+            } else {
+                grp.classList.add('hidden');
+                btn.innerHTML = '<i class="fa-solid fa-file-pen ml-1"></i>החלף קבצים';
+            }
+        }
+
+        async function readExcel(file, skipRows) {
+            return new Promise((resolve, reject) => {
+                if (typeof XLSX === 'undefined') return reject(new Error('ספריית פענוח לא נטענה. ייתכן ויש חסימת אינטרנט.'));
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const wb = XLSX.read(e.target.result, {type: 'array'});
+                        const ws = wb.Sheets[wb.SheetNames[0]];
+                        const options = { raw: false };
+                        if (skipRows > 0) options.range = skipRows;
+                        resolve(XLSX.utils.sheet_to_json(ws, options));
+                    } catch (err) { reject(err); }
+                };
+                reader.onerror = () => reject(new Error('שגיאה בקריאת הקובץ.'));
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        function extractServiceMonth(text, defaultDateStr) {
+            if (text) {
+                const match = String(text).match(/(0?[1-9]|1[0-2])[./-](2[3-9])/);
+                if (match) return `20${match[2]}-${match[1].padStart(2, '0')}`;
+            }
+            if (defaultDateStr) {
+                let parts = defaultDateStr.split('/');
+                if (parts.length >= 3) return `${parts[2]}-${parts[1].padStart(2, '0')}`;
+                if (defaultDateStr.length >= 10 && defaultDateStr.includes('-')) return defaultDateStr.substring(0, 7);
+            }
+            return "Unknown";
+        }
+
+        function isValidTargetMonth(year, month) {
+            const fromVal = document.getElementById('filter-from').value;
+            const toVal = document.getElementById('filter-to').value;
+            const currentStr = `${year}-${String(month).padStart(2, '0')}`;
+            
+            if (fromVal && currentStr < fromVal) return false;
+            if (toVal && currentStr > toVal) return false;
+            return true;
+        }
+
+        async function runAnalysis() {
+            document.getElementById('error-area').classList.add('hidden');
+            document.getElementById('dashboard-area').classList.add('hidden');
+            document.getElementById('loading-area').classList.remove('hidden');
+            document.getElementById('loading-area').classList.add('flex');
+
+            try {
+                const fInv = document.getElementById('file-invoices').files[0];
+                const fOnl = document.getElementById('file-online').files[0];
+                const fBat = document.getElementById('file-batch').files[0];
+
+                const invoices = await readExcel(fInv, 0);
+                const online = await readExcel(fOnl, 3);
+                const batch = await readExcel(fBat, 3);
+
+                document.getElementById('upload-group').classList.add('hidden');
+                document.getElementById('btn-edit-files').classList.remove('hidden');
+                document.getElementById('btn-edit-files').innerHTML = '<i class="fa-solid fa-file-pen ml-1"></i>החלף קבצים';
+
+                processData(invoices, online, batch);
+            } catch (e) {
+                showError("תהליך נכשל: " + e.message);
+                console.error(e);
+            }
+        }
+
+        function processData(invoices, online, batch) {
+            const aggregatedQueries = new Map();
+
+            const parseQueries = (data, type) => {
+                data.forEach(row => {
+                    let kod = cleanId(row['קוד מרכבה']);
+                    let year = parseInt(row['שנה']);
+                    let month = parseInt(row['חודש פעילות']);
+                    let qty = parseFloat(row['כמות חודשית']);
+                    let name = row['גורם'];
+
+                    if (kod && !isNaN(qty) && qty > 0 && isValidTargetMonth(year, month)) {
+                        let mStr = String(month).padStart(2, '0');
+                        let key = `${kod}_${year}-${mStr}`;
+                        
+                        if (!aggregatedQueries.has(key)) {
+                            aggregatedQueries.set(key, { kod, name, year, displayMonth: `${mStr}/${year}`, qtyOnl: 0, qtyBat: 0 });
+                        }
+                        if (type === 'online') aggregatedQueries.get(key).qtyOnl += qty;
+                        if (type === 'batch') aggregatedQueries.get(key).qtyBat += qty;
+                    }
+                });
+            };
+
+            parseQueries(online, 'online');
+            parseQueries(batch, 'batch');
+
+            const invoicesMap = new Map();
+            invoices.forEach(row => {
+                let kod = cleanId(row['לקוח']);
+                let amt = parseFloat(row['סכום במטבע מסמך']);
+                let text = row['טקסט'] || '';
+                let dateStr = String(row['תאריך רישום'] || '');
+                let invNum = String(row['מספר מסמך'] || '');
+
+                if (kod && !isNaN(amt)) {
+                    let sMonth = extractServiceMonth(text, dateStr);
+                    let key = `${kod}_${sMonth}`;
+                    if (!invoicesMap.has(key)) invoicesMap.set(key, []);
+                    invoicesMap.get(key).push({ amt, text, invNum });
+                }
+            });
+
+            missingData = [];
+            mismatchData = [];
+            let totalQueries = 0;
+            
+            let missingLostRevenue = 0; 
+            let mismatchLostRevenue = 0; 
+            let mismatchRefunds = 0; 
+            
+            let totalAbsoluteLost = 0; 
+            let totalFilteredLost = 0; 
+
+            const gapThreshold = parseFloat(document.getElementById('gap-threshold').value) || 0;
+
+            aggregatedQueries.forEach((qData, key) => {
+                let sumQty = qData.qtyOnl + qData.qtyBat;
+                let rate = getRateByYear(qData.year);
+                let expectedBase = sumQty * rate; 
+                
+                totalQueries += sumQty;
+
+                let qType = (qData.qtyOnl > 0 && qData.qtyBat > 0) ? "משולב" : (qData.qtyOnl > 0 ? "און-ליין" : "אצווה");
+                let clientInvs = invoicesMap.get(key) || [];
+
+                let validInvs = clientInvs.filter(inv => {
+                    if (Math.abs(inv.amt - expectedBase) < 5) return true;
+                    return !EXCLUDED_WORDS.some(w => String(inv.text).includes(w));
+                });
+
+                let invoicedAmount = validInvs.reduce((sum, inv) => sum + inv.amt, 0);
+                let invNumbers = validInvs.map(i => i.invNum).join(', ') || 'אין';
+
+                let lostForClient = expectedBase - invoicedAmount; 
+
+                if (lostForClient > 0) {
+                    totalAbsoluteLost += lostForClient;
+                }
+
+                if (invoicedAmount === 0) {
+                    if (expectedBase >= gapThreshold) {
+                        missingData.push({ ...qData, sumQty, qType, expectedBase });
+                        missingLostRevenue += expectedBase;
+                        totalFilteredLost += expectedBase;
+                    }
+                } else {
+                    let absGap = Math.abs(lostForClient);
+                    if (absGap >= gapThreshold) {
+                        mismatchData.push({ ...qData, sumQty, invNumbers, expectedBase, invoicedAmount, displayGap: lostForClient });
+                        
+                        if (lostForClient > 0) {
+                            mismatchLostRevenue += lostForClient;
+                            totalFilteredLost += lostForClient;
+                        } else {
+                            mismatchRefunds += Math.abs(lostForClient);
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('kpi-queries').innerText = totalQueries.toLocaleString();
+            
+            document.getElementById('kpi-lost-filtered').innerText = formatCurrency(totalFilteredLost);
+            document.getElementById('kpi-lost-absolute').innerText = formatCurrency(totalAbsoluteLost);
+
+            document.getElementById('kpi-missing').innerText = missingData.length;
+            document.getElementById('kpi-missing-lost').innerText = formatCurrency(missingLostRevenue);
+
+            document.getElementById('kpi-mismatch').innerText = mismatchData.length;
+            document.getElementById('kpi-mismatch-lost').innerText = formatCurrency(mismatchLostRevenue);
+            document.getElementById('kpi-mismatch-refund').innerText = formatCurrency(mismatchRefunds);
+
+            const fFrom = document.getElementById('filter-from').value;
+            const fTo = document.getElementById('filter-to').value;
+            let dateLabel = "בטווח הנתונים הנבחר";
+            if (fFrom && fTo) dateLabel = `מתאריך ${fFrom} ועד ${fTo}`;
+            else if (fFrom) dateLabel = `החל מתאריך ${fFrom}`;
+            else if (fTo) dateLabel = `עד תאריך ${fTo}`;
+            document.getElementById('kpi-date-label').innerText = dateLabel;
+
+            renderMissing();
+            renderMismatch();
+
+            document.getElementById('loading-area').classList.add('hidden');
+            document.getElementById('loading-area').classList.remove('flex');
+            document.getElementById('dashboard-area').classList.remove('hidden');
+        }
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+            
+            const btnMissing = document.getElementById('btn-tab-missing');
+            const btnMismatch = document.getElementById('btn-tab-mismatch');
+            const contMissing = document.getElementById('container-missing');
+            const contMismatch = document.getElementById('container-mismatch');
+
+            if (tabName === 'missing') {
+                btnMissing.className = "text-lg font-bold text-red-800 border-b-4 border-red-800 pb-1 transition-all";
+                btnMismatch.className = "text-lg font-bold text-slate-400 border-b-4 border-transparent hover:text-amber-800 pb-1 transition-all";
+                contMissing.classList.remove('hidden');
+                contMismatch.classList.add('hidden');
+            } else {
+                btnMismatch.className = "text-lg font-bold text-amber-800 border-b-4 border-amber-800 pb-1 transition-all";
+                btnMissing.className = "text-lg font-bold text-slate-400 border-b-4 border-transparent hover:text-red-800 pb-1 transition-all";
+                contMismatch.classList.remove('hidden');
+                contMissing.classList.add('hidden');
+            }
+        }
+
+        function sortTable(tableType, key) {
+            let config = sortState[tableType];
+            if (config.key === key) config.asc = !config.asc;
+            else { config.key = key; config.asc = false; }
+            
+            let arr = tableType === 'missing' ? missingData : mismatchData;
+            arr.sort((a, b) => {
+                let valA = a[key]; let valB = b[key];
+                if (typeof valA === 'string') return config.asc ? valA.localeCompare(valB, 'he') : valB.localeCompare(valA, 'he');
+                return config.asc ? valA - valB : Math.abs(valB) - Math.abs(valA);
+            });
+
+            if (tableType === 'missing') renderMissing();
+            else renderMismatch();
+        }
+
+        function renderMissing() {
+            const tbody = document.getElementById('tbl-missing');
+            tbody.innerHTML = '';
+            missingData.forEach(r => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-red-50/50 transition-colors">
+                        <td class="p-3 font-bold text-center" dir="ltr">${r.displayMonth}</td>
+                        <td class="p-3">${r.kod}</td>
+                        <td class="p-3 font-bold text-slate-700">${r.name}</td>
+                        <td class="p-3 text-center"><span class="bg-slate-100 px-2 py-1 rounded text-xs text-slate-600">${r.qType}</span></td>
+                        <td class="p-3 text-center font-bold">${r.sumQty.toLocaleString()}</td>
+                        <td class="p-3 font-bold text-red-700">${formatCurrency(r.expectedBase)}</td>
+                    </tr>
+                `;
+            });
+            if(missingData.length === 0) tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">לא אותרו חשבוניות חסרות (מעל רף הפער)</td></tr>`;
+        }
+
+        function renderMismatch() {
+            const tbody = document.getElementById('tbl-mismatch');
+            tbody.innerHTML = '';
+            mismatchData.forEach(r => {
+                let gapColor = r.displayGap > 0 ? 'text-red-600' : 'text-emerald-600';
+                let sign = r.displayGap > 0 ? '+' : '';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-amber-50/30 transition-colors">
+                        <td class="p-3 font-bold text-center" dir="ltr">${r.displayMonth}</td>
+                        <td class="p-3 font-bold text-slate-700">${r.name}</td>
+                        <td class="p-3 text-slate-500">${r.invNumbers}</td>
+                        <td class="p-3 text-center font-bold">${r.sumQty.toLocaleString()}</td>
+                        <td class="p-3 bg-slate-50/50 border-r border-slate-200">${formatCurrency(r.expectedBase)}</td>
+                        <td class="p-3 font-bold text-slate-800 bg-amber-50/20 border-r border-amber-100/50">${formatCurrency(r.invoicedAmount)}</td>
+                        <td class="p-3 font-bold ${gapColor} bg-amber-50/20" dir="ltr" style="text-align:right;">${sign}${formatCurrency(r.displayGap)}</td>
+                    </tr>
+                `;
+            });
+            if(mismatchData.length === 0) tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">לא אותרו אי-התאמות מעל רף הפער המוגדר</td></tr>`;
+        }
+
+        function exportActiveTab() {
+            if (currentTab === 'missing') exportExcel(missingData, 'Missing_Invoices');
+            else exportExcel(mismatchData, 'Mismatched_Invoices');
+        }
+
+        function exportExcel(dataArray, fileName) {
+            if (!dataArray || dataArray.length === 0) return alert('אין נתונים לייצוא');
+            
+            const cleanData = dataArray.map(r => {
+                let obj = {
+                    'לקוח (קוד)': r.kod,
+                    'שם לקוח': r.name,
+                    'חודש שירות': r.displayMonth,
+                    'כמות שאילתות': r.sumQty,
+                    'סכום צפוי (בש"ח)': parseFloat(r.expectedBase.toFixed(2))
+                };
+                if (r.invNumbers !== undefined) {
+                    obj['מספרי חשבוניות'] = r.invNumbers;
+                    obj['חויב בפועל'] = parseFloat(r.invoicedAmount.toFixed(2));
+                    obj['סכום חסר לחיוב'] = parseFloat(r.displayGap.toFixed(2));
+                }
+                return obj;
+            });
+
+            const ws = XLSX.utils.json_to_sheet(cleanData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "דוח בקרה");
+            XLSX.writeFile(wb, `${fileName}_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        function printActiveTab() {
+            if (currentTab === 'missing') printReport('דוח חשבוניות חסרות', missingData, 'missing');
+            else printReport('דוח פערים בחיוב', mismatchData, 'mismatch');
+        }
+
+        function printReport(title, dataArray, type) {
+            if (!dataArray || dataArray.length === 0) return alert('אין נתונים להדפסה');
+            
+            const win = window.open('', '_blank');
+            let tableHtml = "";
+
+            if (type === 'missing') {
+                tableHtml = `<table><thead><tr><th>חודש פעילות</th><th>קוד לקוח</th><th>שם לקוח</th><th>כמות שאילתות</th><th>חיוב חסר (בש"ח)</th></tr></thead><tbody>`;
+                dataArray.forEach(r => {
+                    tableHtml += `<tr><td dir="ltr" style="text-align:right">${r.displayMonth}</td><td>${r.kod}</td><td>${r.name}</td><td>${r.sumQty}</td><td style="color:#b91c1c; font-weight:bold;">${formatCurrency(r.expectedBase)}</td></tr>`;
+                });
+                tableHtml += `</tbody></table>`;
+            } else {
+                tableHtml = `<table><thead><tr><th>חודש</th><th>לקוח</th><th>חשבוניות</th><th>כמות</th><th>סכום צפוי</th><th>חויב בפועל</th><th>סכום חסר לחיוב</th></tr></thead><tbody>`;
+                dataArray.forEach(r => {
+                    let color = r.displayGap > 0 ? '#b91c1c' : '#047857';
+                    let sign = r.displayGap > 0 ? '+' : '';
+                    tableHtml += `<tr><td dir="ltr" style="text-align:right">${r.displayMonth}</td><td>${r.name}</td><td>${r.invNumbers}</td><td>${r.sumQty}</td><td>${formatCurrency(r.expectedBase)}</td><td>${formatCurrency(r.invoicedAmount)}</td><td dir="ltr" style="text-align:right; color:${color}; font-weight:bold;">${sign}${formatCurrency(r.displayGap)}</td></tr>`;
+                });
+                tableHtml += `</tbody></table>`;
+            }
+
+            win.document.write(`
+                <html dir="rtl" lang="he">
+                <head><title>${title}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 40px; color: #333; }
+                    .header { border-bottom: 2px solid #0969c3; padding-bottom: 10px; margin-bottom: 30px; display: flex; justify-content: space-between; }
+                    h2 { color: #0969c3; text-align: center; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: right; }
+                    th { background: #f8f9fa; }
+                    tr:nth-child(even) { background-color: #f9f9f9; }
+                </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div><b>משרד התחבורה והבטיחות בדרכים</b><br>אגף טכנולוגיות דיגיטליות ומידע</div>
+                        <div>תאריך הפקה: ${new Date().toLocaleDateString('he-IL')}</div>
+                    </div>
+                    <h2>${title}</h2>
+                    ${tableHtml}
+                    <script>
+                        window.focus();
+                        setTimeout(() => window.print(), 300);
+                    <\/script>
+                </body>
+                </html>
+            `);
+            win.document.close();
+        }
+    </script>
+</body>
+</html>
