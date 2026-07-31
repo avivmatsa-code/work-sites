@@ -2623,7 +2623,7 @@
                     a { color: var(--print-brand); }
                     @page {
                         size: A4 portrait;
-                        margin: 12mm 17mm 10mm;
+                        margin: 0;
                     }
                     @media print {
                         html, body { width: auto; min-height: 0; }
@@ -2634,6 +2634,9 @@
                             -webkit-print-color-adjust: exact;
                             print-color-adjust: exact;
                         }
+                        .print-page-shell > thead > tr > td { padding: 10mm 17mm 0; }
+                        .print-page-shell > tbody > tr > td { padding: 4mm 17mm !important; }
+                        .print-page-shell > tfoot > tr > td { padding: 0 17mm 8mm; }
                         .print-header {
                             height: 20mm;
                             min-height: 0;
@@ -2646,7 +2649,6 @@
                         .print-header__department { font-size: 8pt; }
                         .print-header__title { font-size: 9pt; }
                         .print-header__date { font-size: 7.5pt; }
-                        .print-page-content { padding-top: 4mm !important; padding-bottom: 4mm !important; }
                         .print-content { margin: 0; }
                         .print-footer {
                             height: 12mm;
