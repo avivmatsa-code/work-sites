@@ -2539,6 +2539,162 @@
             win.document.close();
         }
 
+        function getClientDocumentPrintStyles() {
+            return `
+                <style>
+                    :root {
+                        --print-brand: #064b8d;
+                        --print-brand-soft: #edf5fb;
+                        --print-text: #1f2933;
+                        --print-muted: #607080;
+                        --print-border: #cbd5df;
+                        --print-surface: #f7f9fb;
+                        --print-success: #16834f;
+                        --print-danger: #c0363f;
+                    }
+                    * { box-sizing: border-box; font-family: Arial, "Noto Sans Hebrew", sans-serif !important; }
+                    html, body { margin: 0; padding: 0; color: var(--print-text); background: #fff; }
+                    body { padding: 32px 48px; font-size: 13px; line-height: 1.55; }
+                    .print-page-shell { width: 100%; margin: 0; border: 0; border-collapse: collapse; font-size: inherit; }
+                    .print-page-shell > thead { display: table-header-group; }
+                    .print-page-shell > tfoot { display: table-footer-group; }
+                    .print-page-shell > thead > tr > td,
+                    .print-page-shell > tbody > tr > td,
+                    .print-page-shell > tfoot > tr > td { padding: 0; border: 0; background: #fff; }
+                    .print-header {
+                        min-height: 72px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        gap: 18px;
+                        padding-bottom: 10px;
+                        border-bottom: 2px solid var(--print-brand);
+                    }
+                    .print-header__brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+                    .print-header__logo { width: 56px; height: 56px; object-fit: contain; flex: 0 0 56px; }
+                    .print-header__ministry { font-size: 15px; line-height: 1.3; font-weight: 700; color: var(--print-brand); }
+                    .print-header__department { margin-top: 2px; font-size: 11px; color: var(--print-muted); }
+                    .print-header__document { max-width: 48%; text-align: left; }
+                    .print-header__title { font-size: 13px; line-height: 1.35; font-weight: 700; color: var(--print-brand); }
+                    .print-header__date { margin-top: 3px; font-size: 10px; color: var(--print-muted); }
+                    .print-content { margin-top: 24px; }
+                    .print-footer {
+                        margin-top: 36px;
+                        min-height: 42px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        gap: 16px;
+                        border-top: 1px solid var(--print-border);
+                        padding-top: 8px;
+                        color: var(--print-muted);
+                        font-size: 9px;
+                    }
+                    .print-footer a { color: var(--print-brand); text-decoration: none; }
+                    .document-recipient { margin: 22px 0 18px; }
+                    .document-title { margin: 22px 0; text-align: center; color: var(--print-brand); font-size: 18px; line-height: 1.4; }
+                    .print-content table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
+                    .print-content thead { display: table-header-group; }
+                    .print-content tfoot { display: table-footer-group; }
+                    .print-content tr, .print-content td, .print-content th { break-inside: avoid; page-break-inside: avoid; }
+                    .print-content th, .print-content td { border: 1px solid var(--print-border); padding: 8px 9px; text-align: right; vertical-align: top; }
+                    .print-content th { background: var(--print-brand-soft); color: #26384a; font-weight: 700; }
+                    .print-content tbody tr:nth-child(even) { background: #fbfcfd; }
+                    .signature-area, .signature-box, .payment-section, .report-chart, .report-summary {
+                        break-inside: avoid;
+                        page-break-inside: avoid;
+                    }
+                    .signature-area { margin-top: 48px; display: flex; justify-content: flex-end; }
+                    .signature-box { width: 340px; display: flex; flex-direction: column; }
+                    a { color: var(--print-brand); }
+                    @page {
+                        size: A4 portrait;
+                        margin: 12mm 17mm 10mm;
+                    }
+                    @media print {
+                        html, body { width: auto; min-height: 0; }
+                        body {
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            font-size: 10.5pt;
+                            -webkit-print-color-adjust: exact;
+                            print-color-adjust: exact;
+                        }
+                        .print-header {
+                            height: 20mm;
+                            min-height: 0;
+                            margin-bottom: 5mm;
+                            padding-bottom: 2.5mm;
+                            background: #fff;
+                        }
+                        .print-header__logo { width: 16mm; height: 16mm; flex-basis: 16mm; }
+                        .print-header__ministry { font-size: 11pt; }
+                        .print-header__department { font-size: 8pt; }
+                        .print-header__title { font-size: 9pt; }
+                        .print-header__date { font-size: 7.5pt; }
+                        .print-page-content { padding-top: 4mm !important; padding-bottom: 4mm !important; }
+                        .print-content { margin: 0; }
+                        .print-footer {
+                            height: 12mm;
+                            min-height: 0;
+                            margin-top: 5mm;
+                            padding-top: 2mm;
+                            background: #fff;
+                            font-size: 7.5pt;
+                        }
+                        .print-content table { font-size: 8.5pt; }
+                        .print-content th, .print-content td { padding: 2.2mm 2.4mm; }
+                    }
+                </style>
+            `;
+        }
+
+        function getClientDocumentPrintHeader(documentTitle) {
+            const logoUrl = 'https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg';
+            return `
+                <header class="print-header">
+                    <div class="print-header__brand">
+                        <img class="print-header__logo" src="${logoUrl}" alt="סמל משרד התחבורה והבטיחות בדרכים">
+                        <div>
+                            <div class="print-header__ministry">משרד התחבורה והבטיחות בדרכים</div>
+                            <div class="print-header__department">אגף טכנולוגיות דיגיטליות ומידע</div>
+                        </div>
+                    </div>
+                    <div class="print-header__document">
+                        <div class="print-header__title">${documentTitle}</div>
+                        <div class="print-header__date">תאריך הפקה: ${new Date().toLocaleDateString('he-IL')}</div>
+                    </div>
+                </header>
+            `;
+        }
+
+        function getClientDocumentPrintFooter() {
+            return `
+                <footer class="print-footer">
+                    <span>מחלקת שירות לקוחות וגבייה · אגף טכנולוגיות דיגיטליות ומידע</span>
+                    <span><a href="mailto:customer@mot.gov.il">customer@mot.gov.il</a> · מסמך שהופק ממערכת ניהול הכנסות וגבייה</span>
+                </footer>
+            `;
+        }
+
+        function getClientDocumentPageStart(documentTitle) {
+            return `
+                <table class="print-page-shell">
+                    <thead><tr><td>${getClientDocumentPrintHeader(documentTitle)}</td></tr></thead>
+                    <tfoot><tr><td>${getClientDocumentPrintFooter()}</td></tr></tfoot>
+                    <tbody><tr><td class="print-page-content">
+                        <main class="print-content">
+            `;
+        }
+
+        function getClientDocumentPageEnd() {
+            return `
+                        </main>
+                    </td></tr></tbody>
+                </table>
+            `;
+        }
+
         async function generateAction(mode) {
             const clientCode = db.filter(r => r.name === path.orgName).length > 0 ? db.filter(r => r.name === path.orgName)[0].code : '-';
             const typeText = incomeFilter === 'all' ? 'כלל השירותים' : (incomeFilter === 'fees' ? 'אגרות העברת בעלות' : 'שירותי מידע');
@@ -2570,7 +2726,7 @@
                 const maxVal = Math.max(...monthlyTotals, 1);
 
                 const chartHtml = `
-                    <div style="margin-top: 40px; page-break-inside: avoid; break-inside: avoid;">
+                    <div class="report-chart" style="margin-top: 40px; page-break-inside: avoid; break-inside: avoid;">
                         <h3 style="font-size: 15px; font-bold; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 20px; color:#333;">ריכוז חיובים חודשי לשנת ${CURRENT_YEAR} (בש"ח)</h3>
                         <div style="display: flex; justify-content: space-between; align-items: flex-end; height: 160px; padding: 20px; background: #f8f9fa; border-radius: 12px; border: 1px solid #ddd;">
                             ${MONTH_NAMES.map((mName, idx) => {
@@ -2599,7 +2755,7 @@
                 let pastTableHtml = "";
                 if (clientHasOverdueDebt && pastYearsDebts.length > 0) {
                     pastTableHtml = `
-                        <div style="page-break-inside: avoid; break-inside: avoid; margin-top: 45px;">
+                        <div class="report-summary" style="page-break-inside: avoid; break-inside: avoid; margin-top: 45px;">
                             <h3 style="border-bottom: 2px solid #ef4444; padding-bottom: 5px; font-size:15px; color:#b91c1c; font-bold;">ריכוז חובות פתוחים משנים קודמות</h3>
                             <table>
                                 <thead>
@@ -2659,8 +2815,10 @@
 
                 const autoPrintScript = `
                     <script>
-                        window.focus();
-                        setTimeout(function() { window.print(); }, 250);
+                        window.addEventListener('load', function() {
+                            window.focus();
+                            setTimeout(function() { window.print(); }, 350);
+                        });
                     <\/script>
                 `;
 
@@ -2679,25 +2837,12 @@
 
                 win.document.write(`
                     <html dir="rtl" lang="he"><head><title>דוח שנתי ללקוח - ${path.orgName}</title>
-                    <style>
-                        * { font-family: 'Arial', sans-serif !important; }
-                        body { font-family: 'Arial', sans-serif; padding: 60px; line-height: 1.6; color: #333; }
-                        .header { display: flex; justify-content: space-between; border-bottom: 3px solid #0B3C5D; padding-bottom: 10px; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                        th, td { border: 1px solid #ddd; padding: 10px; text-align: right; }
-                        th { background: #f8f9fa; }
-                        .signature-area { margin-top: 80px; display: flex; justify-content: flex-end; }
-                        .signature-box { width: 380px; display: flex; flex-direction: column; }
-                        @media print {
-                            @page { margin: 0; }
-                            body { margin: 2cm; padding: 0; }
-                        }
-                    </style>
+                    ${getClientDocumentPrintStyles()}
                     </head>
                     <body>
-                        <div class="header"><div><b style="font-size:18px">משרד התחבורה והבטיחות בדרכים</b><br>אגף טכנולוגיות דיגיטליות ומידע</div><div>${new Date().toLocaleDateString('he-IL')}</div></div>
-                        <p style="margin-top:30px">לכבוד: <br><b style="font-size:18px">${path.orgName}</b></p>
-                        <h2 style="text-align:center; margin: 30px 0; font-size:18px; font-bold;">דוח שנתי ללקוח - שנת ${CURRENT_YEAR}</h2>
+                        ${getClientDocumentPageStart('דוח שנתי ללקוח - שנת ' + CURRENT_YEAR)}
+                        <p class="document-recipient">לכבוד: <br><b style="font-size:18px">${path.orgName}</b></p>
+                        <h2 class="document-title">דוח שנתי ללקוח - שנת ${CURRENT_YEAR}</h2>
                         <p>אנו מתכבדים להציג לכם סיכום של החיובים לשנה זו:</p>
                         
                         <table>
@@ -2732,7 +2877,7 @@
                         ${chartHtml}
                         ${pastTableHtml}
 
-                        <div style="page-break-inside: avoid; break-inside: avoid; margin-top: 30px;">
+                        <div class="payment-section" style="page-break-inside: avoid; break-inside: avoid; margin-top: 30px;">
                             ${paymentLinkHtml}
                             <div class="signature-area">
                                 <div class="signature-box">
@@ -2746,6 +2891,7 @@
                                 </div>
                             </div>
                         </div>
+                        ${getClientDocumentPageEnd()}
                         ${autoPrintScript}
                     </body></html>
                 `);
@@ -2766,41 +2912,28 @@
 
             const autoPrintScript = (mode === 'print' || mode === 'download') ? `
                 <script>
-                    window.focus();
-                    setTimeout(function() {
-                        window.print();
-                    }, 250);
+                    window.addEventListener('load', function() {
+                        window.focus();
+                        setTimeout(function() { window.print(); }, 350);
+                    });
                 <\/script>
             ` : '';
 
             win.document.write(`
                 <html dir="rtl" lang="he"><head><title>ריכוז חשבוניות פתוחות - ${path.orgName}</title>
-                <style>
-                    * { font-family: 'Arial', sans-serif !important; }
-                    body { font-family: 'Arial', sans-serif; padding: 60px; line-height: 1.6; color: #333; }
-                    .header { display: flex; justify-content: space-between; border-bottom: 3px solid #0B3C5D; padding-bottom: 10px; margin-bottom: 25px; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 30px; }
-                    th, td { border: 1px solid #ddd; padding: 12px; text-align: right; }
-                    th { background: #f8f9fa; }
-                    .signature-area { margin-top: 80px; display: flex; justify-content: flex-end; }
-                    .signature-box { width: 380px; display: flex; flex-direction: column; }
-                    @media print {
-                        @page { margin: 0; }
-                        body { margin: 2cm; padding: 0; }
-                    }
-                </style>
+                ${getClientDocumentPrintStyles()}
                 </head>
                 <body>
-                    <div class="header"><div><b style="font-size:18px">משרד התחבורה והבטיחות בדרכים</b><br>אגף טכנולוגיות דיגיטליות ומידע</div><div>${new Date().toLocaleDateString('he-IL')}</div></div>
-                    <p style="margin-top:40px">לכבוד: <br><b style="font-size:18px">${path.orgName}</b></p>
-                    <h2 style="text-align:center; margin: 40px 0">ריכוז חשבוניות פתוחות עבור ${typeText}</h2>
+                    ${getClientDocumentPageStart('מכתב חוב - ריכוז חשבוניות פתוחות')}
+                    <p class="document-recipient">לכבוד: <br><b style="font-size:18px">${path.orgName}</b></p>
+                    <h2 class="document-title">ריכוז חשבוניות פתוחות עבור ${typeText}</h2>
                     <p>שלום רב,<br>להלן פירוט החשבוניות והחיובים הפתוחים במערכותינו שטרם הותאמו:</p>
                     
                     <table><thead><tr><th>מספר מסמך</th><th>מועד פירעון</th><th>תיאור השירות</th><th style="text-align:left">סכום בש"ח</th></tr></thead>
                     <tbody>${overdueRows.map(r => `<tr><td>${r.doc}</td><td>${r.dueDate.toLocaleDateString('he-IL')}</td><td>${r.desc}</td><td style="text-align:left">${formatCurrency(r.amount)}</td></tr>`).join('')}
                     <tr style="font-bold; background:#eee"><td colspan="3">סה"כ לתשלום</td><td style="text-align:left">${formatCurrency(total)}</td></tr></tbody></table>
                     
-                    <div style="page-break-inside: avoid; break-inside: avoid; margin-top: 30px;">
+                    <div class="payment-section" style="page-break-inside: avoid; break-inside: avoid; margin-top: 30px;">
                         <div style="font-size: 14px; color: #333; line-height: 1.8;">
                             <p style="margin-bottom: 8px;">להלן הקישור לתשלום החוב בשרת התשלומים: <a href="https://ecom.gov.il/voucherspa/input/414" target="_blank" style="color: #0B3C5D; font-bold; text-decoration: underline;">https://ecom.gov.il/voucherspa/input/414</a></p>
                             <p style="margin-bottom: 16px;">מספר לקוח במרכבה: <b>${clientCode}</b></p>
@@ -2821,6 +2954,7 @@
                             </div>
                         </div>
                     </div>
+                    ${getClientDocumentPageEnd()}
                     ${autoPrintScript}
                 </body></html>`);
             win.document.close();
