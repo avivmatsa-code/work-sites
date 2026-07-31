@@ -1659,17 +1659,26 @@
             document.getElementById('db-debtors-body').innerHTML = debtorsHTML;
         }
 
+        function getDashboardPrintTitle(stageA, stageB) {
+            const activityTitle = stageA === 'fees' ? 'אגרות העברת בעלות' : (stageA === 'info' ? 'שירותי מידע' : 'סיכום משולב');
+            const sectorTitles = {
+                'all-sectors': 'כלל הסקטורים',
+                'gov': 'משרדי ממשלה',
+                'gov-auth': 'רשויות וחברות ממשלתיות',
+                'local': 'רשויות מקומיות',
+                'private': 'לקוחות פרטיים'
+            };
+            return activityTitle + ' - ' + (sectorTitles[stageB] || 'כלל הסקטורים');
+        }
+
         function printDashboardCurrent() {
-            window.print();
+            printDashboardReport([
+                { stageA: dashStageA, stageB: dashStageB, title: getDashboardPrintTitle(dashStageA, dashStageB) }
+            ], 'דוח תמונת מצב - הכנסות וגבייה ' + CURRENT_YEAR);
         }
 
         function printDashboardAll() {
-            const win = window.open('', '_blank');
-            if (!win) {
-                alert("פתיחת החלון החדש נחסמה."); return;
-            }
-
-            const printConfigs = [
+            printDashboardReport([
                 { stageA: 'info', stageB: 'all-sectors', title: 'שירותי מידע - כלל הסקטורים' },
                 { stageA: 'info', stageB: 'gov', title: 'שירותי מידע - משרדי ממשלה' },
                 { stageA: 'info', stageB: 'gov-auth', title: 'שירותי מידע - רשויות וחברות ממשלתיות' },
@@ -1677,25 +1686,21 @@
                 { stageA: 'info', stageB: 'private', title: 'שירותי מידע - לקוחות פרטיים' },
                 { stageA: 'fees', stageB: 'all-sectors', title: 'אגרות העברת בעלות - כלל הסקטורים' },
                 { stageA: 'all', stageB: 'all-sectors', title: 'סיכום משולב (הכל)' }
-            ];
+            ], 'דוח מאוחד - הכנסות וגבייה ' + CURRENT_YEAR);
+        }
+
+        function printDashboardReport(printConfigs, documentTitle) {
+            const win = window.open('', '_blank');
+            if (!win) {
+                alert("פתיחת החלון החדש נחסמה."); return;
+            }
 
             let documentHTML = `
-                <html dir="rtl" lang="he"><head><title>דוח מאוחד - הכנסות וגבייה ${CURRENT_YEAR}</title>
-                <style>
-                    * { font-family: 'Arial', sans-serif !important; }
-                    body { font-family: 'Arial', sans-serif; padding: 40px; color: #333; }
-                    .header { display: flex; justify-content: space-between; border-bottom: 3px solid #0B3C5D; padding-bottom: 10px; margin-bottom: 25px; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 25px; font-size: 12px; }
-                    th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: right; }
-                    th { background: #f8f9fa; }
-                    .page-break { page-break-after: always; }
-                    .kpis { display: flex; gap: 15px; margin-bottom: 20px; }
-                    .kpi-card { flex: 1; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; background: #fafafa; }
-                    .kpi-title { font-size: 10px; color: #666; font-weight: bold; }
-                    .kpi-value { font-size: 18px; font-weight: 900; margin-top: 4px; }
-                </style>
+                <html dir="rtl" lang="he"><head><title>${documentTitle}</title>
+                ${getClientDocumentPrintStyles()}
                 </head>
                 <body>
+                    ${getClientDocumentPageStart(documentTitle)}
             `;
 
             printConfigs.forEach((config, idx) => {
@@ -1726,11 +1731,7 @@
                 dashStageB = dashStageB_orig;
 
                 documentHTML += `
-                    <div class="${idx < printConfigs.length - 1 ? 'page-break' : ''}">
-                        <div class="header">
-                            <div><b style="font-size:16px">משרד התחבורה והבטיחות בדרכים</b><br><span style="font-size:12px">אגף טכנולוגיות דיגיטליות ומידע</span></div>
-                            <div>תאריך הפקה: ${new Date().toLocaleDateString('he-IL')}</div>
-                        </div>
+                    <section class="report-section ${idx < printConfigs.length - 1 ? 'report-page-break' : ''}">
                         <h2 style="text-align:center; color:#0B3C5D; margin-bottom: 20px;">דוח גבייה והכנסות: ${config.title}</h2>
                         
                         <div class="kpis">
@@ -1770,16 +1771,22 @@
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
+                    </section>
                 `;
             });
 
-            documentHTML += `</body></html>`;
+            documentHTML += `
+                    ${getClientDocumentPageEnd()}
+                    <script>
+                        window.addEventListener('load', function() {
+                            window.focus();
+                            setTimeout(function() { window.print(); }, 350);
+                        });
+                    <\/script>
+                </body></html>`;
             win.document.write(documentHTML);
             win.document.close();
 
-            win.focus();
-            setTimeout(function() { win.print(); }, 500);
         }
 
         function refresh() {
@@ -2345,33 +2352,19 @@
 
             const printScript = `
                 <script>
-                    window.focus();
-                    setTimeout(function() { window.print(); }, 250);
+                    window.addEventListener('load', function() {
+                        window.focus();
+                        setTimeout(function() { window.print(); }, 350);
+                    });
                 <\/script>
             `;
 
             win.document.write(`
                 <html dir="rtl" lang="he"><head><title>ריכוז לקוחות - קבוצת ${path.sector}</title>
-                <style>
-                    * { font-family: 'Arial', sans-serif !important; }
-                    body { font-family: 'Arial', sans-serif; padding: 60px; line-height: 1.6; color: #333; }
-                    .header { display: flex; justify-content: space-between; border-bottom: 3px solid #0B3C5D; padding-bottom: 10px; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 30px; }
-                    th, td { border: 1px solid #ddd; padding: 12px; text-align: right; }
-                    th { background: #f8f9fa; }
-                    .signature-area { margin-top: 80px; display: flex; justify-content: flex-end; page-break-inside: avoid; break-inside: avoid; }
-                    .signature-box { width: 380px; display: flex; flex-direction: column; }
-                    @media print {
-                        @page { margin: 0; }
-                        body { margin: 2cm; padding: 0; }
-                    }
-                </style>
+                ${getClientDocumentPrintStyles()}
                 </head>
                 <body>
-                    <div class="header">
-                        <div><b style="font-size:18px">משרד התחבורה והבטיחות בדרכים</b><br>אגף טכנולוגיות דיגיטליות ומידע</div>
-                        <div>${new Date().toLocaleDateString('he-IL')}</div>
-                    </div>
+                    ${getClientDocumentPageStart('ריכוז לקוחות - קבוצת ' + path.sector)}
                     <h2 style="text-align:center; margin: 40px 0">ריכוז לקוחות - קבוצת ${path.sector}</h2>
                     <p><b>סוג החוב:</b> ${kpiFilter === 'overdue' ? 'חובות בפיגור' : 'צפי תזרים עתידי'}</p>
                     
@@ -2412,6 +2405,7 @@
                             </div>
                         </div>
                     </div>
+                    ${getClientDocumentPageEnd()}
                     ${printScript}
                 </body></html>
             `);
@@ -2462,33 +2456,19 @@
             
             const printScript = `
                 <script>
-                    window.focus();
-                    setTimeout(function() { window.print(); }, 250);
+                    window.addEventListener('load', function() {
+                        window.focus();
+                        setTimeout(function() { window.print(); }, 350);
+                    });
                 <\/script>
             `;
             
             win.document.write(`
                 <html dir="rtl" lang="he"><head><title>${reportTitle}</title>
-                <style>
-                    * { font-family: 'Arial', sans-serif !important; }
-                    body { font-family: 'Arial', sans-serif; padding: 60px; line-height: 1.6; color: #333; }
-                    .header { display: flex; justify-content: space-between; border-bottom: 3px solid #0B3C5D; padding-bottom: 10px; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 30px; }
-                    th, td { border: 1px solid #ddd; padding: 12px; text-align: right; }
-                    th { background: #f8f9fa; }
-                    .signature-area { margin-top: 80px; display: flex; justify-content: flex-end; page-break-inside: avoid; break-inside: avoid; }
-                    .signature-box { width: 380px; display: flex; flex-direction: column; }
-                    @media print {
-                        @page { margin: 0; }
-                        body { margin: 2cm; padding: 0; }
-                    }
-                </style>
+                ${getClientDocumentPrintStyles()}
                 </head>
                 <body>
-                    <div class="header">
-                        <div><b style="font-size:18px">משרד התחבורה והבטיחות בדרכים</b><br>אגף טכנולוגיות דיגיטליות ומידע</div>
-                        <div>${new Date().toLocaleDateString('he-IL')}</div>
-                    </div>
+                    ${getClientDocumentPageStart('ריכוז פריטי חיוב פתוחים')}
                     <h2 style="text-align:center; margin: 40px 0; font-size: 18px; line-height: 1.5;">ריכוז פריטי חיוב פתוחים<br><span style="font-size: 15px; color:#555; font-weight:normal;">${reportTitle}</span></h2>
                     
                     <table>
@@ -2533,6 +2513,7 @@
                             </div>
                         </div>
                     </div>
+                    ${getClientDocumentPageEnd()}
                     ${printScript}
                 </body></html>
             `);
@@ -2600,10 +2581,43 @@
                     .print-content th, .print-content td { border: 1px solid var(--print-border); padding: 8px 9px; text-align: right; vertical-align: top; }
                     .print-content th { background: var(--print-brand-soft); color: #26384a; font-weight: 700; }
                     .print-content tbody tr:nth-child(even) { background: #fbfcfd; }
-                    .signature-area, .signature-box, .payment-section, .report-chart, .report-summary {
+                    .signature-area, .signature-box, .payment-section, .report-chart, .report-summary,
+                    .debt-alert, .kpis {
                         break-inside: avoid;
                         page-break-inside: avoid;
                     }
+                    .debt-alert {
+                        margin: 18px 0 24px;
+                        border: 1px solid #e0575f;
+                        border-radius: 8px;
+                        overflow: hidden;
+                        background: #fff5f5;
+                    }
+                    .debt-alert__label {
+                        width: min(330px, 76%);
+                        margin: 0 auto;
+                        padding: 7px 16px;
+                        border-radius: 0 0 7px 7px;
+                        background: #c9363e;
+                        color: #fff;
+                        text-align: center;
+                        font-size: 14px;
+                        font-weight: 700;
+                    }
+                    .debt-alert__message {
+                        padding: 13px 18px 15px;
+                        color: #8f1d26;
+                        text-align: center;
+                        font-size: 13px;
+                        line-height: 1.6;
+                    }
+                    .debt-alert__message strong { display: block; margin-bottom: 2px; font-size: 14px; }
+                    .report-section { break-inside: auto; page-break-inside: auto; }
+                    .report-page-break { break-after: page; page-break-after: always; }
+                    .kpis { display: flex; gap: 12px; margin-bottom: 20px; }
+                    .kpi-card { flex: 1; border: 1px solid var(--print-border); padding: 12px; border-radius: 8px; background: var(--print-surface); }
+                    .kpi-title { font-size: 10px; color: var(--print-muted); font-weight: 700; }
+                    .kpi-value { margin-top: 4px; font-size: 18px; font-weight: 900; }
                     .signature-area { margin-top: 48px; display: flex; justify-content: flex-end; }
                     .signature-box { width: 340px; display: flex; flex-direction: column; }
                     a { color: var(--print-brand); }
@@ -2928,6 +2942,14 @@
                     <p class="document-recipient">לכבוד: <br><b style="font-size:18px">${path.orgName}</b></p>
                     <h2 class="document-title">ריכוז חשבוניות פתוחות עבור ${typeText}</h2>
                     <p>שלום רב,<br>להלן פירוט החשבוניות והחיובים הפתוחים במערכותינו שטרם הותאמו:</p>
+
+                    <section class="debt-alert" aria-label="התראת חוב בפיגור">
+                        <div class="debt-alert__label">נדרשת הסדרה מיידית</div>
+                        <div class="debt-alert__message">
+                            <strong>התראה: החוב נמצא בפיגור ודורש טיפול ללא דיחוי</strong>
+                            נכון למועד הפקת מכתב זה טרם הוסדר חוב בסך ${formatCurrency(total)}. נבקש להסדירו בהקדם כדי למנוע המשך טיפול גבייה ועיכוב במתן השירות.
+                        </div>
+                    </section>
                     
                     <table><thead><tr><th>מספר מסמך</th><th>מועד פירעון</th><th>תיאור השירות</th><th style="text-align:left">סכום בש"ח</th></tr></thead>
                     <tbody>${overdueRows.map(r => `<tr><td>${r.doc}</td><td>${r.dueDate.toLocaleDateString('he-IL')}</td><td>${r.desc}</td><td style="text-align:left">${formatCurrency(r.amount)}</td></tr>`).join('')}
