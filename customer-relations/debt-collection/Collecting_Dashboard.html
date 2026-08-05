@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מערכת לניהול הכנסות וגביית חובות - אגף טכנולוגיות דיגיטליות ומידע</title>
+    <title>מערכת לניהול הכנסות וגביית חובות - משרד התחבורה</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -624,7 +624,482 @@
         .about-copy { margin-block-start: var(--space-5); display: grid; gap: var(--space-3); color: var(--color-text-muted); font-size: var(--font-size-sm); line-height: 1.6; }
         .about-copy p { margin: 0; }
 
+        /* ============================================================
+           Unified suite shell
+           The sidebar owns navigation while every screen keeps its
+           existing business logic and rendering functions.
+           ============================================================ */
+        :root { --suite-sidebar-width: 272px; }
+
+        body.suite-enabled {
+            min-height: 100vh;
+            padding-inline-start: var(--suite-sidebar-width);
+        }
+
+        .suite-sidebar {
+            position: fixed;
+            inset-block-start: 92px;
+            inset-block-end: 0;
+            inset-inline-start: 0;
+            z-index: 70;
+            width: var(--suite-sidebar-width);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background: var(--color-surface);
+            color: var(--color-text);
+            border-inline-end: 1px solid var(--color-border);
+            box-shadow: -6px 0 20px rgba(15, 35, 55, .08);
+        }
+
+        .suite-sidebar__section-label {
+            padding: var(--space-5) var(--space-3) var(--space-2);
+            color: var(--color-text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .04em;
+        }
+
+        .suite-sidebar__section-label:first-child {
+            padding-block-start: var(--space-4);
+        }
+
+        .suite-nav {
+            display: grid;
+            gap: 4px;
+            padding-inline: var(--space-3);
+        }
+
+        .suite-nav__item {
+            width: 100%;
+            min-height: 48px;
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
+            background: transparent;
+            color: var(--brand-active);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding-inline: var(--space-3);
+            text-align: right;
+            font-size: var(--font-size-sm);
+            font-weight: 700;
+            transition: background .15s ease, color .15s ease, border-color .15s ease;
+        }
+
+        .suite-nav__item:hover:not(:disabled) {
+            border-color: var(--brand-border);
+            background: var(--brand-subtle);
+            color: var(--brand-primary);
+        }
+
+        .suite-nav__item.is-active {
+            border-color: var(--brand-border);
+            background: var(--brand-subtle);
+            color: var(--brand-active);
+            box-shadow: inset -3px 0 0 var(--brand-primary);
+        }
+
+        .suite-nav__item:disabled {
+            color: #82909d;
+            background: #f7f9fa;
+            cursor: not-allowed;
+        }
+
+        .suite-nav__item i:first-child {
+            width: 22px;
+            text-align: center;
+        }
+
+        .suite-nav__dot {
+            margin-inline-start: auto;
+            width: 8px;
+            height: 8px;
+            flex: 0 0 8px;
+            border-radius: 50%;
+            background: #d97706;
+            box-shadow: 0 0 0 3px #fff4d6;
+        }
+
+        .suite-menu-toggle,
+        .suite-sidebar-overlay {
+            display: none;
+        }
+
+        .suite-screen {
+            min-width: 0;
+            min-height: 100vh;
+        }
+
+        body.suite-enabled .suite-screen .app-header {
+            width: calc(100% + var(--suite-sidebar-width));
+            margin-inline-start: calc(-1 * var(--suite-sidebar-width));
+        }
+
+        body.suite-enabled .suite-screen .app-header__inner {
+            grid-template-columns: minmax(340px, 1fr) minmax(300px, auto) minmax(340px, 1fr);
+        }
+
+        body.suite-enabled .suite-screen .government-brand { display: flex; }
+        body.suite-enabled .suite-screen .app-identity { text-align: center; }
+        body.suite-enabled .suite-screen .app-title-row { justify-content: center; }
+
+        .source-screen-main,
+        .historical-screen-main,
+        .management-screen-main {
+            width: min(1500px, calc(100% - 40px));
+            margin-inline: auto;
+            padding-block: var(--space-6) var(--space-10);
+        }
+
+        .screen-intro {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: var(--space-5);
+            margin-block-end: var(--space-6);
+            padding: var(--space-5);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            background: var(--color-surface);
+            box-shadow: var(--shadow-panel);
+        }
+
+        .screen-intro h2 {
+            margin: 0;
+            color: var(--brand-active);
+            font-size: var(--font-size-xl);
+        }
+
+        .screen-intro p {
+            max-width: 820px;
+            margin: var(--space-2) 0 0;
+            color: var(--color-text-muted);
+            font-size: var(--font-size-sm);
+            line-height: 1.6;
+        }
+
+        .source-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: var(--space-4);
+            align-items: stretch;
+        }
+
+        .source-card {
+            min-height: 260px;
+            height: 100%;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            background: var(--color-surface);
+            display: grid;
+            grid-template-rows: minmax(126px, auto) auto;
+            padding: var(--space-5);
+            box-shadow: var(--shadow-panel);
+        }
+
+        .source-card.is-loaded {
+            border-color: #86c5a6;
+            background: linear-gradient(180deg, #fff 0%, var(--color-success-bg) 100%);
+        }
+
+        .source-card__heading {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-3);
+        }
+
+        .source-card__icon {
+            width: 44px;
+            height: 44px;
+            flex: 0 0 44px;
+            border-radius: var(--radius-md);
+            background: var(--brand-subtle);
+            color: var(--brand-primary);
+            display: grid;
+            place-items: center;
+        }
+
+        .source-card h3 {
+            margin: 0;
+            font-size: var(--font-size-lg);
+        }
+
+        .source-card p {
+            margin: 4px 0 0;
+            color: var(--color-text-muted);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .source-card__badge {
+            margin-inline-start: auto;
+            border-radius: var(--radius-pill);
+            padding: 4px 8px;
+            background: var(--color-warning-bg);
+            color: var(--color-warning);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .source-card__badge--optional {
+            background: var(--color-info-bg);
+            color: var(--color-info);
+        }
+
+        .source-card .file-action {
+            align-self: end;
+            min-height: 68px;
+        }
+
+        .source-card .file-action small {
+            max-width: 230px;
+        }
+
+        .historical-rule {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-block-end: var(--space-5);
+            padding: var(--space-4);
+            border: 1px solid var(--brand-border);
+            border-radius: var(--radius-md);
+            background: var(--brand-subtle);
+            color: var(--brand-active);
+            font-size: var(--font-size-sm);
+            line-height: 1.55;
+        }
+
+        .historical-rule i { margin-block-start: 3px; }
+        .historical-rule__copy { flex: 1 1 auto; }
+        .historical-rule__action { flex: 0 0 auto; }
+
+        .historical-kpis {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: var(--space-4);
+            margin-block-end: var(--space-5);
+        }
+
+        .historical-kpi {
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            background: var(--color-surface);
+            padding: var(--space-5);
+            box-shadow: var(--shadow-panel);
+        }
+
+        .historical-kpi span {
+            color: var(--color-text-muted);
+            font-size: var(--font-size-xs);
+            font-weight: 700;
+        }
+
+        .historical-kpi strong {
+            display: block;
+            margin-block-start: var(--space-2);
+            color: var(--brand-active);
+            font-size: 28px;
+        }
+
+        .historical-kpi small {
+            display: block;
+            margin-block-start: var(--space-2);
+            color: var(--color-text-muted);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .historical-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--space-5);
+            margin-block-end: var(--space-5);
+        }
+
+        .historical-analysis-stack {
+            display: grid;
+            gap: var(--space-5);
+            margin-block-end: var(--space-5);
+        }
+
+        .historical-analysis-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--space-5);
+            align-items: stretch;
+        }
+
+        .historical-analysis-row > .historical-panel {
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
+        }
+
+        .historical-chart-wrap {
+            min-height: 280px;
+            flex: 1;
+            padding: var(--space-4);
+        }
+
+        .historical-panel {
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            background: var(--color-surface);
+            overflow: hidden;
+            box-shadow: var(--shadow-panel);
+        }
+
+        .historical-panel__header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            min-height: 58px;
+            padding-inline: var(--space-5);
+            border-block-end: 1px solid var(--color-border);
+        }
+
+        .historical-panel__header h3 {
+            margin: 0;
+            color: var(--brand-active);
+            font-size: var(--font-size-lg);
+        }
+
+        .historical-panel__body {
+            overflow-x: auto;
+        }
+
+        .historical-panel table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--font-size-sm);
+        }
+
+        .historical-panel th,
+        .historical-panel td {
+            padding: var(--space-3) var(--space-4);
+            border-block-end: 1px solid #e8edf1;
+            text-align: right;
+        }
+
+        .historical-panel th:last-child,
+        .historical-panel td:last-child {
+            text-align: left;
+        }
+
+        .historical-detail-panel { margin-block-start: var(--space-5); }
+        .historical-detail-panel .historical-panel__body { max-height: 560px; }
+        .historical-detail-panel thead { position: sticky; inset-block-start: 0; z-index: 2; }
+
+        .historical-search {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            margin-inline-start: auto;
+        }
+
+        .historical-search label {
+            color: var(--color-text-muted);
+            font-size: var(--font-size-sm);
+            font-weight: 700;
+        }
+
+        .historical-search input {
+            width: min(280px, 42vw);
+            min-height: 38px;
+            padding: 7px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: var(--color-surface);
+            color: var(--color-text);
+        }
+
+        .historical-search input:focus {
+            border-color: var(--brand-active);
+            outline: 3px solid var(--brand-soft);
+        }
+
+        .summary-link {
+            appearance: none;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: var(--brand-active);
+            font: inherit;
+            font-weight: 700;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .summary-count-note {
+            margin: var(--space-2) var(--space-4) var(--space-3);
+            color: var(--color-text-muted);
+            font-size: 12px;
+        }
+
+        .historical-empty {
+            padding: 64px var(--space-5);
+            color: var(--color-text-muted);
+            text-align: center;
+        }
+
+        .historical-empty i {
+            display: block;
+            margin-block-end: var(--space-3);
+            color: var(--brand-border);
+            font-size: 32px;
+        }
+
+        .historical-toolbar__inner {
+            align-items: flex-end;
+        }
+
+        .historical-toolbar__inner .workspace-control:last-of-type {
+            margin-inline-start: auto;
+        }
+
+        .management-kpis {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: var(--space-4);
+            margin-block-end: var(--space-5);
+        }
+
+        .management-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--space-5);
+        }
+
+        .management-panel--wide { grid-column: 1 / -1; }
+        .management-chart-wrap { min-height: 280px; flex: 1; padding: var(--space-4); }
+        .management-notice { margin-block-end: var(--space-5); }
+
+        .management-report-section {
+            margin-block-start: var(--space-7);
+            padding-block-start: var(--space-5);
+            border-block-start: 1px solid var(--color-border);
+        }
+
+        .management-report-section > h2 {
+            margin: 0 0 var(--space-4);
+            color: var(--brand-active);
+            font-size: var(--font-size-xl);
+        }
+
         @media (max-width: 1023px) {
+            .source-grid { grid-template-columns: 1fr; }
+            .historical-summary-grid { grid-template-columns: 1fr; }
+            .historical-analysis-row { grid-template-columns: 1fr; }
+            .management-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .management-grid { grid-template-columns: 1fr; }
+            .management-panel--wide { grid-column: auto; }
+
+            body.suite-enabled .suite-screen .app-header__inner {
+                grid-template-columns: minmax(250px, 1fr) minmax(240px, auto) minmax(40px, 1fr);
+                gap: var(--space-4);
+            }
+
             .app-header__inner {
                 grid-template-columns: minmax(300px, 1fr) auto;
                 gap: var(--space-5);
@@ -637,6 +1112,67 @@
         }
 
         @media (max-width: 767px) {
+            body.suite-enabled { padding-inline-start: 0; }
+
+            .suite-sidebar {
+                inset-block-start: 0;
+                width: min(86vw, 300px);
+                transform: translateX(105%);
+                transition: transform .2s ease;
+            }
+
+            body.suite-menu-open .suite-sidebar { transform: translateX(0); }
+
+            .suite-sidebar-overlay {
+                position: fixed;
+                inset: 0;
+                z-index: 65;
+                background: rgba(15, 35, 55, .52);
+            }
+
+            body.suite-menu-open .suite-sidebar-overlay { display: block; }
+
+            .suite-menu-toggle {
+                position: fixed;
+                inset-block-start: 14px;
+                inset-inline-start: auto;
+                inset-inline-end: 12px;
+                z-index: 75;
+                width: 42px;
+                height: 42px;
+                border: 1px solid rgba(255,255,255,.5);
+                border-radius: var(--radius-md);
+                background: var(--brand-active);
+                color: #fff;
+                place-items: center;
+            }
+
+            body:not(.suite-menu-open) .suite-menu-toggle { display: grid; }
+
+            body.suite-enabled .suite-screen .app-header__inner {
+                grid-template-columns: 1fr auto;
+                padding-inline-end: 54px;
+            }
+
+            body.suite-enabled .suite-screen .app-header {
+                width: 100%;
+                margin-inline-start: 0;
+            }
+
+            .source-screen-main,
+            .historical-screen-main,
+            .management-screen-main {
+                width: min(100% - 24px, 1500px);
+                padding-block: var(--space-4) var(--space-8);
+            }
+
+            .screen-intro { flex-direction: column; }
+            .historical-kpis { grid-template-columns: 1fr; }
+            .management-kpis { grid-template-columns: 1fr; }
+            .historical-toolbar__inner .workspace-control:last-of-type { margin-inline-start: 0; }
+            .historical-rule { align-items: flex-start; flex-wrap: wrap; }
+            .historical-rule__action { margin-inline-start: 30px; }
+
             .app-header__inner {
                 width: min(100% - 24px, 1600px);
                 grid-template-columns: 1fr auto;
@@ -662,7 +1198,6 @@
             .file-action small { max-width: 240px; }
             #btn-goto-dashboard { width: 100%; }
             .dashboard-toolbar__actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
-            .dashboard-toolbar__actions .button-secondary:last-child { grid-column: 1 / -1; }
             .theme-options { grid-template-columns: 1fr; }
 
             #main-app-container > main,
@@ -677,6 +1212,8 @@
         }
 
         @media print {
+            .suite-sidebar, .suite-menu-toggle, .suite-sidebar-overlay { display: none !important; }
+            body.suite-enabled { padding-inline-start: 0 !important; }
             .app-header { background: #fff !important; color: #000 !important; border-bottom: 1px solid #aaa !important; }
             .app-header__inner { min-height: auto; }
             .government-logo { border-color: #ddd; }
@@ -686,7 +1223,7 @@
     </style>
 
 </head>
-<body class="min-h-screen flex flex-col text-slate-800" style="font-family: Arial, Helvetica, sans-serif !important;">
+<body class="suite-enabled min-h-screen flex flex-col text-slate-800" style="font-family: Arial, Helvetica, sans-serif !important;">
 
     <!-- Display settings dialog -->
     <div id="display-settings-dialog" class="ui-dialog-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="display-settings-title" onclick="closeDialogFromBackdrop(event, 'display-settings-dialog')">
@@ -731,7 +1268,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.4.0 · 19 ביולי 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.5.0 · 4 באוגוסט 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -765,8 +1302,394 @@
         </div>
     </div>
 
+    <!--
+        Unified navigation shell.
+        Core screens remain locked until both mandatory sources are loaded.
+        Optional screens are unlocked by their own supporting data source.
+    -->
+    <aside id="suite-sidebar" class="suite-sidebar no-print" aria-label="ניווט ראשי">
+        <nav class="suite-nav">
+            <div class="suite-sidebar__section-label">מסכי המערכת</div>
+            <button id="nav-dashboard" class="suite-nav__item" type="button" onclick="navigateToScreen('dashboard')" disabled>
+                <i class="fa-solid fa-chart-line" aria-hidden="true"></i><span>דשבורד שנה נוכחית</span>
+            </button>
+            <button id="nav-debt" class="suite-nav__item" type="button" onclick="navigateToScreen('debt')" disabled>
+                <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i><span>ניהול הכנסות וגבייה</span>
+            </button>
+            <button id="nav-historical" class="suite-nav__item" type="button" onclick="navigateToScreen('historical')" disabled>
+                <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i><span>חובות עבר שנגבו השנה</span>
+            </button>
+            <div class="suite-sidebar__section-label">דוחות הנהלה</div>
+            <button id="nav-management" class="suite-nav__item" type="button" onclick="navigateToScreen('management')" disabled>
+                <i class="fa-solid fa-chart-column" aria-hidden="true"></i><span>סקירה מקיפה על שירותי מידע</span>
+            </button>
+            <button id="nav-dashboard-report" class="suite-nav__item" type="button" onclick="closeSuiteMenu(); printDashboardAll()" disabled>
+                <i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>דוח מאוחד הכנסות וגבייה בשנה הנוכחית</span>
+            </button>
+            <div class="suite-sidebar__section-label">הגדרות</div>
+            <button id="nav-sources" class="suite-nav__item is-active" type="button" onclick="navigateToScreen('sources')">
+                <i class="fa-solid fa-database" aria-hidden="true"></i><span>מקורות הנתונים</span><span class="suite-nav__dot" aria-label="מקורות החובה טרם נטענו"></span>
+            </button>
+            <button id="nav-settings" class="suite-nav__item" type="button" onclick="openUiDialog('display-settings-dialog'); closeSuiteMenu()">
+                <i class="fa-solid fa-palette" aria-hidden="true"></i><span>הגדרות תצוגה</span>
+            </button>
+            <button id="nav-about" class="suite-nav__item" type="button" onclick="openUiDialog('about-dialog'); closeSuiteMenu()">
+                <i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>אודות</span>
+            </button>
+        </nav>
+    </aside>
+    <div class="suite-sidebar-overlay no-print" onclick="closeSuiteMenu()" aria-hidden="true"></div>
+    <button id="suite-menu-toggle" class="suite-menu-toggle no-print" type="button" onclick="toggleSuiteMenu()" aria-label="פתיחת התפריט" aria-expanded="false">
+        <i class="fa-solid fa-bars" aria-hidden="true"></i>
+    </button>
+
+    <!-- DATA SOURCES SCREEN: the initial entry point for every session -->
+    <div id="data-sources-container" class="suite-screen hidden flex-col flex-grow">
+        <header class="app-header no-print">
+            <div class="app-header__inner">
+                <div class="government-brand">
+                    <img class="government-logo" src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה והבטיחות בדרכים">
+                    <div>
+                        <div class="ministry-name">משרד התחבורה והבטיחות בדרכים</div>
+                        <div class="department-name">אגף טכנולוגיות דיגיטליות ומידע</div>
+                    </div>
+                </div>
+                <div class="app-identity">
+                    <div class="app-title-row"><h1 class="app-title">מקורות הנתונים</h1><span class="beta-badge">BETA</span></div>
+                    <div class="system-date"></div>
+                </div>
+                <div class="header-actions" aria-hidden="true"></div>
+            </div>
+        </header>
+        <main class="source-screen-main flex-grow no-print">
+            <section class="screen-intro">
+                <div>
+                    <h2>טעינת נתוני המערכת</h2>
+                    <p>יש לטעון את קובץ החובות ואת קובץ ההכנסות של שנת העבודה כדי לפתוח את מסכי הליבה. קובץ החשבוניות שהותאמו בשנת העבודה הוא מקור רשות ופותח את מסך גביית חובות העבר.</p>
+                </div>
+                <div id="sources-year-context" class="year-context hidden"><i class="fa-regular fa-calendar" aria-hidden="true"></i>שנת עבודה <span class="report-year-label"></span></div>
+            </section>
+
+            <section class="source-grid" aria-label="בחירת קובצי נתונים">
+                <article id="debt-source-card" class="source-card">
+                    <div class="source-card__heading">
+                        <span class="source-card__icon"><i class="fa-solid fa-file-circle-exclamation" aria-hidden="true"></i></span>
+                        <div><h3>קובץ חובות</h3><p>פריטי חיוב פתוחים, מועדי פירעון, אמצעי תשלום ויתרות.</p></div>
+                        <span class="source-card__badge">חובה</span>
+                    </div>
+                    <input type="file" id="excel-uploader" class="hidden" accept=".xlsx,.xls" onchange="processExcel(event)">
+                    <label for="excel-uploader" id="debt-file-action" class="file-action" tabindex="0">
+                        <span class="file-action__icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></span>
+                        <span><strong>בחירת קובץ חובות</strong><small id="debt-file-status">טרם נטען</small></span>
+                    </label>
+                </article>
+
+                <article id="revenue-source-card" class="source-card">
+                    <div class="source-card__heading">
+                        <span class="source-card__icon"><i class="fa-solid fa-file-invoice" aria-hidden="true"></i></span>
+                        <div><h3>הכנסות שנה נוכחית</h3><p>חשבוניות והכנסות שנת העבודה לצורך חישובי חיוב וגבייה.</p></div>
+                        <span class="source-card__badge">חובה</span>
+                    </div>
+                    <input type="file" id="revenue-uploader" class="hidden" accept=".xlsx,.xls" onchange="processRevenueExcel(event)">
+                    <label for="revenue-uploader" id="revenue-file-action" class="file-action" tabindex="0">
+                        <span class="file-action__icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></span>
+                        <span><strong>בחירת קובץ הכנסות</strong><small id="revenue-file-status">טרם נטען</small></span>
+                    </label>
+                </article>
+
+                <article id="historical-source-card" class="source-card">
+                    <div class="source-card__heading">
+                        <span class="source-card__icon"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i></span>
+                        <div><h3>חשבוניות שהותאמו בשנת העבודה</h3><p>מבנה זהה לקובץ ההכנסות. המקור משמש לניתוח גביית חובות משנים קודמות.</p></div>
+                        <span class="source-card__badge source-card__badge--optional">רשות</span>
+                    </div>
+                    <input type="file" id="historical-uploader" class="hidden" accept=".xlsx,.xls" onchange="processHistoricalRevenueExcel(event)">
+                    <label for="historical-uploader" id="historical-file-action" class="file-action" tabindex="0">
+                        <span class="file-action__icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></span>
+                        <span><strong>בחר קובץ חשבוניות שהותאמו בשנת העבודה</strong><small id="historical-file-status">טרם נטען</small></span>
+                    </label>
+                </article>
+            </section>
+
+            <p id="data-currency-date" class="data-currency hidden"></p>
+            <p id="data-load-message" class="data-load-message hidden" role="alert" aria-live="assertive">
+                <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                <span id="data-load-message-text"></span>
+            </p>
+        </main>
+    </div>
+
+    <!-- HISTORICAL COLLECTIONS SCREEN -->
+    <div id="historical-container" class="suite-screen hidden flex-col flex-grow">
+        <header class="app-header no-print">
+            <div class="app-header__inner">
+                <div class="government-brand">
+                    <img class="government-logo" src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה והבטיחות בדרכים">
+                    <div>
+                        <div class="ministry-name">משרד התחבורה והבטיחות בדרכים</div>
+                        <div class="department-name">אגף טכנולוגיות דיגיטליות ומידע</div>
+                    </div>
+                </div>
+                <div class="app-identity">
+                    <div class="app-title-row"><h1 class="app-title">חובות עבר שנגבו השנה</h1><span class="beta-badge">BETA</span></div>
+                    <div class="system-date"></div>
+                </div>
+                <div class="header-actions" aria-hidden="true"></div>
+            </div>
+        </header>
+        <section class="workspace-toolbar no-print" aria-label="מסנני גביית חובות עבר">
+            <div class="workspace-toolbar__inner historical-toolbar__inner">
+                <div class="workspace-control">
+                    <span class="control-label">חתך פעילות</span>
+                    <div class="segmented-control" role="group" aria-label="סינון פעילות בחובות עבר">
+                        <button type="button" id="hist-type-info" class="active-filter" onclick="setHistoricalTypeFilter('info')">שירותי מידע</button>
+                        <button type="button" id="hist-type-fees" onclick="setHistoricalTypeFilter('fees')">אגרות העברת בעלות</button>
+                        <button type="button" id="hist-type-all" onclick="setHistoricalTypeFilter('all')">הכול</button>
+                    </div>
+                </div>
+                <div class="workspace-control">
+                    <span class="control-label">סקטור</span>
+                    <div class="segmented-control" role="group" aria-label="סינון סקטור בחובות עבר">
+                        <button type="button" id="hist-sector-all" class="active-filter" onclick="setHistoricalSectorFilter('all')">כל הסקטורים</button>
+                        <button type="button" id="hist-sector-gov" onclick="setHistoricalSectorFilter('משרדי ממשלה')">משרדי ממשלה</button>
+                        <button type="button" id="hist-sector-gov-auth" onclick="setHistoricalSectorFilter('רשויות וחברות ממשלתיות')">רשויות וחברות ממשלתיות</button>
+                        <button type="button" id="hist-sector-local" onclick="setHistoricalSectorFilter('רשויות מקומיות')">רשויות מקומיות</button>
+                        <button type="button" id="hist-sector-private" onclick="setHistoricalSectorFilter('לקוחות פרטיים')">לקוחות פרטיים</button>
+                    </div>
+                </div>
+                <div class="workspace-control">
+                    <label for="historical-year-filter" class="control-label">שנת הפקת החשבונית</label>
+                    <select id="historical-year-filter" class="year-control" onchange="setHistoricalSourceYear(this.value)">
+                        <option value="all">כל השנים</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+        <main class="historical-screen-main flex-grow">
+            <div class="historical-rule">
+                <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                <div class="historical-rule__copy">המסך כולל חשבוניות שתאריך ההתאמה שלהן בשנת <strong class="report-year-label"></strong> ושתאריך הפקתן מוקדם מ־<strong id="historical-cutoff-label"></strong>. כל השנים והסיכומים מחושבים מחדש לפי שנת העבודה.</div>
+                <button type="button" onclick="printHistoricalSummaryReport()" class="button-secondary button-secondary--brand historical-rule__action no-print">
+                    <i class="fa-solid fa-print" aria-hidden="true"></i>הפקת דוח מסכם
+                </button>
+            </div>
+
+            <section class="historical-kpis" aria-label="מדדי גביית חובות עבר">
+                <article class="historical-kpi"><span>סך גביית חובות עבר</span><strong id="historical-kpi-amount">₪0</strong></article>
+                <article class="historical-kpi"><span>מספר חשבוניות מותאמות</span><strong id="historical-kpi-count">0</strong></article>
+                <article class="historical-kpi"><span>מספר לקוחות</span><strong id="historical-kpi-clients">0</strong></article>
+            </section>
+
+            <div id="historical-empty-state" class="historical-panel historical-empty hidden">
+                <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
+                <strong>לא נמצאו חשבוניות המתאימות לכלל ולמסננים שנבחרו.</strong>
+            </div>
+
+            <div id="historical-results">
+                <div class="historical-analysis-stack">
+                    <section class="historical-analysis-row">
+                        <article class="historical-panel">
+                            <div class="historical-panel__header"><i class="fa-solid fa-calendar-days text-amber-600" aria-hidden="true"></i><h3>חובות עבר שנגבו השנה לפי שנים</h3></div>
+                            <div class="historical-panel__body">
+                                <table>
+                                    <thead><tr><th>שנת הפקת החשבונית</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום שנגבה</th></tr></thead>
+                                    <tbody id="historical-year-table-body"></tbody>
+                                </table>
+                                <p class="summary-count-note">בשורת הסה״כ, כל לקוח נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.</p>
+                            </div>
+                        </article>
+                        <article class="historical-panel">
+                            <div class="historical-panel__header"><i class="fa-solid fa-chart-column text-amber-600" aria-hidden="true"></i><h3>גביית עבר לפי שנים</h3></div>
+                            <div class="historical-chart-wrap"><canvas id="historical-year-chart"></canvas></div>
+                        </article>
+                    </section>
+                    <section class="historical-analysis-row">
+                        <article class="historical-panel">
+                            <div class="historical-panel__header"><i class="fa-solid fa-users-viewfinder text-indigo-600" aria-hidden="true"></i><h3>חובות עבר שנגבו השנה לפי סקטורים</h3></div>
+                            <div class="historical-panel__body">
+                                <table>
+                                    <thead><tr><th>סקטור</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום שנגבה</th></tr></thead>
+                                    <tbody id="historical-sector-table-body"></tbody>
+                                </table>
+                            </div>
+                        </article>
+                        <article class="historical-panel">
+                            <div class="historical-panel__header"><i class="fa-solid fa-chart-pie text-indigo-600" aria-hidden="true"></i><h3>גביית עבר לפי סקטורים</h3></div>
+                            <div class="historical-chart-wrap"><canvas id="historical-sector-chart"></canvas></div>
+                        </article>
+                    </section>
+                </div>
+
+                <section class="historical-panel historical-detail-panel">
+                    <div class="historical-panel__header">
+                        <i class="fa-solid fa-list-check text-blue-600" aria-hidden="true"></i>
+                        <h3>פירוט החשבוניות שנגבו השנה</h3>
+                        <div class="historical-search no-print">
+                            <label for="historical-customer-search">חיפוש לקוח</label>
+                            <input id="historical-customer-search" type="search" placeholder="שם לקוח או מספר לקוח" oninput="setHistoricalCustomerQuery(this.value)">
+                        </div>
+                    </div>
+                    <div class="historical-panel__body">
+                        <table>
+                            <thead><tr><th>תאריך התאמה</th><th>תאריך הפקה</th><th>מספר לקוח</th><th>שם לקוח</th><th>מספר חשבונית</th><th>סקטור</th><th>תחום</th><th>סכום</th></tr></thead>
+                            <tbody id="historical-detail-table-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- MANAGEMENT REPORT: information-services data only -->
+    <div id="management-container" class="suite-screen hidden flex-col flex-grow">
+        <header class="app-header no-print">
+            <div class="app-header__inner">
+                <div class="government-brand">
+                    <img class="government-logo" src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה והבטיחות בדרכים">
+                    <div>
+                        <div class="ministry-name">משרד התחבורה והבטיחות בדרכים</div>
+                        <div class="department-name">אגף טכנולוגיות דיגיטליות ומידע</div>
+                    </div>
+                </div>
+                <div class="app-identity">
+                    <div class="app-title-row"><h1 class="app-title">סקירה מקיפה על שירותי מידע</h1><span class="beta-badge">BETA</span></div>
+                    <div class="system-date"></div>
+                </div>
+                <div class="header-actions" aria-hidden="true"></div>
+            </div>
+        </header>
+        <section class="workspace-toolbar no-print" aria-label="פעולות דוח הנהלה">
+            <div class="workspace-toolbar__inner">
+                <div class="year-context"><i class="fa-regular fa-calendar" aria-hidden="true"></i>שנת דוח <span class="report-year-label"></span></div>
+                <button type="button" onclick="printManagementReport()" class="button-secondary button-secondary--brand">
+                    <i class="fa-solid fa-print" aria-hidden="true"></i>הפקת דוח הנהלה
+                </button>
+            </div>
+        </section>
+        <main class="management-screen-main flex-grow">
+            <div class="historical-rule management-notice">
+                <i class="fa-solid fa-filter-circle-dollar" aria-hidden="true"></i>
+                <div>כל המדדים, הטבלאות והתרשימים בדוח זה כוללים <strong>שירותי מידע בלבד</strong>.</div>
+            </div>
+
+            <section class="management-kpis" aria-label="מדדי שנת העבודה לשירותי מידע">
+                <article class="historical-kpi"><span>הכנסות</span><strong id="management-kpi-billed">₪0</strong><small>סך ההכנסות בשנת העבודה</small></article>
+                <article class="historical-kpi"><span>גבייה עד כה</span><strong id="management-kpi-collected">₪0</strong><small>גבייה מחושבת בשנת העבודה</small></article>
+                <article class="historical-kpi"><span>חוב בפיגור</span><strong id="management-kpi-overdue">₪0</strong><small>חשבוניות פתוחות שמועד פירעונן עבר</small></article>
+                <article class="historical-kpi"><span>צפי גבייה עתידי</span><strong id="management-kpi-future">₪0</strong><small>חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></article>
+            </section>
+
+            <div class="historical-analysis-stack" aria-label="הכנסות וגבייה בשנה הנוכחית">
+                <section class="historical-analysis-row">
+                    <article class="historical-panel">
+                        <div class="historical-panel__header"><i class="fa-solid fa-calendar-days text-indigo-600" aria-hidden="true"></i><h3>הכנסות וגבייה לפי חודשים</h3></div>
+                        <div class="historical-panel__body">
+                            <table>
+                                <thead><tr><th>חודש</th><th>הכנסות</th><th>גבייה</th><th>שיעור גבייה</th></tr></thead>
+                                <tbody id="management-monthly-table-body"></tbody>
+                            </table>
+                        </div>
+                    </article>
+                    <article class="historical-panel">
+                        <div class="historical-panel__header"><i class="fa-solid fa-chart-column text-emerald-600" aria-hidden="true"></i><h3>הכנסות מול גבייה לפי חודשים</h3></div>
+                        <div class="management-chart-wrap"><canvas id="management-monthly-chart"></canvas></div>
+                    </article>
+                </section>
+                <section class="historical-analysis-row">
+                    <article class="historical-panel">
+                        <div class="historical-panel__header"><i class="fa-solid fa-users-viewfinder text-blue-600" aria-hidden="true"></i><h3>הכנסות וגבייה לפי סקטורים</h3></div>
+                        <div class="historical-panel__body">
+                            <table>
+                                <thead><tr><th>סקטור</th><th>מספר לקוחות</th><th>הכנסות</th><th>גבייה</th><th>שיעור גבייה</th></tr></thead>
+                                <tbody id="management-sector-table-body"></tbody>
+                            </table>
+                        </div>
+                    </article>
+                    <article class="historical-panel">
+                        <div class="historical-panel__header"><i class="fa-solid fa-chart-pie text-blue-600" aria-hidden="true"></i><h3>התפלגות הכנסות לפי סקטורים</h3></div>
+                        <div class="management-chart-wrap"><canvas id="management-sector-chart"></canvas></div>
+                    </article>
+                </section>
+            </div>
+
+            <section class="management-report-section" aria-labelledby="management-open-debts-title">
+                <h2 id="management-open-debts-title">חובות פתוחים</h2>
+                <div class="historical-analysis-stack">
+                    <div class="historical-analysis-row">
+                        <article class="historical-panel">
+                            <div class="historical-panel__header"><i class="fa-solid fa-calendar-xmark text-red-600" aria-hidden="true"></i><h3>חובות עבר פתוחים לפי שנים</h3></div>
+                            <div class="historical-panel__body">
+                                <table>
+                                    <thead><tr><th>שנת חוב</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום החוב</th></tr></thead>
+                                    <tbody id="management-debt-years-table-body"></tbody>
+                                </table>
+                                <p class="summary-count-note">בשורת הסה״כ, כל לקוח נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.</p>
+                            </div>
+                        </article>
+                        <article class="historical-panel">
+                            <div class="historical-panel__header"><i class="fa-solid fa-chart-column text-red-600" aria-hidden="true"></i><h3>חובות עבר פתוחים לפי שנים</h3></div>
+                            <div class="management-chart-wrap"><canvas id="management-debt-years-chart"></canvas></div>
+                        </article>
+                    </div>
+                    <div class="historical-analysis-row">
+                        <article class="historical-panel">
+                            <div class="historical-panel__header"><i class="fa-solid fa-users-rectangle text-red-600" aria-hidden="true"></i><h3>חובות עבר פתוחים לפי סקטורים</h3></div>
+                            <div class="historical-panel__body">
+                                <table>
+                                    <thead><tr><th>סקטור</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום החוב</th></tr></thead>
+                                    <tbody id="management-debt-sectors-table-body"></tbody>
+                                </table>
+                            </div>
+                        </article>
+                        <article class="historical-panel">
+                            <div class="historical-panel__header"><i class="fa-solid fa-chart-pie text-red-600" aria-hidden="true"></i><h3>חובות עבר פתוחים לפי סקטורים</h3></div>
+                            <div class="management-chart-wrap"><canvas id="management-debt-sectors-chart"></canvas></div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <section id="management-closed-debts-section" class="management-report-section" aria-labelledby="management-closed-debts-title">
+                <h2 id="management-closed-debts-title">חובות עבר שנגבו בשנת העבודה</h2>
+                <div class="historical-analysis-stack">
+                    <div class="historical-analysis-row">
+                        <article class="historical-panel">
+                            <div class="historical-panel__header"><i class="fa-solid fa-clock-rotate-left text-amber-600" aria-hidden="true"></i><h3>חובות עבר שנגבו השנה לפי שנים</h3></div>
+                            <div class="historical-panel__body">
+                                <table>
+                                    <thead><tr><th>שנת הפקת החשבונית</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום שנגבה</th></tr></thead>
+                                    <tbody id="management-historical-years-table-body"></tbody>
+                                </table>
+                                <p class="summary-count-note">בשורת הסה״כ, כל לקוח נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.</p>
+                            </div>
+                        </article>
+                        <article class="historical-panel">
+                            <div class="historical-panel__header"><i class="fa-solid fa-chart-column text-amber-600" aria-hidden="true"></i><h3>חובות עבר שנגבו השנה לפי שנים</h3></div>
+                            <div class="management-chart-wrap"><canvas id="management-historical-years-chart"></canvas></div>
+                        </article>
+                    </div>
+                    <div class="historical-analysis-row">
+                        <article class="historical-panel">
+                            <div class="historical-panel__header"><i class="fa-solid fa-building-columns text-violet-600" aria-hidden="true"></i><h3>חובות עבר שנגבו השנה לפי סקטורים</h3></div>
+                            <div class="historical-panel__body">
+                                <table>
+                                    <thead><tr><th>סקטור</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום שנגבה</th></tr></thead>
+                                    <tbody id="management-historical-sectors-table-body"></tbody>
+                                </table>
+                            </div>
+                        </article>
+                        <article class="historical-panel">
+                            <div class="historical-panel__header"><i class="fa-solid fa-chart-pie text-violet-600" aria-hidden="true"></i><h3>חובות עבר שנגבו השנה לפי סקטורים</h3></div>
+                            <div class="management-chart-wrap"><canvas id="management-historical-sectors-chart"></canvas></div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
     <!-- MAIN APP CONTAINER -->
-    <div id="main-app-container" class="flex flex-col flex-grow">
+    <div id="main-app-container" class="suite-screen hidden flex-col flex-grow">
 
         <header class="app-header no-print">
             <div class="app-header__inner">
@@ -784,14 +1707,7 @@
                     </div>
                     <div class="system-date"></div>
                 </div>
-                <div class="header-actions">
-                    <button type="button" class="header-action" onclick="openUiDialog('display-settings-dialog')" aria-label="הגדרות תצוגה">
-                        <i class="fa-solid fa-palette" aria-hidden="true"></i><span>תצוגה</span>
-                    </button>
-                    <button type="button" class="header-action" onclick="openUiDialog('about-dialog')" aria-label="אודות המערכת">
-                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>אודות</span>
-                    </button>
-                </div>
+                <div class="header-actions" aria-hidden="true"></div>
             </div>
         </header>
         <section class="workspace-toolbar no-print" aria-label="כלי עבודה וטעינת נתונים">
@@ -808,30 +1724,6 @@
                     <label for="report-year-select" class="control-label">שנת עבודה</label>
                     <select id="report-year-select" onchange="setReportYear(this.value)" class="year-control"></select>
                 </div>
-                <div class="workspace-control workspace-control--grow">
-                    <span class="control-label">מקורות נתונים</span>
-                    <div class="data-source-actions">
-                        <input type="file" id="excel-uploader" class="hidden" onchange="processExcel(event)">
-                        <label for="excel-uploader" id="debt-file-action" class="file-action" tabindex="0">
-                            <span class="file-action__icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></span>
-                            <span><strong>קובץ חובות</strong><small id="debt-file-status">טרם נטען</small></span>
-                        </label>
-                        <input type="file" id="revenue-uploader" class="hidden" onchange="processRevenueExcel(event)">
-                        <label for="revenue-uploader" id="revenue-file-action" class="file-action" tabindex="0">
-                            <span class="file-action__icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></span>
-                            <span><strong>הכנסות שנה נוכחית</strong><small id="revenue-file-status">טרם נטען</small></span>
-                        </label>
-                        <button id="btn-goto-dashboard" type="button" onclick="enterDashboard()" disabled aria-disabled="true" title="הדשבורד זמין לאחר טעינת שני הקבצים">
-                            <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
-                            <span class="button-copy"><span>מעבר לדשבורד</span><small>נדרש לטעון שני קבצים</small></span>
-                        </button>
-                    </div>
-                </div>
-                <p id="data-currency-date" class="data-currency hidden"></p>
-                <p id="data-load-message" class="data-load-message hidden" role="alert" aria-live="assertive">
-                    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
-                    <span id="data-load-message-text"></span>
-                </p>
             </div>
         </section>
 
@@ -853,7 +1745,7 @@
                                 <i class="fa-solid fa-money-bill-wave text-emerald-600"></i>
                             </div>
                             <div class="text-2xl font-bold text-emerald-700 mt-2" id="kpi-current-revenue">₪0</div>
-                            <div class="text-[11px] text-slate-400 font-bold mt-1">סך חיובים שנה זו</div>
+                            <div class="text-[11px] text-slate-400 font-bold mt-1">סך ההכנסות בשנת העבודה</div>
                         </div>
                         <!-- גבייה עד כה -->
                         <div class="bg-slate-50/70 border border-slate-200 p-4 rounded-xl flex flex-col justify-between">
@@ -862,25 +1754,25 @@
                                 <i class="fa-solid fa-circle-check text-blue-600"></i>
                             </div>
                             <div class="text-2xl font-bold text-blue-800 mt-2" id="kpi-current-collected">₪0</div>
-                            <div class="text-[11px] text-slate-400 font-bold mt-1">תקבולים בפועל לשנה זו</div>
+                            <div class="text-[11px] text-slate-400 font-bold mt-1">גבייה מחושבת בשנת העבודה</div>
                         </div>
                         <!-- חוב שנה נוכחית -->
                         <div onclick="setKpiFilter('overdue')" class="bg-slate-50/70 border border-slate-200 p-4 rounded-xl cursor-pointer hover:border-red-300 transition-all flex flex-col justify-between">
                             <div class="flex justify-between items-center mb-1">
-                                <span class="text-slate-500 font-bold text-xs">חוב שנה נוכחית</span>
+                                <span class="text-slate-500 font-bold text-xs">חוב בפיגור</span>
                                 <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
                             </div>
                             <div class="text-2xl font-bold text-red-700 mt-2" id="kpi-current-overdue">₪0</div>
-                            <div class="text-[11px] text-slate-400 font-bold mt-1">חוב בפיגור לשנה זו</div>
+                            <div class="text-[11px] text-slate-400 font-bold mt-1">חשבוניות פתוחות שמועד פירעונן עבר</div>
                         </div>
-                        <!-- צפי עתידי -->
+                        <!-- צפי גבייה עתידי -->
                         <div onclick="setKpiFilter('future')" class="bg-slate-50/70 border border-slate-200 p-4 rounded-xl cursor-pointer hover:border-emerald-300 transition-all flex flex-col justify-between">
                             <div class="flex justify-between items-center mb-1">
-                                <span class="text-slate-500 font-bold text-xs">צפי עתידי</span>
+                                <span class="text-slate-500 font-bold text-xs">צפי גבייה עתידי</span>
                                 <i class="fa-solid fa-clock text-emerald-600"></i>
                             </div>
                             <div class="text-2xl font-bold text-emerald-700 mt-2" id="kpi-current-future">₪0</div>
-                            <div class="text-[11px] text-slate-400 font-bold mt-1">תזרים עתידי מתוכנן</div>
+                            <div class="text-[11px] text-slate-400 font-bold mt-1">חשבוניות פתוחות שמועד פירעונן טרם הגיע</div>
                         </div>
                     </div>
                 </div>
@@ -935,7 +1827,7 @@
                         <!-- תיבת סימון מוסר תשלומים -->
                         <label id="morale-toggle-container" class="hidden flex items-center gap-2 cursor-pointer bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition-all border border-slate-300">
                             <input type="checkbox" id="chk-show-morale" onchange="toggleShowMorale(this.checked)" class="rounded text-blue-600 focus:ring-blue-500">
-                            <span class="text-xs font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;">הצג מוסר תשלומים <span class="text-[10px] text-slate-500 font-normal" style="font-family: Arial, Helvetica, sans-serif !important;">(מסמכי חוב בלבד)</span></span>
+                            <span class="text-xs font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;">הצג מוסר תשלומים <span class="text-[10px] text-slate-500 font-normal" style="font-family: Arial, Helvetica, sans-serif !important;">(חשבוניות חוב בלבד)</span></span>
                         </label>
 
                         <!-- כלי מיון -->
@@ -977,9 +1869,10 @@
                     <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 overflow-x-auto">
                         <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 tracking-tight" id="lbl-years-table" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-table ml-2 text-blue-500"></i>ריכוז חובות לפי שנים</h3>
                         <table class="w-full text-right text-sm">
-                            <thead><tr class="text-slate-400 border-b"><th class="p-3" style="font-family: Arial, Helvetica, sans-serif !important;">שנה</th><th class="p-3 text-center" style="font-family: Arial, Helvetica, sans-serif !important;">כמות מסמכים</th><th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">סה"כ בש"ח</th></tr></thead>
+                            <thead><tr class="text-slate-400 border-b"><th class="p-3" style="font-family: Arial, Helvetica, sans-serif !important;">שנת חוב</th><th class="p-3 text-center" style="font-family: Arial, Helvetica, sans-serif !important;">מספר לקוחות</th><th class="p-3 text-center" style="font-family: Arial, Helvetica, sans-serif !important;">מספר חשבוניות</th><th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">סכום החוב</th></tr></thead>
                             <tbody id="years-table-body" class="divide-y divide-slate-50"></tbody>
                         </table>
+                        <p class="summary-count-note">בשורת הסה״כ, כל לקוח נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.</p>
                     </div>
                 </div>
                 
@@ -989,7 +1882,7 @@
     </div>
 
     <!-- DASHBOARD CONTAINER -->
-    <div id="dashboard-container" class="hidden flex-col flex-grow bg-[#f3f4f6]" style="font-family: Arial, Helvetica, sans-serif !important;">
+    <div id="dashboard-container" class="suite-screen hidden flex-col flex-grow bg-[#f3f4f6]" style="font-family: Arial, Helvetica, sans-serif !important;">
 
         <header class="app-header no-print">
             <div class="app-header__inner">
@@ -1002,19 +1895,12 @@
                 </div>
                 <div class="app-identity">
                     <div class="app-title-row flex items-center justify-center gap-2">
-                        <h1 class="app-title m-0">דשבורד הכנסות וגבייה</h1>
+                        <h1 class="app-title m-0">דשבורד שנה נוכחית</h1>
                         <span class="beta-badge">BETA</span>
                     </div>
                     <div class="system-date"></div>
                 </div>
-                <div class="header-actions">
-                    <button type="button" class="header-action" onclick="openUiDialog('display-settings-dialog')" aria-label="הגדרות תצוגה">
-                        <i class="fa-solid fa-palette" aria-hidden="true"></i><span>תצוגה</span>
-                    </button>
-                    <button type="button" class="header-action" onclick="openUiDialog('about-dialog')" aria-label="אודות המערכת">
-                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>אודות</span>
-                    </button>
-                </div>
+                <div class="header-actions" aria-hidden="true"></div>
             </div>
         </header>
         <section class="workspace-toolbar no-print" aria-label="מסנני הדשבורד ופעולות">
@@ -1037,11 +1923,8 @@
                         <button type="button" id="db-sb-private" onclick="setDashStageB('private')">לקוחות פרטיים</button>
                     </div>
                 </div>
-                <div class="year-context"><i class="fa-regular fa-calendar" aria-hidden="true"></i>שנת <span class="report-year-label"></span></div>
                 <div class="dashboard-toolbar__actions">
                     <button type="button" onclick="printDashboardCurrent()" class="button-secondary button-secondary--brand"><i class="fa-solid fa-print" aria-hidden="true"></i>הדפסת תצוגה</button>
-                    <button type="button" onclick="printDashboardAll()" class="button-secondary"><i class="fa-solid fa-layer-group" aria-hidden="true"></i>דוח מאוחד</button>
-                    <button type="button" onclick="exitDashboard()" class="button-secondary"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>חזרה למערכת</button>
                 </div>
             </div>
         </section>
@@ -1051,26 +1934,24 @@
             <!-- KPIs -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 print-row-layout">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
-                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">סה"כ הכנסות (שנת <span class="report-year-label"></span>)</p>
+                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">הכנסות</p>
                     <p id="db-kpi-billed" class="text-3xl font-bold text-blue-900 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</p>
+                    <p class="text-[11px] text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">סך ההכנסות בשנת העבודה</p>
                 </div>
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
-                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">סה"כ תקבולים בפועל</p>
+                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">גבייה עד כה</p>
                     <p id="db-kpi-collected" class="text-3xl font-bold text-emerald-700 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</p>
+                    <p class="text-[11px] text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">גבייה מחושבת בשנת העבודה</p>
                 </div>
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
-                    <div>
-                        <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">יתרת חוב פתוחה (שנת <span class="report-year-label"></span>)</p>
-                        <p id="db-kpi-debt" class="text-3xl font-bold text-red-700 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</p>
-                    </div>
-                    <div class="text-[11px] text-slate-500 font-bold mt-2 pt-1.5 border-t border-slate-100 flex justify-between" style="font-family: Arial, Helvetica, sans-serif !important;">
-                        <span style="font-family: Arial, Helvetica, sans-serif !important;">חוב בפיגור: <span id="db-sub-overdue" class="text-red-600" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</span></span>
-                        <span style="font-family: Arial, Helvetica, sans-serif !important;">תזרים עתידי: <span id="db-sub-future" class="text-emerald-600" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</span></span>
-                    </div>
+                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">חוב בפיגור</p>
+                    <p id="db-kpi-debt" class="text-3xl font-bold text-red-700 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</p>
+                    <p class="text-[11px] text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">חשבוניות פתוחות שמועד פירעונן עבר</p>
                 </div>
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
-                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">שיעור גבייה בפועל</p>
-                    <p id="db-kpi-rate" class="text-3xl font-bold text-indigo-700 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">0.0%</p>
+                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">צפי גבייה עתידי</p>
+                    <p id="db-kpi-future" class="text-3xl font-bold text-emerald-700 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</p>
+                    <p class="text-[11px] text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">חשבוניות פתוחות שמועד פירעונן טרם הגיע</p>
                 </div>
             </div>
 
@@ -1078,7 +1959,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col h-auto">
                     <h3 class="font-bold text-slate-700 mb-3 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
-                        <i class="fa-solid fa-calendar-days ml-2 text-indigo-600"></i>פילוח חודשי שנת <span class="report-year-label"></span>
+                        <i class="fa-solid fa-calendar-days ml-2 text-indigo-600"></i>הכנסות וגבייה לפי חודשים
                     </h3>
                     <div class="pr-1">
                         <table class="w-full text-right text-xs" style="font-family: Arial, Helvetica, sans-serif !important;">
@@ -1087,7 +1968,7 @@
                                     <th class="p-2 text-right" style="font-family: Arial, Helvetica, sans-serif !important;">חודש</th>
                                     <th class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">הכנסות (ש"ח)</th>
                                     <th class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">גבייה (ש"ח)</th>
-                                    <th class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">אחוז גבייה</th>
+                                    <th class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">שיעור גבייה</th>
                                 </tr>
                             </thead>
                             <tbody id="db-monthly-table-body" class="divide-y divide-slate-50"></tbody>
@@ -1116,9 +1997,9 @@
                             <thead>
                                 <tr class="text-slate-400 border-b">
                                     <th class="p-3" style="font-family: Arial, Helvetica, sans-serif !important;">שם הלקוח</th>
-                                    <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">סך חיובים (ש"ח)</th>
-                                    <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">תקבולים בפועל (ש"ח)</th>
-                                    <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">יתרת חוב (ש"ח)</th>
+                                    <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">הכנסות (ש"ח)</th>
+                                    <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">גבייה (ש"ח)</th>
+                                    <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">סך יתרה פתוחה (ש"ח)</th>
                                 </tr>
                             </thead>
                             <tbody id="db-active-clients-body" class="divide-y divide-slate-50"></tbody>
@@ -1137,7 +2018,7 @@
                                     <th class="p-3" style="font-family: Arial, Helvetica, sans-serif !important;">שם הלקוח</th>
                                     <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">חוב בפיגור (ש"ח)</th>
                                     <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">תשלומים עתידיים (ש"ח)</th>
-                                    <th class="p-3 text-center" style="font-family: Arial, Helvetica, sans-serif !important;">מספר מסמכים פתוחים</th>
+                                    <th class="p-3 text-center" style="font-family: Arial, Helvetica, sans-serif !important;">מספר חשבוניות פתוחות</th>
                                 </tr>
                             </thead>
                             <tbody id="db-debtors-body" class="divide-y divide-slate-50"></tbody>
@@ -1152,6 +2033,7 @@
         // --- State ---
         let db = []; 
         let revenueDb = []; 
+        let historicalRevenueDb = [];
         let incomeFilter = 'info'; 
         let kpiFilter = 'overdue';
         let currentLevel = 0; 
@@ -1170,11 +2052,92 @@
         let dashStageA = 'info'; 
         let dashStageB = 'all-sectors'; 
         let dashChart = null;
+        let managementChart = null;
+        let managementSectorChart = null;
+        let managementDebtYearsChart = null;
+        let managementDebtSectorsChart = null;
+        let managementHistoricalYearsChart = null;
+        let managementHistoricalSectorsChart = null;
+        let historicalYearChart = null;
+        let historicalSectorChart = null;
 
         const TODAY = new Date();
         TODAY.setHours(0, 0, 0, 0);
         let CURRENT_YEAR = TODAY.getFullYear();
         const FEE_KEYWORDS = ['אגרה', 'אגרות', 'בעלות', 'רישיון'];
+
+        // Historical collections screen state. All dates are evaluated
+        // relative to CURRENT_YEAR so changing the work year recalculates
+        // both the matching year and the December cutoff dynamically.
+        let historicalTypeFilter = 'info';
+        let historicalSectorFilter = 'all';
+        let historicalSourceYear = 'all';
+        let historicalCustomerQuery = '';
+        let currentScreen = 'sources';
+
+        const SUITE_SCREENS = {
+            sources: 'data-sources-container',
+            dashboard: 'dashboard-container',
+            debt: 'main-app-container',
+            historical: 'historical-container',
+            management: 'management-container'
+        };
+
+        /**
+         * Navigate inside the single-page shell without reloading uploaded data.
+         * Mandatory datasets unlock the dashboard and debt-management screens;
+         * the optional matched-invoices dataset unlocks historical collections.
+         */
+        function navigateToScreen(screen) {
+            const coreReady = db.length > 0 && revenueDb.length > 0;
+            if ((screen === 'dashboard' || screen === 'debt' || screen === 'management') && !coreReady) screen = 'sources';
+            if (screen === 'historical' && (!coreReady || historicalRevenueDb.length === 0)) screen = 'sources';
+            if (!SUITE_SCREENS[screen]) screen = 'sources';
+
+            Object.values(SUITE_SCREENS).forEach(id => {
+                const container = document.getElementById(id);
+                if (!container) return;
+                container.classList.remove('flex');
+                container.classList.add('hidden');
+            });
+
+            const target = document.getElementById(SUITE_SCREENS[screen]);
+            if (target) {
+                target.classList.remove('hidden');
+                target.classList.add('flex');
+            }
+
+            currentScreen = screen;
+            isDashboardActive = screen === 'dashboard';
+            document.querySelectorAll('.suite-nav__item').forEach(item => item.classList.remove('is-active'));
+            document.getElementById('nav-' + screen)?.classList.add('is-active');
+
+            if (screen === 'dashboard') {
+                updateDashFiltersUI();
+                renderDashboard();
+            } else if (screen === 'debt') {
+                refresh();
+            } else if (screen === 'historical') {
+                renderHistoricalCollections();
+            } else if (screen === 'management') {
+                renderManagementReport();
+            }
+
+            closeSuiteMenu();
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        }
+
+        function toggleSuiteMenu() {
+            const isOpen = document.body.classList.toggle('suite-menu-open');
+            const button = document.getElementById('suite-menu-toggle');
+            if (button) button.setAttribute('aria-expanded', String(isOpen));
+        }
+
+        function closeSuiteMenu() {
+            document.body.classList.remove('suite-menu-open');
+            const button = document.getElementById('suite-menu-toggle');
+            if (button) button.setAttribute('aria-expanded', 'false');
+        }
 
         // --- לוגיקת סיווג לקוחות מעודכנת לפי שם הלקוח ---
         function getCustomerSector(customerName) {
@@ -1260,6 +2223,9 @@
                 const year = getRevenueYear(row);
                 if (year) years.add(year);
             });
+            historicalRevenueDb.forEach(row => {
+                if (isValidDate(row.matchDate)) years.add(row.matchDate.getFullYear());
+            });
             db.forEach(row => {
                 if (row.dueDate && row.dueDate.getFullYear()) {
                     years.add(row.dueDate.getFullYear());
@@ -1278,9 +2244,14 @@
             if (!Number.isInteger(year)) return;
             CURRENT_YEAR = year;
             syncReportYearLabels();
-            if (isDashboardActive) {
+            updateHistoricalYearFilter();
+            if (currentScreen === 'dashboard') {
                 renderDashboard();
-            } else if (db.length > 0 || revenueDb.length > 0) {
+            } else if (currentScreen === 'historical') {
+                renderHistoricalCollections();
+            } else if (currentScreen === 'management') {
+                renderManagementReport();
+            } else if (currentScreen === 'debt' && (db.length > 0 || revenueDb.length > 0)) {
                 refresh();
             }
         }
@@ -1378,24 +2349,13 @@
                 updateDashboardAccessState();
                 return;
             }
-            isDashboardActive = true;
-            document.getElementById('main-app-container').classList.add('hidden');
-            document.getElementById('dashboard-container').classList.remove('hidden');
-            document.getElementById('dashboard-container').classList.add('flex');
-            
             dashStageA = 'info';
             dashStageB = 'all-sectors';
-            
-            updateDashFiltersUI();
-            renderDashboard();
+            navigateToScreen('dashboard');
         }
 
         function exitDashboard() {
-            isDashboardActive = false;
-            document.getElementById('dashboard-container').classList.remove('flex');
-            document.getElementById('dashboard-container').classList.add('hidden');
-            document.getElementById('main-app-container').classList.remove('hidden');
-            refresh();
+            navigateToScreen('debt');
         }
 
         function setDashStageA(val) {
@@ -1508,10 +2468,8 @@
 
             document.getElementById('db-kpi-billed').innerText = formatCurrency(totalBilled);
             document.getElementById('db-kpi-collected').innerText = formatCurrency(totalCollected);
-            document.getElementById('db-kpi-debt').innerText = formatCurrency(totalDebt);
-            document.getElementById('db-sub-overdue').innerText = formatCurrency(debtOverdue);
-            document.getElementById('db-sub-future').innerText = formatCurrency(debtFuture);
-            document.getElementById('db-kpi-rate').innerText = collectionRate + "%";
+            document.getElementById('db-kpi-debt').innerText = formatCurrency(debtOverdue);
+            document.getElementById('db-kpi-future').innerText = formatCurrency(debtFuture);
 
             const monthlyBilled = Array(12).fill(0);
             const monthlyUnpaid = Array(12).fill(0);
@@ -1563,7 +2521,7 @@
                     labels: MONTH_NAMES,
                     datasets: [
                         {
-                            label: 'חיובים',
+                            label: 'הכנסות',
                             data: monthlyBilled,
                             backgroundColor: '#0B3C5D', 
                             borderRadius: 4
@@ -1699,7 +2657,7 @@
                 { stageA: 'info', stageB: 'private', title: 'שירותי מידע - לקוחות פרטיים' },
                 { stageA: 'fees', stageB: 'all-sectors', title: 'אגרות העברת בעלות - כלל הסקטורים' },
                 { stageA: 'all', stageB: 'all-sectors', title: 'סיכום משולב (הכל)' }
-            ], 'דוח מאוחד - הכנסות וגבייה ' + CURRENT_YEAR);
+            ], 'דוח מאוחד הכנסות וגבייה בשנה הנוכחית');
         }
 
         function printDashboardReport(printConfigs, documentTitle) {
@@ -1728,6 +2686,8 @@
 
                 const totalBilled = rRows.reduce((acc, r) => acc + r.amount, 0);
                 const totalDebt = dRows.reduce((acc, r) => acc + r.amount, 0);
+                const debtOverdue = dRows.filter(r => r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
+                const debtFuture = dRows.filter(r => !r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
                 const totalCollected = Math.max(0, totalBilled - totalDebt);
                 const collectionRate = totalBilled > 0 ? (totalCollected / totalBilled * 100).toFixed(1) : "0.0";
 
@@ -1748,20 +2708,20 @@
                         <h2 style="text-align:center; color:#0B3C5D; margin-bottom: 20px;">דוח גבייה והכנסות: ${config.title}</h2>
                         
                         <div class="kpis">
-                            <div class="kpi-card"><div class="kpi-title">סה"כ חיובים</div><div class="kpi-value" style="color:#1e3a8a">${formatCurrency(totalBilled)}</div></div>
-                            <div class="kpi-card"><div class="kpi-title">תקבולים בפועל</div><div class="kpi-value" style="color:#047857">${formatCurrency(totalCollected)}</div></div>
-                            <div class="kpi-card"><div class="kpi-title">יתרת חוב</div><div class="kpi-value" style="color:#b91c1c">${formatCurrency(totalDebt)}</div></div>
-                            <div class="kpi-card"><div class="kpi-title">שיעור גבייה</div><div class="kpi-value" style="color:#4338ca">${collectionRate}%</div></div>
+                            <div class="kpi-card"><div class="kpi-title">הכנסות</div><div class="kpi-value" style="color:#1e3a8a">${formatCurrency(totalBilled)}</div></div>
+                            <div class="kpi-card"><div class="kpi-title">גבייה עד כה</div><div class="kpi-value" style="color:#047857">${formatCurrency(totalCollected)}</div></div>
+                            <div class="kpi-card"><div class="kpi-title">חוב בפיגור</div><div class="kpi-value" style="color:#b91c1c">${formatCurrency(debtOverdue)}</div></div>
+                            <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${formatCurrency(debtFuture)}</div></div>
                         </div>
 
-                        <h3>פילוח חודשי שנת ${CURRENT_YEAR}</h3>
+                        <h3>הכנסות וגבייה לפי חודשים</h3>
                         <table>
                             <thead>
                                 <tr>
                                     <th>חודש</th>
                                     <th style="text-align:left">הכנסות (ש"ח)</th>
                                     <th style="text-align:left">גבייה (ש"ח)</th>
-                                    <th style="text-align:left">אחוז גבייה</th>
+                                    <th style="text-align:left">שיעור גבייה</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -2004,13 +2964,13 @@
 
                     let displayDetails = "";
                     if (listFilter === 'debts') {
-                        displayDetails = showClientPct ? `${debtPct}% מסך החובות, ${org.count} מסמכים פתוחים` : `${org.count} מסמכים פתוחים`;
+                        displayDetails = showClientPct ? `${debtPct}% מסך החובות, ${org.count} חשבוניות פתוחות` : `${org.count} חשבוניות פתוחות`;
                     } else if (listFilter === 'revenue') {
-                        displayDetails = showClientPct ? `${revPct}% מסך ההכנסות, ${org.count} מסמכי הכנסה` : `${org.count} מסמכי הכנסה`;
+                        displayDetails = showClientPct ? `${revPct}% מסך ההכנסות, ${org.count} חשבוניות הכנסה` : `${org.count} חשבוניות הכנסה`;
                     } else { 
                         displayDetails = showClientPct 
-                            ? `חוב: ${debtPct}% מהסך, הכנסה: ${revPct}% מהסך, ${org.count} מסמכים` 
-                            : `${org.count} מסמכים`;
+                            ? `חוב: ${debtPct}% מהסך, הכנסה: ${revPct}% מהסך, ${org.count} חשבוניות`
+                            : `${org.count} חשבוניות`;
                     }
 
                     let moraleHtml = "";
@@ -2198,15 +3158,17 @@
         function updateAnalytics(data) {
             const hasRevenue = db.length > 0 && revenueDb.length > 0;
 
-            document.getElementById('lbl-years-pie').innerHTML = `<i class="fa-solid fa-chart-pie ml-2 text-blue-500"></i>${hasRevenue ? 'פילוח חובות לפי שנים' : 'פילוח חוב לפי שנים'}`;
-            document.getElementById('lbl-years-table').innerHTML = `<i class="fa-solid fa-table ml-2 text-blue-500"></i>${hasRevenue ? 'ריכוז חובות לפי שנים' : 'ריכוז לפי שנים'}`;
+            document.getElementById('lbl-years-pie').innerHTML = '<i class="fa-solid fa-chart-pie ml-2 text-blue-500"></i>חובות פתוחים לפי שנים';
+            document.getElementById('lbl-years-table').innerHTML = '<i class="fa-solid fa-table ml-2 text-blue-500"></i>חובות פתוחים לפי שנים';
 
             const yearGroups = {};
             data.forEach(r => {
                 const yr = r.dueDate.getFullYear();
-                if (!yearGroups[yr]) yearGroups[yr] = { sum: 0, count: 0 };
+                if (!yearGroups[yr]) yearGroups[yr] = { sum: 0, count: 0, clients: new Set() };
                 yearGroups[yr].sum += r.amount; 
                 yearGroups[yr].count++;
+                const clientCode = String(r.code || '').trim();
+                if (clientCode) yearGroups[yr].clients.add(clientCode);
             });
 
             const tbody = document.getElementById('years-table-body'); 
@@ -2215,10 +3177,20 @@
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="p-3 font-bold text-blue-900 cursor-pointer underline hover:text-blue-700" onclick="exportBreakdownPdf(${yr})" style="font-family: Arial, Helvetica, sans-serif !important;">${yr}</td>
+                        <td class="p-3 text-slate-400 text-center" style="font-family: Arial, Helvetica, sans-serif !important;">${val.clients.size.toLocaleString('he-IL')}</td>
                         <td class="p-3 text-slate-400 text-center" style="font-family: Arial, Helvetica, sans-serif !important;">${val.count}</td>
                         <td class="p-3 text-left font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(val.sum)}</td>
                     </tr>`;
             });
+            const analyticsClientTotal = countUniqueClients(data);
+            const analyticsAmountTotal = data.reduce((sum, row) => sum + row.amount, 0);
+            tbody.innerHTML += `
+                <tr class="bg-slate-100 font-bold">
+                    <td class="p-3">סה"כ</td>
+                    <td class="p-3 text-center">${analyticsClientTotal.toLocaleString('he-IL')}</td>
+                    <td class="p-3 text-center">${data.length.toLocaleString('he-IL')}</td>
+                    <td class="p-3 text-left">${formatCurrency(analyticsAmountTotal)}</td>
+                </tr>`;
 
             const revMonthlyContainer = document.getElementById('revenue-monthly-container');
             const yearsContainer = document.getElementById('yearly-monthly-grids-container');
@@ -2248,7 +3220,7 @@
                         <div class="p-3 rounded-2xl border ${hasData ? 'bg-emerald-50 border-emerald-100' : 'bg-white border-slate-100 opacity-40'}">
                             <p class="text-[10px] font-bold text-slate-400" style="font-family: Arial, Helvetica, sans-serif !important;">${MONTH_NAMES[idx]}</p>
                             <p class="text-sm font-bold ${hasData ? 'text-emerald-900' : 'text-slate-200'}" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(m.sum)}</p>
-                            <p class="text-[9px] text-slate-300 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${m.count} תקבולים</p>
+                            <p class="text-[9px] text-slate-300 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${m.count} חשבוניות</p>
                         </div>
                     `;
                 });
@@ -2290,7 +3262,7 @@
                         <div ${clickAttr} class="p-3 rounded-2xl border ${hasData ? 'bg-slate-50 border-blue-100 ' + cursorClass : 'bg-white border-slate-100 opacity-40'}">
                             <p class="text-[10px] font-bold text-slate-400" style="font-family: Arial, Helvetica, sans-serif !important;">${MONTH_NAMES[idx]}</p>
                             <p class="text-sm font-bold ${hasData ? 'text-blue-900 underline' : 'text-slate-200'}" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(m.sum)}</p>
-                            <p class="text-[9px] text-slate-300 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${m.count} מסמכים</p>
+                            <p class="text-[9px] text-slate-300 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${m.count} חשבוניות</p>
                         </div>
                     `;
                 });
@@ -2386,7 +3358,7 @@
                             <tr>
                                 <th>מספר חשבון</th>
                                 <th>שם הלקוח</th>
-                                <th style="text-align: center;">מספר מסמכים</th>
+                                <th style="text-align: center;">מספר חשבוניות</th>
                                 <th style="text-align: left;">גובה החוב (ש"ח)</th>
                             </tr>
                         </thead>
@@ -2441,7 +3413,7 @@
             }
 
             if (data.length === 0) {
-                alert("אין מסמכים פתוחים להצגה עבור החתך המבוקש.");
+                alert("אין חשבוניות פתוחות להצגה עבור החתך המבוקש.");
                 return;
             }
 
@@ -2594,6 +3566,8 @@
                     .print-content th, .print-content td { border: 1px solid var(--print-border); padding: 8px 9px; text-align: right; vertical-align: top; }
                     .print-content th { background: var(--print-brand-soft); color: #26384a; font-weight: 700; }
                     .print-content tbody tr:nth-child(even) { background: #fbfcfd; }
+                    .print-content .bg-slate-100 { background: #eef3f7 !important; }
+                    .print-content .font-bold { font-weight: 700 !important; }
                     .signature-area, .signature-box, .payment-section, .report-chart, .report-summary,
                     .debt-alert, .kpis {
                         break-inside: avoid;
@@ -2998,6 +3972,761 @@
             toggleExportModal(false);
         }
 
+        // ============================================================
+        // Historical collections
+        // ============================================================
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function countUniqueClients(rows) {
+            return new Set(
+                rows
+                    .map(row => String(row.code || '').trim())
+                    .filter(Boolean)
+            ).size;
+        }
+
+        function formatDisplayDate(value) {
+            return isValidDate(value) ? value.toLocaleDateString('he-IL') : '-';
+        }
+
+        function getHistoricalCutoffDate() {
+            return new Date(CURRENT_YEAR - 1, 11, 1);
+        }
+
+        /**
+         * Business inclusion rule approved for historical collections:
+         * 1. The invoice was matched during the selected work year.
+         * 2. It was produced before 1 December of the preceding year.
+         */
+        function getEligibleHistoricalRows() {
+            const cutoff = getHistoricalCutoffDate();
+            return historicalRevenueDb.filter(row =>
+                isValidDate(row.matchDate)
+                && row.matchDate.getFullYear() === CURRENT_YEAR
+                && isValidDate(row.documentDate)
+                && row.documentDate < cutoff
+                && Number.isFinite(row.amount)
+            );
+        }
+
+        function setHistoricalTypeFilter(value) {
+            historicalTypeFilter = value;
+            document.querySelectorAll('[id^="hist-type-"]').forEach(button => button.classList.remove('active-filter'));
+            document.getElementById('hist-type-' + value)?.classList.add('active-filter');
+            renderHistoricalCollections();
+        }
+
+        function setHistoricalSectorFilter(value) {
+            historicalSectorFilter = value;
+            const sectorIds = {
+                all: 'hist-sector-all',
+                'משרדי ממשלה': 'hist-sector-gov',
+                'רשויות וחברות ממשלתיות': 'hist-sector-gov-auth',
+                'רשויות מקומיות': 'hist-sector-local',
+                'לקוחות פרטיים': 'hist-sector-private'
+            };
+            document.querySelectorAll('[id^="hist-sector-"]').forEach(button => button.classList.remove('active-filter'));
+            document.getElementById(sectorIds[value])?.classList.add('active-filter');
+            renderHistoricalCollections();
+        }
+
+        function setHistoricalSourceYear(value) {
+            historicalSourceYear = value === 'all' ? 'all' : Number(value);
+            renderHistoricalCollections();
+        }
+
+        /**
+         * The customer query is intentionally local to the invoice-detail list.
+         * It must not change the KPIs, summary tables, charts, or row reports.
+         */
+        function setHistoricalCustomerQuery(value) {
+            historicalCustomerQuery = String(value || '').trim().toLocaleLowerCase('he');
+            renderHistoricalDetailRows(getFilteredHistoricalRows());
+        }
+
+        function updateHistoricalYearFilter() {
+            const select = document.getElementById('historical-year-filter');
+            if (!select) return;
+            const years = [...new Set(
+                getEligibleHistoricalRows()
+                    .map(row => row.documentDate.getFullYear())
+                    .filter(Number.isInteger)
+            )].sort((a, b) => b - a);
+
+            if (historicalSourceYear !== 'all' && !years.includes(Number(historicalSourceYear))) {
+                historicalSourceYear = 'all';
+            }
+
+            select.innerHTML = '<option value="all">כל השנים</option>'
+                + years.map(year => `<option value="${year}">${year}</option>`).join('');
+            select.value = String(historicalSourceYear);
+        }
+
+        /**
+         * Apply the shared historical-screen filters in one place so the
+         * on-screen tables and their printable summary cannot diverge.
+         */
+        function getFilteredHistoricalRows() {
+            return getEligibleHistoricalRows()
+                .filter(row => {
+                    const typeMatch = historicalTypeFilter === 'all'
+                        || (historicalTypeFilter === 'fees' ? row.isFee : !row.isFee);
+                    const sectorMatch = historicalSectorFilter === 'all' || row.sector === historicalSectorFilter;
+                    const yearMatch = historicalSourceYear === 'all'
+                        || row.documentDate.getFullYear() === Number(historicalSourceYear);
+                    return typeMatch && sectorMatch && yearMatch;
+                })
+                .sort((a, b) =>
+                    b.documentDate - a.documentDate
+                    || b.matchDate - a.matchDate
+                    || String(a.name).localeCompare(String(b.name), 'he')
+                );
+        }
+
+        function renderHistoricalDetailRows(summaryRows) {
+            const detailRows = historicalCustomerQuery
+                ? summaryRows.filter(row =>
+                    String(row.name || '').toLocaleLowerCase('he').includes(historicalCustomerQuery)
+                    || String(row.code || '').toLocaleLowerCase('he').includes(historicalCustomerQuery)
+                )
+                : summaryRows;
+            const body = document.getElementById('historical-detail-table-body');
+            if (!body) return;
+            body.innerHTML = detailRows.length
+                ? detailRows.map(row => `
+                    <tr>
+                        <td>${formatDisplayDate(row.matchDate)}</td>
+                        <td>${formatDisplayDate(row.documentDate)}</td>
+                        <td><bdi dir="ltr">${escapeHtml(row.code)}</bdi></td>
+                        <td>${escapeHtml(row.name)}</td>
+                        <td>${escapeHtml(row.doc)}</td>
+                        <td>${escapeHtml(row.sector)}</td>
+                        <td>${row.isFee ? 'אגרות העברת בעלות' : 'שירותי מידע'}</td>
+                        <td><strong>${formatCurrency(row.amount)}</strong></td>
+                    </tr>
+                `).join('')
+                : '<tr><td colspan="8" style="text-align:center;color:#64748b">לא נמצאו חשבוניות ללקוח המבוקש.</td></tr>';
+        }
+
+        const REPORT_CHART_COLORS = ['#0B3C5D', '#6d43d6', '#10b981', '#e59a11', '#d14b57', '#4f7cac'];
+
+        function renderReportBarChart(existingChart, canvasId, labels, values, label, color = '#0B3C5D') {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas || typeof Chart === 'undefined') return existingChart;
+            if (existingChart) existingChart.destroy();
+            return new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{ label, data: values, backgroundColor: color, borderRadius: 5 }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: value => '₪' + Number(value).toLocaleString('he-IL') }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: { label: context => `${label}: ${formatCurrency(context.raw)}` }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderReportDoughnutChart(existingChart, canvasId, labels, values, label) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas || typeof Chart === 'undefined') return existingChart;
+            if (existingChart) existingChart.destroy();
+            return new Chart(canvas.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        label,
+                        data: values.map(value => Math.max(0, value)),
+                        backgroundColor: labels.map((_, index) => REPORT_CHART_COLORS[index % REPORT_CHART_COLORS.length]),
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    cutout: '58%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14 } },
+                        tooltip: {
+                            callbacks: { label: context => `${context.label}: ${formatCurrency(context.raw)}` }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderHistoricalCollections() {
+            const cutoff = getHistoricalCutoffDate();
+            const cutoffLabel = document.getElementById('historical-cutoff-label');
+            if (cutoffLabel) {
+                cutoffLabel.textContent = cutoff.toLocaleDateString('he-IL', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
+
+            updateHistoricalYearFilter();
+            const rows = getFilteredHistoricalRows();
+
+            const totalAmount = rows.reduce((sum, row) => sum + row.amount, 0);
+            const clientCount = countUniqueClients(rows);
+            document.getElementById('historical-kpi-amount').textContent = formatCurrency(totalAmount);
+            document.getElementById('historical-kpi-count').textContent = rows.length.toLocaleString('he-IL');
+            document.getElementById('historical-kpi-clients').textContent = clientCount.toLocaleString('he-IL');
+
+            const empty = rows.length === 0;
+            document.getElementById('historical-empty-state').classList.toggle('hidden', !empty);
+            document.getElementById('historical-results').classList.toggle('hidden', empty);
+            if (empty) return;
+
+            const byYear = new Map();
+            rows.forEach(row => {
+                const year = row.documentDate.getFullYear();
+                const summary = byYear.get(year) || { count: 0, amount: 0, clients: new Set() };
+                summary.count += 1;
+                summary.amount += row.amount;
+                const clientCode = String(row.code || '').trim();
+                if (clientCode) summary.clients.add(clientCode);
+                byYear.set(year, summary);
+            });
+
+            const yearEntries = [...byYear.entries()].sort((a, b) => b[0] - a[0]);
+            const yearRows = yearEntries
+                .map(([year, summary]) => `
+                    <tr>
+                        <td><button type="button" class="summary-link" onclick="printHistoricalBreakdown('year', ${year})">${year}</button></td>
+                        <td>${summary.clients.size.toLocaleString('he-IL')}</td>
+                        <td>${summary.count.toLocaleString('he-IL')}</td>
+                        <td><strong>${formatCurrency(summary.amount)}</strong></td>
+                    </tr>
+                `).join('');
+            document.getElementById('historical-year-table-body').innerHTML = yearRows + `
+                <tr class="bg-slate-100 font-bold">
+                    <td>סה"כ</td><td>${clientCount.toLocaleString('he-IL')}</td><td>${rows.length.toLocaleString('he-IL')}</td><td>${formatCurrency(totalAmount)}</td>
+                </tr>`;
+
+            const sectorOrder = ['משרדי ממשלה', 'רשויות וחברות ממשלתיות', 'רשויות מקומיות', 'לקוחות פרטיים'];
+            const sectorsToShow = historicalSectorFilter === 'all' ? sectorOrder : [historicalSectorFilter];
+            const sectorSummaries = sectorsToShow.map(sector => {
+                const sectorData = rows.filter(row => row.sector === sector);
+                return {
+                    sector,
+                    clients: countUniqueClients(sectorData),
+                    count: sectorData.length,
+                    amount: sectorData.reduce((sum, row) => sum + row.amount, 0)
+                };
+            });
+            const sectorRows = sectorSummaries.map(summary => {
+                return `
+                    <tr>
+                        <td><button type="button" class="summary-link" onclick="printHistoricalBreakdown('sector', decodeURIComponent('${encodeURIComponent(summary.sector)}'))">${escapeHtml(summary.sector)}</button></td>
+                        <td>${summary.clients.toLocaleString('he-IL')}</td>
+                        <td>${summary.count.toLocaleString('he-IL')}</td>
+                        <td><strong>${formatCurrency(summary.amount)}</strong></td>
+                    </tr>`;
+            }).join('');
+            document.getElementById('historical-sector-table-body').innerHTML = sectorRows + `
+                <tr class="bg-slate-100 font-bold">
+                    <td>סה"כ</td><td>${clientCount.toLocaleString('he-IL')}</td><td>${rows.length.toLocaleString('he-IL')}</td><td>${formatCurrency(totalAmount)}</td>
+                </tr>`;
+
+            historicalYearChart = renderReportBarChart(
+                historicalYearChart,
+                'historical-year-chart',
+                yearEntries.map(([year]) => String(year)).reverse(),
+                yearEntries.map(([, summary]) => summary.amount).reverse(),
+                'סכום שנגבה'
+            );
+            historicalSectorChart = renderReportDoughnutChart(
+                historicalSectorChart,
+                'historical-sector-chart',
+                sectorSummaries.map(summary => summary.sector),
+                sectorSummaries.map(summary => summary.amount),
+                'סכום שנגבה'
+            );
+
+            renderHistoricalDetailRows(rows);
+        }
+
+        function printHistoricalBreakdown(groupType, groupValue) {
+            const rows = getFilteredHistoricalRows().filter(row =>
+                groupType === 'year'
+                    ? row.documentDate.getFullYear() === Number(groupValue)
+                    : row.sector === groupValue
+            );
+            if (rows.length === 0) {
+                alert('אין חשבוניות להצגה עבור השורה שנבחרה.');
+                return;
+            }
+
+            const groupLabel = groupType === 'year'
+                ? `שנת הפקת החשבונית ${Number(groupValue)}`
+                : `סקטור ${String(groupValue)}`;
+            const title = `פירוט חובות עבר שנגבו בשנת ${CURRENT_YEAR} - ${groupLabel}`;
+            const totalAmount = rows.reduce((sum, row) => sum + row.amount, 0);
+            const clientCount = countUniqueClients(rows);
+            const win = window.open('', '_blank');
+            if (!win) {
+                alert('פתיחת החלון החדש נחסמה.');
+                return;
+            }
+
+            win.document.write(`
+                <html dir="rtl" lang="he"><head><title>${escapeHtml(title)}</title>
+                    ${getClientDocumentPrintStyles()}
+                </head><body>
+                    ${getClientDocumentPageStart(title)}
+                    <h1 class="document-title">${escapeHtml(title)}</h1>
+                    <div class="kpis">
+                        <div class="kpi-card"><div class="kpi-title">מספר לקוחות</div><div class="kpi-value">${clientCount.toLocaleString('he-IL')}</div></div>
+                        <div class="kpi-card"><div class="kpi-title">מספר חשבוניות</div><div class="kpi-value">${rows.length.toLocaleString('he-IL')}</div></div>
+                        <div class="kpi-card"><div class="kpi-title">סכום שנגבה</div><div class="kpi-value" style="color:#0B3C5D">${formatCurrency(totalAmount)}</div></div>
+                    </div>
+                    <section class="report-section">
+                        <table>
+                            <thead><tr><th>תאריך התאמה</th><th>תאריך הפקה</th><th>מספר לקוח</th><th>שם לקוח</th><th>מספר חשבונית</th><th>סקטור</th><th>תחום</th><th>סכום שנגבה</th></tr></thead>
+                            <tbody>
+                                ${rows.map(row => `
+                                    <tr>
+                                        <td>${formatDisplayDate(row.matchDate)}</td>
+                                        <td>${formatDisplayDate(row.documentDate)}</td>
+                                        <td><bdi dir="ltr">${escapeHtml(row.code)}</bdi></td>
+                                        <td>${escapeHtml(row.name)}</td>
+                                        <td>${escapeHtml(row.doc)}</td>
+                                        <td>${escapeHtml(row.sector)}</td>
+                                        <td>${row.isFee ? 'אגרות העברת בעלות' : 'שירותי מידע'}</td>
+                                        <td>${formatCurrency(row.amount)}</td>
+                                    </tr>
+                                `).join('')}
+                                <tr style="font-weight:bold;background:#eef3f7"><td colspan="6">סה"כ</td><td>${rows.length.toLocaleString('he-IL')} חשבוניות</td><td>${formatCurrency(totalAmount)}</td></tr>
+                            </tbody>
+                        </table>
+                    </section>
+                    ${getClientDocumentPageEnd()}
+                    <script>window.addEventListener('load',function(){window.focus();setTimeout(function(){window.print()},350)});<\/script>
+                </body></html>
+            `);
+            win.document.close();
+        }
+
+        function printHistoricalSummaryReport() {
+            const rows = getFilteredHistoricalRows();
+            if (rows.length === 0) {
+                alert('אין נתונים להפקת הדוח במסננים שנבחרו.');
+                return;
+            }
+
+            renderHistoricalCollections();
+            const activityLabel = historicalTypeFilter === 'all'
+                ? 'כל תחומי הפעילות'
+                : (historicalTypeFilter === 'fees' ? 'אגרות העברת בעלות' : 'שירותי מידע');
+            const sectorLabel = historicalSectorFilter === 'all' ? 'כל הסקטורים' : historicalSectorFilter;
+            const sourceYearLabel = historicalSourceYear === 'all' ? 'כל שנות המקור' : String(historicalSourceYear);
+            const totalAmount = rows.reduce((sum, row) => sum + row.amount, 0);
+            const title = `דוח חובות עבר שנגבו בשנת ${CURRENT_YEAR}`;
+            const yearChartImage = historicalYearChart ? historicalYearChart.toBase64Image() : '';
+            const sectorChartImage = historicalSectorChart ? historicalSectorChart.toBase64Image() : '';
+            const win = window.open('', '_blank');
+            if (!win) {
+                alert('פתיחת החלון החדש נחסמה.');
+                return;
+            }
+
+            win.document.write(`
+                <html dir="rtl" lang="he"><head><title>${title}</title>
+                    ${getClientDocumentPrintStyles()}
+                    <style>
+                        .summary-analysis-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:center;margin-top:22px;break-inside:avoid;page-break-inside:avoid}
+                        .summary-analysis-row .report-section{margin:0}
+                        .summary-chart{width:100%;max-height:210px;object-fit:contain}
+                        .summary-link{appearance:none;border:0;background:transparent;color:inherit;font:inherit;font-weight:700;padding:0}
+                        .summary-count-note{font-size:10px;color:#607080;margin:5px 0 0}
+                    </style>
+                </head><body>
+                    ${getClientDocumentPageStart(title)}
+                    <h1 class="document-title">${title}</h1>
+                    <p style="text-align:center;color:#526779;margin:-10px 0 20px">
+                        ${escapeHtml(activityLabel)} · ${escapeHtml(sectorLabel)} · ${escapeHtml(sourceYearLabel)}
+                    </p>
+                    <div class="kpis">
+                        <div class="kpi-card"><div class="kpi-title">סכום שנגבה</div><div class="kpi-value" style="color:#0B3C5D">${formatCurrency(totalAmount)}</div></div>
+                        <div class="kpi-card"><div class="kpi-title">מספר חשבוניות</div><div class="kpi-value">${rows.length.toLocaleString('he-IL')}</div></div>
+                        <div class="kpi-card"><div class="kpi-title">מספר לקוחות</div><div class="kpi-value">${countUniqueClients(rows).toLocaleString('he-IL')}</div></div>
+                    </div>
+                    <div class="summary-analysis-row">
+                        <section class="report-section">
+                            <h2>חובות עבר שנגבו השנה לפי שנים</h2>
+                            <table>
+                                <thead><tr><th>שנת הפקת החשבונית</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום שנגבה</th></tr></thead>
+                                <tbody>${document.getElementById('historical-year-table-body').innerHTML}</tbody>
+                            </table>
+                            <p class="summary-count-note">בשורת הסה״כ, כל לקוח נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.</p>
+                        </section>
+                        ${yearChartImage ? `<img class="summary-chart" src="${yearChartImage}" alt="גרף גביית עבר לפי שנים">` : ''}
+                    </div>
+                    <div class="summary-analysis-row">
+                        <section class="report-section">
+                            <h2>חובות עבר שנגבו השנה לפי סקטורים</h2>
+                            <table>
+                                <thead><tr><th>סקטור</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום שנגבה</th></tr></thead>
+                                <tbody>${document.getElementById('historical-sector-table-body').innerHTML}</tbody>
+                            </table>
+                        </section>
+                        ${sectorChartImage ? `<img class="summary-chart" src="${sectorChartImage}" alt="גרף גביית עבר לפי סקטורים">` : ''}
+                    </div>
+                    ${getClientDocumentPageEnd()}
+                    <script>window.addEventListener('load',function(){window.focus();setTimeout(function(){window.print()},350)});<\/script>
+                </body></html>
+            `);
+            win.document.close();
+        }
+
+        /**
+         * Build the management-report dataset from the same canonical rows and
+         * collection formula used by the current-year dashboard. Fees are
+         * deliberately excluded from every section.
+         */
+        function getManagementReportData() {
+            const sectors = ['משרדי ממשלה', 'רשויות וחברות ממשלתיות', 'רשויות מקומיות', 'לקוחות פרטיים'];
+            const revenues = revenueDb.filter(row =>
+                getRevenueYear(row) === CURRENT_YEAR && !row.isFee
+            );
+            const currentDebts = db.filter(row =>
+                isValidDate(row.dueDate)
+                && row.dueDate.getFullYear() === CURRENT_YEAR
+                && !row.isFee
+            );
+
+            const totalBilled = revenues.reduce((sum, row) => sum + row.amount, 0);
+            const totalDebt = currentDebts.reduce((sum, row) => sum + row.amount, 0);
+            const totalOverdue = currentDebts
+                .filter(row => row.isOverdue)
+                .reduce((sum, row) => sum + row.amount, 0);
+            const totalFuture = currentDebts
+                .filter(row => !row.isOverdue)
+                .reduce((sum, row) => sum + row.amount, 0);
+            const totalCollected = Math.max(0, totalBilled - totalDebt);
+            const collectionRate = totalBilled > 0 ? totalCollected / totalBilled * 100 : 0;
+
+            const monthlyBilled = Array(12).fill(0);
+            const monthlyUnpaid = Array(12).fill(0);
+            revenues.forEach(row => {
+                const month = getRevenueMonth(row);
+                if (Number.isInteger(month)) monthlyBilled[month] += row.amount;
+            });
+            currentDebts.forEach(row => {
+                const month = isValidDate(row.regDate) ? row.regDate.getMonth() : row.dueDate.getMonth();
+                monthlyUnpaid[month] += row.amount;
+            });
+            const monthlyCollected = monthlyBilled.map((amount, month) =>
+                Math.max(0, amount - monthlyUnpaid[month])
+            );
+
+            const sectorRows = sectors.map(sector => {
+                const sectorRevenues = revenues.filter(row => row.sector === sector);
+                const sectorDebts = currentDebts.filter(row => row.sector === sector);
+                const billed = sectorRevenues.reduce((sum, row) => sum + row.amount, 0);
+                const debt = sectorDebts.reduce((sum, row) => sum + row.amount, 0);
+                const collected = Math.max(0, billed - debt);
+                const clients = countUniqueClients([...sectorRevenues, ...sectorDebts]);
+                return {
+                    sector, clients, billed, collected, debt,
+                    rate: billed > 0 ? collected / billed * 100 : 0
+                };
+            });
+
+            const pastDebts = db.filter(row =>
+                !row.isFee
+                && isValidDate(row.dueDate)
+                && row.dueDate.getFullYear() < CURRENT_YEAR
+            );
+            const debtYearsMap = new Map();
+            pastDebts.forEach(row => {
+                const year = row.dueDate.getFullYear();
+                const summary = debtYearsMap.get(year) || { count: 0, amount: 0, clients: new Set() };
+                summary.count += 1;
+                summary.amount += row.amount;
+                const clientCode = String(row.code || '').trim();
+                if (clientCode) summary.clients.add(clientCode);
+                debtYearsMap.set(year, summary);
+            });
+            const debtYears = [...debtYearsMap.entries()].sort((a, b) => b[0] - a[0]);
+            const debtSectors = sectors.map(sector => {
+                const sectorData = pastDebts.filter(row => row.sector === sector);
+                return {
+                    sector,
+                    clients: countUniqueClients(sectorData),
+                    count: sectorData.length,
+                    amount: sectorData.reduce((sum, row) => sum + row.amount, 0)
+                };
+            });
+
+            const historicalRows = getEligibleHistoricalRows().filter(row => !row.isFee);
+            const historicalYearsMap = new Map();
+            historicalRows.forEach(row => {
+                const year = row.documentDate.getFullYear();
+                const summary = historicalYearsMap.get(year) || { count: 0, amount: 0, clients: new Set() };
+                summary.count += 1;
+                summary.amount += row.amount;
+                const clientCode = String(row.code || '').trim();
+                if (clientCode) summary.clients.add(clientCode);
+                historicalYearsMap.set(year, summary);
+            });
+            const historicalYears = [...historicalYearsMap.entries()].sort((a, b) => b[0] - a[0]);
+            const historicalSectors = sectors.map(sector => {
+                const sectorData = historicalRows.filter(row => row.sector === sector);
+                return {
+                    sector,
+                    clients: countUniqueClients(sectorData),
+                    count: sectorData.length,
+                    amount: sectorData.reduce((sum, row) => sum + row.amount, 0)
+                };
+            });
+
+            return {
+                totalBilled, totalDebt, totalOverdue, totalFuture, totalCollected, collectionRate,
+                monthlyBilled, monthlyCollected, sectorRows, debtYears, debtSectors,
+                pastDebts, historicalRows, historicalYears, historicalSectors
+            };
+        }
+
+        function renderManagementReport() {
+            const data = getManagementReportData();
+            const hasHistoricalSource = historicalRevenueDb.length > 0;
+            const closedDebtsSection = document.getElementById('management-closed-debts-section');
+            if (closedDebtsSection) closedDebtsSection.classList.toggle('hidden', !hasHistoricalSource);
+            document.getElementById('management-kpi-billed').textContent = formatCurrency(data.totalBilled);
+            document.getElementById('management-kpi-collected').textContent = formatCurrency(data.totalCollected);
+            document.getElementById('management-kpi-overdue').textContent = formatCurrency(data.totalOverdue);
+            document.getElementById('management-kpi-future').textContent = formatCurrency(data.totalFuture);
+
+            document.getElementById('management-monthly-table-body').innerHTML = MONTH_NAMES.map((month, index) => {
+                const billed = data.monthlyBilled[index];
+                const collected = data.monthlyCollected[index];
+                const rate = billed > 0 ? collected / billed * 100 : 0;
+                return `<tr><td><strong>${month}</strong></td><td>${formatCurrency(billed)}</td><td>${formatCurrency(collected)}</td><td>${rate.toFixed(1)}%</td></tr>`;
+            }).join('') + `
+                <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${formatCurrency(data.totalBilled)}</td><td>${formatCurrency(data.totalCollected)}</td><td>${data.collectionRate.toFixed(1)}%</td></tr>`;
+
+            const totalSectorClients = countUniqueClients([
+                ...revenueDb.filter(row => getRevenueYear(row) === CURRENT_YEAR && !row.isFee),
+                ...db.filter(row => isValidDate(row.dueDate) && row.dueDate.getFullYear() === CURRENT_YEAR && !row.isFee)
+            ]);
+            document.getElementById('management-sector-table-body').innerHTML = data.sectorRows.map(row => `
+                <tr>
+                    <td><strong>${escapeHtml(row.sector)}</strong></td>
+                    <td>${row.clients.toLocaleString('he-IL')}</td>
+                    <td>${formatCurrency(row.billed)}</td>
+                    <td>${formatCurrency(row.collected)}</td>
+                    <td>${row.rate.toFixed(1)}%</td>
+                </tr>
+            `).join('') + `
+                <tr class="bg-slate-100 font-bold">
+                    <td>סה"כ</td>
+                    <td>${totalSectorClients.toLocaleString('he-IL')}</td>
+                    <td>${formatCurrency(data.totalBilled)}</td>
+                    <td>${formatCurrency(data.totalCollected)}</td>
+                    <td>${data.collectionRate.toFixed(1)}%</td>
+                </tr>`;
+
+            const debtInvoicesTotal = data.pastDebts.length;
+            const debtClientsTotal = countUniqueClients(data.pastDebts);
+            const debtAmountTotal = data.debtYears.reduce((sum, [, row]) => sum + row.amount, 0);
+            document.getElementById('management-debt-years-table-body').innerHTML = data.debtYears.length
+                ? data.debtYears.map(([year, row]) => `<tr><td><strong>${year}</strong></td><td>${row.clients.size.toLocaleString('he-IL')}</td><td>${row.count.toLocaleString('he-IL')}</td><td>${formatCurrency(row.amount)}</td></tr>`).join('') + `
+                    <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${debtClientsTotal.toLocaleString('he-IL')}</td><td>${debtInvoicesTotal.toLocaleString('he-IL')}</td><td>${formatCurrency(debtAmountTotal)}</td></tr>`
+                : '<tr><td colspan="4">אין חובות עבר פתוחים להצגה</td></tr>';
+
+            document.getElementById('management-debt-sectors-table-body').innerHTML = data.debtYears.length
+                ? data.debtSectors.map(row => `<tr><td><strong>${escapeHtml(row.sector)}</strong></td><td>${row.clients.toLocaleString('he-IL')}</td><td>${row.count.toLocaleString('he-IL')}</td><td>${formatCurrency(row.amount)}</td></tr>`).join('') + `
+                    <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${debtClientsTotal.toLocaleString('he-IL')}</td><td>${debtInvoicesTotal.toLocaleString('he-IL')}</td><td>${formatCurrency(debtAmountTotal)}</td></tr>`
+                : '<tr><td colspan="4">אין חובות עבר פתוחים להצגה</td></tr>';
+
+            const historicalInvoicesTotal = data.historicalRows.length;
+            const historicalClientsTotal = countUniqueClients(data.historicalRows);
+            const historicalAmountTotal = data.historicalRows.reduce((sum, row) => sum + row.amount, 0);
+            document.getElementById('management-historical-years-table-body').innerHTML = data.historicalYears.length
+                ? data.historicalYears.map(([year, row]) => `<tr><td><strong>${year}</strong></td><td>${row.clients.size.toLocaleString('he-IL')}</td><td>${row.count.toLocaleString('he-IL')}</td><td>${formatCurrency(row.amount)}</td></tr>`).join('') + `
+                    <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${historicalClientsTotal.toLocaleString('he-IL')}</td><td>${historicalInvoicesTotal.toLocaleString('he-IL')}</td><td>${formatCurrency(historicalAmountTotal)}</td></tr>`
+                : '<tr><td colspan="4">קובץ החשבוניות שהותאמו בשנת העבודה טרם נטען, או שאין נתונים מתאימים</td></tr>';
+
+            document.getElementById('management-historical-sectors-table-body').innerHTML = data.historicalRows.length
+                ? data.historicalSectors.map(row => `<tr><td><strong>${escapeHtml(row.sector)}</strong></td><td>${row.clients.toLocaleString('he-IL')}</td><td>${row.count.toLocaleString('he-IL')}</td><td>${formatCurrency(row.amount)}</td></tr>`).join('') + `
+                    <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${historicalClientsTotal.toLocaleString('he-IL')}</td><td>${historicalInvoicesTotal.toLocaleString('he-IL')}</td><td>${formatCurrency(historicalAmountTotal)}</td></tr>`
+                : '<tr><td colspan="4">קובץ החשבוניות שהותאמו בשנת העבודה טרם נטען, או שאין נתונים מתאימים</td></tr>';
+
+            const canvas = document.getElementById('management-monthly-chart');
+            if (!canvas || typeof Chart === 'undefined') return;
+            if (managementChart) managementChart.destroy();
+            managementChart = new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: MONTH_NAMES,
+                    datasets: [
+                        { label: 'הכנסות', data: data.monthlyBilled, backgroundColor: '#0B3C5D', borderRadius: 4 },
+                        { label: 'גבייה', data: data.monthlyCollected, backgroundColor: '#10b981', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    scales: { y: { beginAtZero: true, ticks: { callback: value => '₪' + value.toLocaleString('he-IL') } } },
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            managementSectorChart = renderReportDoughnutChart(
+                managementSectorChart,
+                'management-sector-chart',
+                data.sectorRows.map(row => row.sector),
+                data.sectorRows.map(row => row.billed),
+                'הכנסות'
+            );
+
+            const debtYearsAscending = [...data.debtYears].reverse();
+            managementDebtYearsChart = renderReportBarChart(
+                managementDebtYearsChart,
+                'management-debt-years-chart',
+                debtYearsAscending.map(([year]) => String(year)),
+                debtYearsAscending.map(([, row]) => row.amount),
+                'סכום החוב'
+            );
+            managementDebtSectorsChart = renderReportDoughnutChart(
+                managementDebtSectorsChart,
+                'management-debt-sectors-chart',
+                data.debtSectors.map(row => row.sector),
+                data.debtSectors.map(row => row.amount),
+                'סכום החוב'
+            );
+
+            const historicalYearsAscending = [...data.historicalYears].reverse();
+            managementHistoricalYearsChart = renderReportBarChart(
+                managementHistoricalYearsChart,
+                'management-historical-years-chart',
+                historicalYearsAscending.map(([year]) => String(year)),
+                historicalYearsAscending.map(([, row]) => row.amount),
+                'סכום שנגבה',
+                '#e59a11'
+            );
+            managementHistoricalSectorsChart = renderReportDoughnutChart(
+                managementHistoricalSectorsChart,
+                'management-historical-sectors-chart',
+                data.historicalSectors.map(row => row.sector),
+                data.historicalSectors.map(row => row.amount),
+                'סכום שנגבה'
+            );
+        }
+
+        function printManagementReport() {
+            renderManagementReport();
+            const title = `סקירה מקיפה על שירותי מידע ${CURRENT_YEAR}`;
+            const hasHistoricalSource = historicalRevenueDb.length > 0;
+            const chartImages = {
+                monthly: managementChart ? managementChart.toBase64Image() : '',
+                sectors: managementSectorChart ? managementSectorChart.toBase64Image() : '',
+                debtYears: managementDebtYearsChart ? managementDebtYearsChart.toBase64Image() : '',
+                debtSectors: managementDebtSectorsChart ? managementDebtSectorsChart.toBase64Image() : '',
+                historicalYears: managementHistoricalYearsChart ? managementHistoricalYearsChart.toBase64Image() : '',
+                historicalSectors: managementHistoricalSectorsChart ? managementHistoricalSectorsChart.toBase64Image() : ''
+            };
+            const tableBlock = (heading, headerHtml, bodyId) => `
+                <section class="report-section">
+                    <h2>${heading}</h2>
+                    <table><thead>${headerHtml}</thead><tbody>${document.getElementById(bodyId).innerHTML}</tbody></table>
+                </section>`;
+            const analysisBlock = (heading, headerHtml, bodyId, image, alt, note = '') => `
+                <div class="management-analysis-unit">
+                    <div>${tableBlock(heading, headerHtml, bodyId)}${note ? `<p class="management-count-note">${note}</p>` : ''}</div>
+                    ${image ? `<img class="management-analysis-chart management-analysis-chart--${bodyId.includes('sector') ? 'doughnut' : 'bar'}" src="${image}" alt="${alt}">` : '<div></div>'}
+                </div>`;
+            const win = window.open('', '_blank');
+            if (!win) {
+                alert('פתיחת החלון החדש נחסמה.');
+                return;
+            }
+            win.document.write(`
+                <html dir="rtl" lang="he"><head><title>${title}</title>
+                    ${getClientDocumentPrintStyles()}
+                    <style>
+                        .management-report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+                        .management-report-grid,.management-analysis-unit,.report-section,table{break-inside:avoid;page-break-inside:avoid}
+                        .management-report-grid .report-section{margin:0!important}
+                        .management-report-chart{width:100%;max-height:170px;object-fit:contain}
+                        .management-analysis-unit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch;margin-top:18px}
+                        .management-analysis-unit .report-section{margin:0}
+                        .management-analysis-chart{width:100%;height:100%;max-height:none;align-self:stretch}
+                        .management-analysis-chart--bar{object-fit:fill}
+                        .management-analysis-chart--doughnut{object-fit:contain}
+                        .management-count-note{font-size:9.5px;color:#607080;margin:4px 0 0}
+                        .kpi-note{display:block;color:#607080;font-size:8.5px;margin-top:3px}
+                        .management-first-page,.management-page{break-after:page;page-break-after:always}
+                        .management-page--last{break-after:auto;page-break-after:auto}
+                        .management-page>h2{color:#0B3C5D;font-size:20px;margin:0 0 18px;padding-bottom:8px;border-bottom:2px solid #d6e0e8}
+                        .management-first-page .document-title{margin:8px 0 14px}
+                        .management-first-page table{font-size:7.5pt}
+                        .management-first-page th,.management-first-page td{padding:1.4mm 1.6mm}
+                        @page{size:A4 portrait}
+                    </style>
+                </head><body>
+                    ${getClientDocumentPageStart(title)}
+                    <section class="management-first-page">
+                        <h1 class="document-title">${title}</h1>
+                        <div class="kpis">
+                            <div class="kpi-card"><div class="kpi-title">הכנסות</div><div class="kpi-value" style="color:#0B3C5D">${document.getElementById('management-kpi-billed').textContent}</div><small class="kpi-note">סך ההכנסות בשנת העבודה</small></div>
+                            <div class="kpi-card"><div class="kpi-title">גבייה עד כה</div><div class="kpi-value" style="color:#047857">${document.getElementById('management-kpi-collected').textContent}</div><small class="kpi-note">גבייה מחושבת בשנת העבודה</small></div>
+                            <div class="kpi-card"><div class="kpi-title">חוב בפיגור</div><div class="kpi-value" style="color:#b91c1c">${document.getElementById('management-kpi-overdue').textContent}</div><small class="kpi-note">חשבוניות פתוחות שמועד פירעונן עבר</small></div>
+                            <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${document.getElementById('management-kpi-future').textContent}</div><small class="kpi-note">חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></div>
+                        </div>
+                        ${analysisBlock('הכנסות וגבייה לפי חודשים', '<tr><th>חודש</th><th>הכנסות</th><th>גבייה</th><th>שיעור גבייה</th></tr>', 'management-monthly-table-body', chartImages.monthly, 'גרף הכנסות וגבייה לפי חודשים')}
+                        ${analysisBlock('הכנסות וגבייה לפי סקטורים', '<tr><th>סקטור</th><th>מספר לקוחות</th><th>הכנסות</th><th>גבייה</th><th>שיעור גבייה</th></tr>', 'management-sector-table-body', chartImages.sectors, 'גרף התפלגות הכנסות לפי סקטורים')}
+                    </section>
+                    <section class="${hasHistoricalSource ? 'management-page' : 'management-page management-page--last'}">
+                        <h2>חובות פתוחים</h2>
+                        ${analysisBlock('חובות עבר פתוחים לפי שנים', '<tr><th>שנת חוב</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום החוב</th></tr>', 'management-debt-years-table-body', chartImages.debtYears, 'גרף חובות עבר פתוחים לפי שנים', 'בשורת הסה״כ, כל לקוח נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.')}
+                        ${analysisBlock('חובות עבר פתוחים לפי סקטורים', '<tr><th>סקטור</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום החוב</th></tr>', 'management-debt-sectors-table-body', chartImages.debtSectors, 'גרף חובות עבר פתוחים לפי סקטורים')}
+                    </section>
+                    ${hasHistoricalSource ? `<section class="management-page management-page--last">
+                        <h2>חובות עבר שנגבו בשנת העבודה</h2>
+                        ${analysisBlock('חובות עבר שנגבו השנה לפי שנים', '<tr><th>שנת הפקת החשבונית</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום שנגבה</th></tr>', 'management-historical-years-table-body', chartImages.historicalYears, 'גרף חובות עבר שנגבו השנה לפי שנים', 'בשורת הסה״כ, כל לקוח נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.')}
+                        ${analysisBlock('חובות עבר שנגבו השנה לפי סקטורים', '<tr><th>סקטור</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום שנגבה</th></tr>', 'management-historical-sectors-table-body', chartImages.historicalSectors, 'גרף חובות עבר שנגבו השנה לפי סקטורים')}
+                    </section>` : ''}
+                    ${getClientDocumentPageEnd()}
+                    <script>window.addEventListener('load',function(){window.focus();setTimeout(function(){window.print()},500)});<\/script>
+                </body></html>
+            `);
+            win.document.close();
+        }
+
+        // ============================================================
+        // Spreadsheet ingestion
+        // ============================================================
+
         function normalizeRowHeaders(row) {
             return Object.fromEntries(
                 Object.entries(row).map(([key, value]) => [
@@ -3031,7 +4760,12 @@
         }
 
         function showFileLoadError(fileType, message) {
-            const sourceName = fileType === 'debt' ? 'קובץ החובות' : 'קובץ ההכנסות';
+            const sourceNames = {
+                debt: 'קובץ החובות',
+                revenue: 'קובץ ההכנסות',
+                historical: 'קובץ החשבוניות שהותאמו בשנת העבודה'
+            };
+            const sourceName = sourceNames[fileType] || 'הקובץ';
             const container = document.getElementById('data-load-message');
             const text = document.getElementById('data-load-message-text');
             if (text) text.textContent = 'שגיאה בטעינת ' + sourceName + ': ' + message;
@@ -3122,6 +4856,70 @@
             reader.readAsArrayBuffer(file);
         }
 
+        /**
+         * Convert the shared revenue workbook structure to the canonical
+         * invoice representation used by current and historical screens.
+         * Existing reporting-year and amount rules are intentionally retained.
+         */
+        function parseRevenueRows(rows) {
+            validateSpreadsheetColumns(rows, [
+                { names: ['לקוח'], label: '"לקוח"' },
+                { names: ['שם חשבון', 'שם לקוח'], label: '"שם חשבון" או "שם לקוח"' },
+                { names: ['מועד פרעון נטו', 'תאריך תשלום', 'מועד פירעון'], label: 'עמודת מועד פירעון' },
+                { names: ['סכום במטבע מסמך', 'סכום'], label: '"סכום במטבע מסמך" או "סכום"' },
+                { names: ['שנה/חודש', 'תאריך רישום'], label: '"שנה/חודש" או "תאריך רישום"' }
+            ]);
+
+            const parsedRevenues = rows.filter(r => String(r['לקוח'] || '').length === 8).map(r => {
+                const code = String(r['לקוח']);
+                const name = String(r['שם חשבון'] || r['שם לקוח'] || 'לקוח').trim();
+                const dueDate = parseExcelDate(r['מועד פרעון נטו'] || r['תאריך תשלום'] || r['מועד פירעון']);
+                const regDate = parseExcelDate(r['תאריך רישום'] || r['תאריך מסמך'] || r['תאריך ערך']);
+                const documentDate = parseExcelDateOrNull(
+                    r['תאריך מסמך'] || r['תאריך רישום'] || r['תאריך ערך']
+                );
+                const reportingPeriod = parseYearMonth(r['שנה/חודש']);
+                const fiscalYear = parseFiscalYear(r['שנת כספים']);
+                const reportYear = fiscalYear
+                    ?? reportingPeriod?.year
+                    ?? (isValidDate(regDate) ? regDate.getFullYear() : null);
+                const reportMonth = reportingPeriod?.month
+                    ?? (isValidDate(regDate) ? regDate.getMonth() : null);
+                const matchDate = parseExcelDateOrNull(
+                    r['תאריך התאמה'] || r['תאריך התאמה נטו'] || r['תאריך תשלום']
+                );
+                const desc = r['טקסט'] || r['תיאור'] || r['תיאור השירות'] || '';
+                const counterAccount = String(r['שם חשבון נגדי'] || '').trim();
+                return {
+                    code, name,
+                    doc: r['מספר מסמך'] || '-',
+                    dueDate,
+                    regDate,
+                    documentDate,
+                    reportYear, reportMonth,
+                    matchDate,
+                    amount: parseFloat(String(r['סכום במטבע מסמך'] || r['סכום'] || 0).replace(/,/g, '')),
+                    desc,
+                    counterAccount,
+                    isFee: FEE_KEYWORDS.some(kw => counterAccount.includes(kw)),
+                    sector: getCustomerSector(name)
+                };
+            });
+
+            if (parsedRevenues.length === 0) {
+                throw new Error('לא נמצאו רשומות הכנסה עם מספר לקוח תקין בן 8 ספרות.');
+            }
+
+            const validReportingRows = parsedRevenues.filter(row =>
+                Number.isInteger(getRevenueYear(row)) && Number.isInteger(getRevenueMonth(row))
+            );
+            if (validReportingRows.length === 0) {
+                throw new Error('לא נמצאו ערכי תקופת דיווח תקינים. יש לבדוק את העמודות "שנת כספים", "שנה/חודש" או "תאריך רישום".');
+            }
+
+            return parsedRevenues;
+        }
+
         function processRevenueExcel(e) {
             const file = e.target.files?.[0];
             if (!file) return;
@@ -3131,55 +4929,7 @@
             reader.onload = (evt) => {
                 try {
                     const rows = getSpreadsheetRows(evt.target.result);
-                    validateSpreadsheetColumns(rows, [
-                        { names: ['לקוח'], label: '"לקוח"' },
-                        { names: ['שם חשבון', 'שם לקוח'], label: '"שם חשבון" או "שם לקוח"' },
-                        { names: ['מועד פרעון נטו', 'תאריך תשלום', 'מועד פירעון'], label: 'עמודת מועד פירעון' },
-                        { names: ['סכום במטבע מסמך', 'סכום'], label: '"סכום במטבע מסמך" או "סכום"' },
-                        { names: ['שנה/חודש', 'תאריך רישום'], label: '"שנה/חודש" או "תאריך רישום"' }
-                    ]);
-
-                    const parsedRevenues = rows.filter(r => String(r['לקוח'] || '').length === 8).map(r => {
-                        const code = String(r['לקוח']);
-                        const name = String(r['שם חשבון'] || r['שם לקוח'] || 'לקוח').trim();
-                        const dueDate = parseExcelDate(r['מועד פרעון נטו'] || r['תאריך תשלום'] || r['מועד פירעון']);
-                        const regDate = parseExcelDate(r['תאריך רישום'] || r['תאריך מסמך'] || r['תאריך ערך']);
-                        const reportingPeriod = parseYearMonth(r['שנה/חודש']);
-                        const fiscalYear = parseFiscalYear(r['שנת כספים']);
-                        const reportYear = fiscalYear
-                            ?? reportingPeriod?.year
-                            ?? (isValidDate(regDate) ? regDate.getFullYear() : null);
-                        const reportMonth = reportingPeriod?.month
-                            ?? (isValidDate(regDate) ? regDate.getMonth() : null);
-                        const matchDateVal = r['תאריך התאמה'] || r['תאריך התאמה נטו'] || r['תאריך תשלום'];
-                        const matchDate = matchDateVal ? parseExcelDate(matchDateVal) : null;
-                        const desc = r['טקסט'] || r['תיאור'] || r['תיאור השירות'] || '';
-                        const counterAccount = String(r['שם חשבון נגדי'] || '').trim();
-                        return {
-                            code, name,
-                            doc: r['מספר מסמך'] || '-',
-                            dueDate,
-                            regDate,
-                            reportYear, reportMonth,
-                            matchDate,
-                            amount: parseFloat(String(r['סכום במטבע מסמך'] || r['סכום'] || 0).replace(/,/g, '')),
-                            desc,
-                            counterAccount,
-                            isFee: FEE_KEYWORDS.some(kw => counterAccount.includes(kw)),
-                            sector: getCustomerSector(name)
-                        };
-                    });
-
-                    if (parsedRevenues.length === 0) {
-                        throw new Error('לא נמצאו רשומות הכנסה עם מספר לקוח תקין בן 8 ספרות.');
-                    }
-
-                    const validReportingRows = parsedRevenues.filter(row =>
-                        Number.isInteger(getRevenueYear(row)) && Number.isInteger(getRevenueMonth(row))
-                    );
-                    if (validReportingRows.length === 0) {
-                        throw new Error('לא נמצאו ערכי תקופת דיווח תקינים. יש לבדוק את העמודות "שנת כספים", "שנה/חודש" או "תאריך רישום".');
-                    }
+                    const parsedRevenues = parseRevenueRows(rows);
 
                     revenueDb = parsedRevenues;
                     updateReportYearOptions();
@@ -3206,6 +4956,48 @@
             };
             reader.onerror = () => {
                 showFileLoadError('revenue', 'לא ניתן לקרוא את הקובץ שנבחר.');
+                e.target.value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        /**
+         * Load invoices matched during the work year. The file is parsed with
+         * the same canonical schema as current-year revenue, but is stored in a
+         * separate collection so it cannot alter existing dashboard totals.
+         */
+        function processHistoricalRevenueExcel(e) {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            clearFileLoadError();
+
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                try {
+                    const rows = getSpreadsheetRows(evt.target.result);
+                    const parsedHistorical = parseRevenueRows(rows);
+                    const usableRows = parsedHistorical.filter(row =>
+                        isValidDate(row.matchDate) && isValidDate(row.documentDate)
+                    );
+                    if (usableRows.length === 0) {
+                        throw new Error('לא נמצאו רשומות עם תאריך התאמה ותאריך הפקת חשבונית תקינים.');
+                    }
+
+                    historicalRevenueDb = parsedHistorical;
+                    historicalSourceYear = 'all';
+                    updateReportYearOptions();
+                    updateHistoricalYearFilter();
+                    clearFileLoadError();
+                    markDataSourceLoaded('historical', file.name);
+                    if (currentScreen === 'historical') renderHistoricalCollections();
+                    if (currentScreen === 'management') renderManagementReport();
+                } catch (error) {
+                    showFileLoadError('historical', error?.message || 'מבנה הקובץ אינו תקין או שלא ניתן לקרוא אותו.');
+                    e.target.value = '';
+                }
+            };
+            reader.onerror = () => {
+                showFileLoadError('historical', 'לא ניתן לקרוא את הקובץ שנבחר.');
                 e.target.value = '';
             };
             reader.readAsArrayBuffer(file);
@@ -3270,23 +5062,61 @@
         }
 
         function markDataSourceLoaded(type, fileName) {
-            const isDebt = type === 'debt';
-            const action = document.getElementById(isDebt ? 'debt-file-action' : 'revenue-file-action');
-            const status = document.getElementById(isDebt ? 'debt-file-status' : 'revenue-file-status');
+            const sourceElements = {
+                debt: {
+                    action: 'debt-file-action',
+                    status: 'debt-file-status',
+                    card: 'debt-source-card'
+                },
+                revenue: {
+                    action: 'revenue-file-action',
+                    status: 'revenue-file-status',
+                    card: 'revenue-source-card'
+                },
+                historical: {
+                    action: 'historical-file-action',
+                    status: 'historical-file-status',
+                    card: 'historical-source-card'
+                }
+            };
+            const source = sourceElements[type];
+            if (!source) return;
+            const action = document.getElementById(source.action);
+            const status = document.getElementById(source.status);
+            const card = document.getElementById(source.card);
             if (action) action.classList.add('is-loaded');
+            if (card) card.classList.add('is-loaded');
             if (status) status.textContent = fileName || 'הקובץ נטען';
             updateDashboardAccessState();
         }
 
         function updateDashboardAccessState() {
-            const button = document.getElementById('btn-goto-dashboard');
-            if (!button) return;
-            const ready = db.length > 0 && revenueDb.length > 0;
-            button.disabled = !ready;
-            button.setAttribute('aria-disabled', String(!ready));
-            button.title = ready ? 'מעבר לדשבורד סיכום שנה' : 'הדשבורד זמין לאחר טעינת קובץ חובות וקובץ הכנסות';
-            const helper = button.querySelector('small');
-            if (helper) helper.textContent = ready ? 'שני מקורות הנתונים נטענו' : 'נדרש לטעון שני קבצים';
+            const coreReady = db.length > 0 && revenueDb.length > 0;
+            const historicalFileReady = historicalRevenueDb.length > 0;
+            const historicalReady = coreReady && historicalFileReady;
+
+            const setAccess = (id, enabled, title) => {
+                const element = document.getElementById(id);
+                if (!element) return;
+                element.disabled = !enabled;
+                element.setAttribute('aria-disabled', String(!enabled));
+                if (title) element.title = title;
+            };
+
+            setAccess('nav-dashboard', coreReady, coreReady ? 'פתיחת הדשבורד' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
+            setAccess('nav-debt', coreReady, coreReady ? 'פתיחת ניהול החובות' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
+            setAccess('nav-management', coreReady, coreReady ? 'פתיחת דוח ההנהלה' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
+            setAccess('nav-dashboard-report', coreReady, coreReady ? 'הפקת דוח מאוחד' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
+            const historicalAccessTitle = historicalReady
+                ? 'פתיחת גביית חובות עבר'
+                : (!coreReady
+                    ? 'נדרש לטעון תחילה את שני מקורות החובה'
+                    : 'נדרש לטעון קובץ חשבוניות שהותאמו בשנת העבודה');
+            setAccess('nav-historical', historicalReady, historicalAccessTitle);
+            const sourcesDot = document.querySelector('#nav-sources .suite-nav__dot');
+            if (sourcesDot) sourcesDot.classList.toggle('hidden', coreReady);
+            const sourcesYearContext = document.getElementById('sources-year-context');
+            if (sourcesYearContext) sourcesYearContext.classList.toggle('hidden', revenueDb.length === 0);
         }
 
         function initializeRedesignedInterface() {
@@ -3305,10 +5135,13 @@
             });
 
             updateDashboardAccessState();
+            syncReportYearLabels();
+            navigateToScreen('sources');
 
             document.addEventListener('keydown', event => {
                 if (event.key !== 'Escape') return;
                 document.querySelectorAll('.ui-dialog-backdrop.flex').forEach(dialog => closeUiDialog(dialog.id));
+                closeSuiteMenu();
             });
         }
 
