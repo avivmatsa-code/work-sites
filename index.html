@@ -23,15 +23,20 @@
       section { width:min(920px,100%); }
       h1 { font-size:clamp(2.4rem,7vw,4.8rem); margin:0 0 14px; color:var(--navy); }
       p { color:var(--muted); font-size:1.15rem; line-height:1.7; margin:0 0 24px; }
+      .actions { display:flex; flex-wrap:wrap; gap:12px; }
       a { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:0 18px; border-radius:8px; background:var(--navy); color:white; text-decoration:none; font-weight:800; }
+      a:focus-visible { outline:3px solid var(--teal); outline-offset:3px; }
     </style>
   </head>
   <body>
     <main>
       <section>
         <h1>אתרי עבודה</h1>
-        <p>דף שער לנושאי עבודה. האתר הראשון הוא אתר מחלקת קשרי לקוחות.</p>
-        <a href="./customer-relations/">פתיחת אתר מחלקת קשרי לקוחות</a>
+        <p>דף שער למערכות העבודה של משרד התחבורה.</p>
+        <div class="actions">
+          <a href="./digital-technologies/budget/">תקציב אגף טכנולוגיות דיגיטליות ומידע</a>
+          <a href="./customer-relations/">אתר מחלקת קשרי לקוחות</a>
+        </div>
       </section>
     </main>
   </body>
