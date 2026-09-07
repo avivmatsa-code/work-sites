@@ -2041,6 +2041,9 @@
                 
                 <div id="yearly-monthly-grids-container" class="space-y-6"></div>
             </div>
+
+            <!-- צריכת השאילתות של הלקוח מוצגת תמיד בסוף מסך הלקוח -->
+            <div id="client-query-container" class="hidden"></div>
         </main>
     </div>
 
@@ -2987,6 +2990,11 @@
             const btnExportClients = document.getElementById('btn-export-clients');
             const listFilterContainer = document.getElementById('list-filter-container');
             const lvl2FilterContainer = document.getElementById('lvl2-filter-container');
+            const clientQueryContainer = document.getElementById('client-query-container');
+            if (clientQueryContainer) {
+                clientQueryContainer.classList.add('hidden');
+                clientQueryContainer.innerHTML = '';
+            }
             
             let data = db.filter(r => (kpiFilter === 'overdue' ? r.isOverdue : !r.isOverdue) && isTypeMatch(r));
             if (db.length === 0 && revenueDb.length === 0) return;
@@ -3281,10 +3289,11 @@
                     updateAnalytics(activeOrgDebts);
                 }
 
-                const clientQueryData = getClientQueryData(path.orgName);
-                html += buildClientQuerySection(path.orgName);
                 view.innerHTML = html;
-                if (clientQueryData.length) {
+                const clientQueryData = getClientQueryData(path.orgName);
+                if (clientQueryContainer && clientQueryData.length) {
+                    clientQueryContainer.innerHTML = buildClientQuerySection(path.orgName);
+                    clientQueryContainer.classList.remove('hidden');
                     requestAnimationFrame(() => renderQueryCharts('client-query', clientQueryData));
                 }
             }
@@ -5583,7 +5592,7 @@
                         .print-query-subject{text-align:center;color:#0B3C5D;margin:8px 0 20px}.print-query-subject span{font-size:14px;color:#607080}
                         .print-query-page{width:210mm;height:297mm;padding:10mm 17mm 8mm;display:flex;flex-direction:column;overflow:hidden;break-after:page;page-break-after:always}.print-query-page:last-child{break-after:auto;page-break-after:auto}.print-query-page__content{flex:1;min-height:0;padding-top:5mm}.print-query-page .print-header,.print-query-page .print-footer{flex:0 0 auto}.print-query-page .print-footer{margin-top:auto}
                         .print-query-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}.print-query-kpis>div{border:1px solid #d5dee6;border-radius:8px;padding:12px}.print-query-kpis span{display:block;color:#607080;font-size:11px}.print-query-kpis strong{display:block;color:#0B3C5D;font-size:22px;margin-top:5px}
-                        .query-panel,.query-year-block{border:1px solid #d5dee6;border-radius:8px;padding:12px;margin:0 0 14px;break-inside:avoid;page-break-inside:avoid}.query-panel h3,.query-year-block h3{color:#0B3C5D;margin:0 0 10px}.query-year-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}.query-year-kpi{border:1px solid #d5dee6;border-radius:7px;padding:8px}.query-year-kpi span{display:block;color:#607080;font-size:9px;font-weight:bold}.query-year-kpi strong{display:block;color:#0B3C5D;font-size:18px;margin-top:3px}.query-grid{display:block}.query-table-wrap{width:100%}.query-table{width:100%;border-collapse:collapse;font-size:10px}.query-table th,.query-table td{border-bottom:1px solid #e8edf1;padding:5px 7px;text-align:right}.query-table th{background:#f5f7f9}.query-table tfoot td{font-weight:bold;background:#edf6fb}.query-peak-row td{background:#fff7e6}.query-chart{min-height:190px;display:flex;align-items:center;margin-top:12px}.query-chart img{display:block;width:100%!important;max-height:225px!important;object-fit:contain}
+                        .query-panel,.query-year-block{border:1px solid #d5dee6;border-radius:8px;padding:12px;margin:0 0 14px;break-inside:avoid;page-break-inside:avoid}.query-panel h3,.query-year-block h3{color:#0B3C5D;margin:0 0 10px}.query-year-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}.query-year-kpi{border:1px solid #d5dee6;border-radius:7px;padding:8px}.query-year-kpi span{display:block;color:#607080;font-size:9px;font-weight:bold}.query-year-kpi strong{display:block;color:#0B3C5D;font-size:18px;margin-top:3px}.query-grid{display:block}.query-table-wrap{width:100%}.query-table{width:100%;border-collapse:collapse;font-size:10px}.query-table th,.query-table td{border-bottom:1px solid #e8edf1;padding:5px 7px;text-align:right}.query-table th{background:#f5f7f9}.query-table tfoot td{font-weight:bold;background:#edf6fb}.query-peak-row td{background:#fff7e6}.query-chart{width:100%;height:225px;min-height:225px;display:block;margin-top:12px}.query-chart img{display:block;width:100%!important;height:225px!important;max-height:none!important;object-fit:fill}
                         @page{size:A4 portrait;margin:0}
                         @media print{
                             .query-panel,.query-year-block{margin:0;break-inside:avoid;page-break-inside:avoid}
