@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>גרסת בדיקה — צריכת שאילתות במערכת ניהול הכנסות וגבייה</title>
+    <title>גרסת בדיקה: צריכת שאילתות במערכת ניהול הכנסות וגבייה</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -906,6 +906,11 @@
         .query-kpi--online strong { color: var(--color-success); }
         .query-kpi--batch strong { color: var(--brand-primary); }
 
+        .query-year-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); margin-block-end: var(--space-4); }
+        .query-year-kpi { padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-subtle); }
+        .query-year-kpi span { display: block; color: var(--color-text-muted); font-size: 11px; font-weight: 700; }
+        .query-year-kpi strong { display: block; margin-block-start: 4px; color: var(--brand-active); font-size: var(--font-size-xl); }
+
         .query-panel, .query-year-block { margin-block-end: var(--space-5); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-panel); }
         .query-panel h3, .query-year-block h3 { margin: 0 0 var(--space-4); color: var(--brand-active); font-size: var(--font-size-lg); }
         .query-grid { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 1.15fr); gap: var(--space-5); align-items: stretch; }
@@ -916,7 +921,8 @@
         .query-table th { background: var(--color-surface-subtle); color: var(--color-text-muted); font-size: var(--font-size-xs); }
         .query-table tfoot td { background: var(--brand-subtle); color: var(--brand-active); font-weight: 700; }
         .query-peak-row td { background: var(--color-warning-bg); }
-        .query-chart { position: relative; min-height: 320px; }
+        .query-chart { position: relative; min-width: 0; min-height: 320px; overflow: hidden; }
+        .query-chart canvas { max-width: 100% !important; }
         .query-empty { padding: 70px var(--space-5); border: 1px dashed var(--color-border-strong); border-radius: var(--radius-lg); background: var(--color-surface); color: var(--color-text-muted); text-align: center; }
 
         .client-query-section { margin-block-start: var(--space-8); padding-block-start: var(--space-6); border-block-start: 3px solid var(--brand-border); }
@@ -927,6 +933,7 @@
         @media (max-width: 980px) {
             .query-grid { grid-template-columns: minmax(0, 1fr); }
             .query-kpis { grid-template-columns: 1fr; }
+            .query-year-kpis { grid-template-columns: 1fr; }
             .query-toolbar { align-items: stretch; flex-direction: column; }
             .query-search { max-width: none; flex-basis: auto; }
         }
@@ -1444,7 +1451,7 @@
             <section class="screen-intro">
                 <div>
                     <h2>טעינת נתוני המערכת</h2>
-                    <p>יש לטעון את קובץ החובות ואת קובץ ההכנסות של שנת העבודה כדי לפתוח את מסכי הליבה. מקורות הרשות פותחים את המסכים הייעודיים שלהם; לצפייה בצריכת שאילתות יש לטעון גם את קובץ האון־ליין וגם את קובץ האצווה.</p>
+                    <p>יש לטעון את קובץ החובות ואת קובץ ההכנסות של שנת העבודה כדי לפתוח את מסכי הליבה. מקורות הרשות פותחים את המסכים הייעודיים שלהם; לצפייה בצריכת שאילתות יש לטעון גם את קובץ האון ליין וגם את קובץ האצווה.</p>
                 </div>
                 <div id="sources-year-context" class="year-context hidden"><i class="fa-regular fa-calendar" aria-hidden="true"></i>שנת עבודה <span class="report-year-label"></span></div>
             </section>
@@ -1492,13 +1499,13 @@
                 <article id="query-online-source-card" class="source-card">
                     <div class="source-card__heading">
                         <span class="source-card__icon"><i class="fa-solid fa-globe" aria-hidden="true"></i></span>
-                        <div><h3>שאילתות און־ליין</h3><p>נתוני צריכת שאילתות בזמן אמת, לפי לקוח, שנה וחודש פעילות.</p></div>
+                        <div><h3>שאילתות און ליין</h3><p>נתוני צריכת שאילתות בזמן אמת, לפי לקוח, שנה וחודש פעילות.</p></div>
                         <span class="source-card__badge source-card__badge--optional">רשות</span>
                     </div>
                     <input type="file" id="query-online-uploader" class="hidden" accept=".xlsx,.xls" onchange="processQueryExcel(event, 'online')">
                     <label for="query-online-uploader" id="query-online-file-action" class="file-action" tabindex="0">
                         <span class="file-action__icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></span>
-                        <span><strong>בחירת קובץ שאילתות און־ליין</strong><small id="query-online-file-status">טרם נטען</small></span>
+                        <span><strong>בחירת קובץ שאילתות און ליין</strong><small id="query-online-file-status">טרם נטען</small></span>
                     </label>
                 </article>
 
@@ -1566,7 +1573,7 @@
             </section>
 
             <section id="query-client-kpis" class="query-kpis" aria-label="מספר לקוחות פעילים">
-                <article class="query-kpi query-kpi--online"><span>לקוחות פעילים און־ליין</span><strong id="query-kpi-online-clients">0</strong></article>
+                <article class="query-kpi query-kpi--online"><span>לקוחות פעילים און ליין</span><strong id="query-kpi-online-clients">0</strong></article>
                 <article class="query-kpi query-kpi--batch"><span>לקוחות פעילים אצווה</span><strong id="query-kpi-batch-clients">0</strong></article>
                 <article class="query-kpi"><span>סך לקוחות פעילים</span><strong id="query-kpi-total-clients">0</strong></article>
             </section>
@@ -2439,6 +2446,16 @@
                 : '';
         }
 
+        function payerCodeBadge(orgName) {
+            const clientCode = normalizeClientCodeValue(getClientCode(orgName));
+            if (!clientCode) return '';
+            const payerCodes = [...new Set(getAllQueryData()
+                .filter(row => row.clientId === clientCode && row.payerCode)
+                .map(row => row.payerCode))];
+            if (!payerCodes.length) return '';
+            return `<span class="inline-flex items-center bg-slate-100 text-slate-600 border border-slate-200 text-base px-2 py-0.5 rounded-full font-bold mr-2" title="קוד גורם משלם" style="font-family: Arial, Helvetica, sans-serif !important;">קוד גורם משלם: <bdi dir="ltr">${payerCodes.join(', ')}</bdi></span>`;
+        }
+
         function directDebitBadge(orgName) {
             return hasDirectDebit(orgName)
                 ? `<span class="inline-flex items-center bg-sky-100 text-sky-800 border border-sky-200 text-[10px] px-2 py-0.5 rounded-full font-bold mr-2" style="font-family: Arial, Helvetica, sans-serif !important;">הו"ק</span>`
@@ -3186,7 +3203,7 @@
             }
             else if (currentLevel === 2) {
                 back.classList.remove('hidden'); sortTools.classList.add('hidden'); pctToggle.classList.add('hidden'); moraleToggle.classList.add('hidden'); btnExportClients.classList.add('hidden'); listFilterContainer.classList.add('hidden');
-                title.innerHTML = `${path.orgName} ${clientCodeBadge(path.orgName)} ${directDebitBadge(path.orgName)}`;
+                title.innerHTML = `${path.orgName} ${clientCodeBadge(path.orgName)} ${payerCodeBadge(path.orgName)} ${directDebitBadge(path.orgName)}`;
 
                 if (hasRevenue) {
                     lvl2FilterContainer.classList.remove('hidden');
@@ -4935,7 +4952,7 @@
                 debt: 'קובץ החובות',
                 revenue: 'קובץ ההכנסות',
                 historical: 'קובץ החשבוניות שהותאמו בשנת העבודה',
-                'query-online': 'קובץ שאילתות האון־ליין',
+                'query-online': 'קובץ שאילתות האון ליין',
                 'query-batch': 'קובץ שאילתות האצווה'
             };
             const sourceName = sourceNames[fileType] || 'הקובץ';
@@ -5186,13 +5203,13 @@
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
             const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
             const normalizeHeader = value => String(value ?? '').replace(/\u00a0/g, ' ').trim();
-            const requiredHeaders = ['שנה', 'חודש פעילות', 'קוד גורם משלם', 'גורם', 'כמות חודשית'];
+            const requiredHeaders = ['שנה', 'חודש פעילות', 'קוד גורם משלם', 'קוד מרכבה', 'גורם', 'כמות חודשית'];
             const headerIndex = matrix.findIndex(row => {
                 const values = row.map(normalizeHeader);
                 return requiredHeaders.every(header => values.includes(header));
             });
             if (headerIndex < 0) {
-                throw new Error('לא נמצאה שורת כותרות תקינה. נדרשות העמודות: שנה, חודש פעילות, קוד גורם משלם, גורם וכמות חודשית.');
+                throw new Error('לא נמצאה שורת כותרות תקינה. נדרשות העמודות: שנה, חודש פעילות, קוד גורם משלם, קוד מרכבה, גורם וכמות חודשית.');
             }
 
             const headers = matrix[headerIndex].map(normalizeHeader);
@@ -5200,13 +5217,15 @@
             column.response = headers.indexOf('קוד תשובה');
 
             const rows = matrix.slice(headerIndex + 1).map(row => {
-                const clientId = normalizeClientCodeValue(row[column['קוד גורם משלם']]);
+                const clientId = normalizeClientCodeValue(row[column['קוד מרכבה']]);
+                const payerCode = normalizeClientCodeValue(row[column['קוד גורם משלם']]);
                 const clientName = String(row[column['גורם']] ?? '').trim();
                 const amount = Number(String(row[column['כמות חודשית']] ?? '0').replace(/,/g, '')) || 0;
                 return {
                     year: Number.parseInt(row[column['שנה']], 10),
                     month: Number.parseInt(row[column['חודש פעילות']], 10),
                     clientId,
+                    payerCode,
                     clientName,
                     amount,
                     type,
@@ -5304,6 +5323,14 @@
             return { online, batch, total: online + batch, activeMonths };
         }
 
+        function summarizeQueryClients(data, year = null) {
+            const rows = year === null ? data : data.filter(row => row.year === year);
+            const onlineIds = new Set(rows.filter(row => row.type === 'online').map(row => row.clientId));
+            const batchIds = new Set(rows.filter(row => row.type === 'batch').map(row => row.clientId));
+            const totalIds = new Set(rows.map(row => row.clientId));
+            return { online: onlineIds.size, batch: batchIds.size, total: totalIds.size };
+        }
+
         function summarizeQueryMonths(data, year) {
             const months = Array.from({ length: 12 }, (_, index) => ({ month: index + 1, online: 0, batch: 0, total: 0 }));
             data.filter(row => row.year === year).forEach(row => {
@@ -5315,7 +5342,7 @@
             return months;
         }
 
-        function buildQueryAnalysisMarkup(data, prefix) {
+        function buildQueryAnalysisMarkup(data, prefix, showClientCounts = false) {
             const years = getQueryYears(data);
             if (years.length === 0) {
                 return '<div class="query-empty"><i class="fa-solid fa-chart-simple text-3xl mb-3" aria-hidden="true"></i><p>לא נמצאו נתוני שאילתות להצגה.</p></div>';
@@ -5332,7 +5359,7 @@
                     <div class="query-grid">
                         <div class="query-table-wrap">
                             <table class="query-table">
-                                <thead><tr><th>שנה</th><th>און־ליין</th><th>אצווה</th><th>סך הכול</th><th>ממוצע חודשי</th></tr></thead>
+                                <thead><tr><th>שנה</th><th>און ליין</th><th>אצווה</th><th>סך הכול</th><th>ממוצע חודשי</th></tr></thead>
                                 <tbody>${annualRows}</tbody>
                             </table>
                         </div>
@@ -5342,6 +5369,7 @@
 
             const yearlyBlocks = years.map(year => {
                 const months = summarizeQueryMonths(data, year);
+                const clientCounts = summarizeQueryClients(data, year);
                 const peak = Math.max(...months.map(month => month.total));
                 const rows = months.map(month => `
                     <tr class="${month.total === peak && peak > 0 ? 'query-peak-row' : ''}">
@@ -5353,11 +5381,17 @@
                 const totals = months.reduce((sum, month) => ({ online: sum.online + month.online, batch: sum.batch + month.batch, total: sum.total + month.total }), { online: 0, batch: 0, total: 0 });
                 return `
                     <section class="query-year-block">
-                        <h3>שנת ${year} — פירוט חודשי</h3>
+                        <h3>פירוט חודשי לצריכת שאילתות בשנת ${year}</h3>
+                        ${showClientCounts ? `
+                            <div class="query-year-kpis">
+                                <div class="query-year-kpi"><span>לקוחות פעילים און ליין בשנת ${year}</span><strong>${clientCounts.online.toLocaleString('he-IL')}</strong></div>
+                                <div class="query-year-kpi"><span>לקוחות פעילים אצווה בשנת ${year}</span><strong>${clientCounts.batch.toLocaleString('he-IL')}</strong></div>
+                                <div class="query-year-kpi"><span>סך לקוחות פעילים בשנת ${year}</span><strong>${clientCounts.total.toLocaleString('he-IL')}</strong></div>
+                            </div>` : ''}
                         <div class="query-grid">
                             <div class="query-table-wrap">
                                 <table class="query-table">
-                                    <thead><tr><th>חודש</th><th>און־ליין</th><th>אצווה</th><th>סך הכול</th></tr></thead>
+                                    <thead><tr><th>חודש</th><th>און ליין</th><th>אצווה</th><th>סך הכול</th></tr></thead>
                                     <tbody>${rows}</tbody>
                                     <tfoot><tr><td>סך הכול</td><td>${totals.online.toLocaleString('he-IL')}</td><td>${totals.batch.toLocaleString('he-IL')}</td><td>${totals.total.toLocaleString('he-IL')}</td></tr></tfoot>
                                 </table>
@@ -5395,7 +5429,7 @@
                 instances.push(new Chart(annualCanvas, {
                     type: 'bar',
                     data: { labels: years, datasets: [
-                        { label: 'און־ליין', data: summaries.map(item => item.online), backgroundColor: onlineColor },
+                        { label: 'און ליין', data: summaries.map(item => item.online), backgroundColor: onlineColor },
                         { label: 'אצווה', data: summaries.map(item => item.batch), backgroundColor: batchColor }
                     ] },
                     options: baseOptions
@@ -5409,7 +5443,7 @@
                 instances.push(new Chart(canvas, {
                     type: 'bar',
                     data: { labels: MONTH_NAMES, datasets: [
-                        { label: 'און־ליין', data: months.map(item => item.online), backgroundColor: onlineColor },
+                        { label: 'און ליין', data: months.map(item => item.online), backgroundColor: onlineColor },
                         { label: 'אצווה', data: months.map(item => item.batch), backgroundColor: batchColor }
                     ] },
                     options: baseOptions
@@ -5434,12 +5468,13 @@
                 document.getElementById('query-client-name').textContent = selected.name;
                 document.getElementById('query-client-code').textContent = selected.id;
             } else {
-                document.getElementById('query-kpi-online-clients').textContent = new Set(queryOnlineDb.map(row => row.clientId)).size.toLocaleString('he-IL');
-                document.getElementById('query-kpi-batch-clients').textContent = new Set(queryBatchDb.map(row => row.clientId)).size.toLocaleString('he-IL');
-                document.getElementById('query-kpi-total-clients').textContent = new Set(getAllQueryData().map(row => row.clientId)).size.toLocaleString('he-IL');
+                const clientCounts = summarizeQueryClients(getAllQueryData());
+                document.getElementById('query-kpi-online-clients').textContent = clientCounts.online.toLocaleString('he-IL');
+                document.getElementById('query-kpi-batch-clients').textContent = clientCounts.batch.toLocaleString('he-IL');
+                document.getElementById('query-kpi-total-clients').textContent = clientCounts.total.toLocaleString('he-IL');
             }
 
-            document.getElementById('query-analysis-content').innerHTML = buildQueryAnalysisMarkup(data, 'query-main');
+            document.getElementById('query-analysis-content').innerHTML = buildQueryAnalysisMarkup(data, 'query-main', !selected);
             requestAnimationFrame(() => renderQueryCharts('query-main', data));
         }
 
@@ -5465,7 +5500,7 @@
             querySelectedClientId = normalizeClientCodeValue(clientId);
             const selected = getQueryClientDirectory().find(client => client.id === querySelectedClientId);
             const input = document.getElementById('query-client-search');
-            if (input && selected) input.value = `${selected.name} — ${selected.id}`;
+            if (input && selected) input.value = `${selected.name}, מספר מרכבה: ${selected.id}`;
             const suggestions = document.getElementById('query-client-suggestions');
             if (suggestions) suggestions.classList.add('hidden');
             renderQueryConsumptionScreen();
@@ -5493,7 +5528,7 @@
                 <section class="client-query-section">
                     <div class="client-query-section__heading">
                         <h3>צריכת שאילתות מידע</h3>
-                        <p>כל שנות הפעילות שנמצאו בקובצי האון־ליין והאצווה · מספר לקוח במרכבה: <bdi dir="ltr">${escapeHtml(clientCode)}</bdi></p>
+                        <p>כל שנות הפעילות שנמצאו בקובצי האון ליין והאצווה. מספר לקוח במרכבה: <bdi dir="ltr">${escapeHtml(clientCode)}</bdi></p>
                     </div>
                     ${buildQueryAnalysisMarkup(data, 'client-query')}
                 </section>`;
@@ -5519,13 +5554,23 @@
 
             const clientCounts = selected ? '' : `
                 <div class="print-query-kpis">
-                    <div><span>לקוחות פעילים און־ליין</span><strong>${new Set(queryOnlineDb.map(row => row.clientId)).size.toLocaleString('he-IL')}</strong></div>
+                    <div><span>לקוחות פעילים און ליין</span><strong>${new Set(queryOnlineDb.map(row => row.clientId)).size.toLocaleString('he-IL')}</strong></div>
                     <div><span>לקוחות פעילים אצווה</span><strong>${new Set(queryBatchDb.map(row => row.clientId)).size.toLocaleString('he-IL')}</strong></div>
                     <div><span>סך לקוחות פעילים</span><strong>${new Set(getAllQueryData().map(row => row.clientId)).size.toLocaleString('he-IL')}</strong></div>
                 </div>`;
             const subject = selected
-                ? `<h2 class="print-query-subject">${escapeHtml(selected.name)} <span>· מספר מרכבה <bdi dir="ltr">${escapeHtml(selected.id)}</bdi></span></h2>`
+                ? `<h2 class="print-query-subject">${escapeHtml(selected.name)} <span>מספר מרכבה: <bdi dir="ltr">${escapeHtml(selected.id)}</bdi></span></h2>`
                 : '<h2 class="print-query-subject">כלל המשק</h2>';
+            const reportSections = [...content.children];
+            const annualSection = reportSections.shift()?.outerHTML || '';
+            const buildPrintPage = body => `
+                <section class="print-query-page">
+                    ${getClientDocumentPrintHeader('דוח צריכת שאילתות מידע')}
+                    <main class="print-content print-query-page__content">${body}</main>
+                    ${getClientDocumentPrintFooter()}
+                </section>`;
+            const reportPages = buildPrintPage(subject + clientCounts + annualSection)
+                + reportSections.map(section => buildPrintPage(section.outerHTML)).join('');
             const reportWindow = window.open('', '_blank');
             if (!reportWindow) {
                 alert('פתיחת חלון ההדפסה נחסמה.');
@@ -5536,14 +5581,16 @@
                     ${getClientDocumentPrintStyles()}
                     <style>
                         .print-query-subject{text-align:center;color:#0B3C5D;margin:8px 0 20px}.print-query-subject span{font-size:14px;color:#607080}
+                        .print-query-page{width:210mm;height:297mm;padding:10mm 17mm 8mm;display:flex;flex-direction:column;overflow:hidden;break-after:page;page-break-after:always}.print-query-page:last-child{break-after:auto;page-break-after:auto}.print-query-page__content{flex:1;min-height:0;padding-top:5mm}.print-query-page .print-header,.print-query-page .print-footer{flex:0 0 auto}.print-query-page .print-footer{margin-top:auto}
                         .print-query-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}.print-query-kpis>div{border:1px solid #d5dee6;border-radius:8px;padding:12px}.print-query-kpis span{display:block;color:#607080;font-size:11px}.print-query-kpis strong{display:block;color:#0B3C5D;font-size:22px;margin-top:5px}
-                        .query-panel,.query-year-block{border:1px solid #d5dee6;border-radius:8px;padding:14px;margin:0 0 18px;break-inside:avoid;page-break-inside:avoid}.query-panel h3,.query-year-block h3{color:#0B3C5D;margin:0 0 12px}.query-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:16px}.query-table{width:100%;border-collapse:collapse;font-size:11px}.query-table th,.query-table td{border-bottom:1px solid #e8edf1;padding:7px;text-align:right}.query-table th{background:#f5f7f9}.query-table tfoot td{font-weight:bold;background:#edf6fb}.query-peak-row td{background:#fff7e6}.query-chart{min-height:220px;display:flex;align-items:center}
-                        @media print{.query-year-block{break-before:page;page-break-before:always}.query-panel{break-after:page;page-break-after:always}}
+                        .query-panel,.query-year-block{border:1px solid #d5dee6;border-radius:8px;padding:12px;margin:0 0 14px;break-inside:avoid;page-break-inside:avoid}.query-panel h3,.query-year-block h3{color:#0B3C5D;margin:0 0 10px}.query-year-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}.query-year-kpi{border:1px solid #d5dee6;border-radius:7px;padding:8px}.query-year-kpi span{display:block;color:#607080;font-size:9px;font-weight:bold}.query-year-kpi strong{display:block;color:#0B3C5D;font-size:18px;margin-top:3px}.query-grid{display:block}.query-table-wrap{width:100%}.query-table{width:100%;border-collapse:collapse;font-size:10px}.query-table th,.query-table td{border-bottom:1px solid #e8edf1;padding:5px 7px;text-align:right}.query-table th{background:#f5f7f9}.query-table tfoot td{font-weight:bold;background:#edf6fb}.query-peak-row td{background:#fff7e6}.query-chart{min-height:190px;display:flex;align-items:center;margin-top:12px}.query-chart img{display:block;width:100%!important;max-height:225px!important;object-fit:contain}
+                        @page{size:A4 portrait;margin:0}
+                        @media print{
+                            .query-panel,.query-year-block{margin:0;break-inside:avoid;page-break-inside:avoid}
+                        }
                     </style>
                 </head><body>
-                    ${getClientDocumentPageStart('דוח צריכת שאילתות מידע')}
-                    ${subject}${clientCounts}${content.innerHTML}
-                    ${getClientDocumentPageEnd()}
+                    ${reportPages}
                     <script>window.addEventListener('load',()=>setTimeout(()=>window.print(),350));<\/script>
                 </body></html>`);
             reportWindow.document.close();
@@ -5659,7 +5706,7 @@
             setAccess('nav-historical', historicalReady, historicalAccessTitle);
             setAccess('nav-queries', queriesReady, queriesReady
                 ? 'פתיחת צריכת שאילתות מידע'
-                : 'נדרש לטעון קובץ שאילתות און־ליין וקובץ שאילתות אצווה');
+                : 'נדרש לטעון קובץ שאילתות און ליין וקובץ שאילתות אצווה');
 
             const querySourceNote = document.getElementById('query-source-note');
             const querySourceNoteText = document.getElementById('query-source-note-text');
@@ -5667,8 +5714,8 @@
             if (querySourceNote) querySourceNote.classList.toggle('hidden', !exactlyOneQuerySource);
             if (querySourceNoteText && exactlyOneQuerySource) {
                 querySourceNoteText.textContent = queryOnlineReady
-                    ? 'קובץ האון־ליין נטען. כדי לפתוח את מסך צריכת השאילתות יש לטעון גם את קובץ האצווה.'
-                    : 'קובץ האצווה נטען. כדי לפתוח את מסך צריכת השאילתות יש לטעון גם את קובץ האון־ליין.';
+                    ? 'קובץ האון ליין נטען. כדי לפתוח את מסך צריכת השאילתות יש לטעון גם את קובץ האצווה.'
+                    : 'קובץ האצווה נטען. כדי לפתוח את מסך צריכת השאילתות יש לטעון גם את קובץ האון ליין.';
             }
             const sourcesDot = document.querySelector('#nav-sources .suite-nav__dot');
             if (sourcesDot) sourcesDot.classList.toggle('hidden', coreReady);
