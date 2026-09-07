@@ -745,6 +745,7 @@
         body.suite-enabled .suite-screen .app-title-row { justify-content: center; }
 
         .source-screen-main,
+        .query-screen-main,
         .historical-screen-main,
         .management-screen-main {
             width: min(1500px, calc(100% - 40px));
@@ -854,6 +855,87 @@
 
         .source-card .file-action small {
             max-width: 230px;
+        }
+
+        .query-source-note {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-block-start: var(--space-4);
+            padding: var(--space-4);
+            border: 1px solid var(--color-warning);
+            border-radius: var(--radius-md);
+            background: var(--color-warning-bg);
+            color: #744500;
+            font-size: var(--font-size-sm);
+            line-height: 1.5;
+        }
+
+        .query-toolbar {
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: var(--space-4);
+            margin-block-end: var(--space-5);
+            padding: var(--space-4);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            background: var(--color-surface);
+            box-shadow: var(--shadow-panel);
+        }
+
+        .query-search { position: relative; flex: 1 1 520px; max-width: 720px; }
+        .query-search label { display: block; margin-block-end: 6px; color: var(--color-text-muted); font-size: var(--font-size-xs); font-weight: 700; }
+        .query-search input { width: 100%; min-height: var(--control-height); padding-inline: var(--space-4); border: 1px solid var(--color-border-strong); border-radius: var(--radius-md); background: #fff; color: var(--color-text); }
+        .query-search input:focus { outline: 3px solid color-mix(in srgb, var(--focus-color) 22%, transparent); border-color: var(--focus-color); }
+        .query-suggestions { position: absolute; inset-inline: 0; inset-block-start: calc(100% + 4px); z-index: 30; max-height: 320px; overflow-y: auto; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: #fff; box-shadow: var(--shadow-floating); }
+        .query-suggestion { width: 100%; display: flex; justify-content: space-between; gap: var(--space-3); padding: 11px var(--space-3); border: 0; border-block-end: 1px solid #eef2f5; background: #fff; color: var(--color-text); text-align: right; }
+        .query-suggestion:hover, .query-suggestion:focus { background: var(--brand-subtle); outline: 0; }
+        .query-suggestion small { color: var(--color-text-muted); direction: ltr; }
+        .query-toolbar__actions { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+
+        .query-client-context { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); margin-block-end: var(--space-5); padding: var(--space-4) var(--space-5); border: 1px solid var(--brand-border); border-radius: var(--radius-lg); background: var(--brand-subtle); }
+        .query-client-context h2 { margin: 0; color: var(--brand-active); font-size: var(--font-size-xl); }
+        .query-client-context p { margin: 4px 0 0; color: var(--color-text-muted); font-size: var(--font-size-sm); }
+
+        .query-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); margin-block-end: var(--space-5); }
+        .query-kpi { padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-panel); }
+        .query-kpi span { display: block; color: var(--color-text-muted); font-size: var(--font-size-xs); font-weight: 700; }
+        .query-kpi strong { display: block; margin-block-start: var(--space-2); color: var(--brand-active); font-size: 30px; }
+        .query-kpi--online strong { color: var(--color-success); }
+        .query-kpi--batch strong { color: var(--brand-primary); }
+
+        .query-year-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); margin-block-end: var(--space-4); }
+        .query-year-kpi { padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface-subtle); }
+        .query-year-kpi span { display: block; color: var(--color-text-muted); font-size: 11px; font-weight: 700; }
+        .query-year-kpi strong { display: block; margin-block-start: 4px; color: var(--brand-active); font-size: var(--font-size-xl); }
+
+        .query-panel, .query-year-block { margin-block-end: var(--space-5); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-panel); }
+        .query-panel h3, .query-year-block h3 { margin: 0 0 var(--space-4); color: var(--brand-active); font-size: var(--font-size-lg); }
+        .query-grid { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 1.15fr); gap: var(--space-5); align-items: stretch; }
+        .query-grid > * { min-width: 0; }
+        .query-table-wrap { max-width: 100%; overflow-x: auto; }
+        .query-table { width: 100%; border-collapse: collapse; font-size: var(--font-size-sm); }
+        .query-table th, .query-table td { padding: 11px 12px; border-block-end: 1px solid #e8edf1; text-align: right; white-space: nowrap; }
+        .query-table th { background: var(--color-surface-subtle); color: var(--color-text-muted); font-size: var(--font-size-xs); }
+        .query-table tfoot td { background: var(--brand-subtle); color: var(--brand-active); font-weight: 700; }
+        .query-peak-row td { background: var(--color-warning-bg); }
+        .query-chart { position: relative; min-width: 0; min-height: 320px; overflow: hidden; }
+        .query-chart canvas { max-width: 100% !important; }
+        .query-empty { padding: 70px var(--space-5); border: 1px dashed var(--color-border-strong); border-radius: var(--radius-lg); background: var(--color-surface); color: var(--color-text-muted); text-align: center; }
+
+        .client-query-section { margin-block-start: var(--space-8); padding-block-start: var(--space-6); border-block-start: 3px solid var(--brand-border); }
+        .client-query-section__heading { margin-block-end: var(--space-4); }
+        .client-query-section__heading h3 { margin: 0; color: var(--brand-active); font-size: var(--font-size-xl); }
+        .client-query-section__heading p { margin: 4px 0 0; color: var(--color-text-muted); font-size: var(--font-size-sm); }
+
+        @media (max-width: 980px) {
+            .query-grid { grid-template-columns: minmax(0, 1fr); }
+            .query-kpis { grid-template-columns: 1fr; }
+            .query-year-kpis { grid-template-columns: 1fr; }
+            .query-toolbar { align-items: stretch; flex-direction: column; }
+            .query-search { max-width: none; flex-basis: auto; }
         }
 
         .historical-rule {
@@ -1160,6 +1242,7 @@
             }
 
             .source-screen-main,
+            .query-screen-main,
             .historical-screen-main,
             .management-screen-main {
                 width: min(100% - 24px, 1500px);
@@ -1319,6 +1402,9 @@
             <button id="nav-historical" class="suite-nav__item" type="button" onclick="navigateToScreen('historical')" disabled>
                 <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i><span>חובות עבר שנגבו השנה</span>
             </button>
+            <button id="nav-queries" class="suite-nav__item" type="button" onclick="navigateToScreen('queries')" disabled>
+                <i class="fa-solid fa-chart-simple" aria-hidden="true"></i><span>צריכת שאילתות מידע</span>
+            </button>
             <div class="suite-sidebar__section-label">דוחות הנהלה</div>
             <button id="nav-management" class="suite-nav__item" type="button" onclick="navigateToScreen('management')" disabled>
                 <i class="fa-solid fa-chart-column" aria-hidden="true"></i><span>סקירה מקיפה על שירותי מידע</span>
@@ -1365,7 +1451,7 @@
             <section class="screen-intro">
                 <div>
                     <h2>טעינת נתוני המערכת</h2>
-                    <p>יש לטעון את קובץ החובות ואת קובץ ההכנסות של שנת העבודה כדי לפתוח את מסכי הליבה. קובץ החשבוניות שהותאמו בשנת העבודה הוא מקור רשות ופותח את מסך גביית חובות העבר.</p>
+                    <p>יש לטעון את קובץ החובות ואת קובץ ההכנסות של שנת העבודה כדי לפתוח את מסכי הליבה. מקורות הרשות פותחים את המסכים הייעודיים שלהם; לצפייה בצריכת שאילתות יש לטעון גם את קובץ האון ליין וגם את קובץ האצווה.</p>
                 </div>
                 <div id="sources-year-context" class="year-context hidden"><i class="fa-regular fa-calendar" aria-hidden="true"></i>שנת עבודה <span class="report-year-label"></span></div>
             </section>
@@ -1409,13 +1495,90 @@
                         <span><strong>בחר קובץ חשבוניות שהותאמו בשנת העבודה</strong><small id="historical-file-status">טרם נטען</small></span>
                     </label>
                 </article>
+
+                <article id="query-online-source-card" class="source-card">
+                    <div class="source-card__heading">
+                        <span class="source-card__icon"><i class="fa-solid fa-globe" aria-hidden="true"></i></span>
+                        <div><h3>שאילתות און ליין</h3><p>נתוני צריכת שאילתות בזמן אמת, לפי לקוח, שנה וחודש פעילות.</p></div>
+                        <span class="source-card__badge source-card__badge--optional">רשות</span>
+                    </div>
+                    <input type="file" id="query-online-uploader" class="hidden" accept=".xlsx,.xls" onchange="processQueryExcel(event, 'online')">
+                    <label for="query-online-uploader" id="query-online-file-action" class="file-action" tabindex="0">
+                        <span class="file-action__icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></span>
+                        <span><strong>בחירת קובץ שאילתות און ליין</strong><small id="query-online-file-status">טרם נטען</small></span>
+                    </label>
+                </article>
+
+                <article id="query-batch-source-card" class="source-card">
+                    <div class="source-card__heading">
+                        <span class="source-card__icon"><i class="fa-solid fa-layer-group" aria-hidden="true"></i></span>
+                        <div><h3>שאילתות אצווה</h3><p>נתוני צריכת שאילתות אצווה, לפי לקוח, שנה וחודש פעילות.</p></div>
+                        <span class="source-card__badge source-card__badge--optional">רשות</span>
+                    </div>
+                    <input type="file" id="query-batch-uploader" class="hidden" accept=".xlsx,.xls" onchange="processQueryExcel(event, 'batch')">
+                    <label for="query-batch-uploader" id="query-batch-file-action" class="file-action" tabindex="0">
+                        <span class="file-action__icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></span>
+                        <span><strong>בחירת קובץ שאילתות אצווה</strong><small id="query-batch-file-status">טרם נטען</small></span>
+                    </label>
+                </article>
             </section>
+
+            <p id="query-source-note" class="query-source-note hidden" role="status" aria-live="polite">
+                <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                <span id="query-source-note-text"></span>
+            </p>
 
             <p id="data-currency-date" class="data-currency hidden"></p>
             <p id="data-load-message" class="data-load-message hidden" role="alert" aria-live="assertive">
                 <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
                 <span id="data-load-message-text"></span>
             </p>
+        </main>
+    </div>
+
+    <!-- QUERY CONSUMPTION SCREEN -->
+    <div id="queries-container" class="suite-screen hidden flex-col flex-grow">
+        <header class="app-header no-print">
+            <div class="app-header__inner">
+                <div class="government-brand">
+                    <img class="government-logo" src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה והבטיחות בדרכים">
+                    <div>
+                        <div class="ministry-name">משרד התחבורה והבטיחות בדרכים</div>
+                        <div class="department-name">אגף טכנולוגיות דיגיטליות ומידע</div>
+                    </div>
+                </div>
+                <div class="app-identity">
+                    <div class="app-title-row"><h1 class="app-title">צריכת שאילתות מידע</h1><span class="beta-badge">BETA</span></div>
+                    <div class="system-date"></div>
+                </div>
+                <div class="header-actions" aria-hidden="true"></div>
+            </div>
+        </header>
+
+        <main class="query-screen-main flex-grow">
+            <section class="query-toolbar no-print" aria-label="חיפוש ופעולות צריכת שאילתות">
+                <div class="query-search">
+                    <label for="query-client-search">חיפוש לקוח לפי שם או מספר במרכבה</label>
+                    <input id="query-client-search" type="search" autocomplete="off" placeholder="הקלד שם לקוח או מספר במרכבה" oninput="renderQueryClientSuggestions(this.value)">
+                    <div id="query-client-suggestions" class="query-suggestions hidden"></div>
+                </div>
+                <div class="query-toolbar__actions">
+                    <button id="query-reset-button" type="button" class="button-secondary hidden" onclick="clearQueryClientSelection()"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>חזרה לכלל המשק</button>
+                    <button type="button" class="button-secondary button-secondary--brand" onclick="printQueryConsumptionReport()"><i class="fa-solid fa-print" aria-hidden="true"></i>הדפסת הדוח</button>
+                </div>
+            </section>
+
+            <section id="query-client-context" class="query-client-context hidden">
+                <div><h2 id="query-client-name"></h2><p>מספר לקוח במרכבה: <bdi id="query-client-code" dir="ltr"></bdi></p></div>
+            </section>
+
+            <section id="query-client-kpis" class="query-kpis" aria-label="מספר לקוחות פעילים">
+                <article class="query-kpi query-kpi--online"><span>לקוחות פעילים און ליין</span><strong id="query-kpi-online-clients">0</strong></article>
+                <article class="query-kpi query-kpi--batch"><span>לקוחות פעילים אצווה</span><strong id="query-kpi-batch-clients">0</strong></article>
+                <article class="query-kpi"><span>סך לקוחות פעילים</span><strong id="query-kpi-total-clients">0</strong></article>
+            </section>
+
+            <div id="query-analysis-content"></div>
         </main>
     </div>
 
@@ -1878,6 +2041,9 @@
                 
                 <div id="yearly-monthly-grids-container" class="space-y-6"></div>
             </div>
+
+            <!-- צריכת השאילתות של הלקוח מוצגת תמיד בסוף מסך הלקוח -->
+            <div id="client-query-container" class="hidden"></div>
         </main>
     </div>
 
@@ -2034,6 +2200,11 @@
         let db = []; 
         let revenueDb = []; 
         let historicalRevenueDb = [];
+        let queryOnlineDb = [];
+        let queryBatchDb = [];
+        let querySelectedClientId = null;
+        let queryChartInstances = [];
+        let clientQueryChartInstances = [];
         let incomeFilter = 'info'; 
         let kpiFilter = 'overdue';
         let currentLevel = 0; 
@@ -2080,6 +2251,7 @@
             dashboard: 'dashboard-container',
             debt: 'main-app-container',
             historical: 'historical-container',
+            queries: 'queries-container',
             management: 'management-container'
         };
 
@@ -2090,8 +2262,10 @@
          */
         function navigateToScreen(screen) {
             const coreReady = db.length > 0 && revenueDb.length > 0;
+            const queriesReady = queryOnlineDb.length > 0 && queryBatchDb.length > 0;
             if ((screen === 'dashboard' || screen === 'debt' || screen === 'management') && !coreReady) screen = 'sources';
             if (screen === 'historical' && (!coreReady || historicalRevenueDb.length === 0)) screen = 'sources';
+            if (screen === 'queries' && !queriesReady) screen = 'sources';
             if (!SUITE_SCREENS[screen]) screen = 'sources';
 
             Object.values(SUITE_SCREENS).forEach(id => {
@@ -2119,6 +2293,8 @@
                 refresh();
             } else if (screen === 'historical') {
                 renderHistoricalCollections();
+            } else if (screen === 'queries') {
+                renderQueryConsumptionScreen();
             } else if (screen === 'management') {
                 renderManagementReport();
             }
@@ -2271,6 +2447,16 @@
             return clientCode
                 ? `<span class="inline-flex items-center bg-slate-100 text-slate-600 border border-slate-200 text-base px-2 py-0.5 rounded-full font-bold mr-2" title="מספר לקוח במרכבה" style="font-family: Arial, Helvetica, sans-serif !important;">לקוח במרכבה: <bdi dir="ltr">${clientCode}</bdi></span>`
                 : '';
+        }
+
+        function payerCodeBadge(orgName) {
+            const clientCode = normalizeClientCodeValue(getClientCode(orgName));
+            if (!clientCode) return '';
+            const payerCodes = [...new Set(getAllQueryData()
+                .filter(row => row.clientId === clientCode && row.payerCode)
+                .map(row => row.payerCode))];
+            if (!payerCodes.length) return '';
+            return `<span class="inline-flex items-center bg-slate-100 text-slate-600 border border-slate-200 text-base px-2 py-0.5 rounded-full font-bold mr-2" title="קוד גורם משלם" style="font-family: Arial, Helvetica, sans-serif !important;">קוד גורם משלם: <bdi dir="ltr">${payerCodes.join(', ')}</bdi></span>`;
         }
 
         function directDebitBadge(orgName) {
@@ -2804,6 +2990,11 @@
             const btnExportClients = document.getElementById('btn-export-clients');
             const listFilterContainer = document.getElementById('list-filter-container');
             const lvl2FilterContainer = document.getElementById('lvl2-filter-container');
+            const clientQueryContainer = document.getElementById('client-query-container');
+            if (clientQueryContainer) {
+                clientQueryContainer.classList.add('hidden');
+                clientQueryContainer.innerHTML = '';
+            }
             
             let data = db.filter(r => (kpiFilter === 'overdue' ? r.isOverdue : !r.isOverdue) && isTypeMatch(r));
             if (db.length === 0 && revenueDb.length === 0) return;
@@ -3020,7 +3211,7 @@
             }
             else if (currentLevel === 2) {
                 back.classList.remove('hidden'); sortTools.classList.add('hidden'); pctToggle.classList.add('hidden'); moraleToggle.classList.add('hidden'); btnExportClients.classList.add('hidden'); listFilterContainer.classList.add('hidden');
-                title.innerHTML = `${path.orgName} ${clientCodeBadge(path.orgName)} ${directDebitBadge(path.orgName)}`;
+                title.innerHTML = `${path.orgName} ${clientCodeBadge(path.orgName)} ${payerCodeBadge(path.orgName)} ${directDebitBadge(path.orgName)}`;
 
                 if (hasRevenue) {
                     lvl2FilterContainer.classList.remove('hidden');
@@ -3099,6 +3290,12 @@
                 }
 
                 view.innerHTML = html;
+                const clientQueryData = getClientQueryData(path.orgName);
+                if (clientQueryContainer && clientQueryData.length) {
+                    clientQueryContainer.innerHTML = buildClientQuerySection(path.orgName);
+                    clientQueryContainer.classList.remove('hidden');
+                    requestAnimationFrame(() => renderQueryCharts('client-query', clientQueryData));
+                }
             }
         }
 
@@ -4763,7 +4960,9 @@
             const sourceNames = {
                 debt: 'קובץ החובות',
                 revenue: 'קובץ ההכנסות',
-                historical: 'קובץ החשבוניות שהותאמו בשנת העבודה'
+                historical: 'קובץ החשבוניות שהותאמו בשנת העבודה',
+                'query-online': 'קובץ שאילתות האון ליין',
+                'query-batch': 'קובץ שאילתות האצווה'
             };
             const sourceName = sourceNames[fileType] || 'הקובץ';
             const container = document.getElementById('data-load-message');
@@ -5003,6 +5202,88 @@
             reader.readAsArrayBuffer(file);
         }
 
+        function normalizeClientCodeValue(value) {
+            return String(value ?? '').trim().replace(/\.0$/, '').replace(/[^0-9]/g, '');
+        }
+
+        function parseQueryRows(arrayBuffer, type) {
+            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+            if (!workbook.SheetNames?.length) throw new Error('הקובץ אינו מכיל גיליון נתונים.');
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+            const normalizeHeader = value => String(value ?? '').replace(/\u00a0/g, ' ').trim();
+            const requiredHeaders = ['שנה', 'חודש פעילות', 'קוד גורם משלם', 'קוד מרכבה', 'גורם', 'כמות חודשית'];
+            const headerIndex = matrix.findIndex(row => {
+                const values = row.map(normalizeHeader);
+                return requiredHeaders.every(header => values.includes(header));
+            });
+            if (headerIndex < 0) {
+                throw new Error('לא נמצאה שורת כותרות תקינה. נדרשות העמודות: שנה, חודש פעילות, קוד גורם משלם, קוד מרכבה, גורם וכמות חודשית.');
+            }
+
+            const headers = matrix[headerIndex].map(normalizeHeader);
+            const column = Object.fromEntries(requiredHeaders.map(header => [header, headers.indexOf(header)]));
+            column.response = headers.indexOf('קוד תשובה');
+
+            const rows = matrix.slice(headerIndex + 1).map(row => {
+                const clientId = normalizeClientCodeValue(row[column['קוד מרכבה']]);
+                const payerCode = normalizeClientCodeValue(row[column['קוד גורם משלם']]);
+                const clientName = String(row[column['גורם']] ?? '').trim();
+                const amount = Number(String(row[column['כמות חודשית']] ?? '0').replace(/,/g, '')) || 0;
+                return {
+                    year: Number.parseInt(row[column['שנה']], 10),
+                    month: Number.parseInt(row[column['חודש פעילות']], 10),
+                    clientId,
+                    payerCode,
+                    clientName,
+                    amount,
+                    type,
+                    responseCode: column.response >= 0 ? String(row[column.response] ?? '').trim() : ''
+                };
+            }).filter(row =>
+                Number.isInteger(row.year) &&
+                Number.isInteger(row.month) && row.month >= 1 && row.month <= 12 &&
+                row.clientId && row.clientName && !row.clientName.includes('סה"כ') &&
+                row.amount > 0
+            );
+
+            if (rows.length === 0) {
+                throw new Error('לא נמצאו רשומות שאילתות תקינות עם שנה, חודש, מספר לקוח וכמות חיובית.');
+            }
+            return rows;
+        }
+
+        function processQueryExcel(event, sourceType) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            clearFileLoadError();
+            const fileType = sourceType === 'online' ? 'query-online' : 'query-batch';
+            const reader = new FileReader();
+
+            reader.onload = loadEvent => {
+                try {
+                    const parsed = parseQueryRows(loadEvent.target.result, sourceType);
+                    if (sourceType === 'online') queryOnlineDb = parsed;
+                    else queryBatchDb = parsed;
+                    querySelectedClientId = null;
+                    clearFileLoadError();
+                    markDataSourceLoaded(fileType, file.name);
+                    if (currentScreen === 'queries' && queryOnlineDb.length && queryBatchDb.length) {
+                        renderQueryConsumptionScreen();
+                    }
+                    if (currentLevel === 2 && currentScreen === 'debt') renderView();
+                } catch (error) {
+                    showFileLoadError(fileType, error?.message || 'מבנה הקובץ אינו תקין או שלא ניתן לקרוא אותו.');
+                    event.target.value = '';
+                }
+            };
+            reader.onerror = () => {
+                showFileLoadError(fileType, 'לא ניתן לקרוא את הקובץ שנבחר.');
+                event.target.value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
         function parseExcelDateOrNull(val) {
             if (val === undefined || val === null || String(val).trim() === '') return null;
             const date = parseExcelDate(val);
@@ -5017,6 +5298,349 @@
         }
 
         function formatCurrency(v) { return "₪" + Math.round(v).toLocaleString('he-IL'); }
+
+        function getAllQueryData() {
+            return [...queryOnlineDb, ...queryBatchDb];
+        }
+
+        function getQueryClientDirectory() {
+            const clients = new Map();
+            getAllQueryData().forEach(row => {
+                if (!clients.has(row.clientId) || row.clientName.length > clients.get(row.clientId).length) {
+                    clients.set(row.clientId, row.clientName);
+                }
+            });
+            return [...clients.entries()]
+                .map(([id, name]) => ({ id, name }))
+                .sort((a, b) => a.name.localeCompare(b.name, 'he'));
+        }
+
+        function getQueryViewData(clientId = querySelectedClientId) {
+            const data = getAllQueryData();
+            return clientId ? data.filter(row => row.clientId === clientId) : data;
+        }
+
+        function getQueryYears(data) {
+            return [...new Set(data.map(row => row.year))].sort((a, b) => b - a);
+        }
+
+        function summarizeQueryYear(data, year) {
+            const rows = data.filter(row => row.year === year);
+            const online = rows.filter(row => row.type === 'online').reduce((sum, row) => sum + row.amount, 0);
+            const batch = rows.filter(row => row.type === 'batch').reduce((sum, row) => sum + row.amount, 0);
+            const activeMonths = new Set(rows.map(row => row.month)).size || 1;
+            return { online, batch, total: online + batch, activeMonths };
+        }
+
+        function summarizeQueryClients(data, year = null) {
+            const rows = year === null ? data : data.filter(row => row.year === year);
+            const onlineIds = new Set(rows.filter(row => row.type === 'online').map(row => row.clientId));
+            const batchIds = new Set(rows.filter(row => row.type === 'batch').map(row => row.clientId));
+            const totalIds = new Set(rows.map(row => row.clientId));
+            return { online: onlineIds.size, batch: batchIds.size, total: totalIds.size };
+        }
+
+        function summarizeQueryMonths(data, year) {
+            const months = Array.from({ length: 12 }, (_, index) => ({ month: index + 1, online: 0, batch: 0, total: 0 }));
+            data.filter(row => row.year === year).forEach(row => {
+                const target = months[row.month - 1];
+                if (!target) return;
+                target[row.type] += row.amount;
+                target.total += row.amount;
+            });
+            return months;
+        }
+
+        function buildQueryAnalysisMarkup(data, prefix, showClientCounts = false) {
+            const years = getQueryYears(data);
+            if (years.length === 0) {
+                return '<div class="query-empty"><i class="fa-solid fa-chart-simple text-3xl mb-3" aria-hidden="true"></i><p>לא נמצאו נתוני שאילתות להצגה.</p></div>';
+            }
+
+            const annualRows = years.map(year => {
+                const summary = summarizeQueryYear(data, year);
+                return `<tr><td><strong>${year}</strong></td><td>${summary.online.toLocaleString('he-IL')}</td><td>${summary.batch.toLocaleString('he-IL')}</td><td><strong>${summary.total.toLocaleString('he-IL')}</strong></td><td>${Math.round(summary.total / summary.activeMonths).toLocaleString('he-IL')}</td></tr>`;
+            }).join('');
+
+            const annualBlock = `
+                <section class="query-panel">
+                    <h3>סיכום שנתי</h3>
+                    <div class="query-grid">
+                        <div class="query-table-wrap">
+                            <table class="query-table">
+                                <thead><tr><th>שנה</th><th>און ליין</th><th>אצווה</th><th>סך הכול</th><th>ממוצע חודשי</th></tr></thead>
+                                <tbody>${annualRows}</tbody>
+                            </table>
+                        </div>
+                        <div class="query-chart"><canvas id="${prefix}-annual-chart" aria-label="גרף סיכום שנתי"></canvas></div>
+                    </div>
+                </section>`;
+
+            const yearlyBlocks = years.map(year => {
+                const months = summarizeQueryMonths(data, year);
+                const clientCounts = summarizeQueryClients(data, year);
+                const peak = Math.max(...months.map(month => month.total));
+                const rows = months.map(month => `
+                    <tr class="${month.total === peak && peak > 0 ? 'query-peak-row' : ''}">
+                        <td>${MONTH_NAMES[month.month - 1]}${month.total === peak && peak > 0 ? ' ★' : ''}</td>
+                        <td>${month.online.toLocaleString('he-IL')}</td>
+                        <td>${month.batch.toLocaleString('he-IL')}</td>
+                        <td><strong>${month.total.toLocaleString('he-IL')}</strong></td>
+                    </tr>`).join('');
+                const totals = months.reduce((sum, month) => ({ online: sum.online + month.online, batch: sum.batch + month.batch, total: sum.total + month.total }), { online: 0, batch: 0, total: 0 });
+                return `
+                    <section class="query-year-block">
+                        <h3>פירוט חודשי לצריכת שאילתות בשנת ${year}</h3>
+                        ${showClientCounts ? `
+                            <div class="query-year-kpis">
+                                <div class="query-year-kpi"><span>לקוחות פעילים און ליין בשנת ${year}</span><strong>${clientCounts.online.toLocaleString('he-IL')}</strong></div>
+                                <div class="query-year-kpi"><span>לקוחות פעילים אצווה בשנת ${year}</span><strong>${clientCounts.batch.toLocaleString('he-IL')}</strong></div>
+                                <div class="query-year-kpi"><span>סך לקוחות פעילים בשנת ${year}</span><strong>${clientCounts.total.toLocaleString('he-IL')}</strong></div>
+                            </div>` : ''}
+                        <div class="query-grid">
+                            <div class="query-table-wrap">
+                                <table class="query-table">
+                                    <thead><tr><th>חודש</th><th>און ליין</th><th>אצווה</th><th>סך הכול</th></tr></thead>
+                                    <tbody>${rows}</tbody>
+                                    <tfoot><tr><td>סך הכול</td><td>${totals.online.toLocaleString('he-IL')}</td><td>${totals.batch.toLocaleString('he-IL')}</td><td>${totals.total.toLocaleString('he-IL')}</td></tr></tfoot>
+                                </table>
+                            </div>
+                            <div class="query-chart"><canvas id="${prefix}-year-${year}-chart" aria-label="גרף חודשי לשנת ${year}"></canvas></div>
+                        </div>
+                    </section>`;
+            }).join('');
+
+            return annualBlock + yearlyBlocks;
+        }
+
+        function renderQueryCharts(prefix, data) {
+            const targetStore = prefix === 'query-main' ? 'main' : 'client';
+            const instances = targetStore === 'main' ? queryChartInstances : clientQueryChartInstances;
+            instances.forEach(chart => chart.destroy());
+            instances.length = 0;
+
+            const years = getQueryYears(data);
+            if (!years.length) return;
+            const styles = getComputedStyle(document.documentElement);
+            const onlineColor = styles.getPropertyValue('--color-success').trim() || '#16834f';
+            const batchColor = styles.getPropertyValue('--brand-primary').trim() || '#0969c3';
+            const baseOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                plugins: { legend: { position: 'bottom', labels: { font: { family: 'Arial' } } } },
+                scales: { y: { beginAtZero: true, ticks: { callback: value => Number(value).toLocaleString('he-IL') } } }
+            };
+
+            const annualCanvas = document.getElementById(`${prefix}-annual-chart`);
+            if (annualCanvas) {
+                const summaries = years.map(year => summarizeQueryYear(data, year));
+                instances.push(new Chart(annualCanvas, {
+                    type: 'bar',
+                    data: { labels: years, datasets: [
+                        { label: 'און ליין', data: summaries.map(item => item.online), backgroundColor: onlineColor },
+                        { label: 'אצווה', data: summaries.map(item => item.batch), backgroundColor: batchColor }
+                    ] },
+                    options: baseOptions
+                }));
+            }
+
+            years.forEach(year => {
+                const canvas = document.getElementById(`${prefix}-year-${year}-chart`);
+                if (!canvas) return;
+                const months = summarizeQueryMonths(data, year);
+                instances.push(new Chart(canvas, {
+                    type: 'bar',
+                    data: { labels: MONTH_NAMES, datasets: [
+                        { label: 'און ליין', data: months.map(item => item.online), backgroundColor: onlineColor },
+                        { label: 'אצווה', data: months.map(item => item.batch), backgroundColor: batchColor }
+                    ] },
+                    options: baseOptions
+                }));
+            });
+        }
+
+        function renderQueryConsumptionScreen() {
+            if (!(queryOnlineDb.length && queryBatchDb.length)) return;
+            const data = getQueryViewData();
+            const context = document.getElementById('query-client-context');
+            const kpis = document.getElementById('query-client-kpis');
+            const reset = document.getElementById('query-reset-button');
+            const selected = querySelectedClientId
+                ? getQueryClientDirectory().find(client => client.id === querySelectedClientId)
+                : null;
+
+            context?.classList.toggle('hidden', !selected);
+            kpis?.classList.toggle('hidden', Boolean(selected));
+            reset?.classList.toggle('hidden', !selected);
+            if (selected) {
+                document.getElementById('query-client-name').textContent = selected.name;
+                document.getElementById('query-client-code').textContent = selected.id;
+            } else {
+                const clientCounts = summarizeQueryClients(getAllQueryData());
+                document.getElementById('query-kpi-online-clients').textContent = clientCounts.online.toLocaleString('he-IL');
+                document.getElementById('query-kpi-batch-clients').textContent = clientCounts.batch.toLocaleString('he-IL');
+                document.getElementById('query-kpi-total-clients').textContent = clientCounts.total.toLocaleString('he-IL');
+            }
+
+            document.getElementById('query-analysis-content').innerHTML = buildQueryAnalysisMarkup(data, 'query-main', !selected);
+            requestAnimationFrame(() => renderQueryCharts('query-main', data));
+        }
+
+        function renderQueryClientSuggestions(value) {
+            const container = document.getElementById('query-client-suggestions');
+            const query = String(value || '').trim().toLowerCase();
+            if (!container) return;
+            if (!query) {
+                container.innerHTML = '';
+                container.classList.add('hidden');
+                return;
+            }
+            const matches = getQueryClientDirectory().filter(client =>
+                client.name.toLowerCase().includes(query) || client.id.includes(query)
+            ).slice(0, 12);
+            container.innerHTML = matches.length
+                ? matches.map(client => `<button type="button" class="query-suggestion" onclick="selectQueryClient('${client.id}')"><span>${escapeHtml(client.name)}</span><small>${escapeHtml(client.id)}</small></button>`).join('')
+                : '<div class="p-4 text-sm text-slate-500">לא נמצאו לקוחות מתאימים</div>';
+            container.classList.remove('hidden');
+        }
+
+        function selectQueryClient(clientId) {
+            querySelectedClientId = normalizeClientCodeValue(clientId);
+            const selected = getQueryClientDirectory().find(client => client.id === querySelectedClientId);
+            const input = document.getElementById('query-client-search');
+            if (input && selected) input.value = `${selected.name}, מספר מרכבה: ${selected.id}`;
+            const suggestions = document.getElementById('query-client-suggestions');
+            if (suggestions) suggestions.classList.add('hidden');
+            renderQueryConsumptionScreen();
+        }
+
+        function clearQueryClientSelection() {
+            querySelectedClientId = null;
+            const input = document.getElementById('query-client-search');
+            if (input) input.value = '';
+            renderQueryConsumptionScreen();
+        }
+
+        function getClientQueryData(orgName) {
+            if (!(queryOnlineDb.length && queryBatchDb.length)) return [];
+            const clientCode = normalizeClientCodeValue(getClientCode(orgName));
+            if (!clientCode) return [];
+            return getAllQueryData().filter(row => row.clientId === clientCode);
+        }
+
+        function buildClientQuerySection(orgName) {
+            const clientCode = normalizeClientCodeValue(getClientCode(orgName));
+            const data = getClientQueryData(orgName);
+            if (!data.length) return '';
+            return `
+                <section class="client-query-section">
+                    <div class="client-query-section__heading">
+                        <h3>צריכת שאילתות מידע</h3>
+                        <p>כל שנות הפעילות שנמצאו בקובצי האון ליין והאצווה. מספר לקוח במרכבה: <bdi dir="ltr">${escapeHtml(clientCode)}</bdi></p>
+                    </div>
+                    ${buildQueryAnalysisMarkup(data, 'client-query')}
+                </section>`;
+        }
+
+        function createWidePrintQueryChartImage(sourceCanvas) {
+            const sourceChart = typeof Chart !== 'undefined' ? Chart.getChart(sourceCanvas) : null;
+            if (!sourceChart) return sourceCanvas?.toDataURL('image/png') || '';
+
+            const printCanvas = document.createElement('canvas');
+            printCanvas.width = 1600;
+            printCanvas.height = 480;
+            const printChart = new Chart(printCanvas.getContext('2d'), {
+                type: sourceChart.config.type,
+                data: {
+                    labels: [...sourceChart.data.labels],
+                    datasets: sourceChart.data.datasets.map(dataset => ({
+                        label: dataset.label,
+                        data: [...dataset.data],
+                        backgroundColor: dataset.backgroundColor,
+                        borderColor: dataset.borderColor,
+                        borderWidth: dataset.borderWidth
+                    }))
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    layout: { padding: { right: 12, left: 12 } },
+                    plugins: { legend: { position: 'bottom', labels: { font: { family: 'Arial', size: 16 }, boxWidth: 24 } } },
+                    scales: {
+                        x: { ticks: { font: { family: 'Arial', size: 14 } } },
+                        y: { beginAtZero: true, ticks: { font: { family: 'Arial', size: 14 }, callback: value => Number(value).toLocaleString('he-IL') } }
+                    }
+                }
+            });
+            printChart.update('none');
+            const image = printChart.toBase64Image();
+            printChart.destroy();
+            return image;
+        }
+
+        function printQueryConsumptionReport() {
+            const data = getQueryViewData();
+            if (!data.length) return;
+            const selected = querySelectedClientId
+                ? getQueryClientDirectory().find(client => client.id === querySelectedClientId)
+                : null;
+            const content = document.getElementById('query-analysis-content')?.cloneNode(true);
+            if (!content) return;
+            const sourceCanvases = document.querySelectorAll('#query-analysis-content canvas');
+            const clonedCanvases = content.querySelectorAll('canvas');
+            clonedCanvases.forEach((canvas, index) => {
+                const image = document.createElement('img');
+                image.src = createWidePrintQueryChartImage(sourceCanvases[index]);
+                image.alt = canvas.getAttribute('aria-label') || 'גרף צריכת שאילתות';
+                image.style.cssText = 'width:100%;height:auto;max-height:300px;object-fit:contain;';
+                canvas.replaceWith(image);
+            });
+
+            const clientCounts = selected ? '' : `
+                <div class="print-query-kpis">
+                    <div><span>לקוחות פעילים און ליין</span><strong>${new Set(queryOnlineDb.map(row => row.clientId)).size.toLocaleString('he-IL')}</strong></div>
+                    <div><span>לקוחות פעילים אצווה</span><strong>${new Set(queryBatchDb.map(row => row.clientId)).size.toLocaleString('he-IL')}</strong></div>
+                    <div><span>סך לקוחות פעילים</span><strong>${new Set(getAllQueryData().map(row => row.clientId)).size.toLocaleString('he-IL')}</strong></div>
+                </div>`;
+            const subject = selected
+                ? `<h2 class="print-query-subject">${escapeHtml(selected.name)} <span>מספר מרכבה: <bdi dir="ltr">${escapeHtml(selected.id)}</bdi></span></h2>`
+                : '<h2 class="print-query-subject">כלל המשק</h2>';
+            const reportSections = [...content.children];
+            const annualSection = reportSections.shift()?.outerHTML || '';
+            const buildPrintPage = body => `
+                <section class="print-query-page">
+                    ${getClientDocumentPrintHeader('דוח צריכת שאילתות מידע')}
+                    <main class="print-content print-query-page__content">${body}</main>
+                    ${getClientDocumentPrintFooter()}
+                </section>`;
+            const reportPages = buildPrintPage(subject + clientCounts + annualSection)
+                + reportSections.map(section => buildPrintPage(section.outerHTML)).join('');
+            const reportWindow = window.open('', '_blank');
+            if (!reportWindow) {
+                alert('פתיחת חלון ההדפסה נחסמה.');
+                return;
+            }
+            reportWindow.document.write(`
+                <html dir="rtl" lang="he"><head><title>דוח צריכת שאילתות מידע</title>
+                    ${getClientDocumentPrintStyles()}
+                    <style>
+                        .print-query-subject{text-align:center;color:#0B3C5D;margin:8px 0 20px}.print-query-subject span{font-size:14px;color:#607080}
+                        .print-query-page{width:210mm;height:297mm;padding:10mm 17mm 8mm;display:flex;flex-direction:column;overflow:hidden;break-after:page;page-break-after:always}.print-query-page:last-child{break-after:auto;page-break-after:auto}.print-query-page__content{flex:1;min-height:0;padding-top:5mm}.print-query-page .print-header,.print-query-page .print-footer{flex:0 0 auto}.print-query-page .print-footer{margin-top:auto}
+                        .print-query-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}.print-query-kpis>div{border:1px solid #d5dee6;border-radius:8px;padding:12px}.print-query-kpis span{display:block;color:#607080;font-size:11px}.print-query-kpis strong{display:block;color:#0B3C5D;font-size:22px;margin-top:5px}
+                        .query-panel,.query-year-block{border:1px solid #d5dee6;border-radius:8px;padding:12px;margin:0 0 14px;break-inside:avoid;page-break-inside:avoid}.query-panel h3,.query-year-block h3{color:#0B3C5D;margin:0 0 10px}.query-year-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}.query-year-kpi{border:1px solid #d5dee6;border-radius:7px;padding:8px}.query-year-kpi span{display:block;color:#607080;font-size:9px;font-weight:bold}.query-year-kpi strong{display:block;color:#0B3C5D;font-size:18px;margin-top:3px}.query-grid{display:block}.query-table-wrap{width:100%}.query-table{width:100%;border-collapse:collapse;font-size:10px}.query-table th,.query-table td{border-bottom:1px solid #e8edf1;padding:5px 7px;text-align:right}.query-table th{background:#f5f7f9}.query-table tfoot td{font-weight:bold;background:#edf6fb}.query-peak-row td{background:#fff7e6}.query-chart{width:100%;min-height:190px;display:block;margin-top:12px}.query-chart img{display:block;width:100%!important;height:auto!important;max-height:215px!important;object-fit:contain}
+                        @page{size:A4 portrait;margin:0}
+                        @media print{
+                            .query-panel,.query-year-block{margin:0;break-inside:avoid;page-break-inside:avoid}
+                        }
+                    </style>
+                </head><body>
+                    ${reportPages}
+                    <script>window.addEventListener('load',()=>setTimeout(()=>window.print(),350));<\/script>
+                </body></html>`);
+            reportWindow.document.close();
+        }
 
         const APP_THEME_STORAGE_KEY = 'mot-debt-collection-theme';
         const APP_THEMES = ['azure', 'emerald', 'violet', 'graphite'];
@@ -5077,6 +5701,16 @@
                     action: 'historical-file-action',
                     status: 'historical-file-status',
                     card: 'historical-source-card'
+                },
+                'query-online': {
+                    action: 'query-online-file-action',
+                    status: 'query-online-file-status',
+                    card: 'query-online-source-card'
+                },
+                'query-batch': {
+                    action: 'query-batch-file-action',
+                    status: 'query-batch-file-status',
+                    card: 'query-batch-source-card'
                 }
             };
             const source = sourceElements[type];
@@ -5094,6 +5728,9 @@
             const coreReady = db.length > 0 && revenueDb.length > 0;
             const historicalFileReady = historicalRevenueDb.length > 0;
             const historicalReady = coreReady && historicalFileReady;
+            const queryOnlineReady = queryOnlineDb.length > 0;
+            const queryBatchReady = queryBatchDb.length > 0;
+            const queriesReady = queryOnlineReady && queryBatchReady;
 
             const setAccess = (id, enabled, title) => {
                 const element = document.getElementById(id);
@@ -5113,6 +5750,19 @@
                     ? 'נדרש לטעון תחילה את שני מקורות החובה'
                     : 'נדרש לטעון קובץ חשבוניות שהותאמו בשנת העבודה');
             setAccess('nav-historical', historicalReady, historicalAccessTitle);
+            setAccess('nav-queries', queriesReady, queriesReady
+                ? 'פתיחת צריכת שאילתות מידע'
+                : 'נדרש לטעון קובץ שאילתות און ליין וקובץ שאילתות אצווה');
+
+            const querySourceNote = document.getElementById('query-source-note');
+            const querySourceNoteText = document.getElementById('query-source-note-text');
+            const exactlyOneQuerySource = queryOnlineReady !== queryBatchReady;
+            if (querySourceNote) querySourceNote.classList.toggle('hidden', !exactlyOneQuerySource);
+            if (querySourceNoteText && exactlyOneQuerySource) {
+                querySourceNoteText.textContent = queryOnlineReady
+                    ? 'קובץ האון ליין נטען. כדי לפתוח את מסך צריכת השאילתות יש לטעון גם את קובץ האצווה.'
+                    : 'קובץ האצווה נטען. כדי לפתוח את מסך צריכת השאילתות יש לטעון גם את קובץ האון ליין.';
+            }
             const sourcesDot = document.querySelector('#nav-sources .suite-nav__dot');
             if (sourcesDot) sourcesDot.classList.toggle('hidden', coreReady);
             const sourcesYearContext = document.getElementById('sources-year-context');
