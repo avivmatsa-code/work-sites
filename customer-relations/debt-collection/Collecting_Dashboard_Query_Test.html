@@ -1945,6 +1945,19 @@
                     </div>
                 </div>
             </section>
+
+            <section class="management-report-section" aria-labelledby="fees-management-entities-title">
+                <h2 id="fees-management-entities-title">כל הגופים המבצעים העברת בעלות</h2>
+                <article class="historical-panel historical-detail-panel">
+                    <div class="historical-panel__header"><i class="fa-solid fa-building text-blue-700" aria-hidden="true"></i><h3>פירוט הכנסות וחשבוניות פתוחות לפי גוף</h3></div>
+                    <div class="historical-panel__body">
+                        <table>
+                            <thead><tr><th>שם הגוף</th><th>הכנסות בשנת העבודה</th><th>חוב בפיגור</th><th>תשלומים עתידיים</th><th>מספר חשבוניות פתוחות</th></tr></thead>
+                            <tbody id="fees-management-entities-table-body"></tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
         </main>
     </div>
 
@@ -5083,7 +5096,7 @@
             const ensureEntity = name => {
                 const key = String(name || '').trim();
                 if (!key) return null;
-                if (!entities.has(key)) entities.set(key, { name: key, billed: 0, overdueDebt: 0, openInvoices: 0 });
+                if (!entities.has(key)) entities.set(key, { name: key, billed: 0, overdueDebt: 0, futurePayments: 0, openInvoices: 0 });
                 return entities.get(key);
             };
             revenues.forEach(row => {
@@ -5094,6 +5107,7 @@
                 const entity = ensureEntity(row.name);
                 if (!entity) return;
                 if (row.isOverdue) entity.overdueDebt += row.amount;
+                else entity.futurePayments += row.amount;
                 entity.openInvoices += 1;
             });
             const entityRows = [...entities.values()].sort((a, b) =>
@@ -5140,6 +5154,10 @@
                     <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${historicalClientsTotal.toLocaleString('he-IL')}</td><td>${historicalInvoicesTotal.toLocaleString('he-IL')}</td><td>${formatCurrency(historicalAmountTotal)}</td></tr>`
                 : '<tr><td colspan="4">קובץ החשבוניות שהותאמו בשנת העבודה טרם נטען, או שאין נתונים מתאימים</td></tr>';
 
+            document.getElementById('fees-management-entities-table-body').innerHTML = data.entityRows.length
+                ? data.entityRows.map(row => `<tr><td><strong>${escapeHtml(row.name)}</strong></td><td>${formatCurrency(row.billed)}</td><td>${formatCurrency(row.overdueDebt)}</td><td>${formatCurrency(row.futurePayments)}</td><td>${row.openInvoices.toLocaleString('he-IL')}</td></tr>`).join('')
+                : '<tr><td colspan="5">לא נמצאו גופים להצגה</td></tr>';
+
             const monthlyCanvas = document.getElementById('fees-management-monthly-chart');
             if (!monthlyCanvas || typeof Chart === 'undefined') return;
             if (feesManagementChart) feesManagementChart.destroy();
@@ -5181,8 +5199,8 @@
                 <section class="report-section"><h2>${heading}</h2><table><thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody></table></section>`;
             const analysisBlock = (heading, headerHtml, bodyId, image, alt, note = '') => `
                 <div class="fees-analysis-unit">
-                    <div>${tableBlock(heading, headerHtml, document.getElementById(bodyId).innerHTML)}${note ? `<p class="fees-count-note">${note}</p>` : ''}</div>
-                    ${image ? `<img class="fees-analysis-chart" src="${image}" alt="${alt}">` : '<div></div>'}
+                    <div class="fees-analysis-frame fees-analysis-table-frame">${tableBlock(heading, headerHtml, document.getElementById(bodyId).innerHTML)}${note ? `<p class="fees-count-note">${note}</p>` : ''}</div>
+                    <div class="fees-analysis-frame fees-analysis-chart-frame">${image ? `<img class="fees-analysis-chart" src="${image}" alt="${alt}">` : ''}</div>
                 </div>`;
 
             const entityChunks = [];
@@ -5193,10 +5211,10 @@
             }
             const entityPages = entityChunks.map((rows, pageIndex) => {
                 const body = rows.length ? rows.map(row => `
-                    <tr><td>${escapeHtml(row.name)}</td><td>${formatCurrency(row.billed)}</td><td>${formatCurrency(row.overdueDebt)}</td><td>${row.openInvoices.toLocaleString('he-IL')}</td></tr>`).join('')
-                    : '<tr><td colspan="4">לא נמצאו גופים להצגה</td></tr>';
+                    <tr><td>${escapeHtml(row.name)}</td><td>${formatCurrency(row.billed)}</td><td>${formatCurrency(row.overdueDebt)}</td><td>${formatCurrency(row.futurePayments)}</td><td>${row.openInvoices.toLocaleString('he-IL')}</td></tr>`).join('')
+                    : '<tr><td colspan="5">לא נמצאו גופים להצגה</td></tr>';
                 return `<h1 class="fees-page-title">כל הגופים המבצעים העברת בעלות${pageIndex ? ' (המשך)' : ''}</h1>
-                    ${tableBlock('', '<tr><th>שם הגוף</th><th>הכנסות בשנת העבודה</th><th>חוב בפיגור</th><th>מספר חשבוניות פתוחות</th></tr>', body)}`;
+                    ${tableBlock('', '<tr><th>שם הגוף</th><th>הכנסות בשנת העבודה</th><th>חוב בפיגור</th><th>תשלומים עתידיים</th><th>מספר חשבוניות פתוחות</th></tr>', body)}`;
             });
 
             const pageBodies = [
@@ -5218,9 +5236,11 @@
             pageBodies.push(...entityPages);
             const reportPages = pageBodies.map((body, index) => `
                 <section class="fees-print-page${index === pageBodies.length - 1 ? ' fees-print-page--last' : ''}">
-                    ${getClientDocumentPrintHeader(title)}
-                    <main class="print-content fees-print-page__content">${body}</main>
-                    ${getClientDocumentPrintFooter()}
+                    <div class="fees-print-page__layout">
+                        ${getClientDocumentPrintHeader(title)}
+                        <main class="print-content fees-print-page__content">${body}</main>
+                        ${getClientDocumentPrintFooter()}
+                    </div>
                 </section>`).join('');
 
             const win = window.open('', '_blank');
@@ -5228,8 +5248,10 @@
             win.document.write(`
                 <html dir="rtl" lang="he"><head><title>${title}</title>${getClientDocumentPrintStyles()}
                     <style>
-                        .fees-print-page{width:210mm;height:297mm;padding:10mm 17mm 8mm;display:flex;flex:none;flex-direction:column;overflow:hidden;break-after:page;page-break-after:always}.fees-print-page+.fees-print-page{break-before:page;page-break-before:always}.fees-print-page__content{flex:1;min-height:0;padding-top:5mm}.fees-print-page .print-header,.fees-print-page .print-footer{flex:0 0 auto}.fees-print-page .print-footer{margin-top:auto}
-                        .fees-page-title{color:#0B3C5D;font-size:20px;margin:0 0 18px;padding-bottom:8px;border-bottom:2px solid #d6e0e8}.fees-analysis-unit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch;margin-top:18px}.fees-analysis-unit .report-section{margin:0}.fees-analysis-chart{width:100%;height:100%;object-fit:fill}.fees-count-note{font-size:9.5px;color:#607080;margin:4px 0 0}.kpi-note{display:block;color:#607080;font-size:8.5px;margin-top:3px}.fees-print-page table{font-size:8pt}.fees-print-page th,.fees-print-page td{padding:1.7mm 1.8mm}.fees-page-title+.report-section h2:empty{display:none}.fees-page-title+.report-section{margin-top:0}
+                        html,body{width:210mm;margin:0!important;padding:0!important}
+                        .fees-print-page{width:210mm;height:296mm;overflow:hidden;break-after:page;page-break-after:always}.fees-print-page+.fees-print-page{break-before:page;page-break-before:always}.fees-print-page__layout{height:100%;padding:10mm 17mm 8mm;display:flex;flex-direction:column;overflow:hidden}.fees-print-page__content{flex:1;min-height:0;padding-top:5mm}.fees-print-page .print-header,.fees-print-page .print-footer{flex:0 0 auto}.fees-print-page .print-footer{margin-top:auto}
+                        .fees-print-page--last{break-after:auto;page-break-after:auto}
+                        .fees-page-title{color:#0B3C5D;font-size:20px;margin:0 0 18px;padding-bottom:8px;border-bottom:2px solid #d6e0e8}.fees-analysis-unit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:16px;align-items:stretch;margin-top:18px}.fees-analysis-frame{height:100%;min-height:92mm;border:1px solid var(--print-border);border-radius:8px;background:#fff;padding:10px;overflow:hidden;display:flex;flex-direction:column}.fees-analysis-unit .report-section{margin:0;height:100%;display:flex;flex-direction:column}.fees-analysis-table-frame .report-section table{margin-top:10px}.fees-analysis-chart-frame{align-items:center;justify-content:center}.fees-analysis-chart{display:block;width:100%;height:100%;min-height:0;object-fit:contain}.fees-count-note{font-size:9.5px;color:#607080;margin:6px 0 0}.kpi-note{display:block;color:#607080;font-size:8.5px;margin-top:3px}.fees-print-page table{font-size:8pt}.fees-print-page th,.fees-print-page td{padding:1.7mm 1.8mm}.fees-page-title+.report-section h2:empty{display:none}.fees-page-title+.report-section{margin-top:0}
                         @page{size:A4 portrait;margin:0}
                     </style>
                 </head><body>${reportPages}<script>window.addEventListener('load',function(){window.focus();setTimeout(function(){window.print()},500)});<\/script></body></html>`);
