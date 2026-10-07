@@ -1893,34 +1893,33 @@
                 <article class="historical-kpi"><span>צפי גבייה עתידי</span><strong id="fees-management-kpi-future">₪0</strong><small>חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></article>
             </section>
 
-            <div class="historical-analysis-stack" aria-label="הכנסות וגבייה באגרות העברת בעלות">
-                <section class="historical-analysis-row">
-                    <article class="historical-panel">
-                        <div class="historical-panel__header"><i class="fa-solid fa-calendar-days text-indigo-600" aria-hidden="true"></i><h3>הכנסות וגבייה לפי חודשים</h3></div>
-                        <div class="historical-panel__body">
-                            <table><thead><tr><th>חודש</th><th>הכנסות</th><th>גבייה</th><th>שיעור גבייה</th></tr></thead><tbody id="fees-management-monthly-table-body"></tbody></table>
-                        </div>
-                    </article>
-                    <article class="historical-panel">
-                        <div class="historical-panel__header"><i class="fa-solid fa-chart-column text-emerald-600" aria-hidden="true"></i><h3>הכנסות מול גבייה לפי חודשים</h3></div>
-                        <div class="management-chart-wrap"><canvas id="fees-management-monthly-chart"></canvas></div>
-                    </article>
-                </section>
-            </div>
-
-            <section class="management-report-section" aria-labelledby="fees-management-open-debts-title">
-                <h2 id="fees-management-open-debts-title">חובות פתוחים</h2>
+            <section class="management-report-section" aria-labelledby="fees-management-monthly-title">
+                <h2 id="fees-management-monthly-title">הכנסות וגבייה לפי חודשים</h2>
                 <div class="historical-analysis-stack">
                     <div class="historical-analysis-row">
                         <article class="historical-panel">
-                            <div class="historical-panel__header"><i class="fa-solid fa-calendar-xmark text-red-600" aria-hidden="true"></i><h3>חובות עבר פתוחים לפי שנים</h3></div>
+                            <div class="historical-panel__body">
+                                <table><thead><tr><th>חודש</th><th>הכנסות</th><th>גבייה</th><th>שיעור גבייה</th></tr></thead><tbody id="fees-management-monthly-table-body"></tbody></table>
+                            </div>
+                        </article>
+                        <article class="historical-panel">
+                            <div class="management-chart-wrap"><canvas id="fees-management-monthly-chart"></canvas></div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <section class="management-report-section" aria-labelledby="fees-management-open-debts-title">
+                <h2 id="fees-management-open-debts-title">חובות עבר פתוחים לפי שנים</h2>
+                <div class="historical-analysis-stack">
+                    <div class="historical-analysis-row">
+                        <article class="historical-panel">
                             <div class="historical-panel__body">
                                 <table><thead><tr><th>שנת חוב</th><th>מספר גופים</th><th>מספר חשבוניות</th><th>סכום החוב</th></tr></thead><tbody id="fees-management-debt-years-table-body"></tbody></table>
                                 <p class="summary-count-note">בשורת הסה״כ, כל גוף נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.</p>
                             </div>
                         </article>
                         <article class="historical-panel">
-                            <div class="historical-panel__header"><i class="fa-solid fa-chart-column text-red-600" aria-hidden="true"></i><h3>חובות עבר פתוחים לפי שנים</h3></div>
                             <div class="management-chart-wrap"><canvas id="fees-management-debt-years-chart"></canvas></div>
                         </article>
                     </div>
@@ -1928,18 +1927,16 @@
             </section>
 
             <section id="fees-management-closed-debts-section" class="management-report-section" aria-labelledby="fees-management-closed-debts-title">
-                <h2 id="fees-management-closed-debts-title">חובות עבר שנגבו בשנת העבודה</h2>
+                <h2 id="fees-management-closed-debts-title">חובות עבר שנגבו בשנה הנוכחית לפי שנת החוב</h2>
                 <div class="historical-analysis-stack">
                     <div class="historical-analysis-row">
                         <article class="historical-panel">
-                            <div class="historical-panel__header"><i class="fa-solid fa-clock-rotate-left text-amber-600" aria-hidden="true"></i><h3>חובות עבר שנגבו השנה לפי שנים</h3></div>
                             <div class="historical-panel__body">
                                 <table><thead><tr><th>שנת הפקת החשבונית</th><th>מספר גופים</th><th>מספר חשבוניות</th><th>סכום שנגבה</th></tr></thead><tbody id="fees-management-historical-years-table-body"></tbody></table>
                                 <p class="summary-count-note">בשורת הסה״כ, כל גוף נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.</p>
                             </div>
                         </article>
                         <article class="historical-panel">
-                            <div class="historical-panel__header"><i class="fa-solid fa-chart-column text-amber-600" aria-hidden="true"></i><h3>חובות עבר שנגבו השנה לפי שנים</h3></div>
                             <div class="management-chart-wrap"><canvas id="fees-management-historical-years-chart"></canvas></div>
                         </article>
                     </div>
@@ -5154,8 +5151,15 @@
                     <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${historicalClientsTotal.toLocaleString('he-IL')}</td><td>${historicalInvoicesTotal.toLocaleString('he-IL')}</td><td>${formatCurrency(historicalAmountTotal)}</td></tr>`
                 : '<tr><td colspan="4">קובץ החשבוניות שהותאמו בשנת העבודה טרם נטען, או שאין נתונים מתאימים</td></tr>';
 
+            const entityTotals = data.entityRows.reduce((totals, row) => ({
+                billed: totals.billed + row.billed,
+                overdueDebt: totals.overdueDebt + row.overdueDebt,
+                futurePayments: totals.futurePayments + row.futurePayments,
+                openInvoices: totals.openInvoices + row.openInvoices
+            }), { billed: 0, overdueDebt: 0, futurePayments: 0, openInvoices: 0 });
             document.getElementById('fees-management-entities-table-body').innerHTML = data.entityRows.length
-                ? data.entityRows.map(row => `<tr><td><strong>${escapeHtml(row.name)}</strong></td><td>${formatCurrency(row.billed)}</td><td>${formatCurrency(row.overdueDebt)}</td><td>${formatCurrency(row.futurePayments)}</td><td>${row.openInvoices.toLocaleString('he-IL')}</td></tr>`).join('')
+                ? data.entityRows.map(row => `<tr><td><strong>${escapeHtml(row.name)}</strong></td><td>${formatCurrency(row.billed)}</td><td>${formatCurrency(row.overdueDebt)}</td><td>${formatCurrency(row.futurePayments)}</td><td>${row.openInvoices.toLocaleString('he-IL')}</td></tr>`).join('') + `
+                    <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${formatCurrency(entityTotals.billed)}</td><td>${formatCurrency(entityTotals.overdueDebt)}</td><td>${formatCurrency(entityTotals.futurePayments)}</td><td>${entityTotals.openInvoices.toLocaleString('he-IL')}</td></tr>`
                 : '<tr><td colspan="5">לא נמצאו גופים להצגה</td></tr>';
 
             const monthlyCanvas = document.getElementById('fees-management-monthly-chart');
@@ -5196,22 +5200,33 @@
             const debtYearsImage = feesManagementDebtYearsChart ? feesManagementDebtYearsChart.toBase64Image() : '';
             const historicalYearsImage = feesManagementHistoricalYearsChart ? feesManagementHistoricalYearsChart.toBase64Image() : '';
             const tableBlock = (heading, headerHtml, bodyHtml) => `
-                <section class="report-section"><h2>${heading}</h2><table><thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody></table></section>`;
+                <section class="report-section">${heading ? `<h2>${heading}</h2>` : ''}<table><thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody></table></section>`;
             const analysisBlock = (heading, headerHtml, bodyId, image, alt, note = '') => `
-                <div class="fees-analysis-unit">
-                    <div class="fees-analysis-frame fees-analysis-table-frame">${tableBlock(heading, headerHtml, document.getElementById(bodyId).innerHTML)}${note ? `<p class="fees-count-note">${note}</p>` : ''}</div>
-                    <div class="fees-analysis-frame fees-analysis-chart-frame">${image ? `<img class="fees-analysis-chart" src="${image}" alt="${alt}">` : ''}</div>
+                <div class="fees-analysis-block">
+                    <h2 class="fees-analysis-title">${heading}</h2>
+                    <div class="fees-analysis-unit">
+                        <div class="fees-analysis-frame fees-analysis-table-frame">${tableBlock('', headerHtml, document.getElementById(bodyId).innerHTML)}${note ? `<p class="fees-count-note">${note}</p>` : ''}</div>
+                        <div class="fees-analysis-frame fees-analysis-chart-frame">${image ? `<img class="fees-analysis-chart" src="${image}" alt="${alt}">` : ''}</div>
+                    </div>
                 </div>`;
 
             const entityChunks = [];
-            const rowsPerPage = 25;
+            const rowsPerPage = 24;
             if (data.entityRows.length === 0) entityChunks.push([]);
             for (let index = 0; index < data.entityRows.length; index += rowsPerPage) {
                 entityChunks.push(data.entityRows.slice(index, index + rowsPerPage));
             }
+            const entityTotals = data.entityRows.reduce((totals, row) => ({
+                billed: totals.billed + row.billed,
+                overdueDebt: totals.overdueDebt + row.overdueDebt,
+                futurePayments: totals.futurePayments + row.futurePayments,
+                openInvoices: totals.openInvoices + row.openInvoices
+            }), { billed: 0, overdueDebt: 0, futurePayments: 0, openInvoices: 0 });
             const entityPages = entityChunks.map((rows, pageIndex) => {
+                const isLastEntityPage = pageIndex === entityChunks.length - 1;
                 const body = rows.length ? rows.map(row => `
-                    <tr><td>${escapeHtml(row.name)}</td><td>${formatCurrency(row.billed)}</td><td>${formatCurrency(row.overdueDebt)}</td><td>${formatCurrency(row.futurePayments)}</td><td>${row.openInvoices.toLocaleString('he-IL')}</td></tr>`).join('')
+                    <tr><td>${escapeHtml(row.name)}</td><td>${formatCurrency(row.billed)}</td><td>${formatCurrency(row.overdueDebt)}</td><td>${formatCurrency(row.futurePayments)}</td><td>${row.openInvoices.toLocaleString('he-IL')}</td></tr>`).join('') + (isLastEntityPage ? `
+                    <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${formatCurrency(entityTotals.billed)}</td><td>${formatCurrency(entityTotals.overdueDebt)}</td><td>${formatCurrency(entityTotals.futurePayments)}</td><td>${entityTotals.openInvoices.toLocaleString('he-IL')}</td></tr>` : '')
                     : '<tr><td colspan="5">לא נמצאו גופים להצגה</td></tr>';
                 return `<h1 class="fees-page-title">כל הגופים המבצעים העברת בעלות${pageIndex ? ' (המשך)' : ''}</h1>
                     ${tableBlock('', '<tr><th>שם הגוף</th><th>הכנסות בשנת העבודה</th><th>חוב בפיגור</th><th>תשלומים עתידיים</th><th>מספר חשבוניות פתוחות</th></tr>', body)}`;
@@ -5226,12 +5241,10 @@
                     <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${formatCurrency(data.totalFuture)}</div><small class="kpi-note">חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></div>
                  </div>
                  ${analysisBlock('הכנסות וגבייה לפי חודשים', '<tr><th>חודש</th><th>הכנסות</th><th>גבייה</th><th>שיעור גבייה</th></tr>', 'fees-management-monthly-table-body', monthlyImage, 'גרף הכנסות וגבייה לפי חודשים')}`,
-                `<h1 class="fees-page-title">חובות פתוחים</h1>
-                 ${analysisBlock('חובות עבר פתוחים לפי שנים', '<tr><th>שנת חוב</th><th>מספר גופים</th><th>מספר חשבוניות</th><th>סכום החוב</th></tr>', 'fees-management-debt-years-table-body', debtYearsImage, 'גרף חובות עבר פתוחים לפי שנים', 'בשורת הסה"כ, כל גוף נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.')}`
+                `${analysisBlock('חובות עבר פתוחים לפי שנים', '<tr><th>שנת חוב</th><th>מספר גופים</th><th>מספר חשבוניות</th><th>סכום החוב</th></tr>', 'fees-management-debt-years-table-body', debtYearsImage, 'גרף חובות עבר פתוחים לפי שנים', 'בשורת הסה"כ, כל גוף נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.')}`
             ];
             if (hasHistoricalSource) {
-                pageBodies.push(`<h1 class="fees-page-title">חובות עבר שנגבו בשנת העבודה</h1>
-                    ${analysisBlock('חובות עבר שנגבו השנה לפי שנים', '<tr><th>שנת הפקת החשבונית</th><th>מספר גופים</th><th>מספר חשבוניות</th><th>סכום שנגבה</th></tr>', 'fees-management-historical-years-table-body', historicalYearsImage, 'גרף חובות עבר שנגבו השנה לפי שנים', 'בשורת הסה"כ, כל גוף נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.')}`);
+                pageBodies.push(`${analysisBlock('חובות עבר שנגבו בשנה הנוכחית לפי שנת החוב', '<tr><th>שנת הפקת החשבונית</th><th>מספר גופים</th><th>מספר חשבוניות</th><th>סכום שנגבה</th></tr>', 'fees-management-historical-years-table-body', historicalYearsImage, 'גרף חובות עבר שנגבו בשנה הנוכחית לפי שנת החוב', 'בשורת הסה"כ, כל גוף נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.')}`);
             }
             pageBodies.push(...entityPages);
             const reportPages = pageBodies.map((body, index) => `
@@ -5251,7 +5264,7 @@
                         html,body{width:210mm;margin:0!important;padding:0!important}
                         .fees-print-page{width:210mm;height:296mm;overflow:hidden;break-after:page;page-break-after:always}.fees-print-page+.fees-print-page{break-before:page;page-break-before:always}.fees-print-page__layout{height:100%;padding:10mm 17mm 8mm;display:flex;flex-direction:column;overflow:hidden}.fees-print-page__content{flex:1;min-height:0;padding-top:5mm}.fees-print-page .print-header,.fees-print-page .print-footer{flex:0 0 auto}.fees-print-page .print-footer{margin-top:auto}
                         .fees-print-page--last{break-after:auto;page-break-after:auto}
-                        .fees-page-title{color:#0B3C5D;font-size:20px;margin:0 0 18px;padding-bottom:8px;border-bottom:2px solid #d6e0e8}.fees-analysis-unit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:16px;align-items:stretch;margin-top:18px}.fees-analysis-frame{height:100%;min-height:92mm;border:1px solid var(--print-border);border-radius:8px;background:#fff;padding:10px;overflow:hidden;display:flex;flex-direction:column}.fees-analysis-unit .report-section{margin:0;height:100%;display:flex;flex-direction:column}.fees-analysis-table-frame .report-section table{margin-top:10px}.fees-analysis-chart-frame{align-items:center;justify-content:center}.fees-analysis-chart{display:block;width:100%;height:100%;min-height:0;object-fit:contain}.fees-count-note{font-size:9.5px;color:#607080;margin:6px 0 0}.kpi-note{display:block;color:#607080;font-size:8.5px;margin-top:3px}.fees-print-page table{font-size:8pt}.fees-print-page th,.fees-print-page td{padding:1.7mm 1.8mm}.fees-page-title+.report-section h2:empty{display:none}.fees-page-title+.report-section{margin-top:0}
+                        .fees-page-title,.fees-analysis-title{color:#0B3C5D;font-size:20px;margin:0 0 18px;padding-bottom:8px;border-bottom:2px solid #d6e0e8}.fees-analysis-unit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:16px;align-items:stretch}.fees-analysis-frame{height:100%;min-height:92mm;border:1px solid var(--print-border);border-radius:8px;background:#fff;padding:10px;overflow:hidden;display:flex;flex-direction:column}.fees-analysis-unit .report-section{margin:0;height:100%;display:flex;flex-direction:column}.fees-analysis-table-frame .report-section table{margin-top:0}.fees-analysis-chart-frame{align-items:center;justify-content:center}.fees-analysis-chart{display:block;width:100%;height:100%;min-height:0;object-fit:contain}.fees-count-note{font-size:9.5px;color:#607080;margin:6px 0 0}.kpi-note{display:block;color:#607080;font-size:8.5px;margin-top:3px}.fees-print-page table{font-size:8pt}.fees-print-page th,.fees-print-page td{padding:1.7mm 1.8mm}.fees-page-title+.report-section{margin-top:0}
                         @page{size:A4 portrait;margin:0}
                     </style>
                 </head><body>${reportPages}<script>window.addEventListener('load',function(){window.focus();setTimeout(function(){window.print()},500)});<\/script></body></html>`);
