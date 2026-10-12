@@ -1176,6 +1176,7 @@
         .dashboard-kpi-card { justify-content: flex-start !important; }
         .dashboard-kpi-card > p[id^="db-kpi-"] { margin-top: 14px; }
         .dashboard-kpi-card > :last-child { margin-top: auto; }
+        .dashboard-kpi-card .collection-breakdown { color: #94a3b8; }
         .management-notice { margin-block-end: var(--space-5); }
 
         .management-report-section {
@@ -4392,15 +4393,15 @@
         function yearTransitionTableFooter(amount, currentYearCollected, cellClass = '') {
             if (amount <= 0) return '';
             return `<tr class="year-transition-row" style="background:#fff8e8;color:#7c4a03">
-                <td class="${cellClass}"><strong>גביית דצמבר ${CURRENT_YEAR - 1} בשנת ${CURRENT_YEAR}</strong></td>
+                <td class="${cellClass}" style="text-align:right;color:#7c4a03"><strong>גביית דצמבר ${CURRENT_YEAR - 1} שבוצעה בשנת ${CURRENT_YEAR}</strong></td>
                 <td class="${cellClass}">—</td>
                 <td class="${cellClass}"><strong>${formatCurrency(amount)}</strong></td>
                 <td class="${cellClass}">—</td>
             </tr>
-            <tr class="year-transition-total-row font-bold" style="background:#edf7f1;color:#11663f;font-weight:700">
-                <td class="${cellClass}">סה"כ גבייה שוטפת</td>
+            <tr class="year-transition-total-row font-bold" style="background:#edf7f1;font-weight:700">
+                <td class="${cellClass}" style="text-align:right;color:#1f2933">סה"כ גבייה שוטפת בשנת ${CURRENT_YEAR}</td>
                 <td class="${cellClass}">—</td>
-                <td class="${cellClass}"><strong>${formatCurrency(currentYearCollected + amount)}</strong></td>
+                <td class="${cellClass}" style="color:#11663f"><strong>${formatCurrency(currentYearCollected + amount)}</strong></td>
                 <td class="${cellClass}">—</td>
             </tr>`;
         }
@@ -6238,5 +6239,6 @@
     </script>
 </body>
 </html>
+
 
 
