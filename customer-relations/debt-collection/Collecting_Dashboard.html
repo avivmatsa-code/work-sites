@@ -1489,7 +1489,7 @@
                 <article id="historical-source-card" class="source-card">
                     <div class="source-card__heading">
                         <span class="source-card__icon"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i></span>
-                        <div><h3>חשבוניות שהותאמו בשנת העבודה</h3><p>מבנה זהה לקובץ ההכנסות. המקור משמש לניתוח גביית חובות משנים קודמות.</p></div>
+                        <div><h3>חשבוניות שהותאמו בשנת העבודה</h3><p>מבנה זהה לקובץ ההכנסות. המקור משמש לזיהוי גביית מעבר שנה ולניתוח גביית חובות משנים קודמות.</p></div>
                         <span class="source-card__badge source-card__badge--optional">רשות</span>
                     </div>
                     <input type="file" id="historical-uploader" class="hidden" accept=".xlsx,.xls" onchange="processHistoricalRevenueExcel(event)">
@@ -1740,7 +1740,7 @@
 
             <section class="management-kpis" aria-label="מדדי שנת העבודה לשירותי מידע">
                 <article class="historical-kpi"><span>הכנסות</span><strong id="management-kpi-billed">₪0</strong><small>סך ההכנסות בשנת העבודה</small></article>
-                <article class="historical-kpi"><span>גבייה עד כה</span><strong id="management-kpi-collected">₪0</strong><small>גבייה מחושבת בשנת העבודה</small></article>
+                <article class="historical-kpi"><span>גבייה שוטפת</span><strong id="management-kpi-collected">₪0</strong><small id="management-kpi-collected-note">כולל גביית מעבר שנה</small></article>
                 <article class="historical-kpi"><span>חוב בפיגור</span><strong id="management-kpi-overdue">₪0</strong><small>חשבוניות פתוחות שמועד פירעונן עבר</small></article>
                 <article class="historical-kpi"><span>צפי גבייה עתידי</span><strong id="management-kpi-future">₪0</strong><small>חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></article>
             </section>
@@ -1751,7 +1751,7 @@
                         <div class="historical-panel__header"><i class="fa-solid fa-calendar-days text-indigo-600" aria-hidden="true"></i><h3>הכנסות וגבייה לפי חודשים</h3></div>
                         <div class="historical-panel__body">
                             <table>
-                                <thead><tr><th>חודש</th><th>הכנסות</th><th>גבייה</th><th>שיעור גבייה</th></tr></thead>
+                                <thead><tr><th>חודש</th><th>הכנסות</th><th>גביית חשבוניות השנה</th><th>מעבר שנה</th><th>סה״כ גבייה שוטפת</th><th>שיעור גביית חשבוניות השנה</th></tr></thead>
                                 <tbody id="management-monthly-table-body"></tbody>
                             </table>
                         </div>
@@ -1766,7 +1766,7 @@
                         <div class="historical-panel__header"><i class="fa-solid fa-users-viewfinder text-blue-600" aria-hidden="true"></i><h3>הכנסות וגבייה לפי סקטורים</h3></div>
                         <div class="historical-panel__body">
                             <table>
-                                <thead><tr><th>סקטור</th><th>מספר לקוחות</th><th>הכנסות</th><th>גבייה</th><th>שיעור גבייה</th></tr></thead>
+                                <thead><tr><th>סקטור</th><th>מספר לקוחות</th><th>הכנסות</th><th>גביית חשבוניות השנה</th><th>מעבר שנה</th><th>סה״כ גבייה שוטפת</th><th>שיעור גביית חשבוניות השנה</th></tr></thead>
                                 <tbody id="management-sector-table-body"></tbody>
                             </table>
                         </div>
@@ -1888,7 +1888,7 @@
 
             <section class="management-kpis" aria-label="מדדי שנת העבודה לאגרות העברת בעלות">
                 <article class="historical-kpi"><span>הכנסות</span><strong id="fees-management-kpi-billed">₪0</strong><small>סך ההכנסות בשנת העבודה</small></article>
-                <article class="historical-kpi"><span>גבייה עד כה</span><strong id="fees-management-kpi-collected">₪0</strong><small>גבייה מחושבת בשנת העבודה</small></article>
+                <article class="historical-kpi"><span>גבייה שוטפת</span><strong id="fees-management-kpi-collected">₪0</strong><small id="fees-management-kpi-collected-note">כולל גביית מעבר שנה</small></article>
                 <article class="historical-kpi"><span>חוב בפיגור</span><strong id="fees-management-kpi-overdue">₪0</strong><small>חשבוניות פתוחות שמועד פירעונן עבר</small></article>
                 <article class="historical-kpi"><span>צפי גבייה עתידי</span><strong id="fees-management-kpi-future">₪0</strong><small>חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></article>
             </section>
@@ -1899,7 +1899,7 @@
                     <div class="historical-analysis-row">
                         <article class="historical-panel">
                             <div class="historical-panel__body">
-                                <table><thead><tr><th>חודש</th><th>הכנסות</th><th>גבייה</th><th>שיעור גבייה</th></tr></thead><tbody id="fees-management-monthly-table-body"></tbody></table>
+                                <table><thead><tr><th>חודש</th><th>הכנסות</th><th>גביית חשבוניות השנה</th><th>מעבר שנה</th><th>סה״כ גבייה שוטפת</th><th>שיעור גביית חשבוניות השנה</th></tr></thead><tbody id="fees-management-monthly-table-body"></tbody></table>
                             </div>
                         </article>
                         <article class="historical-panel">
@@ -2017,14 +2017,14 @@
                             <div class="text-2xl font-bold text-emerald-700 mt-2" id="kpi-current-revenue">₪0</div>
                             <div class="text-[11px] text-slate-400 font-bold mt-1">סך ההכנסות בשנת העבודה</div>
                         </div>
-                        <!-- גבייה עד כה -->
+                        <!-- גבייה שוטפת, לרבות מעבר שנה -->
                         <div class="bg-slate-50/70 border border-slate-200 p-4 rounded-xl flex flex-col justify-between">
                             <div class="flex justify-between items-center mb-1">
-                                <span class="text-slate-500 font-bold text-xs">גבייה עד כה</span>
+                                <span class="text-slate-500 font-bold text-xs">גבייה שוטפת</span>
                                 <i class="fa-solid fa-circle-check text-blue-600"></i>
                             </div>
                             <div class="text-2xl font-bold text-blue-800 mt-2" id="kpi-current-collected">₪0</div>
-                            <div class="text-[11px] text-slate-400 font-bold mt-1">גבייה מחושבת בשנת העבודה</div>
+                            <div id="kpi-current-collected-note" class="text-[11px] text-slate-400 font-bold mt-1">כולל גביית מעבר שנה</div>
                         </div>
                         <!-- חוב שנה נוכחית -->
                         <div onclick="setKpiFilter('overdue')" class="bg-slate-50/70 border border-slate-200 p-4 rounded-xl cursor-pointer hover:border-red-300 transition-all flex flex-col justify-between">
@@ -2212,9 +2212,9 @@
                     <p class="text-[11px] text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">סך ההכנסות בשנת העבודה</p>
                 </div>
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
-                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">גבייה עד כה</p>
+                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">גבייה שוטפת</p>
                     <p id="db-kpi-collected" class="text-3xl font-bold text-emerald-700 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</p>
-                    <p class="text-[11px] text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">גבייה מחושבת בשנת העבודה</p>
+                    <p id="db-kpi-collected-note" class="text-[11px] text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">כולל גביית מעבר שנה</p>
                 </div>
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
                     <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">חוב בפיגור</p>
@@ -2234,14 +2234,16 @@
                     <h3 class="font-bold text-slate-700 mb-3 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
                         <i class="fa-solid fa-calendar-days ml-2 text-indigo-600"></i>הכנסות וגבייה לפי חודשים
                     </h3>
-                    <div class="pr-1">
-                        <table class="w-full text-right text-xs" style="font-family: Arial, Helvetica, sans-serif !important;">
+                    <div class="pr-1 overflow-x-auto">
+                        <table class="w-full min-w-[760px] text-right text-xs" style="font-family: Arial, Helvetica, sans-serif !important;">
                             <thead>
                                 <tr class="text-slate-400 border-b">
                                     <th class="p-2 text-right" style="font-family: Arial, Helvetica, sans-serif !important;">חודש</th>
                                     <th class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">הכנסות (ש"ח)</th>
-                                    <th class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">גבייה (ש"ח)</th>
-                                    <th class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">שיעור גבייה</th>
+                                    <th class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">גביית חשבוניות השנה</th>
+                                    <th class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">מעבר שנה</th>
+                                    <th class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">סה״כ גבייה שוטפת</th>
+                                    <th class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">שיעור גביית חשבוניות השנה</th>
                                 </tr>
                             </thead>
                             <tbody id="db-monthly-table-body" class="divide-y divide-slate-50"></tbody>
@@ -2271,7 +2273,7 @@
                                 <tr class="text-slate-400 border-b">
                                     <th class="p-3" style="font-family: Arial, Helvetica, sans-serif !important;">שם הלקוח</th>
                                     <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">הכנסות (ש"ח)</th>
-                                    <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">גבייה (ש"ח)</th>
+                                    <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">גבייה שוטפת (ש"ח)</th>
                                     <th class="p-3 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">סך יתרה פתוחה (ש"ח)</th>
                                 </tr>
                             </thead>
@@ -2496,6 +2498,80 @@
             return Number.isInteger(row.reportMonth) && row.reportMonth >= 0 && row.reportMonth <= 11
                 ? row.reportMonth
                 : null;
+        }
+
+        /**
+         * December invoices from the preceding year belong to the routine
+         * year-transition collection cycle, not to historical-debt recovery.
+         */
+        function getYearTransitionRows(predicate = () => true) {
+            return historicalRevenueDb.filter(row =>
+                isValidDate(row.matchDate)
+                && row.matchDate.getFullYear() === CURRENT_YEAR
+                && isValidDate(row.documentDate)
+                && row.documentDate.getFullYear() === CURRENT_YEAR - 1
+                && row.documentDate.getMonth() === 11
+                && Number.isFinite(row.amount)
+                && predicate(row)
+            );
+        }
+
+        function buildCurrentYearCollectionData(revenues, currentDebts, transitionPredicate = () => true) {
+            const totalBilled = revenues.reduce((sum, row) => sum + row.amount, 0);
+            const totalDebt = currentDebts.reduce((sum, row) => sum + row.amount, 0);
+            const currentYearCollected = Math.max(0, totalBilled - totalDebt);
+            const transitionRows = getYearTransitionRows(transitionPredicate);
+            const transitionCollected = transitionRows.reduce((sum, row) => sum + row.amount, 0);
+            const operationalCollected = currentYearCollected + transitionCollected;
+
+            const monthlyBilled = Array(12).fill(0);
+            const monthlyUnpaid = Array(12).fill(0);
+            revenues.forEach(row => {
+                const month = getRevenueMonth(row);
+                if (Number.isInteger(month)) monthlyBilled[month] += row.amount;
+            });
+            currentDebts.forEach(row => {
+                const month = isValidDate(row.regDate) ? row.regDate.getMonth() : row.dueDate.getMonth();
+                if (Number.isInteger(month)) monthlyUnpaid[month] += row.amount;
+            });
+            const monthlyCurrentYearCollected = monthlyBilled.map((amount, month) =>
+                Math.max(0, amount - monthlyUnpaid[month])
+            );
+            const monthlyTransitionCollected = Array(12).fill(0);
+            transitionRows.forEach(row => {
+                monthlyTransitionCollected[row.matchDate.getMonth()] += row.amount;
+            });
+            const monthlyOperationalCollected = monthlyCurrentYearCollected.map((amount, month) =>
+                amount + monthlyTransitionCollected[month]
+            );
+
+            return {
+                totalBilled,
+                totalDebt,
+                currentYearCollected,
+                transitionRows,
+                transitionCollected,
+                operationalCollected,
+                collectionRate: totalBilled > 0 ? currentYearCollected / totalBilled * 100 : 0,
+                monthlyBilled,
+                monthlyCurrentYearCollected,
+                monthlyTransitionCollected,
+                monthlyOperationalCollected
+            };
+        }
+
+        function getCollectionBreakdownText(collection) {
+            const currentText = `חשבוניות ${CURRENT_YEAR}: ${formatCurrency(collection.currentYearCollected)}`;
+            if (historicalRevenueDb.length === 0) return `${currentText} | נתוני מעבר שנה טרם נטענו`;
+            if (collection.transitionCollected === 0) return `${currentText} | לא נמצאה גביית מעבר שנה`;
+            return `${currentText} | מעבר שנה, דצמבר ${CURRENT_YEAR - 1}: ${formatCurrency(collection.transitionCollected)}`;
+        }
+
+        function getCollectionBreakdownPrintHtml(collection) {
+            const transitionText = historicalRevenueDb.length === 0
+                ? 'נתוני מעבר שנה טרם נטענו'
+                : `מעבר שנה, דצמבר ${CURRENT_YEAR - 1}: ${formatCurrency(collection.transitionCollected)}`;
+            return `חשבוניות ${CURRENT_YEAR}: ${formatCurrency(collection.currentYearCollected)}<br>${transitionText}`;
         }
 
         function syncReportYearLabels() {
@@ -2757,58 +2833,46 @@
         function renderDashboard() {
             const dashRevenues = revenueDb.filter(r => getRevenueYear(r) === CURRENT_YEAR && isDashboardMatch(r));
             const dashDebts = db.filter(r => r.dueDate.getFullYear() === CURRENT_YEAR && isDashboardMatch(r));
-
-            const totalBilled = dashRevenues.reduce((acc, r) => acc + r.amount, 0);
-            const totalDebt = dashDebts.reduce((acc, r) => acc + r.amount, 0);
-            const totalCollected = Math.max(0, totalBilled - totalDebt);
+            const collection = buildCurrentYearCollectionData(dashRevenues, dashDebts, isDashboardMatch);
+            const totalBilled = collection.totalBilled;
 
             const debtOverdue = dashDebts.filter(r => r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
             const debtFuture = dashDebts.filter(r => !r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
 
-            const collectionRate = totalBilled > 0 ? (totalCollected / totalBilled * 100).toFixed(1) : "0.0";
-
             document.getElementById('db-kpi-billed').innerText = formatCurrency(totalBilled);
-            document.getElementById('db-kpi-collected').innerText = formatCurrency(totalCollected);
+            document.getElementById('db-kpi-collected').innerText = formatCurrency(collection.operationalCollected);
+            document.getElementById('db-kpi-collected-note').innerText = getCollectionBreakdownText(collection);
             document.getElementById('db-kpi-debt').innerText = formatCurrency(debtOverdue);
             document.getElementById('db-kpi-future').innerText = formatCurrency(debtFuture);
 
-            const monthlyBilled = Array(12).fill(0);
-            const monthlyUnpaid = Array(12).fill(0);
-
-            dashRevenues.forEach(r => monthlyBilled[getRevenueMonth(r)] += r.amount);
-            
-            dashDebts.forEach(d => {
-                const m = (d.regDate && !isNaN(d.regDate.getTime())) ? d.regDate.getMonth() : d.dueDate.getMonth();
-                monthlyUnpaid[m] += d.amount;
-            });
-
-            const monthlyCollected = monthlyBilled.map((b, idx) => Math.max(0, b - monthlyUnpaid[idx]));
-
             let tableHTML = "";
-            let sumBilled = 0, sumCollected = 0;
 
             for (let i = 0; i < 12; i++) {
-                sumBilled += monthlyBilled[i];
-                sumCollected += monthlyCollected[i];
-                const monthlyRate = monthlyBilled[i] > 0 ? (monthlyCollected[i] / monthlyBilled[i] * 100).toFixed(1) + "%" : "0.0%";
+                const monthlyRate = collection.monthlyBilled[i] > 0
+                    ? (collection.monthlyCurrentYearCollected[i] / collection.monthlyBilled[i] * 100).toFixed(1) + "%"
+                    : "0.0%";
 
                 tableHTML += `
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="p-2 border-b font-medium" style="font-family: Arial, Helvetica, sans-serif !important;">${MONTH_NAMES[i]}</td>
-                        <td class="p-2 border-b text-left" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(monthlyBilled[i])}</td>
-                        <td class="p-2 border-b text-left text-emerald-700 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(monthlyCollected[i])}</td>
+                        <td class="p-2 border-b text-left" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(collection.monthlyBilled[i])}</td>
+                        <td class="p-2 border-b text-left text-emerald-700 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(collection.monthlyCurrentYearCollected[i])}</td>
+                        <td class="p-2 border-b text-left text-amber-700 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(collection.monthlyTransitionCollected[i])}</td>
+                        <td class="p-2 border-b text-left text-teal-800 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(collection.monthlyOperationalCollected[i])}</td>
                         <td class="p-2 border-b text-left text-indigo-700 font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${monthlyRate}</td>
                     </tr>
                 `;
             }
 
-            const totalRate = sumBilled > 0 ? (sumCollected / sumBilled * 100).toFixed(1) + "%" : "0.0%";
+            const totalRate = collection.collectionRate.toFixed(1) + "%";
             
             tableHTML += `
                 <tr class="bg-slate-100 font-bold">
                     <td class="p-2" style="font-family: Arial, Helvetica, sans-serif !important;">סה"כ</td>
-                    <td class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(sumBilled)}</td>
-                    <td class="p-2 text-left text-emerald-700" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(sumCollected)}</td>
+                    <td class="p-2 text-left" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(collection.totalBilled)}</td>
+                    <td class="p-2 text-left text-emerald-700" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(collection.currentYearCollected)}</td>
+                    <td class="p-2 text-left text-amber-700" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(collection.transitionCollected)}</td>
+                    <td class="p-2 text-left text-teal-800" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(collection.operationalCollected)}</td>
                     <td class="p-2 text-left text-indigo-700" style="font-family: Arial, Helvetica, sans-serif !important;">${totalRate}</td>
                 </tr>
             `;
@@ -2823,15 +2887,24 @@
                     datasets: [
                         {
                             label: 'הכנסות',
-                            data: monthlyBilled,
+                            data: collection.monthlyBilled,
                             backgroundColor: '#0B3C5D', 
-                            borderRadius: 4
+                            borderRadius: 4,
+                            stack: 'billed'
                         },
                         {
-                            label: 'גבייה',
-                            data: monthlyCollected,
+                            label: `גביית חשבוניות ${CURRENT_YEAR}`,
+                            data: collection.monthlyCurrentYearCollected,
                             backgroundColor: '#10b981', 
-                            borderRadius: 4
+                            borderRadius: 4,
+                            stack: 'collected'
+                        },
+                        {
+                            label: `מעבר שנה, דצמבר ${CURRENT_YEAR - 1}`,
+                            data: collection.monthlyTransitionCollected,
+                            backgroundColor: '#e59a11',
+                            borderRadius: 4,
+                            stack: 'collected'
                         }
                     ]
                 },
@@ -2839,11 +2912,11 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
+                        x: { stacked: true },
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                callback: function(value) { return '₪' + value.toLocaleString(); }
-                            }
+                            stacked: true,
+                            ticks: { callback: function(value) { return '₪' + value.toLocaleString(); } }
                         }
                     },
                     plugins: {
@@ -2854,7 +2927,7 @@
 
             const activeClientsData = {};
             dashRevenues.forEach(r => {
-                if (!activeClientsData[r.name]) activeClientsData[r.name] = { billed: 0, unpaid: 0 };
+                if (!activeClientsData[r.name]) activeClientsData[r.name] = { billed: 0, unpaid: 0, transition: 0 };
                 activeClientsData[r.name].billed += r.amount;
             });
             dashDebts.forEach(d => {
@@ -2862,12 +2935,16 @@
                     activeClientsData[d.name].unpaid += d.amount;
                 }
             });
+            collection.transitionRows.forEach(row => {
+                if (activeClientsData[row.name]) activeClientsData[row.name].transition += row.amount;
+            });
 
             const activeClientsList = Object.entries(activeClientsData).map(([name, data]) => ({
                 name,
                 billed: data.billed,
                 unpaid: data.unpaid,
-                collected: Math.max(0, data.billed - data.unpaid)
+                transition: data.transition,
+                collected: Math.max(0, data.billed - data.unpaid) + data.transition
             })).sort((a, b) => b.billed - a.billed).slice(0, 10);
 
             let activeClientsHTML = "";
@@ -2879,7 +2956,7 @@
                             <a href="#" onclick="drillToClientAnnualReport('${safeName}'); return false;" class="text-blue-600 hover:underline font-bold" style="font-family: Arial, Helvetica, sans-serif !important;">${c.name}</a> ${directDebitBadge(c.name)}
                         </td>
                         <td class="p-3 border-b text-left" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(c.billed)}</td>
-                        <td class="p-3 border-b text-left text-emerald-700 font-semibold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(c.collected)}</td>
+                        <td class="p-3 border-b text-left text-emerald-700 font-semibold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(c.collected)}${c.transition > 0 ? `<div class="text-[10px] text-amber-700">כולל מעבר שנה ${formatCurrency(c.transition)}</div>` : ''}</td>
                         <td class="p-3 border-b text-left text-red-600 font-semibold" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(c.unpaid)}</td>
                     </tr>
                 `;
@@ -2984,22 +3061,9 @@
 
                 const rRows = revenueDb.filter(r => getRevenueYear(r) === CURRENT_YEAR && isDashboardMatch(r));
                 const dRows = db.filter(r => r.dueDate.getFullYear() === CURRENT_YEAR && isDashboardMatch(r));
-
-                const totalBilled = rRows.reduce((acc, r) => acc + r.amount, 0);
-                const totalDebt = dRows.reduce((acc, r) => acc + r.amount, 0);
+                const collection = buildCurrentYearCollectionData(rRows, dRows, isDashboardMatch);
                 const debtOverdue = dRows.filter(r => r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
                 const debtFuture = dRows.filter(r => !r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
-                const totalCollected = Math.max(0, totalBilled - totalDebt);
-                const collectionRate = totalBilled > 0 ? (totalCollected / totalBilled * 100).toFixed(1) : "0.0";
-
-                const monthlyBilled = Array(12).fill(0);
-                const monthlyUnpaid = Array(12).fill(0);
-                rRows.forEach(r => monthlyBilled[getRevenueMonth(r)] += r.amount);
-                dRows.forEach(d => {
-                    const m = (d.regDate && !isNaN(d.regDate.getTime())) ? d.regDate.getMonth() : d.dueDate.getMonth();
-                    monthlyUnpaid[m] += d.amount;
-                });
-                const monthlyCollected = monthlyBilled.map((b, i) => Math.max(0, b - monthlyUnpaid[i]));
 
                 dashStageA = dashStageA_orig;
                 dashStageB = dashStageB_orig;
@@ -3009,8 +3073,8 @@
                         <h2 style="text-align:center; color:#0B3C5D; margin-bottom: 20px;">דוח גבייה והכנסות: ${config.title}</h2>
                         
                         <div class="kpis">
-                            <div class="kpi-card"><div class="kpi-title">הכנסות</div><div class="kpi-value" style="color:#1e3a8a">${formatCurrency(totalBilled)}</div></div>
-                            <div class="kpi-card"><div class="kpi-title">גבייה עד כה</div><div class="kpi-value" style="color:#047857">${formatCurrency(totalCollected)}</div></div>
+                            <div class="kpi-card"><div class="kpi-title">הכנסות</div><div class="kpi-value" style="color:#1e3a8a">${formatCurrency(collection.totalBilled)}</div></div>
+                            <div class="kpi-card"><div class="kpi-title">גבייה שוטפת</div><div class="kpi-value" style="color:#047857">${formatCurrency(collection.operationalCollected)}</div><small>${getCollectionBreakdownPrintHtml(collection)}</small></div>
                             <div class="kpi-card"><div class="kpi-title">חוב בפיגור</div><div class="kpi-value" style="color:#b91c1c">${formatCurrency(debtOverdue)}</div></div>
                             <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${formatCurrency(debtFuture)}</div></div>
                         </div>
@@ -3021,27 +3085,33 @@
                                 <tr>
                                     <th>חודש</th>
                                     <th style="text-align:left">הכנסות (ש"ח)</th>
-                                    <th style="text-align:left">גבייה (ש"ח)</th>
-                                    <th style="text-align:left">שיעור גבייה</th>
+                                    <th style="text-align:left">גביית חשבוניות השנה</th>
+                                    <th style="text-align:left">מעבר שנה</th>
+                                    <th style="text-align:left">סה"כ גבייה שוטפת</th>
+                                    <th style="text-align:left">שיעור גביית חשבוניות השנה</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 ${MONTH_NAMES.map((m, i) => {
-                                    const rate = monthlyBilled[i] > 0 ? (monthlyCollected[i] / monthlyBilled[i] * 100).toFixed(1) + "%" : "0.0%";
+                                    const rate = collection.monthlyBilled[i] > 0 ? (collection.monthlyCurrentYearCollected[i] / collection.monthlyBilled[i] * 100).toFixed(1) + "%" : "0.0%";
                                     return `
                                         <tr>
                                             <td>${m}</td>
-                                            <td style="text-align:left">${formatCurrency(monthlyBilled[i])}</td>
-                                            <td style="text-align:left; color:#047857">${formatCurrency(monthlyCollected[i])}</td>
+                                            <td style="text-align:left">${formatCurrency(collection.monthlyBilled[i])}</td>
+                                            <td style="text-align:left; color:#047857">${formatCurrency(collection.monthlyCurrentYearCollected[i])}</td>
+                                            <td style="text-align:left; color:#b96b00">${formatCurrency(collection.monthlyTransitionCollected[i])}</td>
+                                            <td style="text-align:left; color:#0f766e">${formatCurrency(collection.monthlyOperationalCollected[i])}</td>
                                             <td style="text-align:left; color:#4338ca">${rate}</td>
                                         </tr>
                                     `;
                                 }).join('')}
                                 <tr style="font-weight:bold; background:#f1f5f9;">
                                     <td>סה"כ</td>
-                                    <td style="text-align:left">${formatCurrency(totalBilled)}</td>
-                                    <td style="text-align:left; color:#047857">${formatCurrency(totalCollected)}</td>
-                                    <td style="text-align:left; color:#4338ca">${collectionRate}%</td>
+                                    <td style="text-align:left">${formatCurrency(collection.totalBilled)}</td>
+                                    <td style="text-align:left; color:#047857">${formatCurrency(collection.currentYearCollected)}</td>
+                                    <td style="text-align:left; color:#b96b00">${formatCurrency(collection.transitionCollected)}</td>
+                                    <td style="text-align:left; color:#0f766e">${formatCurrency(collection.operationalCollected)}</td>
+                                    <td style="text-align:left; color:#4338ca">${collection.collectionRate.toFixed(1)}%</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -3077,10 +3147,15 @@
             const currentYearFuture = currentYearDebts.filter(r => !r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
             const pastYearsOverdue = pastYearsDebts.filter(r => r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
 
-            const currentYearCollected = Math.max(0, currentYearBilled - (currentYearOverdue + currentYearFuture));
+            const collection = buildCurrentYearCollectionData(
+                currentYearRevenues,
+                currentYearDebts,
+                isTypeMatch
+            );
 
             document.getElementById('kpi-current-revenue').innerText = formatCurrency(currentYearBilled);
-            document.getElementById('kpi-current-collected').innerText = formatCurrency(currentYearCollected);
+            document.getElementById('kpi-current-collected').innerText = formatCurrency(collection.operationalCollected);
+            document.getElementById('kpi-current-collected-note').innerText = getCollectionBreakdownText(collection);
             document.getElementById('kpi-current-overdue').innerText = formatCurrency(currentYearOverdue);
             document.getElementById('kpi-current-future').innerText = formatCurrency(currentYearFuture);
             document.getElementById('kpi-past-overdue').innerText = formatCurrency(pastYearsOverdue);
@@ -3149,7 +3224,11 @@
                     const secCurrentFuture = secCurrentDebts.filter(r => !r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
                     const secPastOverdue = secPastDebts.filter(r => r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
 
-                    const secCollected = Math.max(0, secRevenueSum - (secCurrentOverdue + secCurrentFuture));
+                    const secCollection = buildCurrentYearCollectionData(
+                        secRevenues,
+                        secCurrentDebts,
+                        row => row.sector === s.id && isTypeMatch(row)
+                    );
 
                     html += `
                         <div onclick="selectSector('${s.id}')" class="bg-white border border-slate-200 p-5 rounded-3xl hover:shadow-xl hover:border-blue-400 cursor-pointer transition-all flex flex-col justify-between h-full min-h-[320px]">
@@ -3168,8 +3247,12 @@
                                         <span class="font-bold text-emerald-700">${formatCurrency(secRevenueSum)}</span>
                                     </div>
                                     <div class="flex justify-between items-center">
-                                        <span class="text-slate-500">גבייה עד כה:</span>
-                                        <span class="font-bold text-blue-800">${formatCurrency(secCollected)}</span>
+                                        <span class="text-slate-500">גבייה שוטפת:</span>
+                                        <span class="font-bold text-blue-800">${formatCurrency(secCollection.operationalCollected)}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center text-[10px]">
+                                        <span class="text-amber-700">מתוכה מעבר שנה:</span>
+                                        <span class="font-bold text-amber-700">${formatCurrency(secCollection.transitionCollected)}</span>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-slate-500">חובות שנה נוכחית:</span>
@@ -4019,6 +4102,17 @@
                 const currentYearInvoices = revenueDb.filter(r => r.name === path.orgName && getRevenueYear(r) === CURRENT_YEAR && isTypeMatch(r));
                 currentYearInvoices.sort((a, b) => a.dueDate - b.dueDate);
                 const currentTotal = currentYearInvoices.reduce((acc, r) => acc + r.amount, 0);
+                const currentYearClientDebts = db.filter(r =>
+                    r.name === path.orgName
+                    && isValidDate(r.dueDate)
+                    && r.dueDate.getFullYear() === CURRENT_YEAR
+                    && isTypeMatch(r)
+                );
+                const clientCollection = buildCurrentYearCollectionData(
+                    currentYearInvoices,
+                    currentYearClientDebts,
+                    row => row.name === path.orgName && isTypeMatch(row)
+                );
 
                 const pastYearsDebts = db.filter(r => r.name === path.orgName && r.dueDate.getFullYear() < CURRENT_YEAR && isTypeMatch(r));
                 pastYearsDebts.sort((a,b) => a.dueDate - b.dueDate);
@@ -4159,6 +4253,12 @@
                         <p class="document-recipient">לכבוד: <br><b style="font-size:18px">${path.orgName}</b></p>
                         <h2 class="document-title">דוח שנתי ללקוח - שנת ${CURRENT_YEAR}</h2>
                         <p>אנו מתכבדים להציג לכם סיכום של החיובים לשנה זו:</p>
+
+                        <div class="kpis" style="margin:18px 0 22px;">
+                            <div class="kpi-card"><div class="kpi-title">גביית חשבוניות ${CURRENT_YEAR}</div><div class="kpi-value" style="color:#047857">${formatCurrency(clientCollection.currentYearCollected)}</div><small class="kpi-note">שיעור גבייה ${clientCollection.collectionRate.toFixed(1)}%</small></div>
+                            <div class="kpi-card"><div class="kpi-title">מעבר שנה, דצמבר ${CURRENT_YEAR - 1}</div><div class="kpi-value" style="color:#b96b00">${historicalRevenueDb.length ? formatCurrency(clientCollection.transitionCollected) : 'לא נטען'}</div><small class="kpi-note">${historicalRevenueDb.length ? `נגבה בשנת ${CURRENT_YEAR}` : 'נדרש קובץ חשבוניות שהותאמו'}</small></div>
+                            <div class="kpi-card"><div class="kpi-title">סה"כ גבייה שוטפת</div><div class="kpi-value" style="color:#0f766e">${formatCurrency(clientCollection.operationalCollected)}</div><small class="kpi-note">ללא גביית חובות עבר מוקדמים יותר</small></div>
+                        </div>
                         
                         <table>
                             <thead>
@@ -4734,30 +4834,15 @@
                 && !row.isFee
             );
 
-            const totalBilled = revenues.reduce((sum, row) => sum + row.amount, 0);
-            const totalDebt = currentDebts.reduce((sum, row) => sum + row.amount, 0);
+            const collection = buildCurrentYearCollectionData(revenues, currentDebts, row => !row.isFee);
+            const totalBilled = collection.totalBilled;
+            const totalDebt = collection.totalDebt;
             const totalOverdue = currentDebts
                 .filter(row => row.isOverdue)
                 .reduce((sum, row) => sum + row.amount, 0);
             const totalFuture = currentDebts
                 .filter(row => !row.isOverdue)
                 .reduce((sum, row) => sum + row.amount, 0);
-            const totalCollected = Math.max(0, totalBilled - totalDebt);
-            const collectionRate = totalBilled > 0 ? totalCollected / totalBilled * 100 : 0;
-
-            const monthlyBilled = Array(12).fill(0);
-            const monthlyUnpaid = Array(12).fill(0);
-            revenues.forEach(row => {
-                const month = getRevenueMonth(row);
-                if (Number.isInteger(month)) monthlyBilled[month] += row.amount;
-            });
-            currentDebts.forEach(row => {
-                const month = isValidDate(row.regDate) ? row.regDate.getMonth() : row.dueDate.getMonth();
-                monthlyUnpaid[month] += row.amount;
-            });
-            const monthlyCollected = monthlyBilled.map((amount, month) =>
-                Math.max(0, amount - monthlyUnpaid[month])
-            );
 
             const sectorRows = sectors.map(sector => {
                 const sectorRevenues = revenues.filter(row => row.sector === sector);
@@ -4765,9 +4850,14 @@
                 const billed = sectorRevenues.reduce((sum, row) => sum + row.amount, 0);
                 const debt = sectorDebts.reduce((sum, row) => sum + row.amount, 0);
                 const collected = Math.max(0, billed - debt);
-                const clients = countUniqueClients([...sectorRevenues, ...sectorDebts]);
+                const transition = collection.transitionRows
+                    .filter(row => row.sector === sector)
+                    .reduce((sum, row) => sum + row.amount, 0);
+                const transitionRows = collection.transitionRows.filter(row => row.sector === sector);
+                const clients = countUniqueClients([...sectorRevenues, ...sectorDebts, ...transitionRows]);
                 return {
-                    sector, clients, billed, collected, debt,
+                    sector, clients, billed, collected, transition,
+                    operationalCollected: collected + transition, debt,
                     rate: billed > 0 ? collected / billed * 100 : 0
                 };
             });
@@ -4821,8 +4911,16 @@
             });
 
             return {
-                totalBilled, totalDebt, totalOverdue, totalFuture, totalCollected, collectionRate,
-                monthlyBilled, monthlyCollected, sectorRows, debtYears, debtSectors,
+                totalBilled, totalDebt, totalOverdue, totalFuture,
+                totalCollected: collection.operationalCollected,
+                currentYearCollected: collection.currentYearCollected,
+                transitionCollected: collection.transitionCollected,
+                collectionRate: collection.collectionRate,
+                monthlyBilled: collection.monthlyBilled,
+                monthlyCollected: collection.monthlyCurrentYearCollected,
+                monthlyTransitionCollected: collection.monthlyTransitionCollected,
+                monthlyOperationalCollected: collection.monthlyOperationalCollected,
+                sectorRows, debtYears, debtSectors,
                 pastDebts, historicalRows, historicalYears, historicalSectors
             };
         }
@@ -4834,6 +4932,7 @@
             if (closedDebtsSection) closedDebtsSection.classList.toggle('hidden', !hasHistoricalSource);
             document.getElementById('management-kpi-billed').textContent = formatCurrency(data.totalBilled);
             document.getElementById('management-kpi-collected').textContent = formatCurrency(data.totalCollected);
+            document.getElementById('management-kpi-collected-note').textContent = getCollectionBreakdownText(data);
             document.getElementById('management-kpi-overdue').textContent = formatCurrency(data.totalOverdue);
             document.getElementById('management-kpi-future').textContent = formatCurrency(data.totalFuture);
 
@@ -4841,13 +4940,14 @@
                 const billed = data.monthlyBilled[index];
                 const collected = data.monthlyCollected[index];
                 const rate = billed > 0 ? collected / billed * 100 : 0;
-                return `<tr><td><strong>${month}</strong></td><td>${formatCurrency(billed)}</td><td>${formatCurrency(collected)}</td><td>${rate.toFixed(1)}%</td></tr>`;
+                return `<tr><td><strong>${month}</strong></td><td>${formatCurrency(billed)}</td><td>${formatCurrency(collected)}</td><td>${formatCurrency(data.monthlyTransitionCollected[index])}</td><td>${formatCurrency(data.monthlyOperationalCollected[index])}</td><td>${rate.toFixed(1)}%</td></tr>`;
             }).join('') + `
-                <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${formatCurrency(data.totalBilled)}</td><td>${formatCurrency(data.totalCollected)}</td><td>${data.collectionRate.toFixed(1)}%</td></tr>`;
+                <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${formatCurrency(data.totalBilled)}</td><td>${formatCurrency(data.currentYearCollected)}</td><td>${formatCurrency(data.transitionCollected)}</td><td>${formatCurrency(data.totalCollected)}</td><td>${data.collectionRate.toFixed(1)}%</td></tr>`;
 
             const totalSectorClients = countUniqueClients([
                 ...revenueDb.filter(row => getRevenueYear(row) === CURRENT_YEAR && !row.isFee),
-                ...db.filter(row => isValidDate(row.dueDate) && row.dueDate.getFullYear() === CURRENT_YEAR && !row.isFee)
+                ...db.filter(row => isValidDate(row.dueDate) && row.dueDate.getFullYear() === CURRENT_YEAR && !row.isFee),
+                ...getYearTransitionRows(row => !row.isFee)
             ]);
             document.getElementById('management-sector-table-body').innerHTML = data.sectorRows.map(row => `
                 <tr>
@@ -4855,6 +4955,8 @@
                     <td>${row.clients.toLocaleString('he-IL')}</td>
                     <td>${formatCurrency(row.billed)}</td>
                     <td>${formatCurrency(row.collected)}</td>
+                    <td>${formatCurrency(row.transition)}</td>
+                    <td>${formatCurrency(row.operationalCollected)}</td>
                     <td>${row.rate.toFixed(1)}%</td>
                 </tr>
             `).join('') + `
@@ -4862,6 +4964,8 @@
                     <td>סה"כ</td>
                     <td>${totalSectorClients.toLocaleString('he-IL')}</td>
                     <td>${formatCurrency(data.totalBilled)}</td>
+                    <td>${formatCurrency(data.currentYearCollected)}</td>
+                    <td>${formatCurrency(data.transitionCollected)}</td>
                     <td>${formatCurrency(data.totalCollected)}</td>
                     <td>${data.collectionRate.toFixed(1)}%</td>
                 </tr>`;
@@ -4900,15 +5004,16 @@
                 data: {
                     labels: MONTH_NAMES,
                     datasets: [
-                        { label: 'הכנסות', data: data.monthlyBilled, backgroundColor: '#0B3C5D', borderRadius: 4 },
-                        { label: 'גבייה', data: data.monthlyCollected, backgroundColor: '#10b981', borderRadius: 4 }
+                        { label: 'הכנסות', data: data.monthlyBilled, backgroundColor: '#0B3C5D', borderRadius: 4, stack: 'billed' },
+                        { label: `גביית חשבוניות ${CURRENT_YEAR}`, data: data.monthlyCollected, backgroundColor: '#10b981', borderRadius: 4, stack: 'collected' },
+                        { label: `מעבר שנה, דצמבר ${CURRENT_YEAR - 1}`, data: data.monthlyTransitionCollected, backgroundColor: '#e59a11', borderRadius: 4, stack: 'collected' }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     animation: false,
-                    scales: { y: { beginAtZero: true, ticks: { callback: value => '₪' + value.toLocaleString('he-IL') } } },
+                    scales: { x: { stacked: true }, y: { beginAtZero: true, stacked: true, ticks: { callback: value => '₪' + value.toLocaleString('he-IL') } } },
                     plugins: { legend: { position: 'bottom' } }
                 }
             });
@@ -4957,6 +5062,7 @@
 
         function printManagementReport() {
             renderManagementReport();
+            const data = getManagementReportData();
             const title = `סקירה מקיפה על שירותי מידע ${CURRENT_YEAR}`;
             const hasHistoricalSource = historicalRevenueDb.length > 0;
             const chartImages = {
@@ -5011,12 +5117,12 @@
                         <h1 class="document-title">${title}</h1>
                         <div class="kpis">
                             <div class="kpi-card"><div class="kpi-title">הכנסות</div><div class="kpi-value" style="color:#0B3C5D">${document.getElementById('management-kpi-billed').textContent}</div><small class="kpi-note">סך ההכנסות בשנת העבודה</small></div>
-                            <div class="kpi-card"><div class="kpi-title">גבייה עד כה</div><div class="kpi-value" style="color:#047857">${document.getElementById('management-kpi-collected').textContent}</div><small class="kpi-note">גבייה מחושבת בשנת העבודה</small></div>
+                            <div class="kpi-card"><div class="kpi-title">גבייה שוטפת</div><div class="kpi-value" style="color:#047857">${formatCurrency(data.totalCollected)}</div><small class="kpi-note">${getCollectionBreakdownPrintHtml(data)}</small></div>
                             <div class="kpi-card"><div class="kpi-title">חוב בפיגור</div><div class="kpi-value" style="color:#b91c1c">${document.getElementById('management-kpi-overdue').textContent}</div><small class="kpi-note">חשבוניות פתוחות שמועד פירעונן עבר</small></div>
                             <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${document.getElementById('management-kpi-future').textContent}</div><small class="kpi-note">חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></div>
                         </div>
-                        ${analysisBlock('הכנסות וגבייה לפי חודשים', '<tr><th>חודש</th><th>הכנסות</th><th>גבייה</th><th>שיעור גבייה</th></tr>', 'management-monthly-table-body', chartImages.monthly, 'גרף הכנסות וגבייה לפי חודשים')}
-                        ${analysisBlock('הכנסות וגבייה לפי סקטורים', '<tr><th>סקטור</th><th>מספר לקוחות</th><th>הכנסות</th><th>גבייה</th><th>שיעור גבייה</th></tr>', 'management-sector-table-body', chartImages.sectors, 'גרף התפלגות הכנסות לפי סקטורים')}
+                        ${analysisBlock('הכנסות וגבייה לפי חודשים', '<tr><th>חודש</th><th>הכנסות</th><th>גביית חשבוניות השנה</th><th>מעבר שנה</th><th>סה״כ גבייה שוטפת</th><th>שיעור גביית חשבוניות השנה</th></tr>', 'management-monthly-table-body', chartImages.monthly, 'גרף הכנסות וגבייה לפי חודשים')}
+                        ${analysisBlock('הכנסות וגבייה לפי סקטורים', '<tr><th>סקטור</th><th>מספר לקוחות</th><th>הכנסות</th><th>גביית חשבוניות השנה</th><th>מעבר שנה</th><th>סה״כ גבייה שוטפת</th><th>שיעור גביית חשבוניות השנה</th></tr>', 'management-sector-table-body', chartImages.sectors, 'גרף התפלגות הכנסות לפי סקטורים')}
                     </section>
                     <section class="${hasHistoricalSource ? 'management-page' : 'management-page management-page--last'}">
                         <h2>חובות פתוחים</h2>
@@ -5042,24 +5148,10 @@
             );
             const allOpenDebts = db.filter(row => row.isFee);
 
-            const totalBilled = revenues.reduce((sum, row) => sum + row.amount, 0);
-            const totalDebt = currentDebts.reduce((sum, row) => sum + row.amount, 0);
+            const collection = buildCurrentYearCollectionData(revenues, currentDebts, row => row.isFee);
+            const totalBilled = collection.totalBilled;
             const totalOverdue = currentDebts.filter(row => row.isOverdue).reduce((sum, row) => sum + row.amount, 0);
             const totalFuture = currentDebts.filter(row => !row.isOverdue).reduce((sum, row) => sum + row.amount, 0);
-            const totalCollected = Math.max(0, totalBilled - totalDebt);
-            const collectionRate = totalBilled > 0 ? totalCollected / totalBilled * 100 : 0;
-
-            const monthlyBilled = Array(12).fill(0);
-            const monthlyUnpaid = Array(12).fill(0);
-            revenues.forEach(row => {
-                const month = getRevenueMonth(row);
-                if (Number.isInteger(month)) monthlyBilled[month] += row.amount;
-            });
-            currentDebts.forEach(row => {
-                const month = isValidDate(row.regDate) ? row.regDate.getMonth() : row.dueDate.getMonth();
-                monthlyUnpaid[month] += row.amount;
-            });
-            const monthlyCollected = monthlyBilled.map((amount, month) => Math.max(0, amount - monthlyUnpaid[month]));
 
             const pastDebts = allOpenDebts.filter(row =>
                 isValidDate(row.dueDate) && row.dueDate.getFullYear() < CURRENT_YEAR
@@ -5112,8 +5204,16 @@
             );
 
             return {
-                totalBilled, totalOverdue, totalFuture, totalCollected, collectionRate,
-                monthlyBilled, monthlyCollected, pastDebts, debtYears,
+                totalBilled, totalOverdue, totalFuture,
+                totalCollected: collection.operationalCollected,
+                currentYearCollected: collection.currentYearCollected,
+                transitionCollected: collection.transitionCollected,
+                collectionRate: collection.collectionRate,
+                monthlyBilled: collection.monthlyBilled,
+                monthlyCollected: collection.monthlyCurrentYearCollected,
+                monthlyTransitionCollected: collection.monthlyTransitionCollected,
+                monthlyOperationalCollected: collection.monthlyOperationalCollected,
+                pastDebts, debtYears,
                 historicalRows, historicalYears, entityRows
             };
         }
@@ -5124,6 +5224,7 @@
             document.getElementById('fees-management-closed-debts-section')?.classList.toggle('hidden', !hasHistoricalSource);
             document.getElementById('fees-management-kpi-billed').textContent = formatCurrency(data.totalBilled);
             document.getElementById('fees-management-kpi-collected').textContent = formatCurrency(data.totalCollected);
+            document.getElementById('fees-management-kpi-collected-note').textContent = getCollectionBreakdownText(data);
             document.getElementById('fees-management-kpi-overdue').textContent = formatCurrency(data.totalOverdue);
             document.getElementById('fees-management-kpi-future').textContent = formatCurrency(data.totalFuture);
 
@@ -5131,9 +5232,9 @@
                 const billed = data.monthlyBilled[index];
                 const collected = data.monthlyCollected[index];
                 const rate = billed > 0 ? collected / billed * 100 : 0;
-                return `<tr><td><strong>${month}</strong></td><td>${formatCurrency(billed)}</td><td>${formatCurrency(collected)}</td><td>${rate.toFixed(1)}%</td></tr>`;
+                return `<tr><td><strong>${month}</strong></td><td>${formatCurrency(billed)}</td><td>${formatCurrency(collected)}</td><td>${formatCurrency(data.monthlyTransitionCollected[index])}</td><td>${formatCurrency(data.monthlyOperationalCollected[index])}</td><td>${rate.toFixed(1)}%</td></tr>`;
             }).join('') + `
-                <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${formatCurrency(data.totalBilled)}</td><td>${formatCurrency(data.totalCollected)}</td><td>${data.collectionRate.toFixed(1)}%</td></tr>`;
+                <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${formatCurrency(data.totalBilled)}</td><td>${formatCurrency(data.currentYearCollected)}</td><td>${formatCurrency(data.transitionCollected)}</td><td>${formatCurrency(data.totalCollected)}</td><td>${data.collectionRate.toFixed(1)}%</td></tr>`;
 
             const debtInvoicesTotal = data.pastDebts.length;
             const debtClientsTotal = countUniqueClients(data.pastDebts);
@@ -5168,11 +5269,12 @@
             feesManagementChart = new Chart(monthlyCanvas.getContext('2d'), {
                 type: 'bar',
                 data: { labels: MONTH_NAMES, datasets: [
-                    { label: 'הכנסות', data: data.monthlyBilled, backgroundColor: '#0B3C5D', borderRadius: 4 },
-                    { label: 'גבייה', data: data.monthlyCollected, backgroundColor: '#10b981', borderRadius: 4 }
+                    { label: 'הכנסות', data: data.monthlyBilled, backgroundColor: '#0B3C5D', borderRadius: 4, stack: 'billed' },
+                    { label: `גביית חשבוניות ${CURRENT_YEAR}`, data: data.monthlyCollected, backgroundColor: '#10b981', borderRadius: 4, stack: 'collected' },
+                    { label: `מעבר שנה, דצמבר ${CURRENT_YEAR - 1}`, data: data.monthlyTransitionCollected, backgroundColor: '#e59a11', borderRadius: 4, stack: 'collected' }
                 ] },
                 options: { responsive: true, maintainAspectRatio: false, animation: false,
-                    scales: { y: { beginAtZero: true, ticks: { callback: value => '₪' + value.toLocaleString('he-IL') } } },
+                    scales: { x: { stacked: true }, y: { beginAtZero: true, stacked: true, ticks: { callback: value => '₪' + value.toLocaleString('he-IL') } } },
                     plugins: { legend: { position: 'bottom' } }
                 }
             });
@@ -5236,11 +5338,11 @@
                 `<h1 class="document-title">${title}</h1>
                  <div class="kpis">
                     <div class="kpi-card"><div class="kpi-title">הכנסות</div><div class="kpi-value" style="color:#0B3C5D">${formatCurrency(data.totalBilled)}</div><small class="kpi-note">סך ההכנסות בשנת העבודה</small></div>
-                    <div class="kpi-card"><div class="kpi-title">גבייה עד כה</div><div class="kpi-value" style="color:#047857">${formatCurrency(data.totalCollected)}</div><small class="kpi-note">גבייה מחושבת בשנת העבודה</small></div>
+                    <div class="kpi-card"><div class="kpi-title">גבייה שוטפת</div><div class="kpi-value" style="color:#047857">${formatCurrency(data.totalCollected)}</div><small class="kpi-note">${getCollectionBreakdownPrintHtml(data)}</small></div>
                     <div class="kpi-card"><div class="kpi-title">חוב בפיגור</div><div class="kpi-value" style="color:#b91c1c">${formatCurrency(data.totalOverdue)}</div><small class="kpi-note">חשבוניות פתוחות שמועד פירעונן עבר</small></div>
                     <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${formatCurrency(data.totalFuture)}</div><small class="kpi-note">חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></div>
                  </div>
-                 ${analysisBlock('הכנסות וגבייה לפי חודשים', '<tr><th>חודש</th><th>הכנסות</th><th>גבייה</th><th>שיעור גבייה</th></tr>', 'fees-management-monthly-table-body', monthlyImage, 'גרף הכנסות וגבייה לפי חודשים')}`,
+                 ${analysisBlock('הכנסות וגבייה לפי חודשים', '<tr><th>חודש</th><th>הכנסות</th><th>גביית חשבוניות השנה</th><th>מעבר שנה</th><th>סה״כ גבייה שוטפת</th><th>שיעור גביית חשבוניות השנה</th></tr>', 'fees-management-monthly-table-body', monthlyImage, 'גרף הכנסות וגבייה לפי חודשים')}`,
                 `${analysisBlock('חובות עבר פתוחים לפי שנים', '<tr><th>שנת חוב</th><th>מספר גופים</th><th>מספר חשבוניות</th><th>סכום החוב</th></tr>', 'fees-management-debt-years-table-body', debtYearsImage, 'גרף חובות עבר פתוחים לפי שנים', 'בשורת הסה"כ, כל גוף נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.')}`
             ];
             if (hasHistoricalSource) {
