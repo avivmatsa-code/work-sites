@@ -754,9 +754,14 @@
         .source-screen-main,
         .query-screen-main,
         .historical-screen-main,
-        .management-screen-main,
-        .debtor-finder-screen-main {
+        .management-screen-main {
             width: min(1500px, calc(100% - 40px));
+            margin-inline: auto;
+            padding-block: var(--space-6) var(--space-10);
+        }
+
+        .debtor-finder-screen-main {
+            width: min(1600px, calc(100% - 24px));
             margin-inline: auto;
             padding-block: var(--space-6) var(--space-10);
         }
@@ -1205,6 +1210,10 @@
             gap: var(--space-4);
             align-items: end;
             padding-block: var(--space-2) var(--space-3);
+        }
+
+        .debtor-finder-criteria-panel .historical-panel__body {
+            padding-inline: var(--space-5);
         }
 
         .debtor-finder-controls { display: contents; }
@@ -2194,7 +2203,7 @@
         </section>
 
         <main class="debtor-finder-screen-main flex-grow no-print">
-            <section class="historical-panel" aria-labelledby="debtor-finder-criteria-title">
+            <section class="historical-panel debtor-finder-criteria-panel" aria-labelledby="debtor-finder-criteria-title">
                 <div class="historical-panel__header">
                     <i class="fa-solid fa-filter text-blue-700" aria-hidden="true"></i>
                     <div>
@@ -3680,6 +3689,7 @@
                         .finder-report-criteria { margin:0 0 14px;padding:10px 12px;border-inline-start:4px solid var(--print-brand);background:var(--print-brand-soft); }
                         .finder-report-table { margin-top:0 !important; }
                         .finder-report-table td:nth-child(1) { width:26%; }
+                        .finder-report-table tfoot { display:table-row-group !important; }
                     </style>
                 </head>
                 <body>
@@ -3735,17 +3745,19 @@
             document.getElementById('nav-debtor-finder')?.classList.add('is-active');
             const title = document.querySelector('#main-app-container .app-title');
             if (title) title.textContent = 'איתור חייבים לטיפול';
+            document.getElementById('kpi-container')?.classList.add('hidden');
             const back = document.getElementById('btn-back');
             if (back) {
                 back.onclick = closeDebtorFinderClient;
                 back.innerHTML = '<i class="fa-solid fa-arrow-right ml-2 text-blue-600"></i> חזרה לתוצאות האיתור';
             }
-            requestAnimationFrame(() => document.getElementById('drilldown-viewport')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+            requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'auto' }));
         }
 
         function restoreDebtorFinderDetailContext() {
             const title = document.querySelector('#main-app-container .app-title');
             if (title) title.textContent = 'ניהול הכנסות וגבייה';
+            document.getElementById('kpi-container')?.classList.remove('hidden');
             const back = document.getElementById('btn-back');
             if (back) {
                 back.onclick = navigateBack;
@@ -6881,6 +6893,7 @@
     </script>
 </body>
 </html>
+
 
 
 
