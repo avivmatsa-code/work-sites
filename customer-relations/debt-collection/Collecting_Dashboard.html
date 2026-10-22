@@ -2086,6 +2086,74 @@
                 </div>
             </div>
 
+            <!-- Dynamic debtor identification -->
+            <section id="debtor-finder-panel" class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-slate-50 px-5 py-4 border-b border-slate-200 flex items-start justify-between gap-4 flex-wrap">
+                    <div>
+                        <h2 class="text-lg font-bold text-[#0B3C5D] flex items-center gap-2">
+                            <i class="fa-solid fa-user-clock text-red-600" aria-hidden="true"></i>
+                            איתור חייבים לטיפול
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">איתור דינמי לפי חשבוניות פתוחות שמועד פירעונן עבר. מסנן תחום הפעילות שמעל חל גם על תוצאות אלה.</p>
+                    </div>
+                    <button type="button" onclick="clearDebtorFinderFilters()" class="min-h-[40px] px-4 rounded-lg border border-slate-300 bg-white text-slate-600 text-sm font-bold hover:border-blue-400 hover:text-blue-700 transition-colors">
+                        <i class="fa-solid fa-rotate-left ml-2" aria-hidden="true"></i>ניקוי תנאים
+                    </button>
+                </div>
+
+                <div class="p-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-end">
+                        <label class="block">
+                            <span class="control-label block mb-2">מספר חשבוניות מינימלי</span>
+                            <input id="debtor-finder-min-invoices" type="number" min="1" step="1" inputmode="numeric" placeholder="לדוגמה: 4" oninput="renderDebtorFinder()" class="w-full min-h-[44px] rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 focus:border-blue-500">
+                        </label>
+                        <label class="block">
+                            <span class="control-label block mb-2">סכום חוב מינימלי בש״ח</span>
+                            <input id="debtor-finder-min-amount" type="number" min="0" step="1000" inputmode="decimal" placeholder="לדוגמה: 100000" oninput="renderDebtorFinder()" class="w-full min-h-[44px] rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 focus:border-blue-500">
+                        </label>
+                        <label class="block">
+                            <span class="control-label block mb-2">שילוב התנאים</span>
+                            <select id="debtor-finder-mode" onchange="renderDebtorFinder()" class="w-full min-h-[44px] rounded-lg border border-slate-300 bg-white px-3 text-sm font-bold text-slate-700">
+                                <option value="and">עמידה בכל התנאים שהוגדרו</option>
+                                <option value="or">עמידה לפחות באחד התנאים</option>
+                            </select>
+                        </label>
+                        <label class="block">
+                            <span class="control-label block mb-2">סקטור</span>
+                            <select id="debtor-finder-sector" onchange="renderDebtorFinder()" class="w-full min-h-[44px] rounded-lg border border-slate-300 bg-white px-3 text-sm font-bold text-slate-700">
+                                <option value="all">כל הסקטורים</option>
+                                <option value="משרדי ממשלה">משרדי ממשלה</option>
+                                <option value="רשויות וחברות ממשלתיות">רשויות וחברות ממשלתיות</option>
+                                <option value="רשויות מקומיות">רשויות מקומיות</option>
+                                <option value="לקוחות פרטיים">לקוחות פרטיים</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <div id="debtor-finder-status" class="mt-5 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900" role="status" aria-live="polite">
+                        יש להזין לפחות תנאי אחד כדי להציג חייבים לטיפול.
+                    </div>
+
+                    <div id="debtor-finder-results" class="hidden mt-4 overflow-x-auto rounded-2xl border border-slate-200">
+                        <table class="w-full min-w-[1180px] text-right text-sm">
+                            <thead class="bg-slate-100 text-xs font-bold text-slate-600 border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3">שם הלקוח</th>
+                                    <th class="p-3">לקוח במרכבה</th>
+                                    <th class="p-3">קוד גורם משלם</th>
+                                    <th class="p-3 text-center">חשבוניות בפיגור</th>
+                                    <th class="p-3 text-left">חוב בפיגור</th>
+                                    <th class="p-3">מועד הפירעון הישן ביותר</th>
+                                    <th class="p-3 text-center">ימי פיגור מרביים</th>
+                                    <th class="p-3 text-center">פעולה</th>
+                                </tr>
+                            </thead>
+                            <tbody id="debtor-finder-table-body" class="divide-y divide-slate-100 bg-white"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
             <!-- Table Area -->
             <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[450px]">
                 <div class="bg-slate-50 p-4 border-b flex justify-between items-center flex-wrap gap-4">
@@ -2346,6 +2414,7 @@
         let showClientPct = true; 
         let showClientMorale = false; 
         let currentOrgList = []; 
+        let debtorFinderRows = [];
         
         // Dashboard state
         let isDashboardActive = false;
@@ -2590,13 +2659,21 @@
         }
 
         function payerCodeBadge(orgName) {
-            const clientCode = normalizeClientCodeValue(getClientCode(orgName));
-            if (!clientCode) return '';
-            const payerCodes = [...new Set(getAllQueryData()
-                .filter(row => row.clientId === clientCode && row.payerCode)
-                .map(row => row.payerCode))];
+            const payerCodes = getPayerCodes(orgName);
             if (!payerCodes.length) return '';
             return `<span class="inline-flex items-center bg-slate-100 text-slate-600 border border-slate-200 text-base px-2 py-0.5 rounded-full font-bold mr-2" title="קוד גורם משלם" style="font-family: Arial, Helvetica, sans-serif !important;">קוד גורם משלם: <bdi dir="ltr">${payerCodes.join(', ')}</bdi></span>`;
+        }
+
+        function getPayerCodes(orgName) {
+            const clientCode = normalizeClientCodeValue(getClientCode(orgName));
+            return getPayerCodesByClientCode(clientCode);
+        }
+
+        function getPayerCodesByClientCode(clientCode) {
+            if (!clientCode) return [];
+            return [...new Set(getAllQueryData()
+                .filter(row => row.clientId === clientCode && row.payerCode)
+                .map(row => row.payerCode))];
         }
 
         function directDebitBadge(orgName) {
@@ -3121,12 +3198,143 @@
             document.getElementById('kpi-current-future').innerText = formatCurrency(currentYearFuture);
             document.getElementById('kpi-past-overdue').innerText = formatCurrency(pastYearsOverdue);
 
+            renderDebtorFinder();
             renderView();
         }
 
         function isTypeMatch(row) {
             if (incomeFilter === 'all') return true;
             return incomeFilter === 'fees' ? row.isFee : !row.isFee;
+        }
+
+        function getDebtorFinderCriteria() {
+            const minInvoicesValue = document.getElementById('debtor-finder-min-invoices')?.value.trim() || '';
+            const minAmountValue = document.getElementById('debtor-finder-min-amount')?.value.trim() || '';
+            return {
+                hasInvoiceThreshold: minInvoicesValue !== '' && Number(minInvoicesValue) > 0,
+                minInvoices: Math.max(0, Math.floor(Number(minInvoicesValue) || 0)),
+                hasAmountThreshold: minAmountValue !== '' && Number(minAmountValue) >= 0,
+                minAmount: Math.max(0, Number(minAmountValue) || 0),
+                mode: document.getElementById('debtor-finder-mode')?.value === 'or' ? 'or' : 'and',
+                sector: document.getElementById('debtor-finder-sector')?.value || 'all'
+            };
+        }
+
+        function buildDebtorFinderRows(sector = 'all') {
+            const clients = new Map();
+            db.filter(row => row.isOverdue && isTypeMatch(row) && (sector === 'all' || row.sector === sector))
+                .forEach((row, rowIndex) => {
+                    const code = String(row.code || '').trim();
+                    const key = code || String(row.name || '').trim();
+                    if (!key) return;
+                    if (!clients.has(key)) {
+                        clients.set(key, {
+                            name: row.name,
+                            code,
+                            sector: row.sector,
+                            amount: 0,
+                            documents: new Set(),
+                            oldestDueDate: null,
+                            isDirectDebit: false
+                        });
+                    }
+                    const client = clients.get(key);
+                    client.amount += Number(row.amount) || 0;
+                    const documentNumber = String(row.doc || '').trim();
+                    client.documents.add(documentNumber && documentNumber !== '-' ? documentNumber : `missing-${rowIndex}`);
+                    if (isValidDate(row.dueDate) && (!client.oldestDueDate || row.dueDate < client.oldestDueDate)) {
+                        client.oldestDueDate = row.dueDate;
+                    }
+                    client.isDirectDebit = client.isDirectDebit || Boolean(row.isDirectDebit);
+                });
+
+            return [...clients.values()].map(client => ({
+                ...client,
+                invoiceCount: client.documents.size,
+                payerCodes: getPayerCodesByClientCode(normalizeClientCodeValue(client.code)),
+                maxOverdueDays: client.oldestDueDate
+                    ? Math.max(0, Math.floor((TODAY - client.oldestDueDate) / 86400000))
+                    : null
+            }));
+        }
+
+        function renderDebtorFinder() {
+            const status = document.getElementById('debtor-finder-status');
+            const results = document.getElementById('debtor-finder-results');
+            const body = document.getElementById('debtor-finder-table-body');
+            if (!status || !results || !body) return;
+
+            const criteria = getDebtorFinderCriteria();
+            const hasCriteria = criteria.hasInvoiceThreshold || criteria.hasAmountThreshold;
+            const modeSelect = document.getElementById('debtor-finder-mode');
+            if (modeSelect) modeSelect.disabled = !(criteria.hasInvoiceThreshold && criteria.hasAmountThreshold);
+
+            if (!hasCriteria) {
+                debtorFinderRows = [];
+                body.innerHTML = '';
+                results.classList.add('hidden');
+                status.className = 'mt-5 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900';
+                status.textContent = 'יש להזין לפחות תנאי אחד כדי להציג חייבים לטיפול.';
+                return;
+            }
+
+            const allRows = buildDebtorFinderRows(criteria.sector);
+            debtorFinderRows = allRows.filter(row => {
+                const invoiceMatch = !criteria.hasInvoiceThreshold || row.invoiceCount >= criteria.minInvoices;
+                const amountMatch = !criteria.hasAmountThreshold || row.amount >= criteria.minAmount;
+                if (criteria.hasInvoiceThreshold && criteria.hasAmountThreshold && criteria.mode === 'or') {
+                    return row.invoiceCount >= criteria.minInvoices || row.amount >= criteria.minAmount;
+                }
+                return invoiceMatch && amountMatch;
+            }).sort((a, b) => b.amount - a.amount || b.invoiceCount - a.invoiceCount || a.name.localeCompare(b.name, 'he'));
+
+            const totalAmount = debtorFinderRows.reduce((sum, row) => sum + row.amount, 0);
+            const activityLabel = incomeFilter === 'info' ? 'שירותי מידע' : (incomeFilter === 'fees' ? 'אגרות העברת בעלות' : 'כל תחומי הפעילות');
+            const sectorLabel = criteria.sector === 'all' ? 'כל הסקטורים' : criteria.sector;
+            status.className = 'mt-5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700';
+            status.innerHTML = `<strong>${debtorFinderRows.length.toLocaleString('he-IL')} לקוחות נמצאו</strong><span class="mx-2 text-slate-300">|</span>חוב כולל: <strong class="text-red-700">${formatCurrency(totalAmount)}</strong><span class="mx-2 text-slate-300">|</span>${escapeHtml(activityLabel)}, ${escapeHtml(sectorLabel)}`;
+
+            if (!debtorFinderRows.length) {
+                body.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-slate-500">לא נמצאו לקוחות העומדים בתנאים שהוגדרו.</td></tr>';
+                results.classList.remove('hidden');
+                return;
+            }
+
+            body.innerHTML = debtorFinderRows.map((row, index) => `
+                <tr class="hover:bg-blue-50/60 transition-colors">
+                    <td class="p-3 font-bold text-slate-800">${escapeHtml(row.name)} ${row.isDirectDebit ? '<span class="inline-flex items-center bg-sky-100 text-sky-800 border border-sky-200 text-[10px] px-2 py-0.5 rounded-full font-bold mr-2">הו&quot;ק</span>' : ''}</td>
+                    <td class="p-3"><bdi dir="ltr">${escapeHtml(row.code || 'אין נתון')}</bdi></td>
+                    <td class="p-3"><bdi dir="ltr">${row.payerCodes.length ? escapeHtml(row.payerCodes.join(', ')) : 'אין נתון'}</bdi></td>
+                    <td class="p-3 text-center font-bold">${row.invoiceCount.toLocaleString('he-IL')}</td>
+                    <td class="p-3 text-left font-bold text-red-700">${formatCurrency(row.amount)}</td>
+                    <td class="p-3">${row.oldestDueDate ? row.oldestDueDate.toLocaleDateString('he-IL') : 'אין נתון'}</td>
+                    <td class="p-3 text-center">${row.maxOverdueDays === null ? 'אין נתון' : row.maxOverdueDays.toLocaleString('he-IL')}</td>
+                    <td class="p-3 text-center"><button type="button" onclick="openDebtorFinderClient(${index})" class="min-h-[36px] px-3 rounded-lg border border-blue-300 bg-white text-blue-700 text-xs font-bold hover:bg-blue-50">לפירוט חשבוניות</button></td>
+                </tr>`).join('');
+            results.classList.remove('hidden');
+        }
+
+        function clearDebtorFinderFilters() {
+            const minInvoices = document.getElementById('debtor-finder-min-invoices');
+            const minAmount = document.getElementById('debtor-finder-min-amount');
+            const mode = document.getElementById('debtor-finder-mode');
+            const sector = document.getElementById('debtor-finder-sector');
+            if (minInvoices) minInvoices.value = '';
+            if (minAmount) minAmount.value = '';
+            if (mode) mode.value = 'and';
+            if (sector) sector.value = 'all';
+            renderDebtorFinder();
+        }
+
+        function openDebtorFinderClient(index) {
+            const client = debtorFinderRows[index];
+            if (!client) return;
+            path.sector = client.sector;
+            path.orgName = client.name;
+            currentLevel = 2;
+            lvl2View = 'debt';
+            renderView();
+            document.getElementById('drilldown-viewport')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function renderView() {
