@@ -128,6 +128,7 @@
             --control-height: 44px;
             --button-height: 44px;
             --table-row-height: 50px;
+            --sticky-header-height: 92px;
             --header-primary-button-border: rgba(255, 255, 255, 0.78);
             --header-primary-button-inner-outline: rgba(255, 255, 255, 0.18);
         }
@@ -187,6 +188,9 @@
         }
 
         .app-header {
+            position: sticky;
+            inset-block-start: 0;
+            z-index: 60;
             background: var(--brand-active);
             color: #fff;
             border-block-end: 4px solid var(--brand-border);
@@ -290,6 +294,9 @@
         .header-action:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.62); }
 
         .workspace-toolbar {
+            position: sticky;
+            inset-block-start: var(--sticky-header-height);
+            z-index: 55;
             background: var(--color-surface);
             border-block-end: 1px solid var(--color-border);
         }
@@ -638,7 +645,7 @@
 
         .suite-sidebar {
             position: fixed;
-            inset-block-start: 92px;
+            inset-block-start: var(--sticky-header-height);
             inset-block-end: 0;
             inset-inline-start: 0;
             z-index: 70;
@@ -747,7 +754,8 @@
         .source-screen-main,
         .query-screen-main,
         .historical-screen-main,
-        .management-screen-main {
+        .management-screen-main,
+        .debtor-finder-screen-main {
             width: min(1500px, calc(100% - 40px));
             margin-inline: auto;
             padding-block: var(--space-6) var(--space-10);
@@ -1191,6 +1199,142 @@
             font-size: var(--font-size-xl);
         }
 
+        .debtor-finder-controls {
+            display: grid;
+            grid-template-columns: minmax(190px, 1fr) minmax(230px, 1fr) minmax(290px, 1.25fr) auto;
+            gap: var(--space-5);
+            align-items: end;
+        }
+
+        .debtor-finder-control label,
+        .debtor-finder-control .control-label {
+            display: block;
+            margin-block-end: var(--space-2);
+        }
+
+        .debtor-finder-input {
+            width: 100%;
+            min-height: var(--control-height);
+            border: 1px solid var(--color-border-strong);
+            border-radius: var(--radius-md);
+            background: #fff;
+            color: var(--color-text);
+            padding-inline: var(--space-3);
+            font-size: var(--font-size-md);
+            font-weight: 700;
+        }
+
+        .debtor-finder-input:focus {
+            border-color: var(--brand-primary);
+        }
+
+        .debtor-finder-summary {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 260px));
+            gap: var(--space-4);
+            margin-block: var(--space-5) var(--space-4);
+        }
+
+        .debtor-finder-summary article {
+            min-height: 92px;
+            padding: var(--space-4);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            background: var(--color-surface-subtle);
+        }
+
+        .debtor-finder-summary span {
+            display: block;
+            color: var(--color-text-muted);
+            font-size: var(--font-size-xs);
+            font-weight: 700;
+        }
+
+        .debtor-finder-summary strong {
+            display: block;
+            margin-block-start: var(--space-2);
+            color: var(--brand-active);
+            font-size: 26px;
+        }
+
+        .debtor-finder-summary article:last-child strong { color: var(--color-danger); }
+
+        .debtor-finder-context {
+            margin-block-end: var(--space-3);
+            color: var(--color-text-muted);
+            font-size: var(--font-size-xs);
+        }
+
+        .debtor-finder-table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            background: #fff;
+        }
+
+        .debtor-finder-table {
+            width: 100%;
+            min-width: 1240px;
+            border-collapse: collapse;
+            table-layout: fixed;
+            font-size: var(--font-size-sm);
+        }
+
+        .debtor-finder-table th {
+            padding: 0;
+            border-block-end: 1px solid var(--color-border);
+            background: #f1f5f8;
+            color: var(--color-text-muted);
+            text-align: right;
+            font-size: 12px;
+        }
+
+        .debtor-finder-table th button {
+            width: 100%;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 7px;
+            padding-inline: 16px;
+            color: inherit;
+            text-align: right;
+            font-weight: 700;
+        }
+
+        .debtor-finder-table th button:hover { color: var(--brand-primary); background: var(--brand-subtle); }
+        .debtor-finder-table th[aria-sort]:not([aria-sort="none"]) { color: var(--brand-active); background: var(--brand-subtle); }
+
+        .debtor-finder-table td {
+            min-height: 58px;
+            padding: 14px 16px;
+            border-block-end: 1px solid #e7edf2;
+            vertical-align: middle;
+        }
+
+        .debtor-finder-table tbody tr:last-child td { border-block-end: 0; }
+        .debtor-finder-table tbody tr:hover { background: #f3f8fc; }
+        .debtor-finder-table .numeric-cell { direction: ltr; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+        .debtor-finder-table .center-cell { text-align: center; white-space: nowrap; }
+
+        .debtor-finder-open-button {
+            min-height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding-inline: 13px;
+            border: 1px solid var(--brand-border);
+            border-radius: var(--radius-md);
+            background: var(--brand-subtle);
+            color: var(--brand-active);
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .debtor-finder-open-button:hover { border-color: var(--brand-primary); background: #fff; color: var(--brand-primary); }
+
         @media (max-width: 1023px) {
             .source-grid { grid-template-columns: 1fr; }
             .historical-summary-grid { grid-template-columns: 1fr; }
@@ -1198,6 +1342,7 @@
             .management-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .management-grid { grid-template-columns: 1fr; }
             .management-panel--wide { grid-column: auto; }
+            .debtor-finder-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
             body.suite-enabled .suite-screen .app-header__inner {
                 grid-template-columns: minmax(250px, 1fr) minmax(240px, auto) minmax(40px, 1fr);
@@ -1271,9 +1416,16 @@
                 padding-block: var(--space-4) var(--space-8);
             }
 
+            .debtor-finder-screen-main {
+                width: min(100% - 24px, 1500px);
+                padding-block: var(--space-4) var(--space-8);
+            }
+
             .screen-intro { flex-direction: column; }
             .historical-kpis { grid-template-columns: 1fr; }
             .management-kpis { grid-template-columns: 1fr; }
+            .debtor-finder-controls { grid-template-columns: 1fr; }
+            .debtor-finder-summary { grid-template-columns: 1fr 1fr; }
             .historical-toolbar__inner .workspace-control:last-of-type { margin-inline-start: 0; }
             .historical-rule { align-items: flex-start; flex-wrap: wrap; }
             .historical-rule__action { margin-inline-start: 30px; }
@@ -1420,6 +1572,9 @@
             </button>
             <button id="nav-debt" class="suite-nav__item" type="button" onclick="navigateToScreen('debt')" disabled>
                 <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i><span>ניהול הכנסות וגבייה</span>
+            </button>
+            <button id="nav-debtor-finder" class="suite-nav__item" type="button" onclick="navigateToScreen('debtor-finder')" disabled>
+                <i class="fa-solid fa-user-clock" aria-hidden="true"></i><span>איתור חייבים לטיפול</span>
             </button>
             <button id="nav-historical" class="suite-nav__item" type="button" onclick="navigateToScreen('historical')" disabled>
                 <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i><span>חובות עבר שנגבו השנה</span>
@@ -1628,7 +1783,7 @@
         <section class="workspace-toolbar no-print" aria-label="מסנני גביית חובות עבר">
             <div class="workspace-toolbar__inner historical-toolbar__inner">
                 <div class="workspace-control">
-                    <span class="control-label">חתך פעילות</span>
+                    <span class="control-label">תחום פעילות</span>
                     <div class="segmented-control" role="group" aria-label="סינון פעילות בחובות עבר">
                         <button type="button" id="hist-type-info" class="active-filter" onclick="setHistoricalTypeFilter('info')">שירותי מידע</button>
                         <button type="button" id="hist-type-fees" onclick="setHistoricalTypeFilter('fees')">אגרות העברת בעלות</button>
@@ -1980,6 +2135,118 @@
         </main>
     </div>
 
+    <!-- DYNAMIC DEBTOR IDENTIFICATION SCREEN -->
+    <div id="debtor-finder-container" class="suite-screen hidden flex-col flex-grow">
+        <header class="app-header no-print">
+            <div class="app-header__inner">
+                <div class="government-brand">
+                    <img class="government-logo" src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה והבטיחות בדרכים">
+                    <div>
+                        <div class="ministry-name">משרד התחבורה והבטיחות בדרכים</div>
+                        <div class="department-name">אגף טכנולוגיות דיגיטליות ומידע</div>
+                    </div>
+                </div>
+                <div class="app-identity">
+                    <div class="app-title-row"><h1 class="app-title">איתור חייבים לטיפול</h1><span class="beta-badge">BETA</span></div>
+                    <div class="system-date"></div>
+                </div>
+                <div class="header-actions" aria-hidden="true"></div>
+            </div>
+        </header>
+
+        <section class="workspace-toolbar no-print" aria-label="מסנני איתור חייבים">
+            <div class="workspace-toolbar__inner">
+                <div class="workspace-control">
+                    <span class="control-label">תחום פעילות</span>
+                    <div class="segmented-control" role="group" aria-label="סינון תחום פעילות באיתור חייבים">
+                        <button type="button" id="df-activity-info" class="active-filter" onclick="setDebtorFinderActivity('info')">שירותי מידע</button>
+                        <button type="button" id="df-activity-fees" onclick="setDebtorFinderActivity('fees')">אגרות העברת בעלות</button>
+                        <button type="button" id="df-activity-all" onclick="setDebtorFinderActivity('all')">הכול</button>
+                    </div>
+                </div>
+                <div class="workspace-control">
+                    <span class="control-label">סקטור</span>
+                    <div class="segmented-control" role="group" aria-label="סינון סקטור באיתור חייבים">
+                        <button type="button" id="df-sector-all" class="active-filter" onclick="setDebtorFinderSector('all')">כל הסקטורים</button>
+                        <button type="button" id="df-sector-gov" onclick="setDebtorFinderSector('משרדי ממשלה')">משרדי ממשלה</button>
+                        <button type="button" id="df-sector-gov-auth" onclick="setDebtorFinderSector('רשויות וחברות ממשלתיות')">רשויות וחברות ממשלתיות</button>
+                        <button type="button" id="df-sector-local" onclick="setDebtorFinderSector('רשויות מקומיות')">רשויות מקומיות</button>
+                        <button type="button" id="df-sector-private" onclick="setDebtorFinderSector('לקוחות פרטיים')">לקוחות פרטיים</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <main class="debtor-finder-screen-main flex-grow no-print">
+            <section class="historical-panel" aria-labelledby="debtor-finder-criteria-title">
+                <div class="historical-panel__header">
+                    <i class="fa-solid fa-filter text-blue-700" aria-hidden="true"></i>
+                    <div>
+                        <h2 id="debtor-finder-criteria-title">תנאי האיתור</h2>
+                        <p class="control-label" style="margin-top:4px">האיתור כולל חשבוניות פתוחות שמועד פירעונן עבר בלבד.</p>
+                    </div>
+                </div>
+                <div class="historical-panel__body">
+                    <div class="debtor-finder-controls">
+                        <div class="debtor-finder-control">
+                            <label for="debtor-finder-min-invoices" class="control-label">מספר חשבוניות מינימלי</label>
+                            <input id="debtor-finder-min-invoices" class="debtor-finder-input" type="number" min="1" step="1" inputmode="numeric" value="5" oninput="renderDebtorFinder()">
+                        </div>
+                        <div class="debtor-finder-control">
+                            <label for="debtor-finder-min-amount" class="control-label">סכום חוב מינימלי בש״ח</label>
+                            <input id="debtor-finder-min-amount" class="debtor-finder-input" type="number" min="0" step="100" inputmode="decimal" value="1000" oninput="renderDebtorFinder()">
+                        </div>
+                        <div class="debtor-finder-control">
+                            <span class="control-label">שילוב התנאים</span>
+                            <div class="segmented-control" role="group" aria-label="אופן שילוב תנאי האיתור">
+                                <button type="button" id="df-mode-and" class="active-filter" onclick="setDebtorFinderMode('and')">עמידה בכל התנאים</button>
+                                <button type="button" id="df-mode-or" onclick="setDebtorFinderMode('or')">עמידה לפחות בתנאי אחד</button>
+                            </div>
+                        </div>
+                        <button type="button" class="button-secondary" onclick="resetDebtorFinderDefaults()">
+                            <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>איפוס לברירת המחדל
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="historical-panel" style="margin-top:24px" aria-labelledby="debtor-finder-results-title">
+                <div class="historical-panel__header">
+                    <i class="fa-solid fa-users-viewfinder text-red-600" aria-hidden="true"></i>
+                    <h2 id="debtor-finder-results-title">לקוחות העומדים בתנאים</h2>
+                </div>
+                <div class="historical-panel__body">
+                    <div class="debtor-finder-summary" aria-live="polite">
+                        <article><span>מספר לקוחות שנמצאו</span><strong id="debtor-finder-client-count">0</strong></article>
+                        <article><span>חוב כולל בפיגור</span><strong id="debtor-finder-total-amount">₪0</strong></article>
+                    </div>
+                    <p id="debtor-finder-context" class="debtor-finder-context"></p>
+                    <div class="debtor-finder-table-wrap">
+                        <table class="debtor-finder-table">
+                            <colgroup>
+                                <col style="width:20%"><col style="width:11%"><col style="width:13%"><col style="width:11%">
+                                <col style="width:12%"><col style="width:14%"><col style="width:10%"><col style="width:9%">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th data-debtor-sort-key="name" aria-sort="none"><button type="button" onclick="setDebtorFinderSort('name')">שם הלקוח <i class="fa-solid fa-sort" aria-hidden="true"></i></button></th>
+                                    <th data-debtor-sort-key="code" aria-sort="none"><button type="button" onclick="setDebtorFinderSort('code')">לקוח במרכבה <i class="fa-solid fa-sort" aria-hidden="true"></i></button></th>
+                                    <th data-debtor-sort-key="payerCodes" aria-sort="none"><button type="button" onclick="setDebtorFinderSort('payerCodes')">קוד גורם משלם <i class="fa-solid fa-sort" aria-hidden="true"></i></button></th>
+                                    <th data-debtor-sort-key="invoiceCount" aria-sort="none"><button type="button" onclick="setDebtorFinderSort('invoiceCount')">חשבוניות בפיגור <i class="fa-solid fa-sort" aria-hidden="true"></i></button></th>
+                                    <th data-debtor-sort-key="amount" aria-sort="descending"><button type="button" onclick="setDebtorFinderSort('amount')">חוב בפיגור <i class="fa-solid fa-sort-down" aria-hidden="true"></i></button></th>
+                                    <th data-debtor-sort-key="oldestDueDate" aria-sort="none"><button type="button" onclick="setDebtorFinderSort('oldestDueDate')">מועד הפירעון הישן ביותר <i class="fa-solid fa-sort" aria-hidden="true"></i></button></th>
+                                    <th data-debtor-sort-key="maxOverdueDays" aria-sort="none"><button type="button" onclick="setDebtorFinderSort('maxOverdueDays')">ימי פיגור מרביים <i class="fa-solid fa-sort" aria-hidden="true"></i></button></th>
+                                    <th><span style="display:block;padding:16px;text-align:center">פעולה</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="debtor-finder-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
     <!-- MAIN APP CONTAINER -->
     <div id="main-app-container" class="suite-screen hidden flex-col flex-grow">
 
@@ -2005,7 +2272,7 @@
         <section class="workspace-toolbar no-print" aria-label="כלי עבודה וטעינת נתונים">
             <div class="workspace-toolbar__inner">
                 <div class="workspace-control">
-                    <span class="control-label">חתך פעילות</span>
+                    <span class="control-label">תחום פעילות</span>
                     <div class="segmented-control" role="group" aria-label="סינון לפי סוג פעילות">
                         <button type="button" onclick="setIncomeFilter('info')" id="f-info" class="active-filter">שירותי מידע</button>
                         <button type="button" onclick="setIncomeFilter('fees')" id="f-fees">אגרות העברת בעלות</button>
@@ -2085,74 +2352,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Dynamic debtor identification -->
-            <section id="debtor-finder-panel" class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="bg-slate-50 px-5 py-4 border-b border-slate-200 flex items-start justify-between gap-4 flex-wrap">
-                    <div>
-                        <h2 class="text-lg font-bold text-[#0B3C5D] flex items-center gap-2">
-                            <i class="fa-solid fa-user-clock text-red-600" aria-hidden="true"></i>
-                            איתור חייבים לטיפול
-                        </h2>
-                        <p class="text-xs text-slate-500 mt-1">איתור דינמי לפי חשבוניות פתוחות שמועד פירעונן עבר. מסנן תחום הפעילות שמעל חל גם על תוצאות אלה.</p>
-                    </div>
-                    <button type="button" onclick="clearDebtorFinderFilters()" class="min-h-[40px] px-4 rounded-lg border border-slate-300 bg-white text-slate-600 text-sm font-bold hover:border-blue-400 hover:text-blue-700 transition-colors">
-                        <i class="fa-solid fa-rotate-left ml-2" aria-hidden="true"></i>ניקוי תנאים
-                    </button>
-                </div>
-
-                <div class="p-5">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-end">
-                        <label class="block">
-                            <span class="control-label block mb-2">מספר חשבוניות מינימלי</span>
-                            <input id="debtor-finder-min-invoices" type="number" min="1" step="1" inputmode="numeric" placeholder="לדוגמה: 4" oninput="renderDebtorFinder()" class="w-full min-h-[44px] rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 focus:border-blue-500">
-                        </label>
-                        <label class="block">
-                            <span class="control-label block mb-2">סכום חוב מינימלי בש״ח</span>
-                            <input id="debtor-finder-min-amount" type="number" min="0" step="1000" inputmode="decimal" placeholder="לדוגמה: 100000" oninput="renderDebtorFinder()" class="w-full min-h-[44px] rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 focus:border-blue-500">
-                        </label>
-                        <label class="block">
-                            <span class="control-label block mb-2">שילוב התנאים</span>
-                            <select id="debtor-finder-mode" onchange="renderDebtorFinder()" class="w-full min-h-[44px] rounded-lg border border-slate-300 bg-white px-3 text-sm font-bold text-slate-700">
-                                <option value="and">עמידה בכל התנאים שהוגדרו</option>
-                                <option value="or">עמידה לפחות באחד התנאים</option>
-                            </select>
-                        </label>
-                        <label class="block">
-                            <span class="control-label block mb-2">סקטור</span>
-                            <select id="debtor-finder-sector" onchange="renderDebtorFinder()" class="w-full min-h-[44px] rounded-lg border border-slate-300 bg-white px-3 text-sm font-bold text-slate-700">
-                                <option value="all">כל הסקטורים</option>
-                                <option value="משרדי ממשלה">משרדי ממשלה</option>
-                                <option value="רשויות וחברות ממשלתיות">רשויות וחברות ממשלתיות</option>
-                                <option value="רשויות מקומיות">רשויות מקומיות</option>
-                                <option value="לקוחות פרטיים">לקוחות פרטיים</option>
-                            </select>
-                        </label>
-                    </div>
-
-                    <div id="debtor-finder-status" class="mt-5 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900" role="status" aria-live="polite">
-                        יש להזין לפחות תנאי אחד כדי להציג חייבים לטיפול.
-                    </div>
-
-                    <div id="debtor-finder-results" class="hidden mt-4 overflow-x-auto rounded-2xl border border-slate-200">
-                        <table class="w-full min-w-[1180px] text-right text-sm">
-                            <thead class="bg-slate-100 text-xs font-bold text-slate-600 border-b border-slate-200">
-                                <tr>
-                                    <th class="p-3">שם הלקוח</th>
-                                    <th class="p-3">לקוח במרכבה</th>
-                                    <th class="p-3">קוד גורם משלם</th>
-                                    <th class="p-3 text-center">חשבוניות בפיגור</th>
-                                    <th class="p-3 text-left">חוב בפיגור</th>
-                                    <th class="p-3">מועד הפירעון הישן ביותר</th>
-                                    <th class="p-3 text-center">ימי פיגור מרביים</th>
-                                    <th class="p-3 text-center">פעולה</th>
-                                </tr>
-                            </thead>
-                            <tbody id="debtor-finder-table-body" class="divide-y divide-slate-100 bg-white"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
 
             <!-- Table Area -->
             <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[450px]">
@@ -2415,6 +2614,11 @@
         let showClientMorale = false; 
         let currentOrgList = []; 
         let debtorFinderRows = [];
+        let debtorFinderActivity = 'info';
+        let debtorFinderSector = 'all';
+        let debtorFinderMode = 'and';
+        let debtorFinderSortKey = 'amount';
+        let debtorFinderSortDirection = 'desc';
         
         // Dashboard state
         let isDashboardActive = false;
@@ -2451,6 +2655,7 @@
             sources: 'data-sources-container',
             dashboard: 'dashboard-container',
             debt: 'main-app-container',
+            'debtor-finder': 'debtor-finder-container',
             historical: 'historical-container',
             queries: 'queries-container',
             management: 'management-container',
@@ -2465,7 +2670,7 @@
         function navigateToScreen(screen) {
             const coreReady = db.length > 0 && revenueDb.length > 0;
             const queriesReady = queryOnlineDb.length > 0 && queryBatchDb.length > 0;
-            if ((screen === 'dashboard' || screen === 'debt' || screen === 'management' || screen === 'fees-management') && !coreReady) screen = 'sources';
+            if ((screen === 'dashboard' || screen === 'debt' || screen === 'debtor-finder' || screen === 'management' || screen === 'fees-management') && !coreReady) screen = 'sources';
             if (screen === 'historical' && (!coreReady || historicalRevenueDb.length === 0)) screen = 'sources';
             if (screen === 'queries' && !queriesReady) screen = 'sources';
             if (!SUITE_SCREENS[screen]) screen = 'sources';
@@ -2493,6 +2698,9 @@
                 renderDashboard();
             } else if (screen === 'debt') {
                 refresh();
+            } else if (screen === 'debtor-finder') {
+                updateDebtorFinderFilterUI();
+                renderDebtorFinder();
             } else if (screen === 'historical') {
                 renderHistoricalCollections();
             } else if (screen === 'queries') {
@@ -2504,7 +2712,15 @@
             }
 
             closeSuiteMenu();
+            requestAnimationFrame(syncStickyHeaderHeight);
             window.scrollTo({ top: 0, behavior: 'auto' });
+        }
+
+        function syncStickyHeaderHeight() {
+            const activeScreen = document.getElementById(SUITE_SCREENS[currentScreen]);
+            const header = activeScreen?.querySelector(':scope > .app-header');
+            if (!header) return;
+            document.documentElement.style.setProperty('--sticky-header-height', `${Math.ceil(header.getBoundingClientRect().height)}px`);
         }
 
         function toggleSuiteMenu() {
@@ -3198,7 +3414,6 @@
             document.getElementById('kpi-current-future').innerText = formatCurrency(currentYearFuture);
             document.getElementById('kpi-past-overdue').innerText = formatCurrency(pastYearsOverdue);
 
-            renderDebtorFinder();
             renderView();
         }
 
@@ -3215,14 +3430,19 @@
                 minInvoices: Math.max(0, Math.floor(Number(minInvoicesValue) || 0)),
                 hasAmountThreshold: minAmountValue !== '' && Number(minAmountValue) >= 0,
                 minAmount: Math.max(0, Number(minAmountValue) || 0),
-                mode: document.getElementById('debtor-finder-mode')?.value === 'or' ? 'or' : 'and',
-                sector: document.getElementById('debtor-finder-sector')?.value || 'all'
+                mode: debtorFinderMode,
+                sector: debtorFinderSector
             };
+        }
+
+        function isDebtorFinderTypeMatch(row) {
+            if (debtorFinderActivity === 'all') return true;
+            return debtorFinderActivity === 'fees' ? row.isFee : !row.isFee;
         }
 
         function buildDebtorFinderRows(sector = 'all') {
             const clients = new Map();
-            db.filter(row => row.isOverdue && isTypeMatch(row) && (sector === 'all' || row.sector === sector))
+            db.filter(row => row.isOverdue && isDebtorFinderTypeMatch(row) && (sector === 'all' || row.sector === sector))
                 .forEach((row, rowIndex) => {
                     const code = String(row.code || '').trim();
                     const key = code || String(row.name || '').trim();
@@ -3258,23 +3478,104 @@
             }));
         }
 
+        function setDebtorFinderActivity(value) {
+            debtorFinderActivity = ['info', 'fees', 'all'].includes(value) ? value : 'info';
+            updateDebtorFinderFilterUI();
+            renderDebtorFinder();
+        }
+
+        function setDebtorFinderSector(value) {
+            const allowed = ['all', 'משרדי ממשלה', 'רשויות וחברות ממשלתיות', 'רשויות מקומיות', 'לקוחות פרטיים'];
+            debtorFinderSector = allowed.includes(value) ? value : 'all';
+            updateDebtorFinderFilterUI();
+            renderDebtorFinder();
+        }
+
+        function setDebtorFinderMode(value) {
+            debtorFinderMode = value === 'or' ? 'or' : 'and';
+            updateDebtorFinderFilterUI();
+            renderDebtorFinder();
+        }
+
+        function updateDebtorFinderFilterUI() {
+            document.querySelectorAll('[id^="df-activity-"]').forEach(button => button.classList.remove('active-filter'));
+            document.getElementById('df-activity-' + debtorFinderActivity)?.classList.add('active-filter');
+
+            const sectorIds = {
+                all: 'df-sector-all',
+                'משרדי ממשלה': 'df-sector-gov',
+                'רשויות וחברות ממשלתיות': 'df-sector-gov-auth',
+                'רשויות מקומיות': 'df-sector-local',
+                'לקוחות פרטיים': 'df-sector-private'
+            };
+            document.querySelectorAll('[id^="df-sector-"]').forEach(button => button.classList.remove('active-filter'));
+            document.getElementById(sectorIds[debtorFinderSector])?.classList.add('active-filter');
+
+            document.querySelectorAll('[id^="df-mode-"]').forEach(button => button.classList.remove('active-filter'));
+            document.getElementById('df-mode-' + debtorFinderMode)?.classList.add('active-filter');
+        }
+
+        function getDebtorFinderSortValue(row, key) {
+            if (key === 'payerCodes') return row.payerCodes.join(', ');
+            if (key === 'oldestDueDate') return row.oldestDueDate?.getTime() || 0;
+            return row[key] ?? '';
+        }
+
+        function sortDebtorFinderRows(rows) {
+            const direction = debtorFinderSortDirection === 'asc' ? 1 : -1;
+            return rows.sort((a, b) => {
+                const valueA = getDebtorFinderSortValue(a, debtorFinderSortKey);
+                const valueB = getDebtorFinderSortValue(b, debtorFinderSortKey);
+                if (typeof valueA === 'number' && typeof valueB === 'number') {
+                    return (valueA - valueB) * direction;
+                }
+                return String(valueA).localeCompare(String(valueB), 'he', { numeric: true }) * direction;
+            });
+        }
+
+        function setDebtorFinderSort(key) {
+            const allowed = ['name', 'code', 'payerCodes', 'invoiceCount', 'amount', 'oldestDueDate', 'maxOverdueDays'];
+            if (!allowed.includes(key)) return;
+            if (debtorFinderSortKey === key) {
+                debtorFinderSortDirection = debtorFinderSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                debtorFinderSortKey = key;
+                debtorFinderSortDirection = ['name', 'code', 'payerCodes'].includes(key) ? 'asc' : 'desc';
+            }
+            renderDebtorFinder();
+        }
+
+        function updateDebtorFinderSortHeaders() {
+            document.querySelectorAll('[data-debtor-sort-key]').forEach(header => {
+                const active = header.dataset.debtorSortKey === debtorFinderSortKey;
+                header.setAttribute('aria-sort', active ? (debtorFinderSortDirection === 'asc' ? 'ascending' : 'descending') : 'none');
+                const icon = header.querySelector('i');
+                if (icon) icon.className = active
+                    ? `fa-solid ${debtorFinderSortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down'}`
+                    : 'fa-solid fa-sort';
+            });
+        }
+
         function renderDebtorFinder() {
-            const status = document.getElementById('debtor-finder-status');
-            const results = document.getElementById('debtor-finder-results');
             const body = document.getElementById('debtor-finder-table-body');
-            if (!status || !results || !body) return;
+            const clientCount = document.getElementById('debtor-finder-client-count');
+            const totalAmountElement = document.getElementById('debtor-finder-total-amount');
+            const context = document.getElementById('debtor-finder-context');
+            if (!body || !clientCount || !totalAmountElement || !context) return;
 
             const criteria = getDebtorFinderCriteria();
             const hasCriteria = criteria.hasInvoiceThreshold || criteria.hasAmountThreshold;
-            const modeSelect = document.getElementById('debtor-finder-mode');
-            if (modeSelect) modeSelect.disabled = !(criteria.hasInvoiceThreshold && criteria.hasAmountThreshold);
+            const modeButtons = document.querySelectorAll('[id^="df-mode-"]');
+            modeButtons.forEach(button => button.disabled = !(criteria.hasInvoiceThreshold && criteria.hasAmountThreshold));
+            updateDebtorFinderFilterUI();
+            updateDebtorFinderSortHeaders();
 
             if (!hasCriteria) {
                 debtorFinderRows = [];
-                body.innerHTML = '';
-                results.classList.add('hidden');
-                status.className = 'mt-5 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900';
-                status.textContent = 'יש להזין לפחות תנאי אחד כדי להציג חייבים לטיפול.';
+                clientCount.textContent = '0';
+                totalAmountElement.textContent = formatCurrency(0);
+                context.textContent = 'יש להזין לפחות תנאי אחד כדי להציג חייבים לטיפול.';
+                body.innerHTML = '<tr><td colspan="8" style="padding:32px;text-align:center;color:#607080">לא הוגדרו תנאי איתור.</td></tr>';
                 return;
             }
 
@@ -3286,43 +3587,53 @@
                     return row.invoiceCount >= criteria.minInvoices || row.amount >= criteria.minAmount;
                 }
                 return invoiceMatch && amountMatch;
-            }).sort((a, b) => b.amount - a.amount || b.invoiceCount - a.invoiceCount || a.name.localeCompare(b.name, 'he'));
+            });
+            sortDebtorFinderRows(debtorFinderRows);
 
             const totalAmount = debtorFinderRows.reduce((sum, row) => sum + row.amount, 0);
-            const activityLabel = incomeFilter === 'info' ? 'שירותי מידע' : (incomeFilter === 'fees' ? 'אגרות העברת בעלות' : 'כל תחומי הפעילות');
+            const activityLabel = debtorFinderActivity === 'info' ? 'שירותי מידע' : (debtorFinderActivity === 'fees' ? 'אגרות העברת בעלות' : 'כל תחומי הפעילות');
             const sectorLabel = criteria.sector === 'all' ? 'כל הסקטורים' : criteria.sector;
-            status.className = 'mt-5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700';
-            status.innerHTML = `<strong>${debtorFinderRows.length.toLocaleString('he-IL')} לקוחות נמצאו</strong><span class="mx-2 text-slate-300">|</span>חוב כולל: <strong class="text-red-700">${formatCurrency(totalAmount)}</strong><span class="mx-2 text-slate-300">|</span>${escapeHtml(activityLabel)}, ${escapeHtml(sectorLabel)}`;
+            clientCount.textContent = debtorFinderRows.length.toLocaleString('he-IL');
+            totalAmountElement.textContent = formatCurrency(totalAmount);
+            context.textContent = `${activityLabel}, ${sectorLabel}. הרשימה ממוינת לפי ${getDebtorFinderSortLabel()} ${debtorFinderSortDirection === 'asc' ? 'בסדר עולה' : 'בסדר יורד'}.`;
 
             if (!debtorFinderRows.length) {
-                body.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-slate-500">לא נמצאו לקוחות העומדים בתנאים שהוגדרו.</td></tr>';
-                results.classList.remove('hidden');
+                body.innerHTML = '<tr><td colspan="8" style="padding:32px;text-align:center;color:#607080">לא נמצאו לקוחות העומדים בתנאים שהוגדרו.</td></tr>';
                 return;
             }
 
             body.innerHTML = debtorFinderRows.map((row, index) => `
-                <tr class="hover:bg-blue-50/60 transition-colors">
-                    <td class="p-3 font-bold text-slate-800">${escapeHtml(row.name)} ${row.isDirectDebit ? '<span class="inline-flex items-center bg-sky-100 text-sky-800 border border-sky-200 text-[10px] px-2 py-0.5 rounded-full font-bold mr-2">הו&quot;ק</span>' : ''}</td>
-                    <td class="p-3"><bdi dir="ltr">${escapeHtml(row.code || 'אין נתון')}</bdi></td>
-                    <td class="p-3"><bdi dir="ltr">${row.payerCodes.length ? escapeHtml(row.payerCodes.join(', ')) : 'אין נתון'}</bdi></td>
-                    <td class="p-3 text-center font-bold">${row.invoiceCount.toLocaleString('he-IL')}</td>
-                    <td class="p-3 text-left font-bold text-red-700">${formatCurrency(row.amount)}</td>
-                    <td class="p-3">${row.oldestDueDate ? row.oldestDueDate.toLocaleDateString('he-IL') : 'אין נתון'}</td>
-                    <td class="p-3 text-center">${row.maxOverdueDays === null ? 'אין נתון' : row.maxOverdueDays.toLocaleString('he-IL')}</td>
-                    <td class="p-3 text-center"><button type="button" onclick="openDebtorFinderClient(${index})" class="min-h-[36px] px-3 rounded-lg border border-blue-300 bg-white text-blue-700 text-xs font-bold hover:bg-blue-50">לפירוט חשבוניות</button></td>
+                <tr>
+                    <td><strong>${escapeHtml(row.name)}</strong> ${row.isDirectDebit ? '<span class="inline-flex items-center bg-sky-100 text-sky-800 border border-sky-200 text-[10px] px-2 py-0.5 rounded-full font-bold mr-2">הו&quot;ק</span>' : ''}</td>
+                    <td class="numeric-cell"><bdi dir="ltr">${escapeHtml(row.code || 'אין נתון')}</bdi></td>
+                    <td class="numeric-cell"><bdi dir="ltr">${row.payerCodes.length ? escapeHtml(row.payerCodes.join(', ')) : 'אין נתון'}</bdi></td>
+                    <td class="center-cell"><strong>${row.invoiceCount.toLocaleString('he-IL')}</strong></td>
+                    <td class="numeric-cell" style="color:#b91c1c;font-weight:700">${formatCurrency(row.amount)}</td>
+                    <td class="center-cell">${row.oldestDueDate ? row.oldestDueDate.toLocaleDateString('he-IL') : 'אין נתון'}</td>
+                    <td class="center-cell">${row.maxOverdueDays === null ? 'אין נתון' : row.maxOverdueDays.toLocaleString('he-IL')}</td>
+                    <td class="center-cell"><button type="button" onclick="openDebtorFinderClient(${index})" class="debtor-finder-open-button"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>פתיחת פירוט</button></td>
                 </tr>`).join('');
-            results.classList.remove('hidden');
         }
 
-        function clearDebtorFinderFilters() {
+        function getDebtorFinderSortLabel() {
+            return {
+                name: 'שם הלקוח', code: 'מספר הלקוח במרכבה', payerCodes: 'קוד הגורם המשלם',
+                invoiceCount: 'מספר החשבוניות', amount: 'גובה החוב', oldestDueDate: 'מועד הפירעון',
+                maxOverdueDays: 'מספר ימי הפיגור'
+            }[debtorFinderSortKey] || 'גובה החוב';
+        }
+
+        function resetDebtorFinderDefaults() {
             const minInvoices = document.getElementById('debtor-finder-min-invoices');
             const minAmount = document.getElementById('debtor-finder-min-amount');
-            const mode = document.getElementById('debtor-finder-mode');
-            const sector = document.getElementById('debtor-finder-sector');
-            if (minInvoices) minInvoices.value = '';
-            if (minAmount) minAmount.value = '';
-            if (mode) mode.value = 'and';
-            if (sector) sector.value = 'all';
+            if (minInvoices) minInvoices.value = '5';
+            if (minAmount) minAmount.value = '1000';
+            debtorFinderActivity = 'info';
+            debtorFinderSector = 'all';
+            debtorFinderMode = 'and';
+            debtorFinderSortKey = 'amount';
+            debtorFinderSortDirection = 'desc';
+            updateDebtorFinderFilterUI();
             renderDebtorFinder();
         }
 
@@ -3333,8 +3644,8 @@
             path.orgName = client.name;
             currentLevel = 2;
             lvl2View = 'debt';
-            renderView();
-            document.getElementById('drilldown-viewport')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            navigateToScreen('debt');
+            requestAnimationFrame(() => document.getElementById('drilldown-viewport')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
         }
 
         function renderView() {
@@ -6388,6 +6699,7 @@
 
             setAccess('nav-dashboard', coreReady, coreReady ? 'פתיחת הדשבורד' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
             setAccess('nav-debt', coreReady, coreReady ? 'פתיחת ניהול החובות' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
+            setAccess('nav-debtor-finder', coreReady, coreReady ? 'פתיחת איתור חייבים לטיפול' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
             setAccess('nav-management', coreReady, coreReady ? 'פתיחת דוח ההנהלה' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
             setAccess('nav-fees-management', coreReady, coreReady ? 'פתיחת סקירת אגרות העברת בעלות' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
             setAccess('nav-dashboard-report', coreReady, coreReady ? 'הפקת דוח מאוחד' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
@@ -6430,6 +6742,12 @@
             document.querySelectorAll('.system-date').forEach(element => {
                 element.textContent = formattedDate;
             });
+
+            if (typeof ResizeObserver !== 'undefined') {
+                const stickyHeaderObserver = new ResizeObserver(() => syncStickyHeaderHeight());
+                document.querySelectorAll('.suite-screen > .app-header').forEach(header => stickyHeaderObserver.observe(header));
+            }
+            window.addEventListener('resize', syncStickyHeaderHeight);
 
             updateDashboardAccessState();
             syncReportYearLabels();
