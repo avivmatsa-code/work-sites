@@ -1,0 +1,31 @@
+name: Apply client back and dashboard footer update
+on:
+  push:
+    branches:
+      - agent/duplicate-client-back-and-dashboard-footer
+permissions:
+  contents: write
+jobs:
+  apply-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/duplicate-client-back-and-dashboard-footer
+          fetch-depth: 0
+      - name: Apply staged update
+        shell: bash
+        run: |
+          set -euo pipefail
+          PATCH_FILE=".codex-upload/back-and-footer.patch.gz.b64"
+          if [[ ! -f "$PATCH_FILE" ]]; then exit 0; fi
+          base64 --decode "$PATCH_FILE" | gzip --decompress > /tmp/back-and-footer.patch
+          git apply --check --ignore-space-change --ignore-whitespace /tmp/back-and-footer.patch
+          git apply --ignore-space-change --ignore-whitespace /tmp/back-and-footer.patch
+          rm -rf .codex-upload
+          rm -f .github/workflows/apply-back-and-footer.yml
+          git config user.name "codex-dashboard-update"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Add top client back action and neutral dashboard totals"
+          git push origin HEAD:agent/duplicate-client-back-and-dashboard-footer
