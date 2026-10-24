@@ -1,0 +1,109 @@
+diff --git a/customer-relations/debt-collection/Collecting_Dashboard.html b/customer-relations/debt-collection/Collecting_Dashboard.html
+index 77a4b67..206a99e 100644
+--- a/customer-relations/debt-collection/Collecting_Dashboard.html
++++ b/customer-relations/debt-collection/Collecting_Dashboard.html
+@@ -1556,7 +1556,33 @@
+         .client-profile-operational__item { padding: 12px 16px; border-inline-start: 1px solid var(--color-border); }
+         .client-profile-operational__item:first-child { border-inline-start: 0; }
+         .client-profile-operational__item span { display: block; color: var(--color-text-muted); font-size: 10px; font-weight: 700; }
+-        .client-profile-operational__item strong { display: block; margin-block-start: 4px; color: var(--color-text); font-size: 14px; }
++        .client-profile-operational__item strong { display: block; margin-block-start: 4px; color: var(--color-text); font-size: 14px; }
++        .client-past-debt-section { margin-block-start: var(--space-5); }
++        .client-past-debt-section__header {
++            display: flex;
++            align-items: center;
++            gap: var(--space-3);
++            margin-block-end: var(--space-3);
++            padding-block-end: var(--space-3);
++            border-block-end: 1px solid var(--color-border);
++        }
++        .client-past-debt-section__header i { color: var(--brand-primary); }
++        .client-past-debt-section__header h3 { margin: 0; color: var(--brand-active); font-size: var(--font-size-lg); }
++        .client-past-debt-summary {
++            display: grid;
++            grid-template-columns: repeat(6, minmax(0, 1fr));
++            gap: 1px;
++            overflow: hidden;
++            border: 1px solid var(--color-border);
++            border-radius: var(--radius-lg);
++            background: var(--color-border);
++        }
++        .client-past-debt-item { min-width: 0; min-height: 62px; display: grid; align-content: center; gap: 4px; padding: 10px 12px; background: #fff; }
++        .client-past-debt-item span { color: var(--color-text-muted); font-size: 10px; font-weight: 700; }
++        .client-past-debt-item strong { color: var(--color-text); font-size: 14px; font-weight: 800; white-space: nowrap; }
++        .client-past-debt-item--collected strong { color: #047857; font-size: 18px; }
++        .client-past-debt-item--open strong { color: #b91c1c; font-size: 18px; }
++        .client-past-debt-item--empty strong { color: var(--color-text-muted); font-size: 13px; }
+ 
+         .client-insights-section { padding: var(--space-6); border: 1px solid var(--color-border); border-radius: 24px; background: var(--color-surface); box-shadow: var(--shadow-panel); }
+         .client-insights-section__header { display: flex; align-items: center; gap: var(--space-3); margin-block-end: var(--space-5); padding-block-end: var(--space-3); border-block-end: 1px solid var(--color-border); }
+@@ -1595,6 +1621,7 @@
+             .client-profile-operational { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+             .client-profile-operational__item:nth-child(3), .client-profile-operational__item:nth-child(4) { border-block-start: 1px solid var(--color-border); }
+             .client-insights-charts, .client-insights-grid { grid-template-columns: 1fr; }
++            .client-past-debt-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+             .past-debt-card { grid-template-columns: 1fr; gap: 4px; }
+ 
+             body.suite-enabled .suite-screen .app-header__inner {
+@@ -1636,6 +1663,7 @@
+             .collection-card-breakdown { grid-template-columns: 1fr; }
+             .collection-card-breakdown span + span { padding: 6px 0 0; border-inline-start: 0; border-block-start: 1px solid var(--color-border); }
+             .past-debt-summary { grid-template-columns: 1fr; }
++            .client-past-debt-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+             .past-debt-card + .past-debt-card { border-inline-start: 0; border-block-start: 1px solid var(--color-border); }
+             body.suite-enabled { padding-inline-start: 0; }
+ 
+@@ -4439,13 +4467,7 @@ function getClientProfileMetrics(orgName) {
+                     <article class="client-profile-kpi client-profile-kpi--future"><div class="client-profile-kpi__label"><span>תשלומים עתידיים</span><i class="fa-solid fa-clock"></i></div><strong>${formatCurrency(metrics.futurePayments)}</strong><small>חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></article>
+                     <article class="client-profile-kpi"><div class="client-profile-kpi__label"><span>שיעור גבייה</span><i class="fa-solid fa-percent"></i></div><strong>${metrics.collectionRate === null ? 'אין נתון' : metrics.collectionRate.toFixed(1) + '%'}</strong><small>גבייה מחשבוניות ${CURRENT_YEAR} מתוך החיובים בשנה</small></article>
+                 </div>
+-                ${buildPastDebtSummary(metrics.pastOpenDebt, metrics.collectionComposition)}
+-                <div class="client-profile-operational">
+-                    <div class="client-profile-operational__item"><span>חשבוניות בפיגור</span><strong>${metrics.overdueRows.length.toLocaleString('he-IL')}</strong></div>
+-                    <div class="client-profile-operational__item"><span>חשבוניות עתידיות</span><strong>${metrics.futureRows.length.toLocaleString('he-IL')}</strong></div>
+-                    <div class="client-profile-operational__item"><span>מועד הפירעון הישן ביותר</span><strong>${metrics.oldestDueDate ? metrics.oldestDueDate.toLocaleDateString('he-IL') : 'אין חוב בפיגור'}</strong></div>
+-                    <div class="client-profile-operational__item"><span>ימי פיגור מרביים</span><strong>${metrics.overdueRows.length ? metrics.maximumDays.toLocaleString('he-IL') + ' ימים' : 'אין חוב בפיגור'}</strong></div>
+-                </div>
++                ${buildClientPastDebtSummary(metrics)}
+             </section>`;
+         }
+ 
+@@ -4492,7 +4514,8 @@ function getClientProfileMetrics(orgName) {
+                     .client-profile-heading__side{display:block}.client-profile-badges{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}.client-profile-badge{padding:4px 7px;border:1px solid var(--print-border);border-radius:99px;color:var(--print-muted);font-size:8px;font-weight:700}
+                     .client-profile-financials{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}.client-profile-kpi{min-height:84px;padding:9px;border:1px solid var(--print-border);border-radius:8px;background:var(--print-surface)}
+                     .client-profile-kpi__label{display:flex;justify-content:space-between;color:var(--print-muted);font-size:8px;font-weight:700}.client-profile-kpi strong{display:block;margin-top:7px;color:var(--print-brand);font-size:15px}.client-profile-kpi--collection strong,.client-profile-kpi--future strong{color:var(--print-success)}.client-profile-kpi--debt strong{color:var(--print-danger)}.client-profile-kpi small{display:block;margin-top:4px;color:var(--print-muted);font-size:7.5px}
+-                    .client-profile-operational{display:grid;grid-template-columns:repeat(4,1fr);margin-top:10px;border:1px solid var(--print-border);border-radius:8px}.client-profile-operational__item{padding:8px;border-inline-start:1px solid var(--print-border)}.client-profile-operational__item:first-child{border:0}.client-profile-operational__item span{display:block;color:var(--print-muted);font-size:7.5px}.client-profile-operational__item strong{display:block;margin-top:3px;font-size:10px}
++                    .client-profile-operational{display:grid;grid-template-columns:repeat(4,1fr);margin-top:10px;border:1px solid var(--print-border);border-radius:8px}.client-profile-operational__item{padding:8px;border-inline-start:1px solid var(--print-border)}.client-profile-operational__item:first-child{border:0}.client-profile-operational__item span{display:block;color:var(--print-muted);font-size:7.5px}.client-profile-operational__item strong{display:block;margin-top:3px;font-size:10px}
++                    .client-past-debt-section{margin-top:14px}.client-past-debt-section__header{display:flex;align-items:center;gap:6px;margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid var(--print-border)}.client-past-debt-section__header h3{margin:0;color:var(--print-brand);font-size:15px}.client-past-debt-section__header i{color:var(--print-brand)}.client-past-debt-summary{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1px;overflow:hidden;border:1px solid var(--print-border);border-radius:7px;background:var(--print-border)}.client-past-debt-item{min-width:0;min-height:44px;display:grid;align-content:center;gap:2px;padding:6px;background:#fff}.client-past-debt-item span{color:var(--print-muted);font-size:6.5px;font-weight:700}.client-past-debt-item strong{color:var(--print-text);font-size:9px;font-weight:800;white-space:nowrap}.client-past-debt-item--collected strong{color:var(--print-success);font-size:11px}.client-past-debt-item--open strong{color:var(--print-danger);font-size:11px}.client-past-debt-item--empty strong{color:var(--print-muted);font-size:8px}
+                     .client-insights-section__header{display:flex;gap:8px;padding-bottom:9px;border-bottom:1px solid var(--print-border)}.client-insights-section__header h3{margin:0;color:var(--print-brand);font-size:15px}.client-insights-section__header p{margin:2px 0 0;color:var(--print-muted);font-size:8px}
+                     .client-insights-charts,.client-insights-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.client-insight-card{padding:10px;border:1px solid var(--print-border);border-radius:8px;break-inside:avoid}.client-insight-card h4{margin:0 0 7px;color:var(--print-text);font-size:10px}.client-print-chart{display:block;width:100%;height:150px;object-fit:contain}.client-insight-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.client-insight-metric,.client-ranking-item{padding:6px;background:var(--print-surface);border-radius:5px}.client-insight-metric span,.client-ranking-item span{display:block;color:var(--print-muted);font-size:7.5px}.client-insight-metric strong,.client-ranking-item strong{display:block;margin-top:2px;font-size:9px}.client-ranking-list{display:grid;gap:5px}.client-ranking-badge{display:inline-block;margin-top:6px;color:var(--print-danger);font-size:8px;font-weight:700}.client-insight-note{margin:6px 0 0;color:var(--print-muted);font-size:7px}
+                     .collection-card-breakdown{display:grid;gap:2px;margin-top:4px;color:var(--print-muted);font-size:7px}.collection-card-breakdown span{display:flex;justify-content:space-between;gap:5px}.collection-card-breakdown b{color:var(--print-text);font-size:7px}.past-debt-section{margin-top:18px;padding-top:12px;border-top:1px solid var(--print-border)}.past-debt-section__title{margin:0 0 9px;color:var(--print-brand);font-size:15px;font-weight:800}.past-debt-summary{display:grid;grid-template-columns:repeat(2,1fr);overflow:hidden;border:1px solid var(--print-border);border-radius:7px;margin-top:0}.past-debt-card{display:grid;grid-template-columns:minmax(80px,.8fr) auto minmax(120px,1.4fr);align-items:center;gap:6px;padding:8px}.past-debt-card+.past-debt-card{border-inline-start:1px solid var(--print-border)}.past-debt-card span,.past-debt-card small{display:block;color:var(--print-muted);font-size:7.5px}.past-debt-card strong{display:block;margin:3px 0;font-size:12px}.past-debt-card--open strong{color:var(--print-danger)}.past-debt-card--collected strong{color:var(--print-success)}
+@@ -5673,6 +5696,28 @@ function getCollectionComposition(currentYearCollected, predicate = () => true)
+             </div>`;
+         }
+ 
++        function buildClientPastDebtSummary(metrics) {
++            const composition = metrics.collectionComposition;
++            const historicalValue = composition.hasHistoricalSource
++                ? formatCurrency(composition.historicalCollected)
++                : 'אין מידע';
++            const historicalClass = composition.hasHistoricalSource ? '' : ' client-past-debt-item--empty';
++            return `<section class="client-past-debt-section" aria-labelledby="client-past-debt-section-title">
++                <div class="client-past-debt-section__header">
++                    <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
++                    <h3 id="client-past-debt-section-title">חובות עבר</h3>
++                </div>
++                <div class="client-past-debt-summary">
++                    <div class="client-past-debt-item client-past-debt-item--collected${historicalClass}"><span>נגבה בשנת ${CURRENT_YEAR}</span><strong>${historicalValue}</strong></div>
++                    <div class="client-past-debt-item client-past-debt-item--open"><span>חוב שטרם נגבה</span><strong>${formatCurrency(metrics.pastOpenDebt)}</strong></div>
++                    <div class="client-past-debt-item"><span>חשבוניות בפיגור</span><strong>${metrics.overdueRows.length.toLocaleString('he-IL')}</strong></div>
++                    <div class="client-past-debt-item"><span>חשבוניות עתידיות</span><strong>${metrics.futureRows.length.toLocaleString('he-IL')}</strong></div>
++                    <div class="client-past-debt-item"><span>מועד הפירעון הישן ביותר</span><strong>${metrics.oldestDueDate ? metrics.oldestDueDate.toLocaleDateString('he-IL') : 'אין חוב בפיגור'}</strong></div>
++                    <div class="client-past-debt-item"><span>ימי פיגור מרביים</span><strong>${metrics.overdueRows.length ? metrics.maximumDays.toLocaleString('he-IL') + ' ימים' : 'אין חוב בפיגור'}</strong></div>
++                </div>
++            </section>`;
++        }
++
+         function buildPastDebtSummary(openPastDebt, composition) {
+             return `<section class="past-debt-section" aria-labelledby="past-debt-section-title">
+                 <h4 id="past-debt-section-title" class="past-debt-section__title">חובות עבר</h4>
