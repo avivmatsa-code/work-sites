@@ -1298,6 +1298,16 @@
             gap: var(--space-4);
             margin-top: var(--space-4);
         }
+        .past-debt-section { margin-block-start: var(--space-5); }
+        .past-debt-section__title {
+            margin: 0 0 var(--space-3);
+            padding-block-end: var(--space-2);
+            border-block-end: 1px solid var(--color-border);
+            color: var(--brand-active);
+            font-size: 14px;
+            font-weight: 800;
+        }
+        .past-debt-section .past-debt-summary { margin-top: 0; }
         .past-debt-card {
             min-width: 0;
             padding: 14px 16px;
@@ -1495,14 +1505,14 @@
             align-items: center;
             gap: 8px;
             padding: 7px 12px;
-            border: 1px solid var(--brand-border);
+            border: 1px solid var(--brand-primary);
             border-radius: var(--radius-md);
-            background: #fff;
-            color: var(--brand-primary);
+            background: var(--brand-primary);
+            color: #fff;
             font-size: 12px;
             font-weight: 700;
         }
-        .client-profile-print-button:hover { background: var(--brand-subtle); }
+        .client-profile-print-button:hover { border-color: var(--brand-hover); background: var(--brand-hover); color: #fff; }
 
         .client-profile-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-5); margin-block-end: var(--space-5); padding-block-end: var(--space-4); border-block-end: 1px solid var(--color-border); }
         .client-profile-title { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
@@ -4456,7 +4466,7 @@ function getClientProfileMetrics(orgName) {
                     .client-profile-operational{display:grid;grid-template-columns:repeat(4,1fr);margin-top:10px;border:1px solid var(--print-border);border-radius:8px}.client-profile-operational__item{padding:8px;border-inline-start:1px solid var(--print-border)}.client-profile-operational__item:first-child{border:0}.client-profile-operational__item span{display:block;color:var(--print-muted);font-size:7.5px}.client-profile-operational__item strong{display:block;margin-top:3px;font-size:10px}
                     .client-insights-section__header{display:flex;gap:8px;padding-bottom:9px;border-bottom:1px solid var(--print-border)}.client-insights-section__header h3{margin:0;color:var(--print-brand);font-size:15px}.client-insights-section__header p{margin:2px 0 0;color:var(--print-muted);font-size:8px}
                     .client-insights-charts,.client-insights-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.client-insight-card{padding:10px;border:1px solid var(--print-border);border-radius:8px;break-inside:avoid}.client-insight-card h4{margin:0 0 7px;color:var(--print-text);font-size:10px}.client-print-chart{display:block;width:100%;height:150px;object-fit:contain}.client-insight-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.client-insight-metric,.client-ranking-item{padding:6px;background:var(--print-surface);border-radius:5px}.client-insight-metric span,.client-ranking-item span{display:block;color:var(--print-muted);font-size:7.5px}.client-insight-metric strong,.client-ranking-item strong{display:block;margin-top:2px;font-size:9px}.client-ranking-list{display:grid;gap:5px}.client-ranking-badge{display:inline-block;margin-top:6px;color:var(--print-danger);font-size:8px;font-weight:700}.client-insight-note{margin:6px 0 0;color:var(--print-muted);font-size:7px}
-                    .collection-card-breakdown{display:grid;gap:2px;margin-top:4px;color:var(--print-muted);font-size:7px}.collection-card-breakdown span{display:flex;justify-content:space-between;gap:5px}.collection-card-breakdown b{color:var(--print-text);font-size:7px}.past-debt-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}.past-debt-card{padding:8px;border:1px solid var(--print-border);border-radius:7px}.past-debt-card span,.past-debt-card small{display:block;color:var(--print-muted);font-size:7.5px}.past-debt-card strong{display:block;margin:3px 0;font-size:12px}.past-debt-card--open strong{color:var(--print-danger)}.past-debt-card--collected strong{color:var(--print-success)}
+                    .collection-card-breakdown{display:grid;gap:2px;margin-top:4px;color:var(--print-muted);font-size:7px}.collection-card-breakdown span{display:flex;justify-content:space-between;gap:5px}.collection-card-breakdown b{color:var(--print-text);font-size:7px}.past-debt-section{margin-top:18px;padding-top:12px;border-top:1px solid var(--print-border)}.past-debt-section__title{margin:0 0 9px;color:var(--print-brand);font-size:11px;font-weight:800}.past-debt-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:0}.past-debt-card{padding:8px;border:1px solid var(--print-border);border-radius:7px}.past-debt-card span,.past-debt-card small{display:block;color:var(--print-muted);font-size:7.5px}.past-debt-card strong{display:block;margin:3px 0;font-size:12px}.past-debt-card--open strong{color:var(--print-danger)}.past-debt-card--collected strong{color:var(--print-success)}
                     @page{size:A4 portrait;margin:0}
                 </style></head><body>
                 ${getClientDocumentPageStart(title)}
@@ -5635,9 +5645,12 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
         }
 
         function buildPastDebtSummary(openPastDebt, composition) {
-            return `<section class="past-debt-summary" aria-label="חוב משנים קודמות">
-                ${composition.hasHistoricalSource ? `<article class="past-debt-card past-debt-card--collected"><span>נגבה בשנת ${CURRENT_YEAR}</span><strong>${formatCurrency(composition.historicalCollected)}</strong><small>חובות משנים קודמות שנגבו בשנת העבודה</small></article>` : ''}
-                <article class="past-debt-card past-debt-card--open"><span>חוב שטרם נגבה</span><strong>${formatCurrency(openPastDebt)}</strong><small>יתרת חוב פתוחה משנים קודמות</small></article>
+            return `<section class="past-debt-section" aria-labelledby="past-debt-section-title">
+                <h4 id="past-debt-section-title" class="past-debt-section__title">חובות עבר</h4>
+                <div class="past-debt-summary">
+                    ${composition.hasHistoricalSource ? `<article class="past-debt-card past-debt-card--collected"><span>נגבה בשנת ${CURRENT_YEAR}</span><strong>${formatCurrency(composition.historicalCollected)}</strong><small>חובות משנים קודמות שנגבו בשנת העבודה</small></article>` : ''}
+                    <article class="past-debt-card past-debt-card--open"><span>חוב שטרם נגבה</span><strong>${formatCurrency(openPastDebt)}</strong><small>יתרת חוב פתוחה משנים קודמות</small></article>
+                </div>
             </section>`;
         }
 
