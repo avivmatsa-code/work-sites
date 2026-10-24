@@ -1499,6 +1499,21 @@
 
         .client-profile-section { padding: var(--space-6); border: 1px solid var(--color-border); border-radius: 24px; background: var(--color-surface); box-shadow: var(--shadow-panel); }
         .client-profile-heading__side { display: grid; justify-items: end; gap: 10px; }
+        .client-profile-heading__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
+        .client-profile-back-button {
+            min-height: 36px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border: 1px solid var(--color-border-strong);
+            border-radius: var(--radius-md);
+            background: #fff;
+            color: var(--color-text);
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .client-profile-back-button:hover { border-color: var(--brand-primary); background: var(--brand-subtle); color: var(--brand-primary); }
         .client-profile-print-button {
             min-height: 36px;
             display: inline-flex;
@@ -3388,7 +3403,7 @@
                     <td class="p-2 text-left text-indigo-700" style="font-family: Arial, Helvetica, sans-serif !important;">${totalRate}</td>
                 </tr>
             `;
-            tableHTML += collectionCompositionTableFooter(collectionComposition, 'p-2 border-b text-left');
+            tableHTML += collectionCompositionTableFooter(collectionComposition, 'p-2 border-b text-left', 'dashboard');
             document.getElementById('db-monthly-table-body').innerHTML = tableHTML;
 
             const ctx = document.getElementById('dashChartCanvas').getContext('2d');
@@ -3626,7 +3641,7 @@
                                     <td style="text-align:left; color:#047857">${formatCurrency(totalCollected)}</td>
                                     <td style="text-align:left; color:#4338ca">${collectionRate}%</td>
                                 </tr>
-                                ${collectionCompositionTableFooter(collectionComposition)}
+                                ${collectionCompositionTableFooter(collectionComposition, '', 'dashboard')}
                             </tbody>
                         </table>
                     </section>
@@ -4385,6 +4400,9 @@ function getClientProfileMetrics(orgName) {
             const metrics = getClientProfileMetrics(orgName);
             const activityLabel = incomeFilter === 'info' ? 'שירותי מידע' : (incomeFilter === 'fees' ? 'אגרות העברת בעלות' : 'כל תחומי הפעילות');
             const payerLabel = metrics.payerCodes.join(', ');
+            const fromDebtorFinder = debtorFinderDetailActive || debtorFinderDetailOpening;
+            const backAction = fromDebtorFinder ? 'closeDebtorFinderClient()' : 'navigateBack()';
+            const backLabel = fromDebtorFinder ? 'חזרה לתוצאות האיתור' : 'חזרה';
             return `<section class="client-profile-section" aria-labelledby="client-profile-title">
                 <div class="client-profile-heading">
                     <div class="client-profile-title">
@@ -4392,7 +4410,10 @@ function getClientProfileMetrics(orgName) {
                         <div><h3 id="client-profile-title">${escapeHtml(orgName)}</h3><p>תמונת מצב מרוכזת ללקוח לפי הקבצים והמסננים הפעילים</p></div>
                     </div>
                     <div class="client-profile-heading__side">
-                        <button type="button" class="client-profile-print-button no-print" onclick="printCurrentClientProfile()"><i class="fa-solid fa-print" aria-hidden="true"></i>הדפס כרטיס לקוח</button>
+                        <div class="client-profile-heading__actions no-print">
+                            <button type="button" class="client-profile-back-button" onclick="${backAction}"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>${backLabel}</button>
+                            <button type="button" class="client-profile-print-button" onclick="printCurrentClientProfile()"><i class="fa-solid fa-print" aria-hidden="true"></i>הדפס כרטיס לקוח</button>
+                        </div>
                         <div class="client-profile-badges">
                         ${metrics.clientCode ? `<span class="client-profile-badge"><i class="fa-solid fa-id-card" aria-hidden="true"></i>לקוח במרכבה: <bdi dir="ltr">${escapeHtml(metrics.clientCode)}</bdi></span>` : ''}
                         ${payerLabel ? '<span class="client-profile-badge"><i class="fa-solid fa-receipt" aria-hidden="true"></i>קוד גורם משלם: <bdi dir="ltr">' + escapeHtml(payerLabel) + '</bdi></span>' : ''}
@@ -5654,15 +5675,19 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             </section>`;
         }
 
-        function collectionCompositionTableFooter(composition, cellClass = '') {
+        function collectionCompositionTableFooter(composition, cellClass = '', appearance = 'default') {
             if (!composition.hasHistoricalSource) return '';
-            return `<tr class="year-transition-row" style="background:#fff8e8;color:#7c4a03">
-                <td class="${cellClass}" style="text-align:right;color:#7c4a03"><strong>גביית דצמבר ${CURRENT_YEAR - 1} שבוצעה בשנת ${CURRENT_YEAR}</strong></td>
+            const isDashboard = appearance === 'dashboard';
+            const transitionStyle = isDashboard ? 'background:#fff;color:#1f2933' : 'background:#fff8e8;color:#7c4a03';
+            const transitionLabelColor = isDashboard ? '#1f2933' : '#7c4a03';
+            const totalStyle = isDashboard ? 'background:#eef3f7;font-weight:700' : 'background:#edf7f1;font-weight:700';
+            return `<tr class="year-transition-row" style="${transitionStyle}">
+                <td class="${cellClass}" style="text-align:right;color:${transitionLabelColor}"><strong>גביית דצמבר ${CURRENT_YEAR - 1} שבוצעה בשנת ${CURRENT_YEAR}</strong></td>
                 <td class="${cellClass}">—</td>
                 <td class="${cellClass}"><strong>${formatCurrency(composition.transitionCollected)}</strong></td>
                 <td class="${cellClass}">—</td>
             </tr>
-            <tr class="year-transition-total-row font-bold" style="background:#edf7f1;font-weight:700">
+            <tr class="year-transition-total-row font-bold" style="${totalStyle}">
                 <td class="${cellClass}" style="text-align:right;color:#1f2933">סה"כ גבייה שוטפת בשנת ${CURRENT_YEAR}</td>
                 <td class="${cellClass}">—</td>
                 <td class="${cellClass}" style="color:#11663f"><strong>${formatCurrency(composition.ongoingCollected)}</strong></td>
