@@ -26,8 +26,8 @@ jobs:
             exit 0
           fi
           base64 --decode "$PATCH_FILE" | gzip --decompress > /tmp/client-profile-insights.patch
-          git apply --check /tmp/client-profile-insights.patch
-          git apply /tmp/client-profile-insights.patch
+          git apply --check --ignore-space-change --ignore-whitespace /tmp/client-profile-insights.patch
+          git apply --ignore-space-change --ignore-whitespace /tmp/client-profile-insights.patch
           rm -rf .codex-upload
           rm -f .github/workflows/apply-client-profile-insights.yml
           git config user.name "codex-dashboard-update"
