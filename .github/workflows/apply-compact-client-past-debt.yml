@@ -1,0 +1,33 @@
+name: Apply compact client past debt layout
+
+on:
+  push:
+    branches:
+      - agent/compact-client-past-debt
+    paths:
+      - .codex/compact-client-past-debt.patch
+      - .github/workflows/apply-compact-client-past-debt.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply verified patch
+        shell: bash
+        run: |
+          git apply --check .codex/compact-client-past-debt.patch
+          git apply .codex/compact-client-past-debt.patch
+          rm .codex/compact-client-past-debt.patch
+          rm .github/workflows/apply-compact-client-past-debt.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Compact past debt section in client profile"
+          git push
