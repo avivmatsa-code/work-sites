@@ -1181,6 +1181,135 @@
         }
         .collection-breakdown span { display: block; }
         .collection-breakdown b { color: inherit; font-size: inherit; font-weight: inherit; }
+        .current-year-metrics-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 228px;
+            gap: var(--space-5);
+            align-items: stretch;
+        }
+        .current-year-metrics-panel,
+        .current-year-past-panel {
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            background: var(--color-surface);
+            box-shadow: var(--shadow-card);
+        }
+        .current-year-metrics-panel { padding: var(--space-5); }
+        .current-year-metrics-heading,
+        .current-year-past-heading {
+            margin: 0 0 var(--space-4);
+            padding-block-end: var(--space-3);
+            border-block-end: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            font-size: var(--font-size-xs);
+            font-weight: 700;
+        }
+        .current-year-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: var(--space-4);
+        }
+        .current-year-metric-card {
+            min-width: 0;
+            min-height: 128px;
+            display: grid;
+            grid-template-rows: 20px 48px 34px;
+            align-content: center;
+            padding: 14px 18px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            background: var(--color-surface-subtle);
+            text-align: right;
+        }
+        .current-year-metric-card--interactive { cursor: pointer; transition: border-color .15s ease, background .15s ease; }
+        .current-year-metric-card--interactive:hover { border-color: var(--brand-border); background: var(--brand-subtle); }
+        .current-year-metric-label {
+            align-self: start;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: var(--color-text-muted);
+            font-size: var(--font-size-xs);
+            font-weight: 700;
+        }
+        .current-year-metric-value {
+            align-self: center;
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif !important;
+            font-size: clamp(23px, 2.1vw, 30px);
+            font-weight: 800;
+            line-height: 1;
+            white-space: nowrap;
+        }
+        .current-year-metric-note {
+            align-self: end;
+            color: #8b9bb0;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+        .current-year-metric-value--billed { color: #0b63c8; }
+        .current-year-metric-value--collected,
+        .current-year-metric-value--future { color: #087f5b; }
+        .current-year-metric-value--overdue { color: #c71920; }
+        .current-year-metrics-breakdown {
+            align-self: end;
+            display: grid;
+            gap: 3px;
+            color: var(--color-text-muted);
+            font-family: Arial, Helvetica, sans-serif !important;
+            font-size: 10px;
+            line-height: 1.35;
+        }
+        .current-year-metrics-breakdown__row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        .current-year-metrics-breakdown__row b { color: #425466; font-size: 11px; font-weight: 700; }
+        .current-year-past-panel { padding: var(--space-5); }
+        .current-year-past-row { padding: 12px 2px; }
+        .current-year-past-row + .current-year-past-row { border-block-start: 1px solid var(--color-border); }
+        .current-year-past-row span { display: block; color: var(--color-text-muted); font-size: 10px; font-weight: 700; }
+        .current-year-past-row strong { display: block; margin-block-start: 5px; font-family: Arial, Helvetica, sans-serif !important; font-size: 20px; font-weight: 800; }
+        .current-year-past-row--collected strong { color: #087f5b; }
+        .current-year-past-row--open strong { color: #c71920; }
+        .current-year-past-empty { color: var(--color-text-muted); font-size: 11px; }
+
+        .collection-card-breakdown {
+            display: grid;
+            gap: 3px;
+            margin-top: 6px;
+            color: var(--color-text-muted);
+            font-family: Arial, Helvetica, sans-serif !important;
+            font-size: 9.5px;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+        .collection-card-breakdown span { min-width: 0; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+        .collection-card-breakdown span + span { padding: 0; border: 0; }
+        .collection-card-breakdown b { display: inline; margin: 0; color: #425466; font-size: 10px; font-weight: 700; white-space: nowrap; }
+        .past-debt-summary {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--space-4);
+            margin-top: var(--space-4);
+        }
+        .past-debt-card {
+            min-width: 0;
+            padding: 14px 16px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            background: #fff;
+        }
+        .past-debt-card span { display: block; color: var(--color-text-muted); font-size: 10px; font-weight: 700; }
+        .past-debt-card strong { display: block; margin-top: 5px; font-size: 19px; font-weight: 800; }
+        .past-debt-card--open strong { color: #b91c1c; }
+        .past-debt-card--collected strong { color: #047857; }
+        .past-debt-card small { display: block; margin-top: 4px; color: var(--color-text-muted); font-size: 9px; line-height: 1.35; }
         .historical-kpi .collection-breakdown span {
             color: inherit;
             font-size: 11px;
@@ -1358,6 +1487,69 @@
 
         .debtor-finder-open-button:hover { border-color: var(--brand-primary); background: #fff; color: var(--brand-primary); }
 
+        .client-profile-section { padding: var(--space-6); border: 1px solid var(--color-border); border-radius: 24px; background: var(--color-surface); box-shadow: var(--shadow-panel); }
+        .client-profile-heading__side { display: grid; justify-items: end; gap: 10px; }
+        .client-profile-print-button {
+            min-height: 36px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border: 1px solid var(--brand-border);
+            border-radius: var(--radius-md);
+            background: #fff;
+            color: var(--brand-primary);
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .client-profile-print-button:hover { background: var(--brand-subtle); }
+
+        .client-profile-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-5); margin-block-end: var(--space-5); padding-block-end: var(--space-4); border-block-end: 1px solid var(--color-border); }
+        .client-profile-title { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
+        .client-profile-title__icon { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 42px; border-radius: 14px; background: var(--brand-subtle); color: var(--brand-primary); font-size: 18px; }
+        .client-profile-title h3 { margin: 0; color: var(--brand-active); font-size: 22px; }
+        .client-profile-title p { margin: 4px 0 0; color: var(--color-text-muted); font-size: 12px; }
+        .client-profile-badges { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+        .client-profile-badge { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 5px 10px; border: 1px solid var(--color-border); border-radius: 99px; background: var(--color-surface-subtle); color: var(--color-text-muted); font-size: 11px; font-weight: 700; }
+        .client-profile-badge--direct { border-color: #bae6fd; background: #e0f2fe; color: #075985; }
+        .client-profile-financials { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-4); }
+        .client-profile-kpi { min-width: 0; min-height: 116px; padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface-subtle); }
+        .client-profile-kpi__label { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--color-text-muted); font-size: 11px; font-weight: 700; }
+        .client-profile-kpi__label i { color: var(--brand-primary); }
+        .client-profile-kpi strong { display: block; margin-block-start: 11px; color: var(--brand-active); font-size: 23px; line-height: 1.2; white-space: nowrap; }
+        .client-profile-kpi small { display: block; margin-block-start: 7px; color: var(--color-text-muted); font-size: 10px; line-height: 1.45; }
+        .client-profile-kpi--collection strong { color: #047857; }
+        .client-profile-kpi--debt strong { color: #b91c1c; }
+        .client-profile-kpi--future strong { color: #047857; }
+        .client-profile-operational { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-block-start: var(--space-4); overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: #fff; }
+        .client-profile-operational__item { padding: 12px 16px; border-inline-start: 1px solid var(--color-border); }
+        .client-profile-operational__item:first-child { border-inline-start: 0; }
+        .client-profile-operational__item span { display: block; color: var(--color-text-muted); font-size: 10px; font-weight: 700; }
+        .client-profile-operational__item strong { display: block; margin-block-start: 4px; color: var(--color-text); font-size: 14px; }
+
+        .client-insights-section { padding: var(--space-6); border: 1px solid var(--color-border); border-radius: 24px; background: var(--color-surface); box-shadow: var(--shadow-panel); }
+        .client-insights-section__header { display: flex; align-items: center; gap: var(--space-3); margin-block-end: var(--space-5); padding-block-end: var(--space-3); border-block-end: 1px solid var(--color-border); }
+        .client-insights-section__header h3 { margin: 0; color: var(--brand-active); font-size: var(--font-size-lg); }
+        .client-insights-section__header p { margin: 3px 0 0; color: var(--color-text-muted); font-size: var(--font-size-xs); }
+        .client-insights-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); align-items: stretch; }
+        .client-insights-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); align-items: stretch; margin-block-start: var(--space-5); }
+        .client-insight-card { min-width: 0; padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface-subtle); }
+        .client-insight-card h4 { margin: 0 0 var(--space-4); color: var(--color-text); font-size: var(--font-size-md); }
+        .client-insight-card h4 i { color: var(--brand-primary); margin-inline-end: 7px; }
+        .client-insight-chart-wrap { position: relative; height: 260px; }
+        .client-insight-chart-empty { display: grid; place-items: center; height: 100%; color: var(--color-text-muted); font-size: 12px; text-align: center; }
+        .client-insight-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+        .client-insight-metric { min-height: 76px; padding: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: #fff; }
+        .client-insight-metric span { display: block; color: var(--color-text-muted); font-size: 11px; font-weight: 700; }
+        .client-insight-metric strong { display: block; margin-block-start: 5px; color: var(--brand-active); font-size: 19px; line-height: 1.2; }
+        .client-insight-note { margin: var(--space-3) 0 0; color: var(--color-text-muted); font-size: 11px; line-height: 1.5; }
+        .client-ranking-list { display: grid; gap: var(--space-3); }
+        .client-ranking-item { display: flex; justify-content: space-between; gap: var(--space-3); padding-block-end: var(--space-3); border-block-end: 1px solid var(--color-border); }
+        .client-ranking-item:last-child { padding-block-end: 0; border-block-end: 0; }
+        .client-ranking-item span { color: var(--color-text-muted); font-size: 12px; }
+        .client-ranking-item strong { color: var(--brand-active); font-size: 14px; }
+        .client-ranking-badge { display: inline-flex; margin-block-start: var(--space-4); padding: 6px 10px; border-radius: 99px; background: var(--brand-subtle); color: var(--brand-active); font-size: 11px; font-weight: 700; }
+
         @media (max-width: 1023px) {
             .source-grid { grid-template-columns: 1fr; }
             .historical-summary-grid { grid-template-columns: 1fr; }
@@ -1368,6 +1560,10 @@
             .debtor-finder-criteria-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .debtor-finder-controls { display: contents; }
             .debtor-finder-actions { align-self: end; }
+            .client-profile-financials { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .client-profile-operational { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .client-profile-operational__item:nth-child(3), .client-profile-operational__item:nth-child(4) { border-block-start: 1px solid var(--color-border); }
+            .client-insights-charts, .client-insights-grid { grid-template-columns: 1fr; }
 
             body.suite-enabled .suite-screen .app-header__inner {
                 grid-template-columns: minmax(250px, 1fr) minmax(240px, auto) minmax(40px, 1fr);
@@ -1385,7 +1581,29 @@
             .dashboard-toolbar__actions { margin-inline-start: 0; }
         }
 
+        @media (max-width: 1180px) {
+            .current-year-metrics-layout { grid-template-columns: 1fr; }
+            .current-year-past-panel { display: grid; grid-template-columns: auto 1fr 1fr; gap: var(--space-4); align-items: center; }
+            .current-year-past-heading { margin: 0; padding: 0; border: 0; }
+            .current-year-past-row { padding: 0 var(--space-4); border-inline-start: 1px solid var(--color-border); }
+            .current-year-past-row + .current-year-past-row { border-block-start: 0; }
+        }
+        @media (max-width: 900px) {
+            .current-year-metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
         @media (max-width: 767px) {
+            .current-year-metrics-grid, .current-year-past-panel { grid-template-columns: 1fr; }
+            .current-year-past-row { padding: 10px 0; border-inline-start: 0; border-block-start: 1px solid var(--color-border); }
+            .current-year-past-row + .current-year-past-row { border-block-start: 1px solid var(--color-border); }
+
+            .client-profile-heading { flex-direction: column; }
+            .client-profile-badges { justify-content: flex-start; }
+            .client-profile-financials, .client-profile-operational { grid-template-columns: 1fr; }
+            .client-profile-operational__item { border-inline-start: 0; border-block-start: 1px solid var(--color-border); }
+            .client-profile-operational__item:first-child { border-block-start: 0; }
+            .collection-card-breakdown { grid-template-columns: 1fr; }
+            .collection-card-breakdown span + span { padding: 6px 0 0; border-inline-start: 0; border-block-start: 1px solid var(--color-border); }
+            .past-debt-summary { grid-template-columns: 1fr; }
             body.suite-enabled { padding-inline-start: 0; }
 
             .suite-sidebar {
@@ -1942,9 +2160,13 @@
 
             <section class="management-kpis" aria-label="מדדי שנת העבודה לשירותי מידע">
                 <article class="historical-kpi"><span>חיובים שהופקו</span><strong id="management-kpi-billed">₪0</strong><small>סך החיובים שהופקו בשנת העבודה</small></article>
-                <article class="historical-kpi"><span>גבייה שוטפת</span><strong id="management-kpi-collected">₪0</strong><small class="collection-breakdown"><span>מחשבוניות <b class="report-year-label"></b>: <b id="management-current-year-collected">₪0</b></span><span>מחשבוניות דצמבר <b class="previous-year-label"></b>: <b id="management-transition-collected">₪0</b></span></small></article>
+                <article class="historical-kpi"><span id="management-collection-title">גבייה שוטפת</span><strong id="management-kpi-collected">₪0</strong><small class="collection-card-breakdown"><span>חשבוניות <b class="report-year-label"></b><b id="management-current-year-collected">₪0</b></span><span id="management-transition-part">דצמבר <b class="previous-year-label"></b><b id="management-transition-collected">₪0</b></span></small></article>
                 <article class="historical-kpi"><span>חוב בפיגור</span><strong id="management-kpi-overdue">₪0</strong><small>חשבוניות פתוחות שמועד פירעונן עבר</small></article>
                 <article class="historical-kpi"><span>צפי גבייה עתידי</span><strong id="management-kpi-future">₪0</strong><small>חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></article>
+            </section>
+            <section class="past-debt-summary" aria-label="חוב משנים קודמות בשירותי מידע">
+                <article id="management-historical-card" class="past-debt-card past-debt-card--collected hidden"><span>נגבה בשנת <b class="report-year-label"></b></span><strong id="management-historical-collected">₪0</strong><small>חובות משנים קודמות שנגבו בשנת העבודה</small></article>
+                <article class="past-debt-card past-debt-card--open"><span>חוב שטרם נגבה</span><strong id="management-past-open">₪0</strong><small>יתרת חוב פתוחה משנים קודמות</small></article>
             </section>
 
             <div class="historical-analysis-stack" aria-label="חיובים וגבייה בשנה הנוכחית">
@@ -2090,9 +2312,13 @@
 
             <section class="management-kpis" aria-label="מדדי שנת העבודה לאגרות העברת בעלות">
                 <article class="historical-kpi"><span>חיובים שהופקו</span><strong id="fees-management-kpi-billed">₪0</strong><small>סך החיובים שהופקו בשנת העבודה</small></article>
-                <article class="historical-kpi"><span>גבייה שוטפת</span><strong id="fees-management-kpi-collected">₪0</strong><small class="collection-breakdown"><span>מחשבוניות <b class="report-year-label"></b>: <b id="fees-management-current-year-collected">₪0</b></span><span>מחשבוניות דצמבר <b class="previous-year-label"></b>: <b id="fees-management-transition-collected">₪0</b></span></small></article>
+                <article class="historical-kpi"><span id="fees-management-collection-title">גבייה שוטפת</span><strong id="fees-management-kpi-collected">₪0</strong><small class="collection-card-breakdown"><span>חשבוניות <b class="report-year-label"></b><b id="fees-management-current-year-collected">₪0</b></span><span id="fees-management-transition-part">דצמבר <b class="previous-year-label"></b><b id="fees-management-transition-collected">₪0</b></span></small></article>
                 <article class="historical-kpi"><span>חוב בפיגור</span><strong id="fees-management-kpi-overdue">₪0</strong><small>חשבוניות פתוחות שמועד פירעונן עבר</small></article>
                 <article class="historical-kpi"><span>צפי גבייה עתידי</span><strong id="fees-management-kpi-future">₪0</strong><small>חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></article>
+            </section>
+            <section class="past-debt-summary" aria-label="חוב משנים קודמות באגרות העברת בעלות">
+                <article id="fees-management-historical-card" class="past-debt-card past-debt-card--collected hidden"><span>נגבה בשנת <b class="report-year-label"></b></span><strong id="fees-management-historical-collected">₪0</strong><small>חובות משנים קודמות שנגבו בשנת העבודה</small></article>
+                <article class="past-debt-card past-debt-card--open"><span>חוב שטרם נגבה</span><strong id="fees-management-past-open">₪0</strong><small>יתרת חוב פתוחה משנים קודמות</small></article>
             </section>
 
             <section class="management-report-section" aria-labelledby="fees-management-monthly-title">
@@ -2312,70 +2538,12 @@
 
         <main class="max-w-[1600px] w-full mx-auto p-6 space-y-6 flex-grow no-print">
             
-            <!-- KPIs reorganised section -->
-            <div id="kpi-container" class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch">
-                <!-- אזור 1: שנה נוכחית (תופס 4 עמודות) -->
-                <div class="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-200 flex flex-col justify-between">
-                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">
-                        <i class="fa-solid fa-calendar-day text-blue-600"></i>
-                        <span>מדדי שנה נוכחית (<span class="report-year-label"></span>)</span>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 flex-grow items-stretch">
-                        <!-- חיובים -->
-                        <div class="bg-slate-50/70 border border-slate-200 p-4 rounded-xl flex flex-col justify-between">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-slate-500 font-bold text-xs">חיובים שהופקו</span>
-                                <i class="fa-solid fa-money-bill-wave text-emerald-600"></i>
-                            </div>
-                            <div class="text-2xl font-bold text-emerald-700 mt-2" id="kpi-current-revenue">₪0</div>
-                            <div class="text-[11px] text-slate-400 font-bold mt-1">סך החיובים שהופקו בשנת העבודה</div>
-                        </div>
-                        <!-- גבייה שוטפת -->
-                        <div class="bg-slate-50/70 border border-slate-200 p-4 rounded-xl flex flex-col justify-between">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-slate-500 font-bold text-xs">גבייה שוטפת</span>
-                                <i class="fa-solid fa-circle-check text-blue-600"></i>
-                            </div>
-                            <div class="text-2xl font-bold text-blue-800 mt-2" id="kpi-current-collected">₪0</div>
-                            <div class="collection-breakdown"><span>מחשבוניות <b class="report-year-label"></b>: <b id="kpi-current-year-collected">₪0</b></span><span>מחשבוניות דצמבר <b class="previous-year-label"></b>: <b id="kpi-transition-collected">₪0</b></span></div>
-                        </div>
-                        <!-- חוב שנה נוכחית -->
-                        <div onclick="setKpiFilter('overdue')" class="bg-slate-50/70 border border-slate-200 p-4 rounded-xl cursor-pointer hover:border-red-300 transition-all flex flex-col justify-between">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-slate-500 font-bold text-xs">חוב בפיגור</span>
-                                <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
-                            </div>
-                            <div class="text-2xl font-bold text-red-700 mt-2" id="kpi-current-overdue">₪0</div>
-                            <div class="text-[11px] text-slate-400 font-bold mt-1">חשבוניות פתוחות שמועד פירעונן עבר</div>
-                        </div>
-                        <!-- צפי גבייה עתידי -->
-                        <div onclick="setKpiFilter('future')" class="bg-slate-50/70 border border-slate-200 p-4 rounded-xl cursor-pointer hover:border-emerald-300 transition-all flex flex-col justify-between">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-slate-500 font-bold text-xs">צפי גבייה עתידי</span>
-                                <i class="fa-solid fa-clock text-emerald-600"></i>
-                            </div>
-                            <div class="text-2xl font-bold text-emerald-700 mt-2" id="kpi-current-future">₪0</div>
-                            <div class="text-[11px] text-slate-400 font-bold mt-1">חשבוניות פתוחות שמועד פירעונן טרם הגיע</div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Shared current-year metrics component -->
+            <div id="kpi-container"></div>
 
-                <!-- אזור 2: שנים קודמות (תופס עמודה 1 בצד) -->
-                <div class="lg:col-span-1 bg-white p-5 rounded-2xl border border-slate-200 flex flex-col justify-between h-full">
-                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">
-                        <i class="fa-solid fa-history text-amber-600"></i>
-                        <span>שנים קודמות</span>
-                    </div>
-                    <div class="bg-amber-50/40 border border-amber-200/80 p-4 rounded-xl flex-grow flex flex-col justify-between">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-slate-600 font-bold text-xs">חוב שנים קודמות</span>
-                            <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
-                        </div>
-                        <div class="text-2xl font-bold text-red-700 my-auto py-2" id="kpi-past-overdue">₪0</div>
-                        <div class="text-[11px] text-slate-400 font-bold">חוב עבר מצטבר</div>
-                    </div>
-                </div>
-            </div>
+            <!-- תקציר ותובנות לקוח            <!-- תקציר ותובנות לקוח מוצגים בראש כרטסת הלקוח בלבד -->
+            <div id="client-profile-container" class="hidden"></div>
+            <div id="client-insights-container" class="hidden"></div>
 
             <!-- Table Area -->
             <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[450px]">
@@ -2517,31 +2685,10 @@
 
         <!-- Main Dashboard content -->
         <main class="max-w-[1600px] w-full mx-auto p-6 space-y-6 flex-grow">
-            <!-- KPIs -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 print-row-layout">
-                <div class="dashboard-kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
-                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">חיובים שהופקו</p>
-                    <p id="db-kpi-billed" class="text-3xl font-bold text-blue-900 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</p>
-                    <p class="text-[11px] text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">סך החיובים שהופקו בשנת העבודה</p>
-                </div>
-                <div class="dashboard-kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
-                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">גבייה שוטפת</p>
-                    <p id="db-kpi-collected" class="text-3xl font-bold text-emerald-700 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</p>
-                    <div class="collection-breakdown" style="font-family: Arial, Helvetica, sans-serif !important;"><span>מחשבוניות <b class="report-year-label"></b>: <b id="db-current-year-collected">₪0</b></span><span>מחשבוניות דצמבר <b class="previous-year-label"></b>: <b id="db-transition-collected">₪0</b></span></div>
-                </div>
-                <div class="dashboard-kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
-                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">חוב בפיגור</p>
-                    <p id="db-kpi-debt" class="text-3xl font-bold text-red-700 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</p>
-                    <p class="text-[11px] text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">חשבוניות פתוחות שמועד פירעונן עבר</p>
-                </div>
-                <div class="dashboard-kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-200 print-col-layout flex flex-col justify-between">
-                    <p class="text-slate-400 font-bold text-xs uppercase tracking-wider mb-1" style="font-family: Arial, Helvetica, sans-serif !important;">צפי גבייה עתידי</p>
-                    <p id="db-kpi-future" class="text-3xl font-bold text-emerald-700 font-sans" style="font-family: Arial, Helvetica, sans-serif !important;">₪0</p>
-                    <p class="text-[11px] text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">חשבוניות פתוחות שמועד פירעונן טרם הגיע</p>
-                </div>
-            </div>
+            <!-- Shared current-year metrics component -->
+            <div id="dashboard-current-year-metrics"></div>
 
-            <!-- Half-Half Grid -->
+            <!-- Half-Half Grid -->            <!-- Half-Half Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col h-auto">
                     <h3 class="font-bold text-slate-700 mb-3 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
@@ -2634,6 +2781,8 @@
         let exportContext = 'debt'; 
         let path = { sector: null, orgName: null };
         let myChart = null;
+        let clientMonthlyChart = null;
+        let clientAgeChart = null;
         let showClientPct = true; 
         let showClientMorale = false; 
         let currentOrgList = []; 
@@ -3111,28 +3260,83 @@
             }
         }
 
+        function renderCurrentYearMetricsComponent(containerId, prefix, metrics, options = {}) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const composition = metrics.collectionComposition;
+            const interactive = Boolean(options.interactive);
+            const actionAttributes = filter => interactive
+                ? `class="current-year-metric-card current-year-metric-card--interactive" role="button" tabindex="0" onclick="setKpiFilter('${filter}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setKpiFilter('${filter}')}"`
+                : 'class="current-year-metric-card"';
+            const transitionRow = composition.hasHistoricalSource
+                ? `<div class="current-year-metrics-breakdown__row"><span>דצמבר ${CURRENT_YEAR - 1}</span><b>${formatCurrency(composition.transitionCollected)}</b></div>`
+                : '';
+            const historicalCollected = composition.hasHistoricalSource
+                ? `<div class="current-year-past-row current-year-past-row--collected"><span>נגבה בשנת ${CURRENT_YEAR}</span><strong>${formatCurrency(composition.historicalCollected)}</strong></div>`
+                : '';
+
+            container.innerHTML = `<section class="current-year-metrics-layout" aria-label="מדדי שנה נוכחית וחוב משנים קודמות">
+                <div class="current-year-metrics-panel">
+                    <h2 class="current-year-metrics-heading">מדדי שנה נוכחית (${CURRENT_YEAR})</h2>
+                    <div class="current-year-metrics-grid">
+                        <article class="current-year-metric-card">
+                            <span class="current-year-metric-label">חיובים שהופקו<i class="fa-solid fa-money-bill-wave" aria-hidden="true"></i></span>
+                            <strong id="${prefix}-metric-billed" class="current-year-metric-value current-year-metric-value--billed">${formatCurrency(metrics.billed)}</strong>
+                            <small class="current-year-metric-note">סך החיובים שהופקו בשנת העבודה</small>
+                        </article>
+                        <article class="current-year-metric-card">
+                            <span class="current-year-metric-label">גבייה שוטפת<i class="fa-solid fa-circle-check" aria-hidden="true"></i></span>
+                            <strong id="${prefix}-metric-collected" class="current-year-metric-value current-year-metric-value--collected">${formatCurrency(composition.ongoingCollected)}</strong>
+                            <div class="current-year-metrics-breakdown">
+                                <div class="current-year-metrics-breakdown__row"><span>חשבוניות ${CURRENT_YEAR}</span><b>${formatCurrency(composition.currentYearCollected)}</b></div>
+                                ${transitionRow}
+                            </div>
+                        </article>
+                        <article ${actionAttributes('overdue')}>
+                            <span class="current-year-metric-label">חוב בפיגור<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>
+                            <strong id="${prefix}-metric-overdue" class="current-year-metric-value current-year-metric-value--overdue">${formatCurrency(metrics.overdue)}</strong>
+                            <small class="current-year-metric-note">חשבוניות פתוחות שמועד פירעונן עבר</small>
+                        </article>
+                        <article ${actionAttributes('future')}>
+                            <span class="current-year-metric-label">צפי גבייה עתידי<i class="fa-solid fa-clock" aria-hidden="true"></i></span>
+                            <strong id="${prefix}-metric-future" class="current-year-metric-value current-year-metric-value--future">${formatCurrency(metrics.future)}</strong>
+                            <small class="current-year-metric-note">חשבוניות פתוחות שמועד פירעונן טרם הגיע</small>
+                        </article>
+                    </div>
+                </div>
+                <aside class="current-year-past-panel">
+                    <h2 class="current-year-past-heading">חוב משנים קודמות</h2>
+                    ${historicalCollected}
+                    <div class="current-year-past-row current-year-past-row--open"><span>חוב שטרם נגבה</span><strong>${formatCurrency(metrics.pastOpen)}</strong></div>
+                </aside>
+            </section>`;
+        }
+
         // --- Render Dashboard ---
         function renderDashboard() {
             const dashRevenues = revenueDb.filter(r => getRevenueYear(r) === CURRENT_YEAR && isDashboardMatch(r));
             const dashDebts = db.filter(r => r.dueDate.getFullYear() === CURRENT_YEAR && isDashboardMatch(r));
+            const dashPastDebts = db.filter(r => isValidDate(r.dueDate) && r.dueDate.getFullYear() < CURRENT_YEAR && isDashboardMatch(r));
 
             const totalBilled = dashRevenues.reduce((acc, r) => acc + r.amount, 0);
             const totalDebt = dashDebts.reduce((acc, r) => acc + r.amount, 0);
             const totalCollected = Math.max(0, totalBilled - totalDebt);
-            const transitionCollected = sumYearTransitionCollections(isDashboardMatch);
-            const currentCollectionTotal = totalCollected + transitionCollected;
+            const collectionComposition = getCollectionComposition(totalCollected, isDashboardMatch);
+            const transitionCollected = collectionComposition.transitionCollected;
+            const currentCollectionTotal = collectionComposition.ongoingCollected;
 
             const debtOverdue = dashDebts.filter(r => r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
             const debtFuture = dashDebts.filter(r => !r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
 
             const collectionRate = totalBilled > 0 ? (totalCollected / totalBilled * 100).toFixed(1) : "0.0";
 
-            document.getElementById('db-kpi-billed').innerText = formatCurrency(totalBilled);
-            document.getElementById('db-kpi-collected').innerText = formatCurrency(currentCollectionTotal);
-            document.getElementById('db-current-year-collected').innerText = formatCurrency(totalCollected);
-            document.getElementById('db-transition-collected').innerText = formatYearTransitionCollection(transitionCollected);
-            document.getElementById('db-kpi-debt').innerText = formatCurrency(debtOverdue);
-            document.getElementById('db-kpi-future').innerText = formatCurrency(debtFuture);
+            renderCurrentYearMetricsComponent('dashboard-current-year-metrics', 'db', {
+                billed: totalBilled,
+                collectionComposition,
+                overdue: debtOverdue,
+                future: debtFuture,
+                pastOpen: dashPastDebts.reduce((sum, row) => sum + row.amount, 0)
+            });
 
             const monthlyBilled = Array(12).fill(0);
             const monthlyUnpaid = Array(12).fill(0);
@@ -3174,7 +3378,7 @@
                     <td class="p-2 text-left text-indigo-700" style="font-family: Arial, Helvetica, sans-serif !important;">${totalRate}</td>
                 </tr>
             `;
-            tableHTML += yearTransitionTableFooter(transitionCollected, sumCollected, 'p-2 border-b text-left');
+            tableHTML += collectionCompositionTableFooter(collectionComposition, 'p-2 border-b text-left');
             document.getElementById('db-monthly-table-body').innerHTML = tableHTML;
 
             const ctx = document.getElementById('dashChartCanvas').getContext('2d');
@@ -3347,14 +3551,17 @@
 
                 const rRows = revenueDb.filter(r => getRevenueYear(r) === CURRENT_YEAR && isDashboardMatch(r));
                 const dRows = db.filter(r => r.dueDate.getFullYear() === CURRENT_YEAR && isDashboardMatch(r));
+                const pastRows = db.filter(r => isValidDate(r.dueDate) && r.dueDate.getFullYear() < CURRENT_YEAR && isDashboardMatch(r));
+                const pastOpenDebt = pastRows.reduce((sum, row) => sum + row.amount, 0);
 
                 const totalBilled = rRows.reduce((acc, r) => acc + r.amount, 0);
                 const totalDebt = dRows.reduce((acc, r) => acc + r.amount, 0);
                 const debtOverdue = dRows.filter(r => r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
                 const debtFuture = dRows.filter(r => !r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
                 const totalCollected = Math.max(0, totalBilled - totalDebt);
-                const transitionCollected = sumYearTransitionCollections(isDashboardMatch);
-                const currentCollectionTotal = totalCollected + transitionCollected;
+                const collectionComposition = getCollectionComposition(totalCollected, isDashboardMatch);
+                const transitionCollected = collectionComposition.transitionCollected;
+                const currentCollectionTotal = collectionComposition.ongoingCollected;
                 const collectionRate = totalBilled > 0 ? (totalCollected / totalBilled * 100).toFixed(1) : "0.0";
 
                 const monthlyBilled = Array(12).fill(0);
@@ -3375,10 +3582,11 @@
                         
                         <div class="kpis">
                             <div class="kpi-card"><div class="kpi-title">חיובים שהופקו</div><div class="kpi-value" style="color:#1e3a8a">${formatCurrency(totalBilled)}</div></div>
-                            <div class="kpi-card"><div class="kpi-title">גבייה שוטפת</div><div class="kpi-value" style="color:#047857">${formatCurrency(currentCollectionTotal)}</div><small>מחשבוניות ${CURRENT_YEAR}: ${formatCurrency(totalCollected)}<br>מחשבוניות דצמבר ${CURRENT_YEAR - 1}: ${formatYearTransitionCollection(transitionCollected)}</small></div>
+                            <div class="kpi-card"><div class="kpi-title">גבייה שוטפת</div><div class="kpi-value" style="color:#047857">${formatCurrency(currentCollectionTotal)}</div>${buildCollectionCardBreakdown(collectionComposition)}</div>
                             <div class="kpi-card"><div class="kpi-title">חוב בפיגור</div><div class="kpi-value" style="color:#b91c1c">${formatCurrency(debtOverdue)}</div></div>
                             <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${formatCurrency(debtFuture)}</div></div>
                         </div>
+                        ${buildPastDebtSummary(pastOpenDebt, collectionComposition)}
 
                         <h3>חיובים וגבייה לפי חודש הפקת החשבונית</h3>
                         <table>
@@ -3408,7 +3616,7 @@
                                     <td style="text-align:left; color:#047857">${formatCurrency(totalCollected)}</td>
                                     <td style="text-align:left; color:#4338ca">${collectionRate}%</td>
                                 </tr>
-                                ${yearTransitionTableFooter(transitionCollected, totalCollected)}
+                                ${collectionCompositionTableFooter(collectionComposition)}
                             </tbody>
                         </table>
                     </section>
@@ -3444,15 +3652,15 @@
             const pastYearsOverdue = pastYearsDebts.filter(r => r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
 
             const currentYearCollected = Math.max(0, currentYearBilled - (currentYearOverdue + currentYearFuture));
-            const transitionCollected = sumYearTransitionCollections(isTypeMatch);
+            const collectionComposition = getCollectionComposition(currentYearCollected, isTypeMatch);
 
-            document.getElementById('kpi-current-revenue').innerText = formatCurrency(currentYearBilled);
-            document.getElementById('kpi-current-collected').innerText = formatCurrency(currentYearCollected + transitionCollected);
-            document.getElementById('kpi-current-year-collected').innerText = formatCurrency(currentYearCollected);
-            document.getElementById('kpi-transition-collected').innerText = formatYearTransitionCollection(transitionCollected);
-            document.getElementById('kpi-current-overdue').innerText = formatCurrency(currentYearOverdue);
-            document.getElementById('kpi-current-future').innerText = formatCurrency(currentYearFuture);
-            document.getElementById('kpi-past-overdue').innerText = formatCurrency(pastYearsOverdue);
+            renderCurrentYearMetricsComponent('kpi-container', 'kpi', {
+                billed: currentYearBilled,
+                collectionComposition,
+                overdue: currentYearOverdue,
+                future: currentYearFuture,
+                pastOpen: pastYearsOverdue
+            }, { interactive: true });
 
             renderView();
         }
@@ -3788,7 +3996,19 @@
             const btnExportClients = document.getElementById('btn-export-clients');
             const listFilterContainer = document.getElementById('list-filter-container');
             const lvl2FilterContainer = document.getElementById('lvl2-filter-container');
+            const clientProfileContainer = document.getElementById('client-profile-container');
+            const clientInsightsContainer = document.getElementById('client-insights-container');
             const clientQueryContainer = document.getElementById('client-query-container');
+            if (clientProfileContainer) {
+                clientProfileContainer.classList.add('hidden');
+                clientProfileContainer.innerHTML = '';
+            }
+            if (clientMonthlyChart) { clientMonthlyChart.destroy(); clientMonthlyChart = null; }
+            if (clientAgeChart) { clientAgeChart.destroy(); clientAgeChart = null; }
+            if (clientInsightsContainer) {
+                clientInsightsContainer.classList.add('hidden');
+                clientInsightsContainer.innerHTML = '';
+            }
             if (clientQueryContainer) {
                 clientQueryContainer.classList.add('hidden');
                 clientQueryContainer.innerHTML = '';
@@ -4088,12 +4308,316 @@
                 }
 
                 view.innerHTML = html;
+                const clientProfileHtml = buildClientProfileSection(path.orgName);
+                if (clientProfileContainer && clientProfileHtml) {
+                    clientProfileContainer.innerHTML = clientProfileHtml;
+                    clientProfileContainer.classList.remove('hidden');
+                }
+                const clientInsightsHtml = buildClientInsightsSection(path.orgName);
+                if (clientInsightsContainer && clientInsightsHtml) {
+                    clientInsightsContainer.innerHTML = clientInsightsHtml;
+                    clientInsightsContainer.classList.remove('hidden');
+                    requestAnimationFrame(() => renderClientInsightCharts(path.orgName));
+                }
                 const clientQueryData = getClientQueryData(path.orgName);
                 if (clientQueryContainer && clientQueryData.length) {
                     clientQueryContainer.innerHTML = buildClientQuerySection(path.orgName);
                     clientQueryContainer.classList.remove('hidden');
                     requestAnimationFrame(() => renderQueryCharts('client-query', clientQueryData));
                 }
+            }
+        }
+
+
+function getClientProfileMetrics(orgName) {
+            const clientRows = db.filter(row => row.name === orgName && isTypeMatch(row));
+            const overdueRows = clientRows.filter(row => row.isOverdue);
+            const futureRows = clientRows.filter(row => !row.isOverdue);
+            const currentYearChargesRows = revenueDb.filter(row => row.name === orgName && getRevenueYear(row) === CURRENT_YEAR && isTypeMatch(row));
+            const currentYearOpenRows = clientRows.filter(row => isValidDate(row.dueDate) && row.dueDate.getFullYear() === CURRENT_YEAR);
+            const pastOpenRows = clientRows.filter(row => isValidDate(row.dueDate) && row.dueDate.getFullYear() < CURRENT_YEAR);
+            const currentYearCharges = currentYearChargesRows.reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+            const currentYearOpen = currentYearOpenRows.reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+            const pastOpenDebt = pastOpenRows.reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+            const currentYearCollected = Math.max(0, currentYearCharges - currentYearOpen);
+            const collectionComposition = getCollectionComposition(currentYearCollected, row => row.name === orgName && isTypeMatch(row));
+            const overdueDebt = overdueRows.reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+            const futurePayments = futureRows.reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+            const collectionRate = currentYearCharges > 0 ? currentYearCollected / currentYearCharges * 100 : null;
+            const validOverdueDates = overdueRows.filter(row => isValidDate(row.dueDate)).map(row => row.dueDate);
+            const oldestDueDate = validOverdueDates.length ? new Date(Math.min(...validOverdueDates.map(date => date.getTime()))) : null;
+            const maximumDays = oldestDueDate ? Math.max(0, Math.floor((TODAY - oldestDueDate) / 86400000)) : 0;
+            const representativeRow = clientRows[0] || currentYearChargesRows[0] || db.find(row => row.name === orgName) || revenueDb.find(row => row.name === orgName);
+            return {
+                clientRows,
+                overdueRows,
+                futureRows,
+                currentYearChargesRows,
+                currentYearOpenRows,
+                pastOpenRows,
+                currentYearCharges,
+                currentYearCollected,
+                collectionComposition,
+                totalCollected: collectionComposition.ongoingCollected,
+                pastOpenDebt,
+                overdueDebt,
+                futurePayments,
+                collectionRate,
+                oldestDueDate,
+                maximumDays,
+                sector: representativeRow?.sector || path.sector || '',
+                clientCode: getClientCode(orgName),
+                payerCodes: getPayerCodes(orgName)
+            };
+        }
+
+        function buildClientProfileSection(orgName) {
+            const metrics = getClientProfileMetrics(orgName);
+            const activityLabel = incomeFilter === 'info' ? 'שירותי מידע' : (incomeFilter === 'fees' ? 'אגרות העברת בעלות' : 'כל תחומי הפעילות');
+            const payerLabel = metrics.payerCodes.join(', ');
+            return `<section class="client-profile-section" aria-labelledby="client-profile-title">
+                <div class="client-profile-heading">
+                    <div class="client-profile-title">
+                        <span class="client-profile-title__icon"><i class="fa-solid fa-address-card" aria-hidden="true"></i></span>
+                        <div><h3 id="client-profile-title">${escapeHtml(orgName)}</h3><p>תמונת מצב מרוכזת ללקוח לפי הקבצים והמסננים הפעילים</p></div>
+                    </div>
+                    <div class="client-profile-heading__side">
+                        <button type="button" class="client-profile-print-button no-print" onclick="printCurrentClientProfile()"><i class="fa-solid fa-print" aria-hidden="true"></i>הדפס כרטיס לקוח</button>
+                        <div class="client-profile-badges">
+                        ${metrics.clientCode ? `<span class="client-profile-badge"><i class="fa-solid fa-id-card" aria-hidden="true"></i>לקוח במרכבה: <bdi dir="ltr">${escapeHtml(metrics.clientCode)}</bdi></span>` : ''}
+                        ${payerLabel ? '<span class="client-profile-badge"><i class="fa-solid fa-receipt" aria-hidden="true"></i>קוד גורם משלם: <bdi dir="ltr">' + escapeHtml(payerLabel) + '</bdi></span>' : ''}
+                        <span class="client-profile-badge"><i class="fa-solid fa-layer-group" aria-hidden="true"></i>${escapeHtml(metrics.sector || 'סקטור לא ידוע')}</span>
+                        <span class="client-profile-badge"><i class="fa-solid fa-briefcase" aria-hidden="true"></i>${activityLabel}</span>
+                        <span class="client-profile-badge"><i class="fa-solid fa-calendar" aria-hidden="true"></i>שנת עבודה ${CURRENT_YEAR}</span>
+                        ${hasDirectDebit(orgName) ? '<span class="client-profile-badge client-profile-badge--direct"><i class="fa-solid fa-building-columns" aria-hidden="true"></i>משלם בהוראת קבע</span>' : ''}
+                        </div>
+                    </div>
+                </div>
+                <div class="client-profile-financials">
+                    <article class="client-profile-kpi"><div class="client-profile-kpi__label"><span>חיובים בשנת ${CURRENT_YEAR}</span><i class="fa-solid fa-file-invoice-dollar"></i></div><strong>${formatCurrency(metrics.currentYearCharges)}</strong><small>סך החשבוניות שהופקו בשנת העבודה</small></article>
+                    <article class="client-profile-kpi client-profile-kpi--collection"><div class="client-profile-kpi__label"><span>גבייה שוטפת</span><i class="fa-solid fa-circle-check"></i></div><strong>${formatCurrency(metrics.totalCollected)}</strong>${buildCollectionCardBreakdown(metrics.collectionComposition)}</article>
+                    <article class="client-profile-kpi client-profile-kpi--debt"><div class="client-profile-kpi__label"><span>חוב בפיגור</span><i class="fa-solid fa-triangle-exclamation"></i></div><strong>${formatCurrency(metrics.overdueDebt)}</strong><small>חשבוניות פתוחות שמועד פירעונן עבר</small></article>
+                    <article class="client-profile-kpi client-profile-kpi--future"><div class="client-profile-kpi__label"><span>תשלומים עתידיים</span><i class="fa-solid fa-clock"></i></div><strong>${formatCurrency(metrics.futurePayments)}</strong><small>חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></article>
+                    <article class="client-profile-kpi"><div class="client-profile-kpi__label"><span>שיעור גבייה</span><i class="fa-solid fa-percent"></i></div><strong>${metrics.collectionRate === null ? 'אין נתון' : metrics.collectionRate.toFixed(1) + '%'}</strong><small>גבייה מחשבוניות ${CURRENT_YEAR} מתוך החיובים בשנה</small></article>
+                </div>
+                ${buildPastDebtSummary(metrics.pastOpenDebt, metrics.collectionComposition)}
+                <div class="client-profile-operational">
+                    <div class="client-profile-operational__item"><span>חשבוניות בפיגור</span><strong>${metrics.overdueRows.length.toLocaleString('he-IL')}</strong></div>
+                    <div class="client-profile-operational__item"><span>חשבוניות עתידיות</span><strong>${metrics.futureRows.length.toLocaleString('he-IL')}</strong></div>
+                    <div class="client-profile-operational__item"><span>מועד הפירעון הישן ביותר</span><strong>${metrics.oldestDueDate ? metrics.oldestDueDate.toLocaleDateString('he-IL') : 'אין חוב בפיגור'}</strong></div>
+                    <div class="client-profile-operational__item"><span>ימי פיגור מרביים</span><strong>${metrics.overdueRows.length ? metrics.maximumDays.toLocaleString('he-IL') + ' ימים' : 'אין חוב בפיגור'}</strong></div>
+                </div>
+            </section>`;
+        }
+
+        function printCurrentClientProfile() {
+            const orgName = path.orgName;
+            const profileSource = document.querySelector('#client-profile-container .client-profile-section');
+            const insightsSource = document.querySelector('#client-insights-container .client-insights-section');
+            if (!orgName || !profileSource) {
+                alert('לא נמצא כרטיס לקוח להדפסה.');
+                return;
+            }
+
+            const profileClone = profileSource.cloneNode(true);
+            profileClone.querySelectorAll('.no-print').forEach(element => element.remove());
+            const insightsClone = insightsSource ? insightsSource.cloneNode(true) : null;
+            if (insightsClone) {
+                [
+                    ['client-monthly-insight-chart', clientMonthlyChart],
+                    ['client-age-insight-chart', clientAgeChart]
+                ].forEach(([canvasId, chart]) => {
+                    const canvas = insightsClone.querySelector('#' + canvasId);
+                    if (!canvas || !chart) return;
+                    const image = document.createElement('img');
+                    image.src = chart.toBase64Image();
+                    image.alt = canvas.getAttribute('aria-label') || '';
+                    image.className = 'client-print-chart';
+                    canvas.replaceWith(image);
+                });
+            }
+
+            const win = window.open('', '_blank');
+            if (!win) {
+                alert('פתיחת חלון ההדפסה נחסמה.');
+                return;
+            }
+            const title = 'כרטיס לקוח - ' + orgName;
+            win.document.write(`<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title>
+                ${getClientDocumentPrintStyles()}
+                <style>
+                    .document-title{margin:8px 0 18px}.client-profile-section,.client-insights-section{border:1px solid var(--print-border);border-radius:10px;padding:16px;margin-bottom:18px;background:#fff}
+                    .client-profile-heading{display:flex;justify-content:space-between;gap:14px;padding-bottom:12px;border-bottom:1px solid var(--print-border)}
+                    .client-profile-title{display:flex;gap:10px;align-items:center}.client-profile-title__icon{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--print-brand-soft);color:var(--print-brand)}
+                    .client-profile-title h3{margin:0;color:var(--print-brand);font-size:17px}.client-profile-title p{margin:3px 0 0;color:var(--print-muted);font-size:9px}
+                    .client-profile-heading__side{display:block}.client-profile-badges{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}.client-profile-badge{padding:4px 7px;border:1px solid var(--print-border);border-radius:99px;color:var(--print-muted);font-size:8px;font-weight:700}
+                    .client-profile-financials{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}.client-profile-kpi{min-height:84px;padding:9px;border:1px solid var(--print-border);border-radius:8px;background:var(--print-surface)}
+                    .client-profile-kpi__label{display:flex;justify-content:space-between;color:var(--print-muted);font-size:8px;font-weight:700}.client-profile-kpi strong{display:block;margin-top:7px;color:var(--print-brand);font-size:15px}.client-profile-kpi--collection strong,.client-profile-kpi--future strong{color:var(--print-success)}.client-profile-kpi--debt strong{color:var(--print-danger)}.client-profile-kpi small{display:block;margin-top:4px;color:var(--print-muted);font-size:7.5px}
+                    .client-profile-operational{display:grid;grid-template-columns:repeat(4,1fr);margin-top:10px;border:1px solid var(--print-border);border-radius:8px}.client-profile-operational__item{padding:8px;border-inline-start:1px solid var(--print-border)}.client-profile-operational__item:first-child{border:0}.client-profile-operational__item span{display:block;color:var(--print-muted);font-size:7.5px}.client-profile-operational__item strong{display:block;margin-top:3px;font-size:10px}
+                    .client-insights-section__header{display:flex;gap:8px;padding-bottom:9px;border-bottom:1px solid var(--print-border)}.client-insights-section__header h3{margin:0;color:var(--print-brand);font-size:15px}.client-insights-section__header p{margin:2px 0 0;color:var(--print-muted);font-size:8px}
+                    .client-insights-charts,.client-insights-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.client-insight-card{padding:10px;border:1px solid var(--print-border);border-radius:8px;break-inside:avoid}.client-insight-card h4{margin:0 0 7px;color:var(--print-text);font-size:10px}.client-print-chart{display:block;width:100%;height:150px;object-fit:contain}.client-insight-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.client-insight-metric,.client-ranking-item{padding:6px;background:var(--print-surface);border-radius:5px}.client-insight-metric span,.client-ranking-item span{display:block;color:var(--print-muted);font-size:7.5px}.client-insight-metric strong,.client-ranking-item strong{display:block;margin-top:2px;font-size:9px}.client-ranking-list{display:grid;gap:5px}.client-ranking-badge{display:inline-block;margin-top:6px;color:var(--print-danger);font-size:8px;font-weight:700}.client-insight-note{margin:6px 0 0;color:var(--print-muted);font-size:7px}
+                    .collection-card-breakdown{display:grid;gap:2px;margin-top:4px;color:var(--print-muted);font-size:7px}.collection-card-breakdown span{display:flex;justify-content:space-between;gap:5px}.collection-card-breakdown b{color:var(--print-text);font-size:7px}.past-debt-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}.past-debt-card{padding:8px;border:1px solid var(--print-border);border-radius:7px}.past-debt-card span,.past-debt-card small{display:block;color:var(--print-muted);font-size:7.5px}.past-debt-card strong{display:block;margin:3px 0;font-size:12px}.past-debt-card--open strong{color:var(--print-danger)}.past-debt-card--collected strong{color:var(--print-success)}
+                    @page{size:A4 portrait;margin:0}
+                </style></head><body>
+                ${getClientDocumentPageStart(title)}
+                <h1 class="document-title">${escapeHtml(title)}</h1>
+                ${profileClone.outerHTML}
+                ${insightsClone ? insightsClone.outerHTML : ''}
+                ${getClientDocumentPageEnd()}
+                <script>window.addEventListener('load',function(){window.focus();setTimeout(function(){window.print()},350)});<\/script>
+                </body></html>`);
+            win.document.close();
+        }
+
+        function getClientAgeBuckets(overdueRows) {
+            const buckets = [
+                { label: 'עד 30 ימים', min: 0, max: 30, sum: 0, count: 0 },
+                { label: '31 עד 90 ימים', min: 31, max: 90, sum: 0, count: 0 },
+                { label: '91 עד 180 ימים', min: 91, max: 180, sum: 0, count: 0 },
+                { label: '181 עד 365 ימים', min: 181, max: 365, sum: 0, count: 0 },
+                { label: 'מעל שנה', min: 366, max: Infinity, sum: 0, count: 0 }
+            ];
+            overdueRows.forEach(row => {
+                const days = isValidDate(row.dueDate) ? Math.max(0, Math.floor((TODAY - row.dueDate) / 86400000)) : 0;
+                const bucket = buckets.find(item => days >= item.min && days <= item.max) || buckets[0];
+                bucket.sum += Number(row.amount) || 0;
+                bucket.count += 1;
+            });
+            return buckets;
+        }
+
+        function buildClientInsightsSection(orgName) {
+            const metrics = getClientProfileMetrics(orgName);
+            if (!metrics.currentYearChargesRows.length && !metrics.overdueRows.length) return '';
+
+            const totalDebt = metrics.overdueDebt;
+            const dayValues = metrics.overdueRows.filter(row => isValidDate(row.dueDate)).map(row => Math.max(0, Math.floor((TODAY - row.dueDate) / 86400000)));
+            const averageDays = dayValues.length ? Math.round(dayValues.reduce((sum, days) => sum + days, 0) / dayValues.length) : 0;
+            const averageInvoice = metrics.overdueRows.length ? totalDebt / metrics.overdueRows.length : 0;
+            const debtRatio = metrics.currentYearCharges > 0 ? totalDebt / metrics.currentYearCharges * 100 : null;
+            const ageBuckets = getClientAgeBuckets(metrics.overdueRows);
+            const overYearDebt = ageBuckets.find(bucket => bucket.min === 366)?.sum || 0;
+            const overYearShare = totalDebt > 0 ? overYearDebt / totalDebt * 100 : 0;
+
+            const groupedClients = new Map();
+            db.filter(row => row.isOverdue && isTypeMatch(row) && row.sector === metrics.sector).forEach((row, index) => {
+                const key = String(row.code || '').trim() || String(row.name || '').trim();
+                if (!groupedClients.has(key)) groupedClients.set(key, { key, name: row.name, amount: 0, docs: new Set() });
+                const client = groupedClients.get(key);
+                client.amount += Number(row.amount) || 0;
+                const documentNumber = String(row.doc || '').trim();
+                client.docs.add(documentNumber && documentNumber !== '-' ? documentNumber : `missing-${index}`);
+            });
+            const comparisonRows = [...groupedClients.values()].map(client => ({ ...client, invoiceCount: client.docs.size }));
+            const selectedKey = String(metrics.clientCode || '').trim() || String(orgName || '').trim();
+            const amountRanking = [...comparisonRows].sort((a, b) => b.amount - a.amount);
+            const invoiceRanking = [...comparisonRows].sort((a, b) => b.invoiceCount - a.invoiceCount);
+            const amountIndex = amountRanking.findIndex(client => client.key === selectedKey);
+            const invoiceIndex = invoiceRanking.findIndex(client => client.key === selectedKey);
+            const amountRank = amountIndex >= 0 ? amountIndex + 1 : null;
+            const invoiceRank = invoiceIndex >= 0 ? invoiceIndex + 1 : null;
+            const groupDebt = comparisonRows.reduce((sum, client) => sum + client.amount, 0);
+            const groupShare = groupDebt > 0 ? totalDebt / groupDebt * 100 : 0;
+            const comparisonCount = comparisonRows.length;
+            const isTopDecile = amountRank !== null && comparisonCount > 0 && amountRank <= Math.max(1, Math.ceil(comparisonCount * 0.1));
+            const activityLabel = incomeFilter === 'info' ? 'שירותי מידע' : (incomeFilter === 'fees' ? 'אגרות העברת בעלות' : 'כל תחומי הפעילות');
+
+            return `<section class="client-insights-section" aria-labelledby="client-insights-title">
+                <div class="client-insights-section__header"><i class="fa-solid fa-lightbulb text-amber-500" aria-hidden="true"></i><div><h3 id="client-insights-title">תובנות על הלקוח</h3><p>מגמות, התפלגויות והשוואות המחושבות מתוך הקבצים שנטענו.</p></div></div>
+                <div class="client-insights-charts">
+                    <article class="client-insight-card">
+                        <h4><i class="fa-solid fa-chart-column" aria-hidden="true"></i>חיובים וגבייה לפי חודשים בשנת ${CURRENT_YEAR}</h4>
+                        <div class="client-insight-chart-wrap"><canvas id="client-monthly-insight-chart"></canvas></div>
+                    </article>
+                    <article class="client-insight-card">
+                        <h4><i class="fa-solid fa-chart-pie" aria-hidden="true"></i>התפלגות החוב לפי גיל</h4>
+                        <div class="client-insight-chart-wrap" id="client-age-chart-wrap">${metrics.overdueRows.length ? '<canvas id="client-age-insight-chart"></canvas>' : '<div class="client-insight-chart-empty">ללקוח אין חשבוניות בפיגור בתחום הפעילות שנבחר.</div>'}</div>
+                    </article>
+                </div>
+                <div class="client-insights-grid">
+                    <article class="client-insight-card">
+                        <h4><i class="fa-solid fa-gauge-high" aria-hidden="true"></i>מדדי חומרת החוב</h4>
+                        <div class="client-insight-metrics">
+                            <div class="client-insight-metric"><span>גיל חוב ממוצע</span><strong>${metrics.overdueRows.length ? averageDays.toLocaleString('he-IL') + ' ימים' : 'אין חוב'}</strong></div>
+                            <div class="client-insight-metric"><span>סכום ממוצע לחשבונית בפיגור</span><strong>${metrics.overdueRows.length ? formatCurrency(averageInvoice) : 'אין חוב'}</strong></div>
+                            <div class="client-insight-metric"><span>חוב ביחס לחיובי ${CURRENT_YEAR}</span><strong>${debtRatio === null ? 'אין נתון' : debtRatio.toFixed(1) + '%'}</strong></div>
+                            <div class="client-insight-metric"><span>חלק החוב שגילו מעל שנה</span><strong>${metrics.overdueRows.length ? overYearShare.toFixed(1) + '%' : 'אין חוב'}</strong></div>
+                        </div>
+                        <p class="client-insight-note">החישוב מתייחס לחשבוניות בפיגור בתחום הפעילות שנבחר.</p>
+                    </article>
+                    <article class="client-insight-card">
+                        <h4><i class="fa-solid fa-ranking-star" aria-hidden="true"></i>מיקום בקבוצת ההשוואה</h4>
+                        <div class="client-ranking-list">
+                            <div class="client-ranking-item"><span>דירוג לפי גובה החוב</span><strong>${amountRank === null ? 'אין דירוג' : amountRank + ' מתוך ' + comparisonCount}</strong></div>
+                            <div class="client-ranking-item"><span>דירוג לפי מספר חשבוניות</span><strong>${invoiceRank === null ? 'אין דירוג' : invoiceRank + ' מתוך ' + comparisonCount}</strong></div>
+                            <div class="client-ranking-item"><span>חלק מסך החוב בקבוצה</span><strong>${comparisonCount ? groupShare.toFixed(1) + '%' : 'אין נתון'}</strong></div>
+                        </div>
+                        ${isTopDecile ? '<span class="client-ranking-badge"><i class="fa-solid fa-arrow-trend-up ml-1" aria-hidden="true"></i>בעשירון העליון לפי גובה החוב</span>' : ''}
+                        <p class="client-insight-note">ההשוואה ללקוחות בסקטור ${escapeHtml(metrics.sector || 'הנבחר')} בתחום ${activityLabel}.</p>
+                    </article>
+                </div>
+            </section>`;
+        }
+
+        function renderClientInsightCharts(orgName) {
+            const metrics = getClientProfileMetrics(orgName);
+            const monthlyBilled = Array(12).fill(0);
+            const monthlyUnpaid = Array(12).fill(0);
+            metrics.currentYearChargesRows.forEach(row => {
+                const month = getRevenueMonth(row);
+                if (month !== null) monthlyBilled[month] += Number(row.amount) || 0;
+            });
+            metrics.currentYearOpenRows.forEach(row => {
+                const sourceDate = isValidDate(row.regDate) ? row.regDate : row.dueDate;
+                if (isValidDate(sourceDate)) monthlyUnpaid[sourceDate.getMonth()] += Number(row.amount) || 0;
+            });
+            const monthlyCollected = monthlyBilled.map((amount, index) => Math.max(0, amount - monthlyUnpaid[index]));
+            const monthlyCanvas = document.getElementById('client-monthly-insight-chart');
+            if (monthlyCanvas) {
+                clientMonthlyChart = new Chart(monthlyCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: MONTH_NAMES,
+                        datasets: [
+                            { label: 'חיובים', data: monthlyBilled, backgroundColor: '#0B3C5D', borderRadius: 5, maxBarThickness: 28 },
+                            { label: 'גבייה', data: monthlyCollected, backgroundColor: '#10b981', borderRadius: 5, maxBarThickness: 28 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { callback: value => formatCurrency(value) }, grid: { color: '#e7edf2' } },
+                            x: { grid: { display: false } }
+                        },
+                        plugins: {
+                            legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 9 } },
+                            tooltip: { callbacks: { label: context => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}` } }
+                        }
+                    }
+                });
+            }
+
+            const ageCanvas = document.getElementById('client-age-insight-chart');
+            if (ageCanvas) {
+                const buckets = getClientAgeBuckets(metrics.overdueRows);
+                clientAgeChart = new Chart(ageCanvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: buckets.map(bucket => `${bucket.label} (${bucket.count})`),
+                        datasets: [{ data: buckets.map(bucket => bucket.sum), backgroundColor: ['#38bdf8', '#328CC1', '#D9B310', '#f59e0b', '#b91c1c'], borderColor: '#ffffff', borderWidth: 4 }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '62%',
+                        plugins: {
+                            legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 9, padding: 14 } },
+                            tooltip: { callbacks: { label: context => `${context.label}: ${formatCurrency(context.parsed)}` } }
+                        }
+                    }
+                });
             }
         }
 
@@ -4600,6 +5124,37 @@
                     .kpi-card { flex: 1; border: 1px solid var(--print-border); padding: 12px; border-radius: 8px; background: var(--print-surface); }
                     .kpi-title { font-size: 10px; color: var(--print-muted); font-weight: 700; }
                     .kpi-value { margin-top: 4px; font-size: 18px; font-weight: 900; }
+                    .print-content .collection-card-breakdown {
+                        display: grid;
+                        gap: 3px;
+                        margin-top: 7px;
+                        color: var(--print-muted);
+                        font-size: 8px;
+                        font-weight: 700;
+                        line-height: 1.35;
+                    }
+                    .print-content .collection-card-breakdown span { min-width: 0; display: flex; align-items: baseline; justify-content: space-between; gap: 7px; }
+                    .print-content .collection-card-breakdown span + span { padding: 0; border: 0; }
+                    .print-content .collection-card-breakdown b { display: inline; margin: 0; color: var(--print-text); font-size: 9px; white-space: nowrap; }
+                    .print-content .past-debt-summary {
+                        display: flex;
+                        gap: 12px;
+                        margin: 0 0 20px;
+                        break-inside: avoid;
+                        page-break-inside: avoid;
+                    }
+                    .print-content .past-debt-card {
+                        flex: 1;
+                        padding: 10px 12px;
+                        border: 1px solid var(--print-border);
+                        border-radius: 8px;
+                        background: var(--print-surface);
+                    }
+                    .print-content .past-debt-card span { display: block; color: var(--print-muted); font-size: 9px; font-weight: 700; }
+                    .print-content .past-debt-card strong { display: block; margin-top: 3px; font-size: 14px; font-weight: 800; }
+                    .print-content .past-debt-card--open strong { color: var(--print-danger); }
+                    .print-content .past-debt-card--collected strong { color: var(--print-success); }
+                    .print-content .past-debt-card small { display: block; margin-top: 2px; color: var(--print-muted); font-size: 8px; }
                     .signature-area { margin-top: 48px; display: flex; justify-content: flex-end; }
                     .signature-box { width: 340px; display: flex; flex-direction: column; }
                     a { color: var(--print-brand); }
@@ -4702,6 +5257,8 @@
                 const currentYearInvoices = revenueDb.filter(r => r.name === path.orgName && getRevenueYear(r) === CURRENT_YEAR && isTypeMatch(r));
                 currentYearInvoices.sort((a, b) => a.dueDate - b.dueDate);
                 const currentTotal = currentYearInvoices.reduce((acc, r) => acc + r.amount, 0);
+                const currentYearOpen = db.filter(r => r.name === path.orgName && isTypeMatch(r) && isValidDate(r.dueDate) && r.dueDate.getFullYear() === CURRENT_YEAR).reduce((sum, row) => sum + row.amount, 0);
+                const clientCollectionComposition = getCollectionComposition(Math.max(0, currentTotal - currentYearOpen), row => row.name === path.orgName && isTypeMatch(row));
 
                 const pastYearsDebts = db.filter(r => r.name === path.orgName && r.dueDate.getFullYear() < CURRENT_YEAR && isTypeMatch(r));
                 pastYearsDebts.sort((a,b) => a.dueDate - b.dueDate);
@@ -4842,6 +5399,10 @@
                         <p class="document-recipient">לכבוד: <br><b style="font-size:18px">${path.orgName}</b></p>
                         <h2 class="document-title">דוח שנתי ללקוח - שנת ${CURRENT_YEAR}</h2>
                         <p>אנו מתכבדים להציג לכם סיכום של החיובים לשנה זו:</p>
+                        <div class="kpis">
+                            <div class="kpi-card"><div class="kpi-title">גבייה שוטפת</div><div class="kpi-value" style="color:#047857">${formatCurrency(clientCollectionComposition.ongoingCollected)}</div>${buildCollectionCardBreakdown(clientCollectionComposition)}</div>
+                        </div>
+                        ${buildPastDebtSummary(pastTotal, clientCollectionComposition)}
                         
                         <table>
                             <thead>
@@ -5033,22 +5594,65 @@
             return getYearTransitionRows(predicate).reduce((sum, row) => sum + row.amount, 0);
         }
 
-        function formatYearTransitionCollection(amount) {
-            return historicalRevenueDb.length > 0 ? formatCurrency(amount) : 'המקור טרם נטען';
+function getCollectionComposition(currentYearCollected, predicate = () => true) {
+            const hasHistoricalSource = historicalRevenueDb.length > 0;
+            const transitionCollected = hasHistoricalSource ? sumYearTransitionCollections(predicate) : 0;
+            const historicalCollected = hasHistoricalSource
+                ? getEligibleHistoricalRows().filter(predicate).reduce((sum, row) => sum + row.amount, 0)
+                : 0;
+            return {
+                hasHistoricalSource,
+                currentYearCollected,
+                transitionCollected,
+                historicalCollected,
+                ongoingCollected: currentYearCollected + transitionCollected
+            };
         }
 
-        function yearTransitionTableFooter(amount, currentYearCollected, cellClass = '') {
-            if (amount <= 0) return '';
+        function updateCollectionComposition(prefix, composition) {
+            const totalId = prefix === 'kpi' ? 'kpi-current-collected' : `${prefix}-kpi-collected`;
+            const title = document.getElementById(`${prefix}-collection-title`);
+            const total = document.getElementById(totalId);
+            const current = document.getElementById(`${prefix}-current-year-collected`);
+            const transition = document.getElementById(`${prefix}-transition-collected`);
+            const transitionPart = document.getElementById(`${prefix}-transition-part`);
+            const historical = document.getElementById(`${prefix}-historical-collected`);
+            const historicalCard = document.getElementById(`${prefix}-historical-card`);
+            if (title) title.textContent = 'גבייה שוטפת';
+            if (total) total.textContent = formatCurrency(composition.ongoingCollected);
+            if (current) current.textContent = formatCurrency(composition.currentYearCollected);
+            if (transition) transition.textContent = formatCurrency(composition.transitionCollected);
+            if (transitionPart) transitionPart.classList.toggle('hidden', !composition.hasHistoricalSource);
+            if (historical) historical.textContent = formatCurrency(composition.historicalCollected);
+            if (historicalCard) historicalCard.classList.toggle('hidden', !composition.hasHistoricalSource);
+        }
+
+        function buildCollectionCardBreakdown(composition) {
+            return `<div class="collection-card-breakdown">
+                <span>חשבוניות ${CURRENT_YEAR}<b>${formatCurrency(composition.currentYearCollected)}</b></span>
+                ${composition.hasHistoricalSource ? `<span>דצמבר ${CURRENT_YEAR - 1}<b>${formatCurrency(composition.transitionCollected)}</b></span>` : ''}
+            </div>`;
+        }
+
+        function buildPastDebtSummary(openPastDebt, composition) {
+            return `<section class="past-debt-summary" aria-label="חוב משנים קודמות">
+                ${composition.hasHistoricalSource ? `<article class="past-debt-card past-debt-card--collected"><span>נגבה בשנת ${CURRENT_YEAR}</span><strong>${formatCurrency(composition.historicalCollected)}</strong><small>חובות משנים קודמות שנגבו בשנת העבודה</small></article>` : ''}
+                <article class="past-debt-card past-debt-card--open"><span>חוב שטרם נגבה</span><strong>${formatCurrency(openPastDebt)}</strong><small>יתרת חוב פתוחה משנים קודמות</small></article>
+            </section>`;
+        }
+
+        function collectionCompositionTableFooter(composition, cellClass = '') {
+            if (!composition.hasHistoricalSource) return '';
             return `<tr class="year-transition-row" style="background:#fff8e8;color:#7c4a03">
                 <td class="${cellClass}" style="text-align:right;color:#7c4a03"><strong>גביית דצמבר ${CURRENT_YEAR - 1} שבוצעה בשנת ${CURRENT_YEAR}</strong></td>
                 <td class="${cellClass}">—</td>
-                <td class="${cellClass}"><strong>${formatCurrency(amount)}</strong></td>
+                <td class="${cellClass}"><strong>${formatCurrency(composition.transitionCollected)}</strong></td>
                 <td class="${cellClass}">—</td>
             </tr>
             <tr class="year-transition-total-row font-bold" style="background:#edf7f1;font-weight:700">
                 <td class="${cellClass}" style="text-align:right;color:#1f2933">סה"כ גבייה שוטפת בשנת ${CURRENT_YEAR}</td>
                 <td class="${cellClass}">—</td>
-                <td class="${cellClass}" style="color:#11663f"><strong>${formatCurrency(currentYearCollected + amount)}</strong></td>
+                <td class="${cellClass}" style="color:#11663f"><strong>${formatCurrency(composition.ongoingCollected)}</strong></td>
                 <td class="${cellClass}">—</td>
             </tr>`;
         }
@@ -5558,11 +6162,11 @@
             const closedDebtsSection = document.getElementById('management-closed-debts-section');
             if (closedDebtsSection) closedDebtsSection.classList.toggle('hidden', !hasHistoricalSource);
             document.getElementById('management-kpi-billed').textContent = formatCurrency(data.totalBilled);
-            document.getElementById('management-kpi-collected').textContent = formatCurrency(data.totalCollected + data.transitionCollected);
-            document.getElementById('management-current-year-collected').textContent = formatCurrency(data.totalCollected);
-            document.getElementById('management-transition-collected').textContent = formatYearTransitionCollection(data.transitionCollected);
+            const collectionComposition = getCollectionComposition(data.totalCollected, row => !row.isFee);
+            updateCollectionComposition('management', collectionComposition);
             document.getElementById('management-kpi-overdue').textContent = formatCurrency(data.totalOverdue);
             document.getElementById('management-kpi-future').textContent = formatCurrency(data.totalFuture);
+            document.getElementById('management-past-open').textContent = formatCurrency(data.pastDebts.reduce((sum, row) => sum + row.amount, 0));
 
             document.getElementById('management-monthly-table-body').innerHTML = MONTH_NAMES.map((month, index) => {
                 const billed = data.monthlyBilled[index];
@@ -5571,7 +6175,7 @@
                 return `<tr><td><strong>${month}</strong></td><td>${formatCurrency(billed)}</td><td>${formatCurrency(collected)}</td><td>${rate.toFixed(1)}%</td></tr>`;
             }).join('') + `
                 <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${formatCurrency(data.totalBilled)}</td><td>${formatCurrency(data.totalCollected)}</td><td>${data.collectionRate.toFixed(1)}%</td></tr>
-                ${yearTransitionTableFooter(data.transitionCollected, data.totalCollected)}`;
+                ${collectionCompositionTableFooter(collectionComposition)}`;
 
             const totalSectorClients = countUniqueClients([
                 ...revenueDb.filter(row => getRevenueYear(row) === CURRENT_YEAR && !row.isFee),
@@ -5686,6 +6290,7 @@
         function printManagementReport() {
             renderManagementReport();
             const data = getManagementReportData();
+            const collectionComposition = getCollectionComposition(data.totalCollected, row => !row.isFee);
             const title = `סקירה מקיפה על שירותי מידע ${CURRENT_YEAR}`;
             const hasHistoricalSource = historicalRevenueDb.length > 0;
             const chartImages = {
@@ -5740,10 +6345,11 @@
                         <h1 class="document-title">${title}</h1>
                         <div class="kpis">
                             <div class="kpi-card"><div class="kpi-title">חיובים שהופקו</div><div class="kpi-value" style="color:#0B3C5D">${document.getElementById('management-kpi-billed').textContent}</div><small class="kpi-note">סך החיובים שהופקו בשנת העבודה</small></div>
-                            <div class="kpi-card"><div class="kpi-title">גבייה שוטפת</div><div class="kpi-value" style="color:#047857">${document.getElementById('management-kpi-collected').textContent}</div><small class="kpi-note">מחשבוניות ${CURRENT_YEAR}: ${formatCurrency(data.totalCollected)}<br>מחשבוניות דצמבר ${CURRENT_YEAR - 1}: ${formatYearTransitionCollection(data.transitionCollected)}</small></div>
+                            <div class="kpi-card"><div class="kpi-title">גבייה שוטפת</div><div class="kpi-value" style="color:#047857">${formatCurrency(collectionComposition.ongoingCollected)}</div>${buildCollectionCardBreakdown(collectionComposition)}</div>
                             <div class="kpi-card"><div class="kpi-title">חוב בפיגור</div><div class="kpi-value" style="color:#b91c1c">${document.getElementById('management-kpi-overdue').textContent}</div><small class="kpi-note">חשבוניות פתוחות שמועד פירעונן עבר</small></div>
                             <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${document.getElementById('management-kpi-future').textContent}</div><small class="kpi-note">חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></div>
                         </div>
+                        ${buildPastDebtSummary(data.pastDebts.reduce((sum, row) => sum + row.amount, 0), collectionComposition)}
                         ${analysisBlock('חיובים וגבייה לפי חודש הפקת החשבונית', '<tr><th>חודש הפקת החשבונית</th><th>סכום חיובים</th><th>נגבה עד כה</th><th>שיעור גבייה</th></tr>', 'management-monthly-table-body', chartImages.monthly, 'גרף חיובים וגבייה בחודשי שנת העבודה')}
                         ${analysisBlock('חיובים וגבייה לפי סקטורים', '<tr><th>סקטור</th><th>מספר לקוחות</th><th>חיובים שהופקו</th><th>נגבה עד כה</th><th>שיעור גבייה</th></tr>', 'management-sector-table-body', chartImages.sectors, 'גרף התפלגות חיובים לפי סקטורים')}
                     </section>
@@ -5853,11 +6459,11 @@
             const hasHistoricalSource = historicalRevenueDb.length > 0;
             document.getElementById('fees-management-closed-debts-section')?.classList.toggle('hidden', !hasHistoricalSource);
             document.getElementById('fees-management-kpi-billed').textContent = formatCurrency(data.totalBilled);
-            document.getElementById('fees-management-kpi-collected').textContent = formatCurrency(data.totalCollected + data.transitionCollected);
-            document.getElementById('fees-management-current-year-collected').textContent = formatCurrency(data.totalCollected);
-            document.getElementById('fees-management-transition-collected').textContent = formatYearTransitionCollection(data.transitionCollected);
+            const collectionComposition = getCollectionComposition(data.totalCollected, row => row.isFee);
+            updateCollectionComposition('fees-management', collectionComposition);
             document.getElementById('fees-management-kpi-overdue').textContent = formatCurrency(data.totalOverdue);
             document.getElementById('fees-management-kpi-future').textContent = formatCurrency(data.totalFuture);
+            document.getElementById('fees-management-past-open').textContent = formatCurrency(data.pastDebts.reduce((sum, row) => sum + row.amount, 0));
 
             document.getElementById('fees-management-monthly-table-body').innerHTML = MONTH_NAMES.map((month, index) => {
                 const billed = data.monthlyBilled[index];
@@ -5866,7 +6472,7 @@
                 return `<tr><td><strong>${month}</strong></td><td>${formatCurrency(billed)}</td><td>${formatCurrency(collected)}</td><td>${rate.toFixed(1)}%</td></tr>`;
             }).join('') + `
                 <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${formatCurrency(data.totalBilled)}</td><td>${formatCurrency(data.totalCollected)}</td><td>${data.collectionRate.toFixed(1)}%</td></tr>
-                ${yearTransitionTableFooter(data.transitionCollected, data.totalCollected)}`;
+                ${collectionCompositionTableFooter(collectionComposition)}`;
 
             const debtInvoicesTotal = data.pastDebts.length;
             const debtClientsTotal = countUniqueClients(data.pastDebts);
@@ -5927,6 +6533,7 @@
         function printFeesManagementReport() {
             renderFeesManagementReport();
             const data = getFeesManagementReportData();
+            const collectionComposition = getCollectionComposition(data.totalCollected, row => row.isFee);
             const title = `סקירה מקיפה על אגרות העברת בעלות ${CURRENT_YEAR}`;
             const hasHistoricalSource = historicalRevenueDb.length > 0;
             const monthlyImage = feesManagementChart ? feesManagementChart.toBase64Image() : '';
@@ -5969,10 +6576,11 @@
                 `<h1 class="document-title">${title}</h1>
                  <div class="kpis">
                     <div class="kpi-card"><div class="kpi-title">חיובים שהופקו</div><div class="kpi-value" style="color:#0B3C5D">${formatCurrency(data.totalBilled)}</div><small class="kpi-note">סך החיובים שהופקו בשנת העבודה</small></div>
-                    <div class="kpi-card"><div class="kpi-title">גבייה שוטפת</div><div class="kpi-value" style="color:#047857">${formatCurrency(data.totalCollected + data.transitionCollected)}</div><small class="kpi-note">מחשבוניות ${CURRENT_YEAR}: ${formatCurrency(data.totalCollected)}<br>מחשבוניות דצמבר ${CURRENT_YEAR - 1}: ${formatYearTransitionCollection(data.transitionCollected)}</small></div>
+                    <div class="kpi-card"><div class="kpi-title">גבייה שוטפת</div><div class="kpi-value" style="color:#047857">${formatCurrency(collectionComposition.ongoingCollected)}</div>${buildCollectionCardBreakdown(collectionComposition)}</div>
                     <div class="kpi-card"><div class="kpi-title">חוב בפיגור</div><div class="kpi-value" style="color:#b91c1c">${formatCurrency(data.totalOverdue)}</div><small class="kpi-note">חשבוניות פתוחות שמועד פירעונן עבר</small></div>
                     <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${formatCurrency(data.totalFuture)}</div><small class="kpi-note">חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></div>
                  </div>
+                 ${buildPastDebtSummary(data.pastDebts.reduce((sum, row) => sum + row.amount, 0), collectionComposition)}
                  ${analysisBlock('חיובים וגבייה לפי חודש הפקת החשבונית', '<tr><th>חודש הפקת החשבונית</th><th>סכום חיובים</th><th>נגבה עד כה</th><th>שיעור גבייה</th></tr>', 'fees-management-monthly-table-body', monthlyImage, 'גרף חיובים וגבייה בחודשי שנת העבודה')}`,
                 `${analysisBlock('חובות עבר פתוחים לפי שנים', '<tr><th>שנת חוב</th><th>מספר גופים</th><th>מספר חשבוניות</th><th>סכום החוב</th></tr>', 'fees-management-debt-years-table-body', debtYearsImage, 'גרף חובות עבר פתוחים לפי שנים', 'בשורת הסה"כ, כל גוף נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.')}`
             ];
