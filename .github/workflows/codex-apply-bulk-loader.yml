@@ -1,0 +1,25 @@
+name: Apply bulk loader implementation
+on:
+  push:
+    branches:
+      - agent/add-folder-bulk-loader
+    paths:
+      - .github/workflows/codex-apply-bulk-loader.yml
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/add-folder-bulk-loader
+          fetch-depth: 0
+      - name: Apply implementation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git am --3way .codex/bulk-loader.patch
+          git rm .codex/bulk-loader.patch .github/workflows/codex-apply-bulk-loader.yml
+          git commit -m "Remove temporary patch delivery files"
+          git push origin HEAD:agent/add-folder-bulk-loader
