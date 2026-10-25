@@ -1,0 +1,25 @@
+name: Apply unmatched transfers final update
+on:
+  push:
+    branches:
+      - agent/add-unmatched-transfers-final
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/add-unmatched-transfers-final
+      - name: Apply prepared patch
+        run: |
+          git apply --whitespace=nowarn .codex-unmatched-transfers-final.patch
+          rm .codex-unmatched-transfers-final.patch
+          rm .github/workflows/apply-unmatched-transfers-final.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "הוספת העברות שטרם הותאמו"
+          git push origin HEAD:agent/add-unmatched-transfers-final
