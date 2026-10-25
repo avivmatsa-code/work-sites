@@ -19,7 +19,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git am --3way .codex/bulk-loader.patch
+          git apply --ignore-space-change --ignore-whitespace .codex/bulk-loader.patch
           git rm .codex/bulk-loader.patch .github/workflows/codex-apply-bulk-loader.yml
-          git commit -m "Remove temporary patch delivery files"
+          git add customer-relations/debt-collection/Collecting_Dashboard.html
+          git commit -m "Add one-click data folder loading"
           git push origin HEAD:agent/add-folder-bulk-loader
