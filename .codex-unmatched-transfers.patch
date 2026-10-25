@@ -1,0 +1,385 @@
+diff --git a/customer-relations/debt-collection/Collecting_Dashboard.html b/customer-relations/debt-collection/Collecting_Dashboard.html
+index 77a4b67..3ceaa6a 100644
+--- a/customer-relations/debt-collection/Collecting_Dashboard.html
++++ b/customer-relations/debt-collection/Collecting_Dashboard.html
+@@ -1753,6 +1753,30 @@
+             .department-name, .system-date { color: #555 !important; }
+             .workspace-toolbar, .header-actions, .beta-badge { display: none !important; }
+         }
++        .unmatched-transfer-badge { display:inline-flex;align-items:center;gap:5px;margin-inline-start:7px;padding:2px 7px;border:1px solid #f2c46d;border-radius:999px;background:#fff8e8;color:#8a5700;font-size:10px;font-weight:800;white-space:nowrap; }
++        .unmatched-transfer-summary { margin-top:12px;padding:12px 14px;border:1px solid #f0c36a;border-radius:10px;background:#fffbef; }
++        .unmatched-transfer-summary__heading { display:flex;align-items:center;justify-content:space-between;gap:12px; }
++        .unmatched-transfer-summary__heading h4 { margin:0;color:#7a4a00;font-size:14px;font-weight:800; }
++        .unmatched-transfer-summary__metrics { display:flex;align-items:center;gap:22px;color:#526579;font-size:12px; }
++        .unmatched-transfer-summary__metrics strong { color:#20364f;font-size:16px;margin-inline-start:4px; }
++        .unmatched-transfer-client-section { margin-top:18px;border:1px solid #f0c36a;border-radius:14px;overflow:hidden;background:#fff; }
++        .unmatched-transfer-client-section__header { display:flex;justify-content:space-between;align-items:center;gap:14px;padding:13px 16px;background:#fffbef;border-bottom:1px solid #f0dfb7; }
++        .unmatched-transfer-client-section__header h3 { margin:0;color:#7a4a00;font-size:16px;font-weight:800; }
++        .unmatched-transfer-client-section__header p { margin:3px 0 0;color:#6b7787;font-size:11px; }
++        .unmatched-transfer-client-section__totals { display:flex;gap:18px;color:#526579;font-size:11px;white-space:nowrap; }
++        .unmatched-transfer-client-section__totals strong { color:#20364f;font-size:14px;margin-inline-start:3px; }
++        .unmatched-report-main { padding:24px; }
++        .unmatched-report-panel { background:#fff;border:1px solid #d5dee8;border-radius:12px;overflow:hidden;box-shadow:0 4px 14px rgba(26,55,85,.05); }
++        .unmatched-report-panel__header { display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;border-bottom:1px solid #d5dee8; }
++        .unmatched-report-panel__header h2 { margin:0;color:#064f8c;font-size:19px; }
++        .unmatched-report-panel__header p { margin:4px 0 0;color:#607080;font-size:12px; }
++        .unmatched-report-table { width:100%;border-collapse:collapse; }
++        .unmatched-report-table th,.unmatched-report-table td { padding:12px 16px;border-bottom:1px solid #e2e8f0;text-align:right; }
++        .unmatched-report-table th { background:#f3f6f9;color:#526579;font-size:12px; }
++        .unmatched-report-table td { font-size:13px; }
++        .unmatched-report-table .numeric-cell { direction:ltr;text-align:right;font-variant-numeric:tabular-nums; }
++        .unmatched-report-total { background:#eef3f7;font-weight:800; }
++        @media (max-width:760px) { .unmatched-transfer-summary__heading,.unmatched-transfer-client-section__header{align-items:flex-start;flex-direction:column}.unmatched-transfer-summary__metrics,.unmatched-transfer-client-section__totals{flex-wrap:wrap;gap:9px 16px}.unmatched-report-main{padding:12px} }
+     </style>
+ 
+ </head>
+@@ -1868,6 +1892,9 @@
+             <button id="nav-dashboard-report" class="suite-nav__item" type="button" onclick="closeSuiteMenu(); printDashboardAll()" disabled>
+                 <i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>דוח מאוחד הכנסות וגבייה בשנה הנוכחית</span>
+             </button>
++            <button id="nav-unmatched-transfers" class="suite-nav__item" type="button" onclick="navigateToScreen('unmatched-transfers')" disabled>
++                <i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i><span>דוח העברות שטרם הותאמו</span>
++            </button>
+             <div class="suite-sidebar__section-label">הגדרות</div>
+             <button id="nav-sources" class="suite-nav__item is-active" type="button" onclick="navigateToScreen('sources')">
+                 <i class="fa-solid fa-database" aria-hidden="true"></i><span>מקורות הנתונים</span><span class="suite-nav__dot" aria-label="מקורות החובה טרם נטענו"></span>
+@@ -1952,6 +1979,18 @@
+                     </label>
+                 </article>
+ 
++                <article id="unmatched-transfers-source-card" class="source-card">
++                    <div class="source-card__heading">
++                        <span class="source-card__icon"><i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i></span>
++                        <div><h3>העברות שטרם הותאמו</h3><p>מסמכי DZ אינפורמטיביים להצגה בכרטיס הלקוח ובדוח הייעודי בלבד.</p></div>
++                        <span class="source-card__badge source-card__badge--optional">רשות</span>
++                    </div>
++                    <input type="file" id="unmatched-transfers-uploader" class="hidden" accept=".xlsx,.xls" onchange="processUnmatchedTransfersExcel(event)">
++                    <label for="unmatched-transfers-uploader" id="unmatched-transfers-file-action" class="file-action" tabindex="0">
++                        <span class="file-action__icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></span>
++                        <span><strong>בחירת קובץ העברות שטרם הותאמו</strong><small id="unmatched-transfers-file-status">טרם נטען</small></span>
++                    </label>
++                </article>
+                 <article id="query-online-source-card" class="source-card">
+                     <div class="source-card__heading">
+                         <span class="source-card__icon"><i class="fa-solid fa-globe" aria-hidden="true"></i></span>
+@@ -1992,6 +2031,28 @@
+         </main>
+     </div>
+ 
++    <!-- UNMATCHED TRANSFERS REPORT SCREEN -->
++    <div id="unmatched-transfers-container" class="suite-screen hidden flex-col flex-grow">
++        <header class="app-header no-print">
++            <div class="app-header__inner">
++                <div class="government-brand">
++                    <img class="government-logo" src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה והבטיחות בדרכים">
++                    <div><div class="ministry-name">משרד התחבורה והבטיחות בדרכים</div><div class="department-name">אגף טכנולוגיות דיגיטליות ומידע</div></div>
++                </div>
++                <div class="app-identity"><div class="app-title-row"><h1 class="app-title">דוח העברות שטרם הותאמו</h1><span class="beta-badge">BETA</span></div><div class="system-date"></div></div>
++                <div class="header-actions" aria-hidden="true"></div>
++            </div>
++        </header>
++        <main class="unmatched-report-main flex-grow">
++            <section class="unmatched-report-panel">
++                <div class="unmatched-report-panel__header">
++                    <div><h2>ריכוז העברות שטרם הותאמו לפי לקוח</h2><p>הסכומים מוצגים לאחר היפוך הסימן בקובץ המקור. מידע זה אינו משפיע על מדדי המערכת.</p></div>
++                    <button type="button" class="button-secondary button-secondary--brand no-print" onclick="printUnmatchedTransfersReport()"><i class="fa-solid fa-print" aria-hidden="true"></i>הדפסת הדוח</button>
++                </div>
++                <div style="overflow-x:auto"><table class="unmatched-report-table"><thead><tr><th>לקוח</th><th>סה״כ העברות</th><th>סכום</th></tr></thead><tbody id="unmatched-report-table-body"></tbody></table></div>
++            </section>
++        </main>
++    </div>
+     <!-- QUERY CONSUMPTION SCREEN -->
+     <div id="queries-container" class="suite-screen hidden flex-col flex-grow">
+         <header class="app-header no-print">
+@@ -2800,6 +2861,7 @@
+         let db = []; 
+         let revenueDb = []; 
+         let historicalRevenueDb = [];
++        let unmatchedTransfersDb = [];
+         let queryOnlineDb = [];
+         let queryBatchDb = [];
+         let querySelectedClientId = null;
+@@ -2868,7 +2930,8 @@
+             historical: 'historical-container',
+             queries: 'queries-container',
+             management: 'management-container',
+-            'fees-management': 'fees-management-container'
++            'fees-management': 'fees-management-container',
++            'unmatched-transfers': 'unmatched-transfers-container'
+         };
+ 
+         /**
+@@ -2885,6 +2948,7 @@
+             if ((screen === 'dashboard' || screen === 'debt' || screen === 'debtor-finder' || screen === 'management' || screen === 'fees-management') && !coreReady) screen = 'sources';
+             if (screen === 'historical' && (!coreReady || historicalRevenueDb.length === 0)) screen = 'sources';
+             if (screen === 'queries' && !queriesReady) screen = 'sources';
++            if (screen === 'unmatched-transfers' && unmatchedTransfersDb.length === 0) screen = 'sources';
+             if (!SUITE_SCREENS[screen]) screen = 'sources';
+ 
+             Object.values(SUITE_SCREENS).forEach(id => {
+@@ -2921,6 +2985,8 @@
+                 renderManagementReport();
+             } else if (screen === 'fees-management') {
+                 renderFeesManagementReport();
++            } else if (screen === 'unmatched-transfers') {
++                renderUnmatchedTransfersReport();
+             }
+ 
+             closeSuiteMenu();
+@@ -3867,7 +3933,7 @@
+ 
+             body.innerHTML = debtorFinderRows.map((row, index) => `
+                 <tr>
+-                    <td><strong>${escapeHtml(row.name)}</strong> ${row.isDirectDebit ? '<span class="inline-flex items-center bg-sky-100 text-sky-800 border border-sky-200 text-[10px] px-2 py-0.5 rounded-full font-bold mr-2">הו&quot;ק</span>' : ''}</td>
++                    <td><strong>${escapeHtml(row.name)}</strong> ${unmatchedTransferBadge(row.code)} ${row.isDirectDebit ? '<span class="inline-flex items-center bg-sky-100 text-sky-800 border border-sky-200 text-[10px] px-2 py-0.5 rounded-full font-bold mr-2">הו&quot;ק</span>' : ''}</td>
+                     <td class="numeric-cell"><bdi dir="ltr">${escapeHtml(row.code || 'אין נתון')}</bdi></td>
+                     <td class="center-cell"><strong>${row.invoiceCount.toLocaleString('he-IL')}</strong></td>
+                     <td class="numeric-cell" style="color:#b91c1c;font-weight:700">${formatCurrency(row.amount)}</td>
+@@ -4247,7 +4313,7 @@
+ 
+                     html += `<div onclick="selectOrg('${safeName}')" class="flex justify-between items-center p-5 bg-white border border-slate-200 rounded-2xl hover:border-blue-400 hover:bg-blue-50 cursor-pointer transition-all shadow-sm">
+                         <div class="text-right">
+-                            <p class="font-bold text-slate-700 text-base leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">${org.name} ${directDebitBadge(org.name)}</p>
++                            <p class="font-bold text-slate-700 text-base leading-tight" style="font-family: Arial, Helvetica, sans-serif !important;">${org.name} ${directDebitBadge(org.name)} ${unmatchedTransferBadge(org.name)}</p>
+                             <p class="text-[11px] text-slate-400 font-bold mt-1" style="font-family: Arial, Helvetica, sans-serif !important;">${displayDetails}</p>
+                             ${moraleHtml}
+                         </div>
+@@ -4262,7 +4328,7 @@
+             }
+             else if (currentLevel === 2) {
+                 back.classList.remove('hidden'); sortTools.classList.add('hidden'); pctToggle.classList.add('hidden'); moraleToggle.classList.add('hidden'); btnExportClients.classList.add('hidden'); listFilterContainer.classList.add('hidden');
+-                title.innerHTML = `${path.orgName} ${clientCodeBadge(path.orgName)} ${payerCodeBadge(path.orgName)} ${directDebitBadge(path.orgName)}`;
++                title.innerHTML = `${path.orgName} ${clientCodeBadge(path.orgName)} ${payerCodeBadge(path.orgName)} ${directDebitBadge(path.orgName)} ${unmatchedTransferBadge(path.orgName)}`;
+ 
+                 if (hasRevenue) {
+                     lvl2FilterContainer.classList.remove('hidden');
+@@ -4340,6 +4406,7 @@
+                     updateAnalytics(activeOrgDebts);
+                 }
+ 
++                html += buildUnmatchedTransfersClientSection(path.orgName);
+                 view.innerHTML = html;
+                 const clientProfileHtml = buildClientProfileSection(path.orgName);
+                 if (clientProfileContainer && clientProfileHtml) {
+@@ -4439,7 +4506,8 @@ function getClientProfileMetrics(orgName) {
+                     <article class="client-profile-kpi client-profile-kpi--future"><div class="client-profile-kpi__label"><span>תשלומים עתידיים</span><i class="fa-solid fa-clock"></i></div><strong>${formatCurrency(metrics.futurePayments)}</strong><small>חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></article>
+                     <article class="client-profile-kpi"><div class="client-profile-kpi__label"><span>שיעור גבייה</span><i class="fa-solid fa-percent"></i></div><strong>${metrics.collectionRate === null ? 'אין נתון' : metrics.collectionRate.toFixed(1) + '%'}</strong><small>גבייה מחשבוניות ${CURRENT_YEAR} מתוך החיובים בשנה</small></article>
+                 </div>
+-                ${buildPastDebtSummary(metrics.pastOpenDebt, metrics.collectionComposition)}
++                ${buildPastDebtSummary(metrics.pastOpenDebt, metrics.collectionComposition)}
++                ${buildUnmatchedTransfersClientSummary(orgName)}
+                 <div class="client-profile-operational">
+                     <div class="client-profile-operational__item"><span>חשבוניות בפיגור</span><strong>${metrics.overdueRows.length.toLocaleString('he-IL')}</strong></div>
+                     <div class="client-profile-operational__item"><span>חשבוניות עתידיות</span><strong>${metrics.futureRows.length.toLocaleString('he-IL')}</strong></div>
+@@ -4682,7 +4750,7 @@ function getClientProfileMetrics(orgName) {
+                 const escapedName = org.name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                 html += `
+                     <div onclick="selectSearchClient('${escapedName}')" class="p-3 text-sm hover:bg-blue-50 cursor-pointer transition-colors text-right font-medium text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;">
+-                        ${org.name} ${directDebitBadge(org.name)}
++                        ${org.name} ${directDebitBadge(org.name)} ${unmatchedTransferBadge(org.name)}
+                     </div>
+                 `;
+             });
+@@ -6221,7 +6289,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true)
+                 return `<tr><td><strong>${month}</strong></td><td>${formatCurrency(billed)}</td><td>${formatCurrency(collected)}</td><td>${rate.toFixed(1)}%</td></tr>`;
+             }).join('') + `
+                 <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${formatCurrency(data.totalBilled)}</td><td>${formatCurrency(data.totalCollected)}</td><td>${data.collectionRate.toFixed(1)}%</td></tr>
+-                ${collectionCompositionTableFooter(collectionComposition)}`;
++                ${collectionCompositionTableFooter(collectionComposition, '', 'dashboard')}`;
+ 
+             const totalSectorClients = countUniqueClients([
+                 ...revenueDb.filter(row => getRevenueYear(row) === CURRENT_YEAR && !row.isFee),
+@@ -6518,7 +6586,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true)
+                 return `<tr><td><strong>${month}</strong></td><td>${formatCurrency(billed)}</td><td>${formatCurrency(collected)}</td><td>${rate.toFixed(1)}%</td></tr>`;
+             }).join('') + `
+                 <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${formatCurrency(data.totalBilled)}</td><td>${formatCurrency(data.totalCollected)}</td><td>${data.collectionRate.toFixed(1)}%</td></tr>
+-                ${collectionCompositionTableFooter(collectionComposition)}`;
++                ${collectionCompositionTableFooter(collectionComposition, '', 'dashboard')}`;
+ 
+             const debtInvoicesTotal = data.pastDebts.length;
+             const debtClientsTotal = countUniqueClients(data.pastDebts);
+@@ -6699,6 +6767,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true)
+                 debt: 'קובץ החובות',
+                 revenue: 'קובץ ההכנסות',
+                 historical: 'קובץ החשבוניות שהותאמו בשנת העבודה',
++                'unmatched-transfers': 'קובץ ההעברות שטרם הותאמו',
+                 'query-online': 'קובץ שאילתות האון ליין',
+                 'query-batch': 'קובץ שאילתות האצווה'
+             };
+@@ -6898,6 +6967,148 @@ function getCollectionComposition(currentYearCollected, predicate = () => true)
+             reader.readAsArrayBuffer(file);
+         }
+ 
++        function parseUnmatchedTransferRows(rows) {
++            validateSpreadsheetColumns(rows, [
++                { names: ['סוג מסמך'], label: '"סוג מסמך"' },
++                { names: ['לקוח'], label: '"לקוח"' },
++                { names: ['שם חשבון'], label: '"שם חשבון"' },
++                { names: ['מספר מסמך'], label: '"מספר מסמך"' },
++                { names: ['סכום במטבע מסמך'], label: '"סכום במטבע מסמך"' }
++            ]);
++            const parsed = rows.filter(row => String(row['סוג מסמך'] || '').trim().toUpperCase() === 'DZ').map(row => {
++                const sourceAmount = Number(String(row['סכום במטבע מסמך'] ?? '0').replace(/,/g, '')) || 0;
++                return {
++                    documentType: 'DZ',
++                    clientCode: normalizeClientCodeValue(row['לקוח']),
++                    clientName: String(row['שם חשבון'] || 'לקוח ללא שם').trim(),
++                    documentNumber: String(row['מספר מסמך'] || '-').trim(),
++                    postingDate: parseExcelDateOrNull(row['תאריך רישום']),
++                    paymentDate: parseExcelDateOrNull(row['תאריך תשלום']),
++                    dueDate: parseExcelDateOrNull(row['מועד פרעון נטו']),
++                    text: String(row['טקסט'] || '').trim(),
++                    counterpartyName: String(row['שם חשבון נגדי'] || '').trim(),
++                    reference: String(row['סימוכין חשבונית'] || '').trim(),
++                    sourceAmount,
++                    amount: -sourceAmount
++                };
++            }).filter(row => row.clientCode);
++            if (!parsed.length) throw new Error('לא נמצאו בקובץ רשומות מסוג מסמך DZ עם מספר לקוח תקין.');
++            return parsed;
++        }
++
++        function processUnmatchedTransfersExcel(event) {
++            const file = event.target.files?.[0];
++            if (!file) return;
++            clearFileLoadError();
++            const reader = new FileReader();
++            reader.onload = loadEvent => {
++                try {
++                    const rows = getSpreadsheetRows(loadEvent.target.result);
++                    unmatchedTransfersDb = parseUnmatchedTransferRows(rows);
++                    clearFileLoadError();
++                    markDataSourceLoaded('unmatched-transfers', file.name);
++                    if (currentScreen === 'unmatched-transfers') renderUnmatchedTransfersReport();
++                    if (currentLevel === 2 && currentScreen === 'debt') renderView();
++                    if (currentScreen === 'debtor-finder') renderDebtorFinder();
++                } catch (error) {
++                    showFileLoadError('unmatched-transfers', error?.message || 'מבנה הקובץ אינו תקין או שלא ניתן לקרוא אותו.');
++                    event.target.value = '';
++                }
++            };
++            reader.onerror = () => {
++                showFileLoadError('unmatched-transfers', 'לא ניתן לקרוא את הקובץ שנבחר.');
++                event.target.value = '';
++            };
++            reader.readAsArrayBuffer(file);
++        }
++
++        function getUnmatchedTransfersForClient(orgName) {
++            const clientCode = normalizeClientCodeValue(getClientCode(orgName));
++            if (!clientCode) return [];
++            return unmatchedTransfersDb.filter(row => row.clientCode === clientCode);
++        }
++
++        function hasUnmatchedTransfers(orgNameOrCode) {
++            const directCode = normalizeClientCodeValue(orgNameOrCode);
++            const code = directCode && unmatchedTransfersDb.some(row => row.clientCode === directCode)
++                ? directCode
++                : normalizeClientCodeValue(getClientCode(orgNameOrCode));
++            return Boolean(code) && unmatchedTransfersDb.some(row => row.clientCode === code);
++        }
++
++        function unmatchedTransferBadge(orgNameOrCode) {
++            return hasUnmatchedTransfers(orgNameOrCode)
++                ? '<span class="unmatched-transfer-badge" title="ללקוח קיימות העברות שטרם הותאמו"><i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i>העברות שטרם הותאמו</span>'
++                : '';
++        }
++
++        function aggregateUnmatchedTransfers() {
++            const clients = new Map();
++            unmatchedTransfersDb.forEach(row => {
++                const key = row.clientCode;
++                if (!clients.has(key)) clients.set(key, { clientCode:key, clientName:row.clientName, count:0, amount:0 });
++                const client = clients.get(key);
++                client.count += 1;
++                client.amount += Number(row.amount) || 0;
++                if (row.clientName.length > client.clientName.length) client.clientName = row.clientName;
++            });
++            return [...clients.values()].sort((a,b) => b.amount - a.amount || a.clientName.localeCompare(b.clientName, 'he'));
++        }
++
++        function buildUnmatchedTransfersClientSummary(orgName) {
++            const rows = getUnmatchedTransfersForClient(orgName);
++            if (!rows.length) return '';
++            const amount = rows.reduce((sum,row) => sum + (Number(row.amount) || 0), 0);
++            return `<div class="unmatched-transfer-summary no-print" aria-label="העברות שטרם הותאמו">
++                <div class="unmatched-transfer-summary__heading"><h4><i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i> העברות שטרם הותאמו</h4>
++                    <div class="unmatched-transfer-summary__metrics"><span>מספר העברות <strong>${rows.length.toLocaleString('he-IL')}</strong></span><span>סכום נטו <strong>${formatCurrency(amount)}</strong></span></div>
++                </div></div>`;
++        }
++
++        function buildUnmatchedTransfersClientSection(orgName) {
++            const rows = getUnmatchedTransfersForClient(orgName);
++            if (!rows.length) return '';
++            const amount = rows.reduce((sum,row) => sum + (Number(row.amount) || 0), 0);
++            const rowHtml = [...rows].sort((a,b) => (b.postingDate?.getTime() || 0) - (a.postingDate?.getTime() || 0)).map(row => `<tr>
++                <td class="p-4 font-bold text-slate-700">${escapeHtml(row.documentNumber)}</td>
++                <td class="p-4">${row.postingDate ? row.postingDate.toLocaleDateString('he-IL') : 'אין מידע'}</td>
++                <td class="p-4">${row.paymentDate ? row.paymentDate.toLocaleDateString('he-IL') : 'אין מידע'}</td>
++                <td class="p-4">${escapeHtml(row.text || row.reference || 'אין מידע')}</td>
++                <td class="p-4">${escapeHtml(row.counterpartyName || 'אין מידע')}</td>
++                <td class="p-4 font-bold text-left">${formatCurrency(row.amount)}</td>
++            </tr>`).join('');
++            return `<section class="unmatched-transfer-client-section no-print" aria-label="פירוט העברות שטרם הותאמו">
++                <div class="unmatched-transfer-client-section__header"><div><h3>העברות שטרם הותאמו</h3><p>מידע אינפורמטיבי ממסמכי DZ. אינו נכלל בסכומי החיובים, החובות או הגבייה.</p></div><div class="unmatched-transfer-client-section__totals"><span>העברות <strong>${rows.length.toLocaleString('he-IL')}</strong></span><span>סכום נטו <strong>${formatCurrency(amount)}</strong></span></div></div>
++                <div style="overflow-x:auto"><table class="w-full text-right border-collapse"><thead class="bg-slate-100 text-xs font-bold text-slate-500"><tr><th class="p-4">מספר מסמך</th><th class="p-4">תאריך רישום</th><th class="p-4">תאריך תשלום</th><th class="p-4">טקסט</th><th class="p-4">חשבון נגדי</th><th class="p-4 text-left">סכום</th></tr></thead><tbody class="divide-y divide-slate-100 bg-white">${rowHtml}</tbody></table></div>
++            </section>`;
++        }
++
++        function renderUnmatchedTransfersReport() {
++            const body = document.getElementById('unmatched-report-table-body');
++            if (!body) return;
++            const rows = aggregateUnmatchedTransfers();
++            const totalCount = rows.reduce((sum,row) => sum + row.count, 0);
++            const totalAmount = rows.reduce((sum,row) => sum + row.amount, 0);
++            body.innerHTML = rows.map(row => `<tr><td><strong>${escapeHtml(row.clientName)}</strong></td><td class="numeric-cell">${row.count.toLocaleString('he-IL')}</td><td class="numeric-cell"><strong>${formatCurrency(row.amount)}</strong></td></tr>`).join('') +
++                `<tr class="unmatched-report-total"><td>סה״כ</td><td class="numeric-cell">${totalCount.toLocaleString('he-IL')}</td><td class="numeric-cell">${formatCurrency(totalAmount)}</td></tr>`;
++        }
++
++        function printUnmatchedTransfersReport() {
++            const rows = aggregateUnmatchedTransfers();
++            if (!rows.length) return;
++            const totalCount = rows.reduce((sum,row) => sum + row.count, 0);
++            const totalAmount = rows.reduce((sum,row) => sum + row.amount, 0);
++            const tableRows = rows.map(row => `<tr><td><strong>${escapeHtml(row.clientName)}</strong></td><td style="text-align:center">${row.count.toLocaleString('he-IL')}</td><td style="direction:ltr;text-align:right;font-weight:700">${formatCurrency(row.amount)}</td></tr>`).join('');
++            const win = window.open('', '_blank');
++            if (!win) { alert('פתיחת חלון ההדפסה נחסמה.'); return; }
++            const title = 'דוח העברות שטרם הותאמו';
++            win.document.write(`<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>${title}</title>${getClientDocumentPrintStyles()}<style>@page{size:A4 portrait;margin:0}.unmatched-print-note{margin:0 0 14px;color:var(--print-muted);font-size:9pt}.unmatched-print-table tfoot{display:table-row-group!important}</style></head><body>
++                ${getClientDocumentPageStart(title)}<h1 class="document-title">${title}</h1><p class="unmatched-print-note">הסכומים מוצגים לאחר היפוך הסימן בקובץ המקור. דוח זה אינפורמטיבי ואינו משפיע על מדדי המערכת.</p>
++                <table class="unmatched-print-table"><thead><tr><th>לקוח</th><th>סה״כ העברות</th><th>סכום</th></tr></thead><tbody>${tableRows}<tr style="font-weight:700;background:#eef3f7"><td>סה״כ</td><td style="text-align:center">${totalCount.toLocaleString('he-IL')}</td><td style="direction:ltr;text-align:right">${formatCurrency(totalAmount)}</td></tr></tbody></table>${getClientDocumentPageEnd()}
++                <script>window.addEventListener('load',function(){window.focus();setTimeout(function(){window.print()},350)});<\/script></body></html>`);
++            win.document.close();
++        }
++
+         /**
+          * Load invoices matched during the work year. The file is parsed with
+          * the same canonical schema as current-year revenue, but is stored in a
+@@ -7441,6 +7652,11 @@ function getCollectionComposition(currentYearCollected, predicate = () => true)
+                     status: 'historical-file-status',
+                     card: 'historical-source-card'
+                 },
++                'unmatched-transfers': {
++                    action: 'unmatched-transfers-file-action',
++                    status: 'unmatched-transfers-file-status',
++                    card: 'unmatched-transfers-source-card'
++                },
+                 'query-online': {
+                     action: 'query-online-file-action',
+                     status: 'query-online-file-status',
+@@ -7470,6 +7686,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true)
+             const queryOnlineReady = queryOnlineDb.length > 0;
+             const queryBatchReady = queryBatchDb.length > 0;
+             const queriesReady = queryOnlineReady && queryBatchReady;
++            const unmatchedTransfersReady = unmatchedTransfersDb.length > 0;
+ 
+             const setAccess = (id, enabled, title) => {
+                 const element = document.getElementById(id);
+@@ -7485,6 +7702,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true)
+             setAccess('nav-management', coreReady, coreReady ? 'פתיחת דוח ההנהלה' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
+             setAccess('nav-fees-management', coreReady, coreReady ? 'פתיחת סקירת אגרות העברת בעלות' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
+             setAccess('nav-dashboard-report', coreReady, coreReady ? 'הפקת דוח מאוחד' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
++            setAccess('nav-unmatched-transfers', unmatchedTransfersReady, unmatchedTransfersReady ? 'פתיחת דוח העברות שטרם הותאמו' : 'נדרש לטעון קובץ העברות שטרם הותאמו');
+             const historicalAccessTitle = historicalReady
+                 ? 'פתיחת גביית חובות עבר'
+                 : (!coreReady
