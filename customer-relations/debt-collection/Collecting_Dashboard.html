@@ -1371,7 +1371,7 @@
 
         .debtor-finder-criteria-layout {
             display: grid;
-            grid-template-columns: minmax(140px, 170px) minmax(160px, 190px) auto minmax(150px, 175px) minmax(180px, 215px);
+            grid-template-columns: repeat(4, minmax(115px, 1fr)) auto minmax(135px, 165px) minmax(160px, 200px);
             gap: var(--space-4);
             align-items: end;
             padding-block: var(--space-2) var(--space-3);
@@ -1803,8 +1803,9 @@
             .department-name, .system-date { color: #555 !important; }
             .workspace-toolbar, .header-actions, .beta-badge { display: none !important; }
         }
-        .unmatched-transfer-badge { display:inline-flex;align-items:center;gap:5px;margin-inline-start:7px;padding:2px 7px;border:1px solid #86d6aa;border-radius:999px;background:#ecfdf5;color:#047857;font-family:var(--font-family-base)!important;font-size:10px;font-weight:800;white-space:nowrap; }
-        .unmatched-transfer-client-section *, .unmatched-transfer-summary *, .unmatched-transfer-badge { font-family:var(--font-family-base)!important; }
+        .unmatched-transfer-badge { display:inline-flex;align-items:center;gap:5px;margin-inline-start:7px;padding:3px 8px;border:1px solid #86d6aa;border-radius:999px;background:#ecfdf5;color:#047857;font-family:var(--font-family-base)!important;font-size:11px;font-style:normal;font-weight:700;line-height:1.2;letter-spacing:normal;white-space:nowrap; }
+        .unmatched-transfer-badge i { font-family:"Font Awesome 6 Free"!important;font-style:normal;font-weight:900; }
+        .unmatched-transfer-client-section, .unmatched-transfer-summary { font-family:Arial,Helvetica,sans-serif!important; }
         .unmatched-transfer-summary { margin-top:12px;padding:12px 14px;border:1px solid var(--color-border);border-radius:10px;background:#fff;font-family:var(--font-family-base)!important; }
         .unmatched-transfer-summary__heading { display:flex;align-items:center;justify-content:space-between;gap:12px; }
         .unmatched-transfer-summary__heading h4 { margin:0;color:var(--brand-active);font-family:var(--font-family-base)!important;font-size:14px;font-weight:800; }
@@ -1826,6 +1827,9 @@
         .unmatched-report-table th { background:#f3f6f9;color:#526579;font-size:12px; }
         .unmatched-report-table td { font-size:13px; }
         .unmatched-report-table .numeric-cell { direction:ltr;text-align:right;font-variant-numeric:tabular-nums; }
+        .unmatched-report-client-summary { background:#eaf2f8;font-weight:800; }
+        .unmatched-report-detail td { color:#40566d;font-size:12px; }
+        .unmatched-report-detail td:nth-child(2) { padding-inline-start:28px; }
         .unmatched-report-total { background:#eef3f7;font-weight:800; }
         @media (max-width:760px) { .unmatched-transfer-summary__heading,.unmatched-transfer-client-section__header{align-items:flex-start;flex-direction:column}.unmatched-transfer-summary__metrics,.unmatched-transfer-client-section__totals{flex-wrap:wrap;gap:9px 16px}.unmatched-report-main{padding:12px} }
     </style>
@@ -2112,7 +2116,7 @@
                     <div><h2>ריכוז העברות שטרם הותאמו לפי לקוח</h2><p>הסכומים מוצגים לאחר היפוך הסימן בקובץ המקור. מידע זה אינו משפיע על מדדי המערכת.</p></div>
                     <button type="button" class="button-secondary button-secondary--brand no-print" onclick="printUnmatchedTransfersReport()"><i class="fa-solid fa-print" aria-hidden="true"></i>הדפסת הדוח</button>
                 </div>
-                <div style="overflow-x:auto"><table class="unmatched-report-table"><thead><tr><th>לקוח</th><th>סה״כ העברות</th><th>סכום</th></tr></thead><tbody id="unmatched-report-table-body"></tbody></table></div>
+                <div style="overflow-x:auto"><table class="unmatched-report-table"><thead><tr><th>קוד מרכבה</th><th>לקוח / מספר מסמך</th><th>מספר העברות</th><th>תאריך תשלום</th><th>פרטים</th><th>סכום</th></tr></thead><tbody id="unmatched-report-table-body"></tbody></table></div>
             </section>
         </main>
     </div>
@@ -2604,6 +2608,14 @@
                         <div class="debtor-finder-control">
                             <label for="debtor-finder-min-amount" class="control-label">סכום חוב מינימלי בש״ח</label>
                             <input id="debtor-finder-min-amount" class="debtor-finder-input" type="number" min="0" step="100" inputmode="decimal" value="1000" oninput="renderDebtorFinder()">
+                        </div>
+                        <div class="debtor-finder-control">
+                            <label for="debtor-finder-from-year" class="control-label">משנת חוב</label>
+                            <select id="debtor-finder-from-year" class="debtor-finder-input" onchange="renderDebtorFinder()"><option value="">כל השנים</option></select>
+                        </div>
+                        <div class="debtor-finder-control">
+                            <label for="debtor-finder-to-year" class="control-label">עד שנת חוב</label>
+                            <select id="debtor-finder-to-year" class="debtor-finder-input" onchange="renderDebtorFinder()"><option value="">כל השנים</option></select>
                         </div>
                         <div class="debtor-finder-actions">
                             <button type="button" class="button-secondary" onclick="resetDebtorFinderDefaults()" title="החזרת תנאי האיתור והמסננים לברירת המחדל">
@@ -3699,6 +3711,17 @@
             let documentHTML = `
                 <html dir="rtl" lang="he"><head><title>${documentTitle}</title>
                 ${getClientDocumentPrintStyles()}
+                <style>
+                    .dashboard-report-page { break-inside:avoid; page-break-inside:avoid; }
+                    .dashboard-report-page .kpis { margin-bottom:8px; }
+                    .dashboard-report-page h3 { margin:7px 0 5px; }
+                    .dashboard-report-page table { margin-top:0; font-size:8.4px; }
+                    .dashboard-report-page th, .dashboard-report-page td { padding:3px 5px; }
+                    .dashboard-report-page .past-debt-section { margin-top:9px; padding-top:6px; }
+                    .dashboard-report-page .past-debt-section__title { margin-bottom:5px; }
+                    .dashboard-report-page .past-debt-summary { margin-bottom:0; }
+                    .dashboard-report-page .past-debt-card { padding:6px 8px; }
+                </style>
                 </head>
                 <body>
                     ${getClientDocumentPageStart(documentTitle)}
@@ -3739,7 +3762,7 @@
                 dashStageB = dashStageB_orig;
 
                 documentHTML += `
-                    <section class="report-section ${idx < printConfigs.length - 1 ? 'report-page-break' : ''}">
+                    <section class="report-section dashboard-report-page ${idx < printConfigs.length - 1 ? 'report-page-break' : ''}">
                         <h2 style="text-align:center; color:#0B3C5D; margin-bottom: 20px;">דוח חיובים וגבייה: ${config.title}</h2>
                         
                         <div class="kpis">
@@ -3748,8 +3771,6 @@
                             <div class="kpi-card"><div class="kpi-title">חוב בפיגור</div><div class="kpi-value" style="color:#b91c1c">${formatCurrency(debtOverdue)}</div></div>
                             <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${formatCurrency(debtFuture)}</div></div>
                         </div>
-                        ${buildPastDebtSummary(pastOpenDebt, collectionComposition)}
-
                         <h3>חיובים וגבייה לפי חודש הפקת החשבונית</h3>
                         <table>
                             <thead>
@@ -3781,6 +3802,7 @@
                                 ${collectionCompositionTableFooter(collectionComposition, '', 'dashboard')}
                             </tbody>
                         </table>
+                        ${buildPastDebtSummary(pastOpenDebt, collectionComposition)}
                     </section>
                 `;
             });
@@ -3832,14 +3854,34 @@
             return incomeFilter === 'fees' ? row.isFee : !row.isFee;
         }
 
+        function updateDebtorFinderYearOptions() {
+            const years = [...new Set(db
+                .filter(row => row.isOverdue && isValidDate(row.dueDate))
+                .map(row => row.dueDate.getFullYear()))].sort((a, b) => a - b);
+            const options = '<option value="">כל השנים</option>' + years.map(year => `<option value="${year}">${year}</option>`).join('');
+            ['debtor-finder-from-year', 'debtor-finder-to-year'].forEach(id => {
+                const select = document.getElementById(id);
+                if (!select) return;
+                const previous = select.value;
+                select.innerHTML = options;
+                select.value = previous && years.includes(Number(previous)) ? previous : '';
+            });
+        }
         function getDebtorFinderCriteria() {
             const minInvoicesValue = document.getElementById('debtor-finder-min-invoices')?.value.trim() || '';
             const minAmountValue = document.getElementById('debtor-finder-min-amount')?.value.trim() || '';
+            const fromYearValue = document.getElementById('debtor-finder-from-year')?.value || '';
+            const toYearValue = document.getElementById('debtor-finder-to-year')?.value || '';
+            const fromYear = fromYearValue ? Number(fromYearValue) : null;
+            const toYear = toYearValue ? Number(toYearValue) : null;
             return {
                 hasInvoiceThreshold: minInvoicesValue !== '' && Number(minInvoicesValue) > 0,
                 minInvoices: Math.max(0, Math.floor(Number(minInvoicesValue) || 0)),
                 hasAmountThreshold: minAmountValue !== '' && Number(minAmountValue) >= 0,
                 minAmount: Math.max(0, Number(minAmountValue) || 0),
+                fromYear,
+                toYear,
+                hasValidYearRange: fromYear === null || toYear === null || fromYear <= toYear,
                 sector: debtorFinderSector
             };
         }
@@ -3849,9 +3891,14 @@
             return debtorFinderActivity === 'fees' ? row.isFee : !row.isFee;
         }
 
-        function buildDebtorFinderRows(sector = 'all') {
+        function buildDebtorFinderRows(sector = 'all', fromYear = null, toYear = null) {
             const clients = new Map();
-            db.filter(row => row.isOverdue && isDebtorFinderTypeMatch(row) && (sector === 'all' || row.sector === sector))
+            db.filter(row => {
+                if (!row.isOverdue || !isDebtorFinderTypeMatch(row) || (sector !== 'all' && row.sector !== sector)) return false;
+                const year = isValidDate(row.dueDate) ? row.dueDate.getFullYear() : null;
+                if (year === null) return fromYear === null && toYear === null;
+                return (fromYear === null || year >= fromYear) && (toYear === null || year <= toYear);
+            })
                 .forEach((row, rowIndex) => {
                     const code = String(row.code || '').trim();
                     const key = code || String(row.name || '').trim();
@@ -3962,8 +4009,9 @@
             const context = document.getElementById('debtor-finder-context');
             if (!body || !clientCount || !totalAmountElement || !context) return;
 
+            updateDebtorFinderYearOptions();
             const criteria = getDebtorFinderCriteria();
-            const hasCriteria = criteria.hasInvoiceThreshold && criteria.hasAmountThreshold;
+            const hasCriteria = criteria.hasInvoiceThreshold && criteria.hasAmountThreshold && criteria.hasValidYearRange;
             updateDebtorFinderFilterUI();
             updateDebtorFinderSortHeaders();
 
@@ -3971,12 +4019,12 @@
                 debtorFinderRows = [];
                 clientCount.textContent = '0';
                 totalAmountElement.textContent = formatCurrency(0);
-                context.textContent = 'יש להזין ערך תקין בשני תנאי האיתור.';
+                context.textContent = criteria.hasValidYearRange ? 'יש להזין ערך תקין בשני תנאי האיתור.' : 'שנת ההתחלה אינה יכולה להיות מאוחרת משנת הסיום.';
                 body.innerHTML = '<tr><td colspan="7" style="padding:32px;text-align:center;color:#607080">לא הוגדרו שני תנאי איתור תקינים.</td></tr>';
                 return;
             }
 
-            const allRows = buildDebtorFinderRows(criteria.sector);
+            const allRows = buildDebtorFinderRows(criteria.sector, criteria.fromYear, criteria.toYear);
             debtorFinderRows = allRows.filter(row => {
                 return row.invoiceCount >= criteria.minInvoices && row.amount >= criteria.minAmount;
             });
@@ -3985,9 +4033,12 @@
             const totalAmount = debtorFinderRows.reduce((sum, row) => sum + row.amount, 0);
             const activityLabel = debtorFinderActivity === 'info' ? 'שירותי מידע' : (debtorFinderActivity === 'fees' ? 'אגרות העברת בעלות' : 'כל תחומי הפעילות');
             const sectorLabel = criteria.sector === 'all' ? 'כל הסקטורים' : criteria.sector;
+            const yearRangeLabel = criteria.fromYear === null && criteria.toYear === null
+                ? 'כל שנות החוב'
+                : `שנות חוב ${criteria.fromYear ?? 'מהשנה הראשונה'} עד ${criteria.toYear ?? 'השנה האחרונה'}`;
             clientCount.textContent = debtorFinderRows.length.toLocaleString('he-IL');
             totalAmountElement.textContent = formatCurrency(totalAmount);
-            context.textContent = `${activityLabel}, ${sectorLabel}. הרשימה ממוינת לפי ${getDebtorFinderSortLabel()} ${debtorFinderSortDirection === 'asc' ? 'בסדר עולה' : 'בסדר יורד'}.`;
+            context.textContent = `${activityLabel}, ${sectorLabel}, ${yearRangeLabel}. הרשימה ממוינת לפי ${getDebtorFinderSortLabel()} ${debtorFinderSortDirection === 'asc' ? 'בסדר עולה' : 'בסדר יורד'}.`;
 
             if (!debtorFinderRows.length) {
                 body.innerHTML = '<tr><td colspan="7" style="padding:32px;text-align:center;color:#607080">לא נמצאו לקוחות העומדים בתנאים שהוגדרו.</td></tr>';
@@ -4016,14 +4067,17 @@
 
         function printDebtorFinderReport() {
             const criteria = getDebtorFinderCriteria();
-            if (!criteria.hasInvoiceThreshold || !criteria.hasAmountThreshold) {
-                alert('יש להזין ערך תקין בשני תנאי האיתור לפני הפקת הדוח.');
+            if (!criteria.hasInvoiceThreshold || !criteria.hasAmountThreshold || !criteria.hasValidYearRange) {
+                alert(criteria.hasValidYearRange ? 'יש להזין ערך תקין בשני תנאי האיתור לפני הפקת הדוח.' : 'שנת ההתחלה אינה יכולה להיות מאוחרת משנת הסיום.');
                 return;
             }
 
             renderDebtorFinder();
             const activityLabel = debtorFinderActivity === 'info' ? 'שירותי מידע' : (debtorFinderActivity === 'fees' ? 'אגרות העברת בעלות' : 'כל תחומי הפעילות');
             const sectorLabel = debtorFinderSector === 'all' ? 'כל הסקטורים' : debtorFinderSector;
+            const yearRangeLabel = criteria.fromYear === null && criteria.toYear === null
+                ? 'כל שנות החוב'
+                : `${criteria.fromYear ?? 'השנה הראשונה'} עד ${criteria.toYear ?? 'השנה האחרונה'}`;
             const totalAmount = debtorFinderRows.reduce((sum, row) => sum + row.amount, 0);
             const totalInvoices = debtorFinderRows.reduce((sum, row) => sum + row.invoiceCount, 0);
             const reportTitle = 'דוח איתור חייבים לטיפול';
@@ -4052,7 +4106,7 @@
                     ${getClientDocumentPrintStyles()}
                     <style>
                         @page { size: A4 landscape; margin: 0; }
-                        .finder-report-meta { display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 16px; }
+                        .finder-report-meta { display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:0 0 16px; }
                         .finder-report-meta > div { border:1px solid var(--print-border);border-radius:7px;padding:9px 11px;background:var(--print-surface); }
                         .finder-report-meta span { display:block;color:var(--print-muted);font-size:8.5pt;font-weight:700; }
                         .finder-report-meta strong { display:block;margin-top:2px;font-size:11pt; }
@@ -4068,10 +4122,11 @@
                     <div class="finder-report-meta">
                         <div><span>תחום פעילות</span><strong>${escapeHtml(activityLabel)}</strong></div>
                         <div><span>סקטור</span><strong>${escapeHtml(sectorLabel)}</strong></div>
+                        <div><span>טווח שנות חוב</span><strong>${escapeHtml(yearRangeLabel)}</strong></div>
                         <div><span>לקוחות שאותרו</span><strong>${debtorFinderRows.length.toLocaleString('he-IL')}</strong></div>
                         <div><span>חוב כולל בפיגור</span><strong style="color:var(--print-danger)">${formatCurrency(totalAmount)}</strong></div>
                     </div>
-                    <p class="finder-report-criteria"><strong>תנאי האיתור:</strong> לפחות ${criteria.minInvoices.toLocaleString('he-IL')} חשבוניות בפיגור וגם חוב בפיגור בסך ${formatCurrency(criteria.minAmount)} לפחות. הרשימה ממוינת לפי ${getDebtorFinderSortLabel()} ${debtorFinderSortDirection === 'asc' ? 'בסדר עולה' : 'בסדר יורד'}.</p>
+                    <p class="finder-report-criteria"><strong>תנאי האיתור:</strong> לפחות ${criteria.minInvoices.toLocaleString('he-IL')} חשבוניות בפיגור וגם חוב בפיגור בסך ${formatCurrency(criteria.minAmount)} לפחות, בטווח ${escapeHtml(yearRangeLabel)}. הרשימה ממוינת לפי ${getDebtorFinderSortLabel()} ${debtorFinderSortDirection === 'asc' ? 'בסדר עולה' : 'בסדר יורד'}.</p>
                     <table class="finder-report-table">
                         <thead><tr><th>שם הלקוח</th><th>לקוח במרכבה</th><th>חשבוניות בפיגור</th><th>חוב בפיגור</th><th>מועד הפירעון הישן ביותר</th><th>ימי פיגור מרביים</th></tr></thead>
                         <tbody>${reportRows}</tbody>
@@ -4088,6 +4143,10 @@
             const minAmount = document.getElementById('debtor-finder-min-amount');
             if (minInvoices) minInvoices.value = '5';
             if (minAmount) minAmount.value = '1000';
+            const fromYear = document.getElementById('debtor-finder-from-year');
+            const toYear = document.getElementById('debtor-finder-to-year');
+            if (fromYear) fromYear.value = '';
+            if (toYear) toYear.value = '';
             debtorFinderActivity = 'info';
             debtorFinderSector = 'all';
             debtorFinderSortKey = 'amount';
@@ -5428,6 +5487,7 @@ function getClientProfileMetrics(orgName) {
                 const pastYearsDebts = db.filter(r => r.name === path.orgName && r.dueDate.getFullYear() < CURRENT_YEAR && isTypeMatch(r));
                 pastYearsDebts.sort((a,b) => a.dueDate - b.dueDate);
                 const pastTotal = pastYearsDebts.reduce((acc, r) => acc + r.amount, 0);
+                const hasPastDebtSummary = pastTotal !== 0 || (clientCollectionComposition.hasHistoricalSource && clientCollectionComposition.historicalCollected !== 0);
 
                 const monthlyPaid = Array(12).fill(0);
                 const monthlyUnpaid = Array(12).fill(0);
@@ -5565,9 +5625,10 @@ function getClientProfileMetrics(orgName) {
                         <h2 class="document-title">דוח שנתי ללקוח - שנת ${CURRENT_YEAR}</h2>
                         <p>אנו מתכבדים להציג לכם סיכום של החיובים לשנה זו:</p>
                         <div class="kpis">
+                            <div class="kpi-card"><div class="kpi-title">חיובים בשנת ${CURRENT_YEAR}</div><div class="kpi-value" style="color:#1e3a8a">${formatCurrency(currentTotal)}</div><small>סך החיובים שהופקו בשנת העבודה</small></div>
                             <div class="kpi-card"><div class="kpi-title">גבייה שוטפת</div><div class="kpi-value" style="color:#047857">${formatCurrency(clientCollectionComposition.ongoingCollected)}</div>${buildCollectionCardBreakdown(clientCollectionComposition)}</div>
                         </div>
-                        ${buildPastDebtSummary(pastTotal, clientCollectionComposition)}
+                        ${hasPastDebtSummary ? buildPastDebtSummary(pastTotal, clientCollectionComposition) : ''}
                         
                         <table>
                             <thead>
@@ -7126,15 +7187,20 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const clients = new Map();
             unmatchedTransfersDb.forEach(row => {
                 const key = row.clientCode;
-                if (!clients.has(key)) clients.set(key, { clientCode:key, clientName:row.clientName, count:0, amount:0 });
+                if (!clients.has(key)) clients.set(key, { clientCode:key, clientName:row.clientName, count:0, amount:0, transfers:[] });
                 const client = clients.get(key);
                 client.count += 1;
                 client.amount += Number(row.amount) || 0;
+                client.transfers.push(row);
                 if (row.clientName.length > client.clientName.length) client.clientName = row.clientName;
             });
-            return [...clients.values()].sort((a,b) => b.amount - a.amount || a.clientName.localeCompare(b.clientName, 'he'));
+            return [...clients.values()].map(client => ({
+                ...client,
+                transfers: client.transfers.sort((a,b) =>
+                    (b.paymentDate?.getTime() || b.postingDate?.getTime() || 0) - (a.paymentDate?.getTime() || a.postingDate?.getTime() || 0)
+                    || String(a.documentNumber).localeCompare(String(b.documentNumber), 'he', { numeric:true }))
+            })).sort((a,b) => String(a.clientCode).localeCompare(String(b.clientCode), 'he', { numeric:true }));
         }
-
         function buildUnmatchedTransfersClientSummary(orgName) {
             const rows = getUnmatchedTransfersForClient(orgName);
             if (!rows.length) return '';
@@ -7162,32 +7228,65 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             </section>`;
         }
 
+        function unmatchedTransferDetailText(row) {
+            return [row.text, row.counterpartyName, row.reference].filter(Boolean).join(' | ') || 'אין מידע';
+        }
+
         function renderUnmatchedTransfersReport() {
             const body = document.getElementById('unmatched-report-table-body');
             if (!body) return;
-            const rows = aggregateUnmatchedTransfers();
-            const totalCount = rows.reduce((sum,row) => sum + row.count, 0);
-            const totalAmount = rows.reduce((sum,row) => sum + row.amount, 0);
-            body.innerHTML = rows.map(row => `<tr><td><strong>${escapeHtml(row.clientName)}</strong></td><td class="numeric-cell">${row.count.toLocaleString('he-IL')}</td><td class="numeric-cell"><strong>${formatCurrency(row.amount)}</strong></td></tr>`).join('') +
-                `<tr class="unmatched-report-total"><td>סה״כ</td><td class="numeric-cell">${totalCount.toLocaleString('he-IL')}</td><td class="numeric-cell">${formatCurrency(totalAmount)}</td></tr>`;
+            const clients = aggregateUnmatchedTransfers();
+            const totalCount = clients.reduce((sum,row) => sum + row.count, 0);
+            const totalAmount = clients.reduce((sum,row) => sum + row.amount, 0);
+            const groupedRows = clients.map(client => `
+                <tr class="unmatched-report-client-summary">
+                    <td class="numeric-cell"><bdi dir="ltr">${escapeHtml(client.clientCode)}</bdi></td>
+                    <td><strong>${escapeHtml(client.clientName)}</strong></td>
+                    <td class="numeric-cell">${client.count.toLocaleString('he-IL')}</td>
+                    <td></td><td>סיכום ללקוח</td>
+                    <td class="numeric-cell"><strong>${formatCurrency(client.amount)}</strong></td>
+                </tr>
+                ${client.transfers.map(row => `<tr class="unmatched-report-detail">
+                    <td></td>
+                    <td><bdi dir="ltr">${escapeHtml(row.documentNumber)}</bdi></td>
+                    <td></td>
+                    <td>${row.paymentDate ? row.paymentDate.toLocaleDateString('he-IL') : 'אין מידע'}</td>
+                    <td>${escapeHtml(unmatchedTransferDetailText(row))}</td>
+                    <td class="numeric-cell">${formatCurrency(row.amount)}</td>
+                </tr>`).join('')}`).join('');
+            body.innerHTML = groupedRows + `<tr class="unmatched-report-total"><td colspan="2">סה״כ</td><td class="numeric-cell">${totalCount.toLocaleString('he-IL')}</td><td colspan="2"></td><td class="numeric-cell">${formatCurrency(totalAmount)}</td></tr>`;
         }
 
         function printUnmatchedTransfersReport() {
-            const rows = aggregateUnmatchedTransfers();
-            if (!rows.length) return;
-            const totalCount = rows.reduce((sum,row) => sum + row.count, 0);
-            const totalAmount = rows.reduce((sum,row) => sum + row.amount, 0);
-            const tableRows = rows.map(row => `<tr><td><strong>${escapeHtml(row.clientName)}</strong></td><td style="text-align:center">${row.count.toLocaleString('he-IL')}</td><td style="direction:ltr;text-align:right;font-weight:700">${formatCurrency(row.amount)}</td></tr>`).join('');
+            const clients = aggregateUnmatchedTransfers();
+            if (!clients.length) return;
+            const totalCount = clients.reduce((sum,row) => sum + row.count, 0);
+            const totalAmount = clients.reduce((sum,row) => sum + row.amount, 0);
+            const tableRows = clients.map(client => `
+                <tr class="client-summary-row">
+                    <td style="direction:ltr;text-align:right"><strong>${escapeHtml(client.clientCode)}</strong></td>
+                    <td><strong>${escapeHtml(client.clientName)}</strong></td>
+                    <td style="text-align:center">${client.count.toLocaleString('he-IL')}</td>
+                    <td></td><td>סיכום ללקוח</td>
+                    <td style="direction:ltr;text-align:right;font-weight:700">${formatCurrency(client.amount)}</td>
+                </tr>
+                ${client.transfers.map(row => `<tr class="transfer-detail-row">
+                    <td></td>
+                    <td style="direction:ltr;text-align:right">${escapeHtml(row.documentNumber)}</td>
+                    <td></td>
+                    <td>${row.paymentDate ? row.paymentDate.toLocaleDateString('he-IL') : 'אין מידע'}</td>
+                    <td>${escapeHtml(unmatchedTransferDetailText(row))}</td>
+                    <td style="direction:ltr;text-align:right">${formatCurrency(row.amount)}</td>
+                </tr>`).join('')}`).join('');
             const win = window.open('', '_blank');
             if (!win) { alert('פתיחת חלון ההדפסה נחסמה.'); return; }
             const title = 'דוח העברות שטרם הותאמו';
-            win.document.write(`<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>${title}</title>${getClientDocumentPrintStyles()}<style>@page{size:A4 portrait;margin:0}.unmatched-print-note{margin:0 0 14px;color:var(--print-muted);font-size:9pt}.unmatched-print-table tfoot{display:table-row-group!important}</style></head><body>
+            win.document.write(`<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>${title}</title>${getClientDocumentPrintStyles()}<style>@page{size:A4 landscape;margin:0}.unmatched-print-note{margin:0 0 10px;color:var(--print-muted);font-size:8.5pt}.unmatched-print-table{font-size:8.2pt}.unmatched-print-table th,.unmatched-print-table td{padding:4px 6px}.unmatched-print-table thead{display:table-header-group}.unmatched-print-table tfoot{display:table-row-group!important}.client-summary-row{background:#eaf2f8;font-weight:700;break-after:avoid;page-break-after:avoid}.transfer-detail-row td{color:#34495e}.transfer-detail-row td:nth-child(2){padding-inline-start:16px}</style></head><body>
                 ${getClientDocumentPageStart(title)}<h1 class="document-title">${title}</h1><p class="unmatched-print-note">הסכומים מוצגים לאחר היפוך הסימן בקובץ המקור. דוח זה אינפורמטיבי ואינו משפיע על מדדי המערכת.</p>
-                <table class="unmatched-print-table"><thead><tr><th>לקוח</th><th>סה״כ העברות</th><th>סכום</th></tr></thead><tbody>${tableRows}<tr style="font-weight:700;background:#eef3f7"><td>סה״כ</td><td style="text-align:center">${totalCount.toLocaleString('he-IL')}</td><td style="direction:ltr;text-align:right">${formatCurrency(totalAmount)}</td></tr></tbody></table>${getClientDocumentPageEnd()}
+                <table class="unmatched-print-table"><thead><tr><th>קוד מרכבה</th><th>לקוח / מספר מסמך</th><th>מספר העברות</th><th>תאריך תשלום</th><th>פרטים</th><th>סכום</th></tr></thead><tbody>${tableRows}</tbody><tfoot><tr style="font-weight:700;background:#eef3f7"><td colspan="2">סה״כ</td><td style="text-align:center">${totalCount.toLocaleString('he-IL')}</td><td colspan="2"></td><td style="direction:ltr;text-align:right">${formatCurrency(totalAmount)}</td></tr></tfoot></table>${getClientDocumentPageEnd()}
                 <script>window.addEventListener('load',function(){window.focus();setTimeout(function(){window.print()},350)});<\/script></body></html>`);
             win.document.close();
         }
-
         /**
          * Load invoices matched during the work year. The file is parsed with
          * the same canonical schema as current-year revenue, but is stored in a
