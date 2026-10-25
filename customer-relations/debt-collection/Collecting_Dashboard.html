@@ -1832,6 +1832,32 @@
         .unmatched-report-detail td:nth-child(2) { padding-inline-start:28px; }
         .unmatched-report-total { background:#eef3f7;font-weight:800; }
         @media (max-width:760px) { .unmatched-transfer-summary__heading,.unmatched-transfer-client-section__header{align-items:flex-start;flex-direction:column}.unmatched-transfer-summary__metrics,.unmatched-transfer-client-section__totals{flex-wrap:wrap;gap:9px 16px}.unmatched-report-main{padding:12px} }
+
+        /* Admin assistant: a self-contained workspace inside the existing suite shell. */
+        .admin-chat-main { width: 100%; max-width: 1500px; margin: 0 auto; padding: 24px 28px 32px; min-height: calc(100vh - var(--sticky-header-height)); }
+        .admin-auth-card { max-width: 620px; margin: 48px auto; padding: 28px; border: 1px solid var(--color-border); border-radius: 18px; background: #fff; box-shadow: var(--shadow-card); }
+        .admin-auth-card__icon { display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:var(--brand-subtle);color:var(--brand-primary);font-size:21px;margin-bottom:16px }
+        .admin-auth-card h2 { margin: 0; color: var(--brand-primary); font-size: 23px; }.admin-auth-card p { margin: 8px 0 20px; color: var(--color-text-muted); line-height: 1.65; }
+        .admin-auth-form { display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end }.admin-auth-field { display:grid;gap:7px }.admin-auth-field label { color:var(--color-text-muted);font-size:12px;font-weight:800 }
+        .admin-auth-field input { min-height:46px;border:1px solid var(--color-border);border-radius:10px;padding:0 13px;direction:ltr;text-align:left;font:14px ui-monospace,SFMono-Regular,Consolas,monospace;outline:none }.admin-auth-field input:focus { border-color:var(--brand-primary);box-shadow:0 0 0 3px rgba(11,103,181,.12) }
+        .admin-auth-status { min-height:20px;margin-top:10px;color:var(--color-danger);font-size:12px }
+        .admin-chat-shell { height: calc(100vh - var(--sticky-header-height) - 56px); min-height: 560px; display:grid;grid-template-rows:auto 1fr auto;border:1px solid var(--color-border);border-radius:18px;background:#fff;box-shadow:var(--shadow-card);overflow:hidden }
+        .admin-chat-toolbar { display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 18px;border-bottom:1px solid var(--color-border);background:#fbfdff }.admin-chat-toolbar__title { display:flex;align-items:center;gap:11px;min-width:0 }.admin-chat-toolbar__icon { display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--brand-subtle);color:var(--brand-primary) }
+        .admin-chat-toolbar h2 { margin:0;color:var(--brand-primary);font-size:18px }.admin-chat-toolbar p{margin:2px 0 0;color:var(--color-text-muted);font-size:11px}.admin-chat-toolbar__actions { display:flex;align-items:center;gap:8px;flex-wrap:wrap }
+        .admin-chat-connected { display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid #a7d9bf;border-radius:99px;background:#effaf4;color:#087443;font-size:11px;font-weight:800 }.admin-chat-connected::before { content:"";width:7px;height:7px;border-radius:50%;background:#10a162 }
+        .admin-chat-messages { overflow:auto;padding:22px;scroll-behavior:smooth;background:linear-gradient(180deg,#f8fbfd 0,#fff 35%) }
+        .admin-chat-welcome { max-width:760px;margin:30px auto;padding:24px;border:1px solid #d8e5ef;border-radius:16px;background:#fff;text-align:center }.admin-chat-welcome i { color:var(--brand-primary);font-size:28px }.admin-chat-welcome h3{margin:10px 0 6px;color:var(--brand-primary)}.admin-chat-welcome p{margin:0;color:var(--color-text-muted);line-height:1.65}
+        .admin-chat-suggestions { display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:16px }.admin-chat-suggestions button{border:1px solid #c9dbea;border-radius:99px;background:#f5f9fc;color:var(--brand-primary);padding:7px 11px;font-size:11px;font-weight:700;cursor:pointer}.admin-chat-suggestions button:hover{background:var(--brand-subtle)}
+        .admin-message { display:flex;margin:0 0 16px }.admin-message--user{justify-content:flex-start}.admin-message--assistant{justify-content:flex-end}.admin-message__bubble { max-width:min(820px,86%);padding:12px 15px;border-radius:15px;line-height:1.65;font-size:14px;box-shadow:0 1px 2px rgba(15,50,75,.06) }
+        .admin-message--user .admin-message__bubble{background:var(--brand-primary);color:#fff;border-bottom-right-radius:4px}.admin-message--assistant .admin-message__bubble{background:#fff;color:var(--color-text);border:1px solid var(--color-border);border-bottom-left-radius:4px}
+        .admin-message__bubble p{margin:0 0 8px}.admin-message__bubble p:last-child{margin-bottom:0}.admin-message__bubble ul,.admin-message__bubble ol{margin:6px 18px 8px 0}.admin-message__bubble table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12px}.admin-message__bubble th,.admin-message__bubble td{border:1px solid #d8e2ea;padding:6px 8px;text-align:right}.admin-message__bubble th{background:#eef4f8;color:var(--brand-primary)}
+        .admin-message__meta { margin-top:6px;color:var(--color-text-muted);font-size:10px }.admin-message--user .admin-message__meta{color:rgba(255,255,255,.75)}
+        .admin-chat-action { display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:10px;padding:10px;border:1px solid #bdd6e9;border-radius:10px;background:#f2f8fc }.admin-chat-action span{font-size:12px;font-weight:700;color:var(--brand-primary)}
+        .admin-chat-chart { margin-top:12px;padding:12px;border:1px solid var(--color-border);border-radius:12px;background:#fff;height:310px }.admin-chat-chart canvas{width:100%!important;height:100%!important}
+        .admin-chat-typing { display:inline-flex;gap:5px;align-items:center }.admin-chat-typing span{width:6px;height:6px;border-radius:50%;background:#7890a3;animation:adminTyping 1.1s infinite}.admin-chat-typing span:nth-child(2){animation-delay:.15s}.admin-chat-typing span:nth-child(3){animation-delay:.3s}@keyframes adminTyping{0%,70%,100%{transform:translateY(0);opacity:.45}35%{transform:translateY(-4px);opacity:1}}
+        .admin-chat-composer { padding:13px 16px 15px;border-top:1px solid var(--color-border);background:#fff }.admin-chat-composer__row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.admin-chat-composer textarea{width:100%;min-height:48px;max-height:150px;resize:none;border:1px solid var(--color-border);border-radius:13px;padding:12px 14px;line-height:1.5;outline:none}.admin-chat-composer textarea:focus{border-color:var(--brand-primary);box-shadow:0 0 0 3px rgba(11,103,181,.11)}.admin-chat-composer small{display:block;margin-top:6px;color:var(--color-text-muted);font-size:10px}
+        .admin-chat-send { width:48px;height:48px;border:0;border-radius:13px;background:var(--brand-primary);color:#fff;cursor:pointer;font-size:16px}.admin-chat-send:disabled{opacity:.45;cursor:not-allowed}
+        @media(max-width:760px){.admin-chat-main{padding:12px}.admin-auth-form{grid-template-columns:1fr}.admin-chat-shell{height:calc(100vh - var(--sticky-header-height) - 24px);border-radius:12px}.admin-chat-toolbar{align-items:flex-start}.admin-chat-toolbar__actions{justify-content:flex-end}.admin-chat-connected{display:none}.admin-message__bubble{max-width:94%}}
     </style>
 
 </head>
@@ -1880,7 +1906,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.5.0 · 4 באוגוסט 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.6.0 · 26 באוקטובר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -1950,6 +1976,10 @@
             <button id="nav-unmatched-transfers" class="suite-nav__item" type="button" onclick="navigateToScreen('unmatched-transfers')" disabled>
                 <i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i><span>דוח העברות שטרם הותאמו</span>
             </button>
+            <div class="suite-sidebar__section-label">כלים</div>
+            <button id="nav-admin" class="suite-nav__item" type="button" onclick="navigateToScreen('admin')">
+                <i class="fa-solid fa-comments" aria-hidden="true"></i><span>אדמין</span>
+            </button>
             <div class="suite-sidebar__section-label">הגדרות</div>
             <button id="nav-sources" class="suite-nav__item is-active" type="button" onclick="navigateToScreen('sources')">
                 <i class="fa-solid fa-database" aria-hidden="true"></i><span>מקורות הנתונים</span><span class="suite-nav__dot" aria-label="מקורות החובה טרם נטענו"></span>
@@ -1966,6 +1996,43 @@
     <button id="suite-menu-toggle" class="suite-menu-toggle no-print" type="button" onclick="toggleSuiteMenu()" aria-label="פתיחת התפריט" aria-expanded="false">
         <i class="fa-solid fa-bars" aria-hidden="true"></i>
     </button>
+
+    <!-- ADMIN ASSISTANT SCREEN -->
+    <div id="admin-chat-container" class="suite-screen hidden flex-col flex-grow">
+        <header class="app-header no-print">
+            <div class="app-header__inner">
+                <div class="government-brand">
+                    <img class="government-logo" src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה והבטיחות בדרכים">
+                    <div><div class="ministry-name">משרד התחבורה והבטיחות בדרכים</div><div class="department-name">אגף טכנולוגיות דיגיטליות ומידע</div></div>
+                </div>
+                <div class="app-identity"><div class="app-title-row"><h1 class="app-title">אדמין</h1><span class="beta-badge">BETA</span></div><div class="system-date"></div></div>
+                <div class="header-actions" aria-hidden="true"></div>
+            </div>
+        </header>
+        <main class="admin-chat-main flex-grow no-print">
+            <section id="admin-auth-view" class="admin-auth-card">
+                <div class="admin-auth-card__icon"><i class="fa-solid fa-key" aria-hidden="true"></i></div>
+                <h2>חיבור לעוזר הארגוני</h2>
+                <p>יש להזין את מפתח Gemini הארגוני. המפתח יישמר בדפדפן זה עד ללחיצה על „ניתוק”, ולא ייכלל בקובץ המערכת או בהיסטוריית השיחה.</p>
+                <form class="admin-auth-form" onsubmit="connectAdminAssistant(event)">
+                    <div class="admin-auth-field"><label for="admin-api-key">מפתח Gemini API</label><input id="admin-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="הדבקת המפתח הארגוני"></div>
+                    <button id="admin-connect-button" class="button-primary" type="submit"><i class="fa-solid fa-plug" aria-hidden="true"></i>התחברות</button>
+                </form>
+                <div id="admin-auth-status" class="admin-auth-status" role="status" aria-live="polite"></div>
+            </section>
+            <section id="admin-chat-view" class="admin-chat-shell hidden" aria-label="שיחה עם העוזר הארגוני">
+                <div class="admin-chat-toolbar">
+                    <div class="admin-chat-toolbar__title"><span class="admin-chat-toolbar__icon"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i></span><div><h2>עוזר ניהול הכנסות וגבייה</h2><p>תשובות ופעולות המבוססות על הקבצים שנטענו ועל לוגיקת המערכת</p></div></div>
+                    <div class="admin-chat-toolbar__actions"><span class="admin-chat-connected">Gemini מחובר</span><button type="button" class="button-secondary" onclick="clearAdminConversation()"><i class="fa-regular fa-trash-can" aria-hidden="true"></i>ניקוי שיחה</button><button type="button" class="button-secondary" onclick="disconnectAdminAssistant()"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>ניתוק</button></div>
+                </div>
+                <div id="admin-chat-messages" class="admin-chat-messages" aria-live="polite"></div>
+                <form class="admin-chat-composer" onsubmit="sendAdminMessage(event)">
+                    <div class="admin-chat-composer__row"><textarea id="admin-chat-input" rows="1" placeholder="אפשר לשאול על לקוח, לבקש ניתוח, טבלה, גרף או הפקת מסמך..." onkeydown="handleAdminComposerKey(event)" oninput="resizeAdminComposer(this)"></textarea><button id="admin-chat-send" class="admin-chat-send" type="submit" aria-label="שליחת הודעה"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button></div>
+                    <small>העוזר קורא רק נתונים שנטענו בדפדפן זה. יש לבדוק מידע מהותי לפני הסתמכות או הפקת מסמך.</small>
+                </form>
+            </section>
+        </main>
+    </div>
 
     <!-- DATA SOURCES SCREEN: the initial entry point for every session -->
     <div id="data-sources-container" class="suite-screen hidden flex-col flex-grow">
@@ -2996,9 +3063,21 @@
         let historicalSourceYear = 'all';
         let historicalCustomerQuery = '';
         let currentScreen = 'sources';
+        const ADMIN_API_KEY_STORAGE_KEY = 'collecting_dashboard_gemini_api_key_v1';
+        const ADMIN_MODEL_STORAGE_KEY = 'collecting_dashboard_gemini_model_v1';
+        const ADMIN_CONVERSATION_STORAGE_KEY = 'collecting_dashboard_admin_conversation_v1';
+        let adminApiKey = '';
+        let adminGeminiModel = 'models/gemini-2.5-flash';
+        let adminConversation = [];
+        let adminRequestActive = false;
+        let adminPendingArtifacts = [];
+        let adminActionRegistry = new Map();
+        let adminArtifactCounter = 0;
+        let adminChatCharts = [];
 
         const SUITE_SCREENS = {
             sources: 'data-sources-container',
+            admin: 'admin-chat-container',
             dashboard: 'dashboard-container',
             debt: 'main-app-container',
             'debtor-finder': 'debtor-finder-container',
@@ -3062,6 +3141,8 @@
                 renderFeesManagementReport();
             } else if (screen === 'unmatched-transfers') {
                 renderUnmatchedTransfersReport();
+            } else if (screen === 'admin') {
+                renderAdminAssistant();
             }
 
             closeSuiteMenu();
@@ -3086,6 +3167,417 @@
             document.body.classList.remove('suite-menu-open');
             const button = document.getElementById('suite-menu-toggle');
             if (button) button.setAttribute('aria-expanded', 'false');
+        }
+
+        // ============================================================
+        // Admin assistant (Gemini)
+        // ============================================================
+        function loadAdminAssistantState() {
+            try {
+                adminApiKey = localStorage.getItem(ADMIN_API_KEY_STORAGE_KEY) || '';
+                adminGeminiModel = localStorage.getItem(ADMIN_MODEL_STORAGE_KEY) || 'models/gemini-2.5-flash';
+                const savedConversation = JSON.parse(localStorage.getItem(ADMIN_CONVERSATION_STORAGE_KEY) || '[]');
+                adminConversation = Array.isArray(savedConversation)
+                    ? savedConversation.filter(item => ['user', 'model'].includes(item?.role) && typeof item?.text === 'string').slice(-30)
+                    : [];
+            } catch (error) {
+                adminApiKey = '';
+                adminConversation = [];
+            }
+        }
+
+        function persistAdminConversation() {
+            try {
+                const trimmed = adminConversation.slice(-30).map(item => ({ role:item.role, text:item.text.slice(0, 18000) }));
+                localStorage.setItem(ADMIN_CONVERSATION_STORAGE_KEY, JSON.stringify(trimmed));
+            } catch (error) {
+                console.warn('Could not persist admin conversation.');
+            }
+        }
+
+        function renderAdminAssistant() {
+            const authView = document.getElementById('admin-auth-view');
+            const chatView = document.getElementById('admin-chat-view');
+            if (!authView || !chatView) return;
+            authView.classList.toggle('hidden', Boolean(adminApiKey));
+            chatView.classList.toggle('hidden', !adminApiKey);
+            if (adminApiKey && !document.getElementById('admin-chat-messages')?.children.length) renderAdminConversation();
+            if (adminApiKey) requestAnimationFrame(() => document.getElementById('admin-chat-input')?.focus());
+        }
+
+        async function connectAdminAssistant(event) {
+            event?.preventDefault();
+            const input = document.getElementById('admin-api-key');
+            const status = document.getElementById('admin-auth-status');
+            const button = document.getElementById('admin-connect-button');
+            const candidateKey = input?.value.trim() || '';
+            if (!candidateKey) {
+                if (status) status.textContent = 'יש להזין מפתח Gemini API.';
+                return;
+            }
+            if (status) status.textContent = 'בודק את החיבור ל-Gemini...';
+            if (button) button.disabled = true;
+            try {
+                const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=100', { headers: { 'x-goog-api-key': candidateKey } });
+                const payload = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(payload?.error?.message || 'המפתח לא אושר על ידי שירות Gemini.');
+                const supported = (payload.models || []).filter(model => (model.supportedGenerationMethods || []).includes('generateContent'));
+                const preferred = supported.find(model => model.name === 'models/gemini-2.5-flash') || supported.find(model => /gemini.*flash/i.test(model.name || '')) || supported.find(model => /gemini/i.test(model.name || ''));
+                if (!preferred) throw new Error('לא נמצא עבור המפתח מודל Gemini התומך בשיחה.');
+                adminApiKey = candidateKey;
+                adminGeminiModel = preferred.name;
+                localStorage.setItem(ADMIN_API_KEY_STORAGE_KEY, adminApiKey);
+                localStorage.setItem(ADMIN_MODEL_STORAGE_KEY, adminGeminiModel);
+                if (input) input.value = '';
+                if (status) status.textContent = '';
+                renderAdminAssistant();
+            } catch (error) {
+                if (status) status.textContent = 'החיבור נכשל: ' + (error?.message || 'שגיאה לא ידועה') + ' אם המפתח תקין, יש לבדוק הרשאות רשת ו-CORS.';
+            } finally {
+                if (button) button.disabled = false;
+            }
+        }
+
+        function disconnectAdminAssistant() {
+            if (!confirm('לנתק את Gemini ולמחוק את המפתח שנשמר בדפדפן זה? היסטוריית השיחה תישמר.')) return;
+            adminApiKey = '';
+            try { localStorage.removeItem(ADMIN_API_KEY_STORAGE_KEY); localStorage.removeItem(ADMIN_MODEL_STORAGE_KEY); } catch (error) {}
+            const input = document.getElementById('admin-api-key');
+            if (input) input.value = '';
+            renderAdminAssistant();
+        }
+
+        function clearAdminConversation() {
+            if (adminConversation.length && !confirm('למחוק את היסטוריית השיחה בדפדפן זה?')) return;
+            adminConversation = [];
+            adminActionRegistry.clear();
+            adminChatCharts.forEach(chart => chart?.destroy?.());
+            adminChatCharts = [];
+            persistAdminConversation();
+            renderAdminConversation();
+        }
+
+        function adminWelcomeHtml() {
+            return `<div class="admin-chat-welcome"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><h3>אפשר לשוחח בחופשיות על הנתונים שנטענו</h3><p>העוזר יכול לנתח לקוחות וחובות, להכין טבלאות וגרפים, לפתוח תיק לקוח ולהכין דוח או מכתב באמצעות פונקציות המערכת.</p><div class="admin-chat-suggestions"><button type="button" onclick="useAdminSuggestion('תן לי תמונת מצב כללית של הנתונים שנטענו')">תמונת מצב כללית</button><button type="button" onclick="useAdminSuggestion('מי הם עשרת הלקוחות עם החוב הגבוה ביותר? הצג בטבלה')">עשרת החייבים הגדולים</button><button type="button" onclick="useAdminSuggestion('נתח את מגמת החיובים והגבייה לפי חודשים והכן גרף')">ניתוח חודשי</button></div></div>`;
+        }
+
+        function renderAdminConversation() {
+            const container = document.getElementById('admin-chat-messages');
+            if (!container) return;
+            adminChatCharts.forEach(chart => chart?.destroy?.());
+            adminChatCharts = [];
+            container.innerHTML = adminConversation.length ? '' : adminWelcomeHtml();
+            adminConversation.forEach(item => appendAdminMessage(item.role, item.text, false));
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function adminInlineMarkup(value) {
+            return escapeHtml(value).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        }
+
+        function renderAdminMarkdown(markdown) {
+            const lines = String(markdown || '').replace(/\r/g, '').split('\n');
+            const html = [];
+            for (let index = 0; index < lines.length;) {
+                const line = lines[index];
+                const next = lines[index + 1] || '';
+                if (line.includes('|') && /^\s*\|?\s*:?-{3,}/.test(next)) {
+                    const headers = line.split('|').map(cell => cell.trim()).filter(Boolean);
+                    index += 2;
+                    const rows = [];
+                    while (index < lines.length && lines[index].includes('|') && lines[index].trim()) { rows.push(lines[index].split('|').map(cell => cell.trim()).filter(Boolean)); index++; }
+                    html.push(`<div style="overflow-x:auto"><table><thead><tr>${headers.map(cell => `<th>${adminInlineMarkup(cell)}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr>${row.map(cell => `<td>${adminInlineMarkup(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`);
+                    continue;
+                }
+                if (/^#{1,3}\s+/.test(line)) html.push(`<h3>${adminInlineMarkup(line.replace(/^#{1,3}\s+/, ''))}</h3>`);
+                else if (/^[-*]\s+/.test(line)) {
+                    const items = [];
+                    while (index < lines.length && /^[-*]\s+/.test(lines[index])) { items.push(`<li>${adminInlineMarkup(lines[index].replace(/^[-*]\s+/, ''))}</li>`); index++; }
+                    html.push(`<ul>${items.join('')}</ul>`);
+                    continue;
+                } else if (line.trim()) html.push(`<p>${adminInlineMarkup(line)}</p>`);
+                index++;
+            }
+            return html.join('');
+        }
+
+        function appendAdminMessage(role, text, persist = true) {
+            const container = document.getElementById('admin-chat-messages');
+            if (!container) return;
+            container.querySelector('.admin-chat-welcome')?.remove();
+            const wrapper = document.createElement('div');
+            wrapper.className = `admin-message admin-message--${role === 'user' ? 'user' : 'assistant'}`;
+            const time = new Intl.DateTimeFormat('he-IL', { hour:'2-digit', minute:'2-digit' }).format(new Date());
+            wrapper.innerHTML = `<div class="admin-message__bubble"><div>${role === 'user' ? adminInlineMarkup(text).replace(/\n/g, '<br>') : renderAdminMarkdown(text)}</div><div class="admin-message__meta">${role === 'user' ? 'אתה' : 'העוזר הארגוני'} · ${time}</div></div>`;
+            container.appendChild(wrapper);
+            if (persist) { adminConversation.push({ role: role === 'user' ? 'user' : 'model', text:String(text) }); persistAdminConversation(); }
+            container.scrollTop = container.scrollHeight;
+            return wrapper;
+        }
+
+        function setAdminTyping(show) {
+            const container = document.getElementById('admin-chat-messages');
+            document.getElementById('admin-typing-message')?.remove();
+            if (!show || !container) return;
+            const item = document.createElement('div');
+            item.id = 'admin-typing-message';
+            item.className = 'admin-message admin-message--assistant';
+            item.innerHTML = '<div class="admin-message__bubble"><span class="admin-chat-typing"><span></span><span></span><span></span></span></div>';
+            container.appendChild(item);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function resizeAdminComposer(textarea) { textarea.style.height = 'auto'; textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px'; }
+        function handleAdminComposerKey(event) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); document.querySelector('#admin-chat-view .admin-chat-composer')?.requestSubmit(); } }
+        function useAdminSuggestion(text) { const input = document.getElementById('admin-chat-input'); if (!input) return; input.value = text; document.querySelector('#admin-chat-view .admin-chat-composer')?.requestSubmit(); }
+
+        function adminActivityMatches(row, activity = 'all') {
+            const normalized = activity === 'current' ? incomeFilter : activity;
+            if (normalized === 'fees') return Boolean(row.isFee);
+            if (normalized === 'info') return !row.isFee;
+            return true;
+        }
+
+        function adminSectorMatches(row, sector = 'all') { return !sector || sector === 'all' || row.sector === sector; }
+        function adminClientNames() { return [...new Set([...db, ...revenueDb].map(row => row.name).filter(Boolean))]; }
+
+        function resolveAdminClient(value) {
+            const query = String(value || '').trim();
+            const normalizedCode = normalizeClientCodeValue(query);
+            const names = adminClientNames();
+            const codeMatch = normalizedCode ? names.find(name => normalizeClientCodeValue(getClientCode(name)) === normalizedCode) : '';
+            if (codeMatch) return { ok:true, name:codeMatch };
+            const exact = names.find(name => name.localeCompare(query, 'he', { sensitivity:'base' }) === 0);
+            if (exact) return { ok:true, name:exact };
+            const matches = names.filter(name => name.toLowerCase().includes(query.toLowerCase())).slice(0, 12);
+            if (matches.length === 1) return { ok:true, name:matches[0] };
+            return { ok:false, error:matches.length ? 'נמצאו מספר לקוחות מתאימים.' : 'לא נמצא לקוח מתאים.', matches };
+        }
+
+        function adminSystemOverview(args = {}) {
+            const activity = args.activity || 'all';
+            const sector = args.sector || 'all';
+            const debts = db.filter(row => adminActivityMatches(row, activity) && adminSectorMatches(row, sector));
+            const revenues = revenueDb.filter(row => getRevenueYear(row) === CURRENT_YEAR && adminActivityMatches(row, activity) && adminSectorMatches(row, sector));
+            const billed = revenues.reduce((sum,row) => sum + (Number(row.amount) || 0), 0);
+            const overdue = debts.filter(row => row.isOverdue).reduce((sum,row) => sum + (Number(row.amount) || 0), 0);
+            const future = debts.filter(row => !row.isOverdue).reduce((sum,row) => sum + (Number(row.amount) || 0), 0);
+            const currentOpen = debts.filter(row => isValidDate(row.dueDate) && row.dueDate.getFullYear() === CURRENT_YEAR).reduce((sum,row) => sum + (Number(row.amount) || 0), 0);
+            const transition = historicalRevenueDb.length ? getYearTransitionRows(row => adminActivityMatches(row, activity) && adminSectorMatches(row, sector)).reduce((sum,row) => sum + row.amount, 0) : 0;
+            const historicalCollected = historicalRevenueDb.length ? getEligibleHistoricalRows().filter(row => adminActivityMatches(row, activity) && adminSectorMatches(row, sector)).reduce((sum,row) => sum + row.amount, 0) : null;
+            return { year:CURRENT_YEAR, activity, sector, clients:new Set([...debts,...revenues].map(row => row.code)).size, billed, currentYearCollected:Math.max(0,billed-currentOpen), previousDecemberCollected:transition, ongoingCollected:Math.max(0,billed-currentOpen)+transition, historicalCollected, overdueDebt:overdue, futurePayments:future, openInvoices:debts.length, loadedSources:{ debts:Boolean(db.length), revenues:Boolean(revenueDb.length), historical:Boolean(historicalRevenueDb.length), queries:Boolean(queryOnlineDb.length && queryBatchDb.length), unmatchedTransfers:Boolean(unmatchedTransfersDb.length) } };
+        }
+
+        function adminClientOverview(args = {}) {
+            const resolved = resolveAdminClient(args.client);
+            if (!resolved.ok) return resolved;
+            const name = resolved.name;
+            const activity = args.activity || 'all';
+            const debts = db.filter(row => row.name === name && adminActivityMatches(row, activity));
+            const revenues = revenueDb.filter(row => row.name === name && getRevenueYear(row) === CURRENT_YEAR && adminActivityMatches(row, activity));
+            const billed = revenues.reduce((sum,row) => sum + (Number(row.amount) || 0), 0);
+            const currentOpen = debts.filter(row => isValidDate(row.dueDate) && row.dueDate.getFullYear() === CURRENT_YEAR).reduce((sum,row) => sum + row.amount, 0);
+            const transition = historicalRevenueDb.length ? getYearTransitionRows(row => row.name === name && adminActivityMatches(row, activity)).reduce((sum,row) => sum + row.amount, 0) : 0;
+            const historicalCollected = historicalRevenueDb.length ? getEligibleHistoricalRows().filter(row => row.name === name && adminActivityMatches(row, activity)).reduce((sum,row) => sum + row.amount, 0) : null;
+            const overdueRows = debts.filter(row => row.isOverdue);
+            const futureRows = debts.filter(row => !row.isOverdue);
+            const queryRows = getAllQueryData().filter(row => row.clientId === normalizeClientCodeValue(getClientCode(name)));
+            return { ok:true, name, clientCode:getClientCode(name), payerCodes:getPayerCodes(name), sector:getCustomerSector(name), directDebit:hasDirectDebit(name), year:CURRENT_YEAR, billed, currentYearCollected:Math.max(0,billed-currentOpen), previousDecemberCollected:transition, ongoingCollected:Math.max(0,billed-currentOpen)+transition, historicalCollected, overdueDebt:overdueRows.reduce((sum,row)=>sum+row.amount,0), futurePayments:futureRows.reduce((sum,row)=>sum+row.amount,0), overdueInvoices:overdueRows.length, futureInvoices:futureRows.length, oldestDueDate:overdueRows.filter(row=>isValidDate(row.dueDate)).sort((a,b)=>a.dueDate-b.dueDate)[0]?.dueDate?.toISOString().slice(0,10) || null, unmatchedTransfers:getUnmatchedTransfersForClient(name).length, queryConsumption:queryRows.length ? queryRows.reduce((sum,row)=>sum+row.amount,0) : null };
+        }
+
+        function adminFindClients(args = {}) {
+            const query = String(args.query || '').trim().toLowerCase();
+            const normalizedQuery = normalizeClientCodeValue(query);
+            const limit = Math.min(Math.max(Number(args.limit) || 15, 1), 50);
+            return adminClientNames().filter(name => !query || name.toLowerCase().includes(query) || (normalizedQuery && normalizeClientCodeValue(getClientCode(name)).includes(normalizedQuery))).slice(0,limit).map(name => ({ name, clientCode:getClientCode(name), sector:getCustomerSector(name) }));
+        }
+
+        function adminListInvoices(args = {}) {
+            const resolved = resolveAdminClient(args.client);
+            if (!resolved.ok) return resolved;
+            const status = args.status || 'open';
+            const limit = Math.min(Math.max(Number(args.limit) || 50, 1), 150);
+            let rows = db.filter(row => row.name === resolved.name && adminActivityMatches(row, args.activity || 'all'));
+            if (status === 'overdue') rows = rows.filter(row => row.isOverdue);
+            if (status === 'future') rows = rows.filter(row => !row.isOverdue);
+            rows = rows.sort((a,b) => (a.dueDate?.getTime() || 0) - (b.dueDate?.getTime() || 0)).slice(0,limit);
+            return { client:resolved.name, status, count:rows.length, invoices:rows.map(row => ({ document:String(row.doc), dueDate:isValidDate(row.dueDate)?row.dueDate.toISOString().slice(0,10):null, description:String(row.desc||''), amount:Number(row.amount)||0, overdue:Boolean(row.isOverdue) })) };
+        }
+
+        function adminFindDebtors(args = {}) {
+            const minInvoices = Math.max(Number(args.min_invoices) || 1, 1);
+            const minAmount = Math.max(Number(args.min_amount) || 0, 0);
+            const fromYear = Number(args.from_year) || 0;
+            const toYear = Number(args.to_year) || 9999;
+            const limit = Math.min(Math.max(Number(args.limit) || 20, 1), 100);
+            const grouped = new Map();
+            db.filter(row => row.isOverdue && adminActivityMatches(row,args.activity||'all') && adminSectorMatches(row,args.sector||'all') && (!isValidDate(row.dueDate) || (row.dueDate.getFullYear()>=fromYear && row.dueDate.getFullYear()<=toYear))).forEach(row => {
+                if (!grouped.has(row.name)) grouped.set(row.name,{ name:row.name,clientCode:row.code,sector:row.sector,invoiceCount:0,amount:0,oldestDueDate:null });
+                const item=grouped.get(row.name); item.invoiceCount++; item.amount+=Number(row.amount)||0; if(isValidDate(row.dueDate)&&(!item.oldestDueDate||row.dueDate<item.oldestDueDate)) item.oldestDueDate=row.dueDate;
+            });
+            const matches=[...grouped.values()].filter(item=>item.invoiceCount>=minInvoices&&item.amount>=minAmount).sort((a,b)=>b.amount-a.amount).slice(0,limit).map(item=>({...item,oldestDueDate:item.oldestDueDate?.toISOString().slice(0,10)||null}));
+            return { criteria:{minInvoices,minAmount,fromYear:fromYear||null,toYear:toYear===9999?null:toYear}, count:matches.length, clients:matches };
+        }
+
+        function adminMonthlySummary(args = {}) {
+            const year = Number(args.year) || CURRENT_YEAR;
+            const activity = args.activity || 'all';
+            let clientName = '';
+            if (args.client) { const resolved = resolveAdminClient(args.client); if (!resolved.ok) return resolved; clientName = resolved.name; }
+            const revenues = revenueDb.filter(row => getRevenueYear(row)===year && adminActivityMatches(row,activity) && (!clientName||row.name===clientName));
+            const openByDocument = new Map(db.filter(row => adminActivityMatches(row,activity) && (!clientName||row.name===clientName)).map(row => [String(row.doc),Number(row.amount)||0]));
+            const months = MONTH_NAMES.map((month,index)=>({ month,monthNumber:index+1,billed:0,collected:0,open:0 }));
+            revenues.forEach(row=>{const month=getRevenueMonth(row);if(month===null)return;const amount=Number(row.amount)||0;const open=Math.min(amount,openByDocument.get(String(row.doc))||0);months[month].billed+=amount;months[month].open+=open;months[month].collected+=Math.max(0,amount-open)});
+            return { year,client:clientName||null,activity,months,totals:months.reduce((acc,item)=>({billed:acc.billed+item.billed,collected:acc.collected+item.collected,open:acc.open+item.open}),{billed:0,collected:0,open:0}) };
+        }
+
+        function queueAdminAction(type, client) {
+            const resolved = resolveAdminClient(client);
+            if (!resolved.ok) return resolved;
+            const id = 'admin-action-' + (++adminArtifactCounter);
+            adminActionRegistry.set(id,{type,client:resolved.name});
+            adminPendingArtifacts.push({kind:'action',id,type,client:resolved.name});
+            return {ok:true,client:resolved.name,action:type,message:'הפעולה הוכנה וממתינה לאישור המשתמש בכפתור שיוצג בשיחה.'};
+        }
+
+        function queueAdminChart(args = {}) {
+            const labels = Array.isArray(args.labels) ? args.labels.slice(0,36).map(String) : [];
+            const values = Array.isArray(args.values) ? args.values.slice(0,36).map(value=>Number(value)||0) : [];
+            if (!labels.length || labels.length !== values.length) return {ok:false,error:'לגרף נדרשות רשימות labels ו-values באורך זהה.'};
+            const id='admin-chart-'+(++adminArtifactCounter);
+            adminPendingArtifacts.push({kind:'chart',id,title:String(args.title||'גרף נתונים'),labels,values,datasetLabel:String(args.dataset_label||'ערך'),chartType:['line','bar','doughnut'].includes(args.chart_type)?args.chart_type:'bar'});
+            return {ok:true,message:'הגרף הוכן ויוצג מתחת לתשובה.'};
+        }
+
+        const ADMIN_FUNCTION_DECLARATIONS = [
+            {name:'get_system_overview',description:'מחזיר תמונת מצב מסכמת של חיובים, גבייה, חובות ולקוחות מתוך הנתונים שנטענו.',parameters:{type:'OBJECT',properties:{activity:{type:'STRING',enum:['all','info','fees'],description:'תחום פעילות'},sector:{type:'STRING',description:'שם סקטור או all'}}}},
+            {name:'find_clients',description:'מחפש לקוחות לפי חלק משם או מספר מרכבה.',parameters:{type:'OBJECT',properties:{query:{type:'STRING'},limit:{type:'NUMBER'}},required:['query']}},
+            {name:'get_client_overview',description:'מחזיר תמונת מצב מלאה של לקוח.',parameters:{type:'OBJECT',properties:{client:{type:'STRING'},activity:{type:'STRING',enum:['all','info','fees']}},required:['client']}},
+            {name:'list_client_invoices',description:'מחזיר חשבוניות פתוחות, בפיגור או עתידיות של לקוח.',parameters:{type:'OBJECT',properties:{client:{type:'STRING'},status:{type:'STRING',enum:['open','overdue','future']},activity:{type:'STRING',enum:['all','info','fees']},limit:{type:'NUMBER'}},required:['client']}},
+            {name:'find_debtors',description:'מאתר לקוחות לפי מספר חשבוניות וגובה חוב בפיגור, עם מסנני פעילות, סקטור ושנים.',parameters:{type:'OBJECT',properties:{min_invoices:{type:'NUMBER'},min_amount:{type:'NUMBER'},activity:{type:'STRING',enum:['all','info','fees']},sector:{type:'STRING'},from_year:{type:'NUMBER'},to_year:{type:'NUMBER'},limit:{type:'NUMBER'}}}},
+            {name:'get_monthly_summary',description:'מחזיר סיכום חודשי של חיובים, גבייה ויתרה לשנה, לכלל הנתונים או ללקוח.',parameters:{type:'OBJECT',properties:{year:{type:'NUMBER'},client:{type:'STRING'},activity:{type:'STRING',enum:['all','info','fees']}}}},
+            {name:'show_chart',description:'מציג גרף בשיחה. יש להשתמש רק בערכים שהוחזרו מכלי נתונים.',parameters:{type:'OBJECT',properties:{title:{type:'STRING'},labels:{type:'ARRAY',items:{type:'STRING'}},values:{type:'ARRAY',items:{type:'NUMBER'}},dataset_label:{type:'STRING'},chart_type:{type:'STRING',enum:['bar','line','doughnut']}},required:['title','labels','values']}},
+            {name:'open_client',description:'מכין כפתור לפתיחת תיק הלקוח במערכת.',parameters:{type:'OBJECT',properties:{client:{type:'STRING'}},required:['client']}},
+            {name:'prepare_client_report',description:'מכין כפתור להפקת דוח שנתי ללקוח באמצעות מחולל הדוחות של המערכת.',parameters:{type:'OBJECT',properties:{client:{type:'STRING'}},required:['client']}},
+            {name:'prepare_debt_letter',description:'מכין כפתור להפקת מכתב חוב ללקוח באמצעות מחולל המכתבים של המערכת.',parameters:{type:'OBJECT',properties:{client:{type:'STRING'}},required:['client']}},
+            {name:'prepare_client_card',description:'מכין כפתור להדפסת כרטיס לקוח.',parameters:{type:'OBJECT',properties:{client:{type:'STRING'}},required:['client']}}
+        ];
+
+        async function executeAdminFunction(name,args={}) {
+            if(name==='get_system_overview')return adminSystemOverview(args);
+            if(name==='find_clients')return adminFindClients(args);
+            if(name==='get_client_overview')return adminClientOverview(args);
+            if(name==='list_client_invoices')return adminListInvoices(args);
+            if(name==='find_debtors')return adminFindDebtors(args);
+            if(name==='get_monthly_summary')return adminMonthlySummary(args);
+            if(name==='show_chart')return queueAdminChart(args);
+            if(name==='open_client')return queueAdminAction('open-client',args.client);
+            if(name==='prepare_client_report')return queueAdminAction('client-report',args.client);
+            if(name==='prepare_debt_letter')return queueAdminAction('debt-letter',args.client);
+            if(name==='prepare_client_card')return queueAdminAction('client-card',args.client);
+            return {ok:false,error:'פעולה לא מוכרת.'};
+        }
+
+        function adminSystemInstruction() {
+            return `אתה העוזר הארגוני של מערכת ניהול הכנסות וגבייה במשרד התחבורה. השב בעברית ברורה ותמציתית. שנת העבודה שנבחרה היא ${CURRENT_YEAR}. הסתמך רק על תוצאות הכלים ועל נתונים שנמסרו בשיחה; לעולם אל תמציא מספרים. כל החישובים העסקיים חייבים להיעשות בכלים ולא בחישוב חופשי. הצג סכומים בשקלים וטבלאות בפורמט Markdown כשזה מועיל. אם שם לקוח אינו חד משמעי, השתמש בחיפוש ובקש בחירה. להפקת מסמך או פתיחת לקוח השתמש בכלי המתאים; הפעולה תוצג למשתמש ככפתור אישור. אין אפשרות לשלוח דוא״ל בשלב זה, ולכן אם התבקשת לשלוח, הסבר שאפשר להכין ולהוריד את המסמך בלבד. אל תבקש, תציג או תחזיר את מפתח ה-API. ציין במפורש כאשר מקור נתונים רלוונטי לא נטען.`;
+        }
+
+        async function requestGeminiAdminResponse() {
+            const contents=adminConversation.slice(-20).map(item=>({role:item.role,parts:[{text:item.text}]}));
+            for(let step=0;step<6;step++){
+                const endpoint=`https://generativelanguage.googleapis.com/v1beta/${adminGeminiModel}:generateContent`;
+                const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':adminApiKey},body:JSON.stringify({systemInstruction:{parts:[{text:adminSystemInstruction()}]},contents,tools:[{functionDeclarations:ADMIN_FUNCTION_DECLARATIONS}],toolConfig:{functionCallingConfig:{mode:'AUTO'}},generationConfig:{temperature:.2,maxOutputTokens:8192}})});
+                const payload=await response.json().catch(()=>({}));
+                if(!response.ok)throw new Error(payload?.error?.message||'שירות Gemini החזיר שגיאה.');
+                const content=payload?.candidates?.[0]?.content;
+                if(!content?.parts?.length)throw new Error('לא התקבלה תשובה מ-Gemini.');
+                const calls=content.parts.filter(part=>part.functionCall).map(part=>part.functionCall);
+                if(!calls.length)return content.parts.map(part=>part.text||'').join('\n').trim()||'הפעולה הושלמה.';
+                contents.push(content);
+                const responseParts=[];
+                for(const call of calls){
+                    let result;
+                    try{result=await executeAdminFunction(call.name,call.args||{});}catch(error){result={ok:false,error:error?.message||'הפעולה נכשלה.'};}
+                    responseParts.push({functionResponse:{name:call.name,response:{result}}});
+                }
+                contents.push({role:'user',parts:responseParts});
+            }
+            throw new Error('הבקשה דרשה יותר מדי שלבי פעולה. יש לנסח בקשה ממוקדת יותר.');
+        }
+
+        async function sendAdminMessage(event) {
+            event?.preventDefault();
+            if(adminRequestActive)return;
+            const input=document.getElementById('admin-chat-input');
+            const send=document.getElementById('admin-chat-send');
+            const text=input?.value.trim()||'';
+            if(!text)return;
+            if(!adminApiKey){renderAdminAssistant();return;}
+            appendAdminMessage('user',text);
+            input.value=''; resizeAdminComposer(input); adminRequestActive=true; if(send)send.disabled=true; setAdminTyping(true); adminPendingArtifacts=[];
+            try{
+                const answer=await requestGeminiAdminResponse();
+                setAdminTyping(false);
+                const messageElement=appendAdminMessage('assistant',answer);
+                appendAdminArtifacts(messageElement);
+            }catch(error){
+                setAdminTyping(false);
+                const message=String(error?.message||'שגיאה לא ידועה');
+                appendAdminMessage('assistant','לא הצלחתי להשלים את הבקשה. '+message+(message.includes('API key')?' אפשר להתנתק ולהזין מחדש את המפתח.':''));
+            }finally{
+                adminRequestActive=false;
+                if(send)send.disabled=false;
+                input?.focus();
+            }
+        }
+
+        function appendAdminArtifacts(messageElement) {
+            const bubble=messageElement?.querySelector('.admin-message__bubble');
+            if(!bubble)return;
+            adminPendingArtifacts.forEach(artifact=>{
+                if(artifact.kind==='action'){
+                    const labels={'open-client':'פתיחת תיק לקוח','client-report':'הפקת דוח ללקוח','debt-letter':'הפקת מכתב חוב','client-card':'הדפסת כרטיס לקוח'};
+                    const action=document.createElement('div');
+                    action.className='admin-chat-action';
+                    action.innerHTML=`<span><i class="fa-solid fa-file-circle-check" aria-hidden="true"></i> ${escapeHtml(labels[artifact.type]||'ביצוע פעולה')} עבור ${escapeHtml(artifact.client)}</span><button type="button" class="button-primary" onclick="runAdminChatAction('${artifact.id}')">${escapeHtml(labels[artifact.type]||'ביצוע')}</button>`;
+                    bubble.insertBefore(action,bubble.lastElementChild);
+                }else if(artifact.kind==='chart'){
+                    const frame=document.createElement('div');
+                    frame.className='admin-chat-chart';
+                    frame.innerHTML=`<canvas id="${artifact.id}" aria-label="${escapeHtml(artifact.title)}"></canvas>`;
+                    bubble.insertBefore(frame,bubble.lastElementChild);
+                    requestAnimationFrame(()=>{
+                        const canvas=document.getElementById(artifact.id);if(!canvas)return;
+                        const colors=['#0B67B5','#10A162','#F0A000','#C0363F','#744FC6','#34A8DB'];
+                        const chart=new Chart(canvas.getContext('2d'),{type:artifact.chartType,data:{labels:artifact.labels,datasets:[{label:artifact.datasetLabel,data:artifact.values,backgroundColor:artifact.chartType==='doughnut'?colors:'rgba(11,103,181,.78)',borderColor:artifact.chartType==='line'?'#0B67B5':'#fff',borderWidth:artifact.chartType==='line'?2:1,tension:.25}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom'}},scales:artifact.chartType==='doughnut'?{}:{y:{beginAtZero:true}}}});
+                        adminChatCharts.push(chart);
+                    });
+                }
+            });
+            adminPendingArtifacts=[];
+        }
+
+        function openAdminClient(client) {
+            const resolved=resolveAdminClient(client);
+            if(!resolved.ok){alert(resolved.error);return false;}
+            const representative=db.find(row=>row.name===resolved.name)||revenueDb.find(row=>row.name===resolved.name);
+            if(!representative){alert('לא נמצאו נתוני לקוח.');return false;}
+            incomeFilter='all';
+            path.sector=representative.sector||getCustomerSector(resolved.name);
+            path.orgName=resolved.name;
+            currentLevel=2;
+            navigateToScreen('debt');
+            renderView();
+            return true;
+        }
+
+        function runAdminChatAction(id) {
+            const action=adminActionRegistry.get(id);
+            if(!action)return;
+            if(!openAdminClient(action.client))return;
+            if(action.type==='client-report')setTimeout(()=>toggleExportModal(true,'annual'),80);
+            else if(action.type==='debt-letter')setTimeout(()=>toggleExportModal(true,'debt'),80);
+            else if(action.type==='client-card')setTimeout(()=>printCurrentClientProfile(),120);
         }
 
         // --- לוגיקת סיווג לקוחות מעודכנת לפי שם הלקוח ---
@@ -5894,10 +6386,9 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
 
         function collectionCompositionTableFooter(composition, cellClass = '', appearance = 'default') {
             if (!composition.hasHistoricalSource) return '';
-            const isDashboard = appearance === 'dashboard';
-            const transitionStyle = isDashboard ? 'background:#fff;color:#1f2933' : 'background:#fff8e8;color:#7c4a03';
-            const transitionLabelColor = isDashboard ? '#1f2933' : '#7c4a03';
-            const totalStyle = isDashboard ? 'background:#eef3f7;font-weight:700' : 'background:#edf7f1;font-weight:700';
+            const transitionStyle = 'background:#fff;color:#1f2933';
+            const transitionLabelColor = '#1f2933';
+            const totalStyle = 'background:#eef3f7;font-weight:700';
             return `<tr class="year-transition-row" style="${transitionStyle}">
                 <td class="${cellClass}" style="text-align:right;color:${transitionLabelColor}"><strong>גביית דצמבר ${CURRENT_YEAR - 1} שבוצעה בשנת ${CURRENT_YEAR}</strong></td>
                 <td class="${cellClass}">—</td>
@@ -8170,6 +8661,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
         }
 
         function initializeRedesignedInterface() {
+            loadAdminAssistantState();
             let savedTheme = 'azure';
             try { savedTheme = localStorage.getItem(APP_THEME_STORAGE_KEY) || 'azure'; } catch (error) {}
             setAppTheme(savedTheme, false);
@@ -8207,6 +8699,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
     </script>
 </body>
 </html>
+
 
 
 
