@@ -1817,12 +1817,13 @@
         .unmatched-transfer-client-section__header p { margin:3px 0 0;color:#6b7787;font-size:11px; }
         .unmatched-transfer-client-section__totals { display:flex;gap:18px;color:#526579;font-size:11px;white-space:nowrap; }
         .unmatched-transfer-client-section__totals strong { color:#20364f;font-size:14px;margin-inline-start:3px; }
-        .unmatched-report-main { padding:24px; }
+        .unmatched-report-main { padding:24px;font-family:var(--font-family-base)!important; }
         .unmatched-report-panel { background:#fff;border:1px solid #d5dee8;border-radius:12px;overflow:hidden;box-shadow:0 4px 14px rgba(26,55,85,.05); }
         .unmatched-report-panel__header { display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;border-bottom:1px solid #d5dee8; }
         .unmatched-report-panel__header h2 { margin:0;color:#064f8c;font-size:19px; }
         .unmatched-report-panel__header p { margin:4px 0 0;color:#607080;font-size:12px; }
-        .unmatched-report-table { width:100%;border-collapse:collapse; }
+        .unmatched-report-table { width:100%;border-collapse:collapse;font-family:var(--font-family-base)!important; }
+        .unmatched-report-table th,.unmatched-report-table td,.unmatched-report-client-summary,.unmatched-report-client-summary strong { font-family:var(--font-family-base)!important; }
         .unmatched-report-table th,.unmatched-report-table td { padding:12px 16px;border-bottom:1px solid #e2e8f0;text-align:right; }
         .unmatched-report-table th { background:#f3f6f9;color:#526579;font-size:12px; }
         .unmatched-report-table td { font-size:13px; }
@@ -1906,7 +1907,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.6.0 · 26 באוקטובר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.6.1 · 26 באוקטובר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -2012,18 +2013,18 @@
         <main class="admin-chat-main flex-grow no-print">
             <section id="admin-auth-view" class="admin-auth-card">
                 <div class="admin-auth-card__icon"><i class="fa-solid fa-key" aria-hidden="true"></i></div>
-                <h2>חיבור לעוזר הארגוני</h2>
-                <p>יש להזין את מפתח Gemini הארגוני. המפתח יישמר בדפדפן זה עד ללחיצה על „ניתוק”, ולא ייכלל בקובץ המערכת או בהיסטוריית השיחה.</p>
+                <h2>כניסת אדמין</h2>
+                <p>יש להזין סיסמת אדמין כדי להמשיך.</p>
                 <form class="admin-auth-form" onsubmit="connectAdminAssistant(event)">
-                    <div class="admin-auth-field"><label for="admin-api-key">מפתח Gemini API</label><input id="admin-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="הדבקת המפתח הארגוני"></div>
-                    <button id="admin-connect-button" class="button-primary" type="submit"><i class="fa-solid fa-plug" aria-hidden="true"></i>התחברות</button>
+                    <div class="admin-auth-field"><label for="admin-api-key">סיסמת אדמין</label><input id="admin-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="הזנת סיסמה"></div>
+                    <button id="admin-connect-button" class="button-primary" type="submit"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>כניסה</button>
                 </form>
                 <div id="admin-auth-status" class="admin-auth-status" role="status" aria-live="polite"></div>
             </section>
             <section id="admin-chat-view" class="admin-chat-shell hidden" aria-label="שיחה עם העוזר הארגוני">
                 <div class="admin-chat-toolbar">
                     <div class="admin-chat-toolbar__title"><span class="admin-chat-toolbar__icon"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i></span><div><h2>עוזר ניהול הכנסות וגבייה</h2><p>תשובות ופעולות המבוססות על הקבצים שנטענו ועל לוגיקת המערכת</p></div></div>
-                    <div class="admin-chat-toolbar__actions"><span class="admin-chat-connected">Gemini מחובר</span><button type="button" class="button-secondary" onclick="clearAdminConversation()"><i class="fa-regular fa-trash-can" aria-hidden="true"></i>ניקוי שיחה</button><button type="button" class="button-secondary" onclick="disconnectAdminAssistant()"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>ניתוק</button></div>
+                    <div class="admin-chat-toolbar__actions"><span class="admin-chat-connected">מצב אדמין פעיל</span><button type="button" class="button-secondary" onclick="clearAdminConversation()"><i class="fa-regular fa-trash-can" aria-hidden="true"></i>ניקוי שיחה</button><button type="button" class="button-secondary" onclick="disconnectAdminAssistant()"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>ניתוק</button></div>
                 </div>
                 <div id="admin-chat-messages" class="admin-chat-messages" aria-live="polite"></div>
                 <form class="admin-chat-composer" onsubmit="sendAdminMessage(event)">
@@ -3212,10 +3213,10 @@
             const button = document.getElementById('admin-connect-button');
             const candidateKey = input?.value.trim() || '';
             if (!candidateKey) {
-                if (status) status.textContent = 'יש להזין מפתח Gemini API.';
+                if (status) status.textContent = 'יש להזין סיסמת אדמין.';
                 return;
             }
-            if (status) status.textContent = 'בודק את החיבור ל-Gemini...';
+            if (status) status.textContent = 'מאמת את הסיסמה...';
             if (button) button.disabled = true;
             try {
                 const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=100', { headers: { 'x-goog-api-key': candidateKey } });
@@ -3232,14 +3233,15 @@
                 if (status) status.textContent = '';
                 renderAdminAssistant();
             } catch (error) {
-                if (status) status.textContent = 'החיבור נכשל: ' + (error?.message || 'שגיאה לא ידועה') + ' אם המפתח תקין, יש לבדוק הרשאות רשת ו-CORS.';
+                console.warn('Admin authentication failed.', error);
+                if (status) status.textContent = 'סיסמת האדמין לא אושרה. יש לבדוק את הסיסמה ואת החיבור לרשת.';
             } finally {
                 if (button) button.disabled = false;
             }
         }
 
         function disconnectAdminAssistant() {
-            if (!confirm('לנתק את Gemini ולמחוק את המפתח שנשמר בדפדפן זה? היסטוריית השיחה תישמר.')) return;
+            if (!confirm('לצאת ממצב אדמין ולמחוק את הסיסמה שנשמרה בדפדפן זה? היסטוריית השיחה תישמר.')) return;
             adminApiKey = '';
             try { localStorage.removeItem(ADMIN_API_KEY_STORAGE_KEY); localStorage.removeItem(ADMIN_MODEL_STORAGE_KEY); } catch (error) {}
             const input = document.getElementById('admin-api-key');
@@ -3340,6 +3342,32 @@
 
         function adminSectorMatches(row, sector = 'all') { return !sector || sector === 'all' || row.sector === sector; }
         function adminClientNames() { return [...new Set([...db, ...revenueDb].map(row => row.name).filter(Boolean))]; }
+
+        function adminSectorSummary(args = {}) {
+            const activity = args.activity || 'all';
+            const sectorNames = ['משרדי ממשלה', 'רשויות וחברות ממשלתיות', 'רשויות מקומיות', 'לקוחות פרטיים'];
+            const relevantDebts = db.filter(row => adminActivityMatches(row, activity));
+            const relevantRevenues = revenueDb.filter(row => getRevenueYear(row) === CURRENT_YEAR && adminActivityMatches(row, activity));
+            const relevantClients = [...new Set([...relevantDebts, ...relevantRevenues].map(row => row.name).filter(Boolean))];
+            const clientSector = new Map(relevantClients.map(name => [name, getCustomerSector(name)]));
+            return {
+                year: CURRENT_YEAR,
+                activity,
+                sectors: sectorNames.map(sector => {
+                    const clientNames = [...clientSector].filter(([,value]) => value === sector).map(([name]) => name);
+                    const clientSet = new Set(clientNames);
+                    const debts = relevantDebts.filter(row => clientSet.has(row.name));
+                    const revenues = relevantRevenues.filter(row => clientSet.has(row.name));
+                    return {
+                        sector,
+                        clientCount: clientNames.length,
+                        billed: revenues.reduce((sum,row) => sum + (Number(row.amount) || 0), 0),
+                        overdueDebt: debts.filter(row => row.isOverdue).reduce((sum,row) => sum + (Number(row.amount) || 0), 0),
+                        futurePayments: debts.filter(row => !row.isOverdue).reduce((sum,row) => sum + (Number(row.amount) || 0), 0)
+                    };
+                })
+            };
+        }
 
         function resolveAdminClient(value) {
             const query = String(value || '').trim();
@@ -3451,6 +3479,7 @@
 
         const ADMIN_FUNCTION_DECLARATIONS = [
             {name:'get_system_overview',description:'מחזיר תמונת מצב מסכמת של חיובים, גבייה, חובות ולקוחות מתוך הנתונים שנטענו.',parameters:{type:'OBJECT',properties:{activity:{type:'STRING',enum:['all','info','fees'],description:'תחום פעילות'},sector:{type:'STRING',description:'שם סקטור או all'}}}},
+            {name:'get_sector_summary',description:'מחזיר את חלוקת הלקוחות והמדדים לפי ארבעת הסקטורים של המערכת. יש להשתמש בו לכל שאלה על סקטורים, השוואה ביניהם או מספר הלקוחות בכל סקטור.',parameters:{type:'OBJECT',properties:{activity:{type:'STRING',enum:['all','info','fees'],description:'תחום פעילות: הכל, שירותי מידע או אגרות העברת בעלות'}}}},
             {name:'find_clients',description:'מחפש לקוחות לפי חלק משם או מספר מרכבה.',parameters:{type:'OBJECT',properties:{query:{type:'STRING'},limit:{type:'NUMBER'}},required:['query']}},
             {name:'get_client_overview',description:'מחזיר תמונת מצב מלאה של לקוח.',parameters:{type:'OBJECT',properties:{client:{type:'STRING'},activity:{type:'STRING',enum:['all','info','fees']}},required:['client']}},
             {name:'list_client_invoices',description:'מחזיר חשבוניות פתוחות, בפיגור או עתידיות של לקוח.',parameters:{type:'OBJECT',properties:{client:{type:'STRING'},status:{type:'STRING',enum:['open','overdue','future']},activity:{type:'STRING',enum:['all','info','fees']},limit:{type:'NUMBER'}},required:['client']}},
@@ -3465,6 +3494,7 @@
 
         async function executeAdminFunction(name,args={}) {
             if(name==='get_system_overview')return adminSystemOverview(args);
+            if(name==='get_sector_summary')return adminSectorSummary(args);
             if(name==='find_clients')return adminFindClients(args);
             if(name==='get_client_overview')return adminClientOverview(args);
             if(name==='list_client_invoices')return adminListInvoices(args);
@@ -3479,7 +3509,23 @@
         }
 
         function adminSystemInstruction() {
-            return `אתה העוזר הארגוני של מערכת ניהול הכנסות וגבייה במשרד התחבורה. השב בעברית ברורה ותמציתית. שנת העבודה שנבחרה היא ${CURRENT_YEAR}. הסתמך רק על תוצאות הכלים ועל נתונים שנמסרו בשיחה; לעולם אל תמציא מספרים. כל החישובים העסקיים חייבים להיעשות בכלים ולא בחישוב חופשי. הצג סכומים בשקלים וטבלאות בפורמט Markdown כשזה מועיל. אם שם לקוח אינו חד משמעי, השתמש בחיפוש ובקש בחירה. להפקת מסמך או פתיחת לקוח השתמש בכלי המתאים; הפעולה תוצג למשתמש ככפתור אישור. אין אפשרות לשלוח דוא״ל בשלב זה, ולכן אם התבקשת לשלוח, הסבר שאפשר להכין ולהוריד את המסמך בלבד. אל תבקש, תציג או תחזיר את מפתח ה-API. ציין במפורש כאשר מקור נתונים רלוונטי לא נטען.`;
+            return `אתה העוזר הארגוני של מערכת ניהול הכנסות וגבייה במשרד התחבורה. השב בעברית ברורה ותמציתית. שנת העבודה שנבחרה היא ${CURRENT_YEAR}.
+
+מילון עסקי מחייב:
+- חיובים שהופקו: סכום מסמכי החיוב שהופקו בשנת העבודה מתוך קובץ ההכנסות.
+- גבייה מחשבוניות השנה: חיובי שנת העבודה בניכוי היתרה הפתוחה מאותן חשבוניות.
+- גביית דצמבר של השנה הקודמת: גבייה בשנת העבודה מחשבוניות שהופקו בדצמבר הקודם. היא חלק מהגבייה השוטפת אך מוצגת בנפרד.
+- גבייה שוטפת: גבייה מחשבוניות שנת העבודה ועוד גביית דצמבר של השנה הקודמת.
+- גביית חובות עבר: חשבוניות שהופקו לפני דצמבר של השנה הקודמת והותאמו בשנת העבודה. זהו מדד נפרד שאינו נכלל בגבייה השוטפת.
+- חוב בפיגור: חשבוניות פתוחות שמועד הפירעון שלהן עבר.
+- תשלומים עתידיים או צפי גבייה עתידי: חשבוניות פתוחות שמועד פירעונן טרם הגיע.
+- חוב משנים קודמות: יתרת חשבוניות פתוחות משנות עבודה קודמות.
+- העברות שטרם הותאמו: מסמכי DZ אינפורמטיביים; הם אינם נכללים בסכומי החיובים, החובות או הגבייה.
+- תחום פעילות info פירושו שירותי מידע; fees פירושו אגרות העברת בעלות; all פירושו הכול.
+
+סקטורי הלקוחות במערכת הם בדיוק: משרדי ממשלה; רשויות וחברות ממשלתיות; רשויות מקומיות; לקוחות פרטיים. הסיווג נקבע לפי שם הלקוח בלוגיקת המערכת. לכל שאלה על סקטור של לקוח השתמש בחיפוש או בתמונת הלקוח; לכל שאלה מסכמת או השוואה בין סקטורים השתמש בכלי get_sector_summary. אין להסיק סקטור באופן עצמאי.
+
+הסתמך רק על תוצאות הכלים ועל נתונים שנמסרו בשיחה; לעולם אל תמציא מספרים. כל החישובים העסקיים חייבים להיעשות בכלים ולא בחישוב חופשי. הצג סכומים בשקלים וטבלאות בפורמט Markdown כשזה מועיל. אם שם לקוח אינו חד משמעי, השתמש בחיפוש ובקש בחירה. להפקת מסמך או פתיחת לקוח השתמש בכלי המתאים; הפעולה תוצג למשתמש ככפתור אישור. אין אפשרות לשלוח דוא״ל בשלב זה, ולכן אם התבקשת לשלוח, הסבר שאפשר להכין ולהוריד את המסמך בלבד. אל תבקש, תציג או תחזיר את סיסמת האדמין או את ערכה. ציין במפורש כאשר מקור נתונים רלוונטי לא נטען.`;
         }
 
         async function requestGeminiAdminResponse() {
@@ -3523,7 +3569,8 @@
             }catch(error){
                 setAdminTyping(false);
                 const message=String(error?.message||'שגיאה לא ידועה');
-                appendAdminMessage('assistant','לא הצלחתי להשלים את הבקשה. '+message+(message.includes('API key')?' אפשר להתנתק ולהזין מחדש את המפתח.':''));
+                const authFailure=/API key|API_KEY_INVALID|PERMISSION_DENIED|UNAUTHENTICATED/i.test(message);
+                appendAdminMessage('assistant',authFailure?'החיבור פג או אינו תקין. אפשר להתנתק ולהזין מחדש את סיסמת האדמין.':'לא הצלחתי להשלים את הבקשה. '+message);
             }finally{
                 adminRequestActive=false;
                 if(send)send.disabled=false;
@@ -7772,7 +7819,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const win = window.open('', '_blank');
             if (!win) { alert('פתיחת חלון ההדפסה נחסמה.'); return; }
             const title = 'דוח העברות שטרם הותאמו';
-            win.document.write(`<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>${title}</title>${getClientDocumentPrintStyles()}<style>@page{size:A4 landscape;margin:0}.unmatched-print-note{margin:0 0 10px;color:var(--print-muted);font-size:8.5pt}.unmatched-print-table{font-size:8.2pt}.unmatched-print-table th,.unmatched-print-table td{padding:4px 6px}.unmatched-print-table thead{display:table-header-group}.unmatched-print-table tfoot{display:table-row-group!important}.client-summary-row{background:#eaf2f8;font-weight:700;break-after:avoid;page-break-after:avoid}.transfer-detail-row td{color:#34495e}.transfer-detail-row td:nth-child(2){padding-inline-start:16px}</style></head><body>
+            win.document.write(`<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>${title}</title>${getClientDocumentPrintStyles()}<style>@page{size:A4 landscape;margin:0}.unmatched-print-note{margin:0 0 10px;color:var(--print-muted);font-size:8.5pt}.unmatched-print-table,.unmatched-print-table th,.unmatched-print-table td,.client-summary-row,.client-summary-row strong{font-family:Arial,"Noto Sans Hebrew",sans-serif!important}.unmatched-print-table{font-size:8.2pt}.unmatched-print-table th,.unmatched-print-table td{padding:4px 6px}.unmatched-print-table thead{display:table-header-group}.unmatched-print-table tfoot{display:table-row-group!important}.client-summary-row{background:#eaf2f8;font-weight:700;break-after:avoid;page-break-after:avoid}.transfer-detail-row td{color:#34495e}.transfer-detail-row td:nth-child(2){padding-inline-start:16px}</style></head><body>
                 ${getClientDocumentPageStart(title)}<h1 class="document-title">${title}</h1><p class="unmatched-print-note">הסכומים מוצגים לאחר היפוך הסימן בקובץ המקור. דוח זה אינפורמטיבי ואינו משפיע על מדדי המערכת.</p>
                 <table class="unmatched-print-table"><thead><tr><th>קוד מרכבה</th><th>לקוח / מספר מסמך</th><th>מספר העברות</th><th>תאריך תשלום</th><th>פרטים</th><th>סכום</th></tr></thead><tbody>${tableRows}</tbody><tfoot><tr style="font-weight:700;background:#eef3f7"><td colspan="2">סה״כ</td><td style="text-align:center">${totalCount.toLocaleString('he-IL')}</td><td colspan="2"></td><td style="direction:ltr;text-align:right">${formatCurrency(totalAmount)}</td></tr></tfoot></table>${getClientDocumentPageEnd()}
                 <script>window.addEventListener('load',function(){window.focus();setTimeout(function(){window.print()},350)});<\/script></body></html>`);
@@ -8699,6 +8746,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
     </script>
 </body>
 </html>
+
 
 
 
