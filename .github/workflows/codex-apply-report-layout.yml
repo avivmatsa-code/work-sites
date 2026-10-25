@@ -1,0 +1,26 @@
+name: Apply report layout patch
+on:
+  push:
+    branches:
+      - agent/report-layout-and-year-filters
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/report-layout-and-year-filters
+      - name: Apply tested dashboard changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git apply --ignore-space-change --ignore-whitespace .codex/report-layout-and-year-filters.patch
+          rm .codex/report-layout-and-year-filters.patch
+          rm .github/workflows/codex-apply-report-layout.yml
+          git add customer-relations/debt-collection/Collecting_Dashboard.html
+          git add -u .codex .github/workflows
+          git commit -m "Refine collection reports and debtor filters"
+          git push origin HEAD
