@@ -1817,22 +1817,34 @@
         .unmatched-transfer-client-section__header p { margin:3px 0 0;color:#6b7787;font-size:11px; }
         .unmatched-transfer-client-section__totals { display:flex;gap:18px;color:#526579;font-size:11px;white-space:nowrap; }
         .unmatched-transfer-client-section__totals strong { color:#20364f;font-size:14px;margin-inline-start:3px; }
-        .unmatched-report-main { padding:24px;font-family:var(--font-family-base)!important; }
-        .unmatched-report-panel { background:#fff;border:1px solid #d5dee8;border-radius:12px;overflow:hidden;box-shadow:0 4px 14px rgba(26,55,85,.05); }
-        .unmatched-report-panel__header { display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;border-bottom:1px solid #d5dee8; }
-        .unmatched-report-panel__header h2 { margin:0;color:#064f8c;font-size:19px; }
-        .unmatched-report-panel__header p { margin:4px 0 0;color:#607080;font-size:12px; }
-        .unmatched-report-table { width:100%;border-collapse:collapse;font-family:var(--font-family-base)!important; }
-        .unmatched-report-table th,.unmatched-report-table td,.unmatched-report-client-summary,.unmatched-report-client-summary strong { font-family:var(--font-family-base)!important; }
-        .unmatched-report-table th,.unmatched-report-table td { padding:12px 16px;border-bottom:1px solid #e2e8f0;text-align:right; }
-        .unmatched-report-table th { background:#f3f6f9;color:#526579;font-size:12px; }
-        .unmatched-report-table td { font-size:13px; }
+        .unmatched-report-main { padding:24px;font-family:Arial,"Noto Sans Hebrew",sans-serif!important; }
+        .unmatched-report-panel { background:#fff;border:1px solid #d5dee8;border-radius:16px;overflow:hidden;box-shadow:0 7px 22px rgba(26,55,85,.07); }
+        .unmatched-report-panel__header { display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 22px 16px;border-bottom:0; }
+        .unmatched-report-panel__header h2 { margin:0;color:#064f8c;font-family:Arial,"Noto Sans Hebrew",sans-serif!important;font-size:20px;font-weight:800; }
+        .unmatched-report-panel__header p { margin:5px 0 0;color:#607080;font-size:12px;line-height:1.55; }
+        .unmatched-report-summary { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:0 22px 20px; }
+        .unmatched-report-summary__card { position:relative;padding:14px 16px;border:1px solid #d9e4ed;border-radius:12px;background:#f8fbfd;overflow:hidden; }
+        .unmatched-report-summary__card::after { content:"";position:absolute;inset-inline-end:0;top:0;bottom:0;width:4px;background:#0b67b5; }
+        .unmatched-report-summary__card span { display:block;color:#657689;font-size:11px;font-weight:700; }
+        .unmatched-report-summary__card strong { display:block;margin-top:5px;color:#11395d;font-family:Arial,"Noto Sans Hebrew",sans-serif!important;font-size:22px;font-weight:800; }
+        .unmatched-report-table-wrap { overflow-x:auto;border-top:1px solid #dce5ed; }
+        .unmatched-report-table { width:100%;border-collapse:separate;border-spacing:0;font-family:Arial,"Noto Sans Hebrew",sans-serif!important; }
+        .unmatched-report-table th,.unmatched-report-table td,.unmatched-report-client-summary,.unmatched-report-client-summary strong { font-family:Arial,"Noto Sans Hebrew",sans-serif!important;font-style:normal;letter-spacing:normal; }
+        .unmatched-report-table th,.unmatched-report-table td { padding:11px 16px;border-bottom:1px solid #e5ebf0;text-align:right;vertical-align:middle; }
+        .unmatched-report-table th { position:sticky;top:0;z-index:1;background:#f1f5f8;color:#526579;font-size:11px;font-weight:800; }
+        .unmatched-report-table td { color:#2f465c;font-size:13px; }
         .unmatched-report-table .numeric-cell { direction:ltr;text-align:right;font-variant-numeric:tabular-nums; }
-        .unmatched-report-client-summary { background:#eaf2f8;font-weight:800; }
+        .unmatched-report-client-summary { background:#e9f3fb;font-weight:800;box-shadow:inset 4px 0 #0b67b5; }
+        .unmatched-report-client-summary td { color:#083f6d;padding-top:13px;padding-bottom:13px; }
+        .unmatched-report-client-name { display:block;font-family:Arial,"Noto Sans Hebrew",sans-serif!important;font-size:14px;font-weight:800; }
+        .unmatched-report-client-code { color:#60778d;font-size:11px;font-weight:700; }
+        .unmatched-report-count { display:inline-flex;min-width:30px;justify-content:center;padding:3px 8px;border-radius:99px;background:#fff;border:1px solid #bdd3e4;color:#075a9e;font-weight:800; }
+        .unmatched-report-detail:nth-child(even) td { background:#fbfcfd; }
         .unmatched-report-detail td { color:#40566d;font-size:12px; }
-        .unmatched-report-detail td:nth-child(2) { padding-inline-start:28px; }
-        .unmatched-report-total { background:#eef3f7;font-weight:800; }
-        @media (max-width:760px) { .unmatched-transfer-summary__heading,.unmatched-transfer-client-section__header{align-items:flex-start;flex-direction:column}.unmatched-transfer-summary__metrics,.unmatched-transfer-client-section__totals{flex-wrap:wrap;gap:9px 16px}.unmatched-report-main{padding:12px} }
+        .unmatched-report-detail td:nth-child(2) { padding-inline-start:26px;color:#174f7b;font-weight:700; }
+        .unmatched-report-total { background:#e9eef3;font-weight:800; }
+        .unmatched-report-total td { border-top:2px solid #b9c8d5;color:#153c5e; }
+        @media (max-width:760px) { .unmatched-transfer-summary__heading,.unmatched-transfer-client-section__header{align-items:flex-start;flex-direction:column}.unmatched-transfer-summary__metrics,.unmatched-transfer-client-section__totals{flex-wrap:wrap;gap:9px 16px}.unmatched-report-main{padding:12px}.unmatched-report-panel__header{align-items:flex-start;flex-direction:column}.unmatched-report-summary{grid-template-columns:1fr;padding-inline:14px}.unmatched-report-table th,.unmatched-report-table td{padding-inline:10px} }
 
         /* Admin assistant: a self-contained workspace inside the existing suite shell. */
         .admin-chat-main { width: 100%; max-width: 1500px; margin: 0 auto; padding: 24px 28px 32px; min-height: calc(100vh - var(--sticky-header-height)); }
@@ -1845,7 +1857,7 @@
         .admin-chat-shell { height: calc(100vh - var(--sticky-header-height) - 56px); min-height: 560px; display:grid;grid-template-rows:auto 1fr auto;border:1px solid var(--color-border);border-radius:18px;background:#fff;box-shadow:var(--shadow-card);overflow:hidden }
         .admin-chat-toolbar { display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 18px;border-bottom:1px solid var(--color-border);background:#fbfdff }.admin-chat-toolbar__title { display:flex;align-items:center;gap:11px;min-width:0 }.admin-chat-toolbar__icon { display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--brand-subtle);color:var(--brand-primary) }
         .admin-chat-toolbar h2 { margin:0;color:var(--brand-primary);font-size:18px }.admin-chat-toolbar p{margin:2px 0 0;color:var(--color-text-muted);font-size:11px}.admin-chat-toolbar__actions { display:flex;align-items:center;gap:8px;flex-wrap:wrap }
-        .admin-chat-connected { display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid #a7d9bf;border-radius:99px;background:#effaf4;color:#087443;font-size:11px;font-weight:800 }.admin-chat-connected::before { content:"";width:7px;height:7px;border-radius:50%;background:#10a162 }
+        .admin-chat-connected { display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid #a7d9bf;border-radius:99px;background:#effaf4;color:#087443;font-family:Arial,"Noto Sans Hebrew",sans-serif!important;font-size:11px;font-style:normal;font-weight:800;letter-spacing:normal }.admin-chat-connected::before { content:"";width:7px;height:7px;border-radius:50%;background:#10a162 }
         .admin-chat-messages { overflow:auto;padding:22px;scroll-behavior:smooth;background:linear-gradient(180deg,#f8fbfd 0,#fff 35%) }
         .admin-chat-welcome { max-width:760px;margin:30px auto;padding:24px;border:1px solid #d8e5ef;border-radius:16px;background:#fff;text-align:center }.admin-chat-welcome i { color:var(--brand-primary);font-size:28px }.admin-chat-welcome h3{margin:10px 0 6px;color:var(--brand-primary)}.admin-chat-welcome p{margin:0;color:var(--color-text-muted);line-height:1.65}
         .admin-chat-suggestions { display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:16px }.admin-chat-suggestions button{border:1px solid #c9dbea;border-radius:99px;background:#f5f9fc;color:var(--brand-primary);padding:7px 11px;font-size:11px;font-weight:700;cursor:pointer}.admin-chat-suggestions button:hover{background:var(--brand-subtle)}
@@ -1907,7 +1919,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.6.1 · 26 באוקטובר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.7.0 · 26 באוקטובר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -2184,7 +2196,8 @@
                     <div><h2>ריכוז העברות שטרם הותאמו לפי לקוח</h2><p>הסכומים מוצגים לאחר היפוך הסימן בקובץ המקור. מידע זה אינו משפיע על מדדי המערכת.</p></div>
                     <button type="button" class="button-secondary button-secondary--brand no-print" onclick="printUnmatchedTransfersReport()"><i class="fa-solid fa-print" aria-hidden="true"></i>הדפסת הדוח</button>
                 </div>
-                <div style="overflow-x:auto"><table class="unmatched-report-table"><thead><tr><th>קוד מרכבה</th><th>לקוח / מספר מסמך</th><th>מספר העברות</th><th>תאריך תשלום</th><th>פרטים</th><th>סכום</th></tr></thead><tbody id="unmatched-report-table-body"></tbody></table></div>
+                <div id="unmatched-report-summary" class="unmatched-report-summary" aria-label="סיכום הדוח"></div>
+                <div class="unmatched-report-table-wrap"><table class="unmatched-report-table"><thead><tr><th>קוד מרכבה</th><th>לקוח / מספר העברה</th><th>מספר העברות</th><th>תאריך תשלום</th><th>פרטי העברה</th><th>סכום</th></tr></thead><tbody id="unmatched-report-table-body"></tbody></table></div>
             </section>
         </main>
     </div>
@@ -3369,6 +3382,117 @@
             };
         }
 
+        function adminRowSector(row) {
+            return row?.sector || getCustomerSector(row?.name || row?.clientName || '');
+        }
+
+        function adminGenericActivityMatches(row, activity = 'all', dataType = '') {
+            if (activity === 'all' || !activity) return true;
+            if (dataType === 'queries') return activity === 'info';
+            const isFee = typeof row?.isFee === 'boolean'
+                ? row.isFee
+                : FEE_KEYWORDS.some(keyword => String(row?.counterpartyName || '').includes(keyword));
+            return activity === 'fees' ? isFee : !isFee;
+        }
+
+        function adminAnalysisYear(row, basis, fallbackFields = []) {
+            const dateFields = {
+                document: row?.documentDate || row?.regDate,
+                match: row?.matchDate,
+                due: row?.dueDate,
+                payment: row?.paymentDate || row?.postingDate,
+                report: Number.isInteger(getRevenueYear(row)) ? getRevenueYear(row) : null
+            };
+            const selected = dateFields[basis];
+            if (Number.isInteger(selected)) return selected;
+            if (isValidDate(selected)) return selected.getFullYear();
+            for (const field of fallbackFields) {
+                const value = dateFields[field];
+                if (Number.isInteger(value)) return value;
+                if (isValidDate(value)) return value.getFullYear();
+            }
+            return Number.isInteger(row?.year) ? row.year : null;
+        }
+
+        function adminDataBreakdown(args = {}) {
+            const metric = args.metric || 'billed';
+            const groupBy = args.group_by || 'sector_year';
+            const activity = args.activity || 'all';
+            const requestedSector = args.sector || 'all';
+            const fromYear = Number(args.from_year) || 0;
+            const toYear = Number(args.to_year) || 9999;
+            const requestedBasis = args.year_basis || 'auto';
+            const items = [];
+            const add = (row, amount, year, dataType = '') => {
+                const sector = adminRowSector(row);
+                if (!year || year < fromYear || year > toYear) return;
+                if (requestedSector !== 'all' && sector !== requestedSector) return;
+                if (!adminGenericActivityMatches(row, activity, dataType)) return;
+                items.push({ sector, year, amount:Number(amount) || 0, client:String(row?.code || row?.clientCode || row?.clientId || row?.name || row?.clientName || '') });
+            };
+            const basisFor = defaults => requestedBasis === 'auto' ? defaults[0] : requestedBasis;
+            let unit = 'currency';
+            let sourceLoaded = true;
+
+            if (metric === 'billed') {
+                revenueDb.forEach(row => add(row, row.amount, adminAnalysisYear(row, basisFor(['report']), ['report','document'])));
+                sourceLoaded = revenueDb.length > 0;
+            } else if (metric === 'current_collection' || metric === 'ongoing_collection') {
+                const openByDocument = new Map();
+                db.forEach(row => openByDocument.set(String(row.doc), (openByDocument.get(String(row.doc)) || 0) + (Number(row.amount) || 0)));
+                revenueDb.forEach(row => {
+                    const collected = Math.max(0, (Number(row.amount) || 0) - (openByDocument.get(String(row.doc)) || 0));
+                    add(row, collected, adminAnalysisYear(row, basisFor(['report']), ['report','document']));
+                });
+                if (metric === 'ongoing_collection') {
+                    historicalRevenueDb.filter(row => {
+                        if (!isValidDate(row.matchDate) || !isValidDate(row.documentDate)) return false;
+                        const matchYear = row.matchDate.getFullYear();
+                        return row.documentDate.getFullYear() === matchYear - 1 && row.documentDate.getMonth() === 11;
+                    }).forEach(row => add(row, row.amount, adminAnalysisYear(row, basisFor(['match']), ['match','document'])));
+                }
+                sourceLoaded = revenueDb.length > 0;
+            } else if (['open_debt','overdue_debt','future_payments','historical_open_debt'].includes(metric)) {
+                db.filter(row => metric === 'open_debt'
+                    || (metric === 'overdue_debt' && row.isOverdue)
+                    || (metric === 'future_payments' && !row.isOverdue)
+                    || (metric === 'historical_open_debt' && isValidDate(row.dueDate) && row.dueDate.getFullYear() < CURRENT_YEAR)
+                ).forEach(row => add(row, row.amount, adminAnalysisYear(row, basisFor(['due']), ['due','document'])));
+                sourceLoaded = db.length > 0;
+            } else if (metric === 'historical_collected') {
+                historicalRevenueDb.filter(row => {
+                    if (!isValidDate(row.matchDate) || !isValidDate(row.documentDate)) return false;
+                    return row.documentDate < new Date(row.matchDate.getFullYear() - 1, 11, 1);
+                }).forEach(row => add(row, row.amount, adminAnalysisYear(row, basisFor(['document']), ['document','match'])));
+                sourceLoaded = historicalRevenueDb.length > 0;
+            } else if (metric === 'matched_invoices') {
+                historicalRevenueDb.filter(row => isValidDate(row.matchDate)).forEach(row => add(row, row.amount, adminAnalysisYear(row, basisFor(['match']), ['match','document'])));
+                sourceLoaded = historicalRevenueDb.length > 0;
+            } else if (metric === 'unmatched_transfers') {
+                unmatchedTransfersDb.forEach(row => add(row, row.amount, adminAnalysisYear(row, basisFor(['payment']), ['payment']), 'unmatched'));
+                sourceLoaded = unmatchedTransfersDb.length > 0;
+            } else if (metric === 'query_consumption') {
+                unit = 'queries';
+                getAllQueryData().forEach(row => add(row, row.amount, adminAnalysisYear(row, basisFor(['report']), ['report']), 'queries'));
+                sourceLoaded = queryOnlineDb.length > 0 && queryBatchDb.length > 0;
+            } else {
+                return { ok:false, error:'מדד לא מוכר.' };
+            }
+
+            const groups = new Map();
+            items.forEach(item => {
+                const key = groupBy === 'sector' ? item.sector : groupBy === 'year' ? String(item.year) : `${item.year}|${item.sector}`;
+                if (!groups.has(key)) groups.set(key, { sector:groupBy === 'year' ? null : item.sector, year:groupBy === 'sector' ? null : item.year, amount:0, recordCount:0, clients:new Set() });
+                const group = groups.get(key);
+                group.amount += item.amount;
+                group.recordCount += 1;
+                if (item.client) group.clients.add(item.client);
+            });
+            const sectorOrder = ['משרדי ממשלה','רשויות וחברות ממשלתיות','רשויות מקומיות','לקוחות פרטיים'];
+            const results = [...groups.values()].map(group => ({ sector:group.sector, year:group.year, amount:group.amount, recordCount:group.recordCount, clientCount:group.clients.size })).sort((a,b) => (b.year || 0) - (a.year || 0) || sectorOrder.indexOf(a.sector) - sectorOrder.indexOf(b.sector));
+            return { ok:true, metric, groupBy, yearBasis:requestedBasis, activity, sector:requestedSector, unit, sourceLoaded, results, total:{ amount:items.reduce((sum,item)=>sum+item.amount,0), recordCount:items.length, clientCount:new Set(items.map(item=>item.client).filter(Boolean)).size } };
+        }
+
         function resolveAdminClient(value) {
             const query = String(value || '').trim();
             const normalizedCode = normalizeClientCodeValue(query);
@@ -3480,6 +3604,7 @@
         const ADMIN_FUNCTION_DECLARATIONS = [
             {name:'get_system_overview',description:'מחזיר תמונת מצב מסכמת של חיובים, גבייה, חובות ולקוחות מתוך הנתונים שנטענו.',parameters:{type:'OBJECT',properties:{activity:{type:'STRING',enum:['all','info','fees'],description:'תחום פעילות'},sector:{type:'STRING',description:'שם סקטור או all'}}}},
             {name:'get_sector_summary',description:'מחזיר את חלוקת הלקוחות והמדדים לפי ארבעת הסקטורים של המערכת. יש להשתמש בו לכל שאלה על סקטורים, השוואה ביניהם או מספר הלקוחות בכל סקטור.',parameters:{type:'OBJECT',properties:{activity:{type:'STRING',enum:['all','info','fees'],description:'תחום פעילות: הכל, שירותי מידע או אגרות העברת בעלות'}}}},
+            {name:'get_data_breakdown',description:'כלי הניתוח המרכזי לפילוח נתוני המערכת לפי סקטור, שנה או שניהם. תומך בחיובים, גבייה, חובות, חובות עבר, גביית עבר, התאמות, שאילתות והעברות שטרם הותאמו. יש להשתמש בו בכל בקשת פילוח או השוואה.',parameters:{type:'OBJECT',properties:{metric:{type:'STRING',enum:['billed','current_collection','ongoing_collection','open_debt','overdue_debt','future_payments','historical_open_debt','historical_collected','matched_invoices','query_consumption','unmatched_transfers']},group_by:{type:'STRING',enum:['sector','year','sector_year']},activity:{type:'STRING',enum:['all','info','fees']},sector:{type:'STRING',description:'שם סקטור מדויק או all'},year_basis:{type:'STRING',enum:['auto','report','document','match','due','payment'],description:'בסיס השנה. auto בוחר את הבסיס העסקי המתאים למדד.'},from_year:{type:'NUMBER'},to_year:{type:'NUMBER'}},required:['metric','group_by']}},
             {name:'find_clients',description:'מחפש לקוחות לפי חלק משם או מספר מרכבה.',parameters:{type:'OBJECT',properties:{query:{type:'STRING'},limit:{type:'NUMBER'}},required:['query']}},
             {name:'get_client_overview',description:'מחזיר תמונת מצב מלאה של לקוח.',parameters:{type:'OBJECT',properties:{client:{type:'STRING'},activity:{type:'STRING',enum:['all','info','fees']}},required:['client']}},
             {name:'list_client_invoices',description:'מחזיר חשבוניות פתוחות, בפיגור או עתידיות של לקוח.',parameters:{type:'OBJECT',properties:{client:{type:'STRING'},status:{type:'STRING',enum:['open','overdue','future']},activity:{type:'STRING',enum:['all','info','fees']},limit:{type:'NUMBER'}},required:['client']}},
@@ -3495,6 +3620,7 @@
         async function executeAdminFunction(name,args={}) {
             if(name==='get_system_overview')return adminSystemOverview(args);
             if(name==='get_sector_summary')return adminSectorSummary(args);
+            if(name==='get_data_breakdown')return adminDataBreakdown(args);
             if(name==='find_clients')return adminFindClients(args);
             if(name==='get_client_overview')return adminClientOverview(args);
             if(name==='list_client_invoices')return adminListInvoices(args);
@@ -3524,6 +3650,8 @@
 - תחום פעילות info פירושו שירותי מידע; fees פירושו אגרות העברת בעלות; all פירושו הכול.
 
 סקטורי הלקוחות במערכת הם בדיוק: משרדי ממשלה; רשויות וחברות ממשלתיות; רשויות מקומיות; לקוחות פרטיים. הסיווג נקבע לפי שם הלקוח בלוגיקת המערכת. לכל שאלה על סקטור של לקוח השתמש בחיפוש או בתמונת הלקוח; לכל שאלה מסכמת או השוואה בין סקטורים השתמש בכלי get_sector_summary. אין להסיק סקטור באופן עצמאי.
+
+כללי ניתוח ופילוח: בכל בקשה לפילוח לפי סקטור, שנה או שילוב ביניהם השתמש בכלי get_data_breakdown. הוא מכסה את המדדים billed (חיובים), current_collection (גבייה מחשבוניות השנה), ongoing_collection (גבייה שוטפת כולל דצמבר קודם), open_debt (חוב פתוח), overdue_debt (חוב בפיגור), future_payments (תשלומים עתידיים), historical_open_debt (חוב פתוח משנים קודמות), historical_collected (גביית חובות עבר), matched_invoices (חשבוניות שהותאמו), query_consumption (צריכת שאילתות) ו-unmatched_transfers (העברות שטרם הותאמו). ברירת המחדל auto משתמשת בשנת הדיווח לחיובים ולגבייה, בשנת הפירעון לחובות, בשנת החוב לגביית חובות עבר, בשנת ההתאמה לחשבוניות שהותאמו ובשנת התשלום להעברות. אם המשתמש שואל באיזו שנה בוצעה גביית העבר, השתמש ב-year_basis match; אם הוא שואל מאיזו שנת חוב נגבה, השתמש ב-year_basis document. אין לחשב פילוחים בעצמך מתוצאות חלקיות.
 
 הסתמך רק על תוצאות הכלים ועל נתונים שנמסרו בשיחה; לעולם אל תמציא מספרים. כל החישובים העסקיים חייבים להיעשות בכלים ולא בחישוב חופשי. הצג סכומים בשקלים וטבלאות בפורמט Markdown כשזה מועיל. אם שם לקוח אינו חד משמעי, השתמש בחיפוש ובקש בחירה. להפקת מסמך או פתיחת לקוח השתמש בכלי המתאים; הפעולה תוצג למשתמש ככפתור אישור. אין אפשרות לשלוח דוא״ל בשלב זה, ולכן אם התבקשת לשלוח, הסבר שאפשר להכין ולהוריד את המסמך בלבד. אל תבקש, תציג או תחזיר את סיסמת האדמין או את ערכה. ציין במפורש כאשר מקור נתונים רלוונטי לא נטען.`;
         }
@@ -7772,21 +7900,26 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
 
         function renderUnmatchedTransfersReport() {
             const body = document.getElementById('unmatched-report-table-body');
+            const summary = document.getElementById('unmatched-report-summary');
             if (!body) return;
             const clients = aggregateUnmatchedTransfers();
             const totalCount = clients.reduce((sum,row) => sum + row.count, 0);
             const totalAmount = clients.reduce((sum,row) => sum + row.amount, 0);
+            if (summary) summary.innerHTML = `
+                <div class="unmatched-report-summary__card"><span>לקוחות בדוח</span><strong>${clients.length.toLocaleString('he-IL')}</strong></div>
+                <div class="unmatched-report-summary__card"><span>מספר העברות</span><strong>${totalCount.toLocaleString('he-IL')}</strong></div>
+                <div class="unmatched-report-summary__card"><span>סכום העברות נטו</span><strong>${formatCurrency(totalAmount)}</strong></div>`;
             const groupedRows = clients.map(client => `
                 <tr class="unmatched-report-client-summary">
-                    <td class="numeric-cell"><bdi dir="ltr">${escapeHtml(client.clientCode)}</bdi></td>
-                    <td><strong>${escapeHtml(client.clientName)}</strong></td>
-                    <td class="numeric-cell">${client.count.toLocaleString('he-IL')}</td>
-                    <td></td><td>סיכום ללקוח</td>
+                    <td><span class="unmatched-report-client-code"><bdi dir="ltr">${escapeHtml(client.clientCode)}</bdi></span></td>
+                    <td><span class="unmatched-report-client-name">${escapeHtml(client.clientName)}</span></td>
+                    <td><span class="unmatched-report-count">${client.count.toLocaleString('he-IL')}</span></td>
+                    <td></td><td>סיכום לקוח</td>
                     <td class="numeric-cell"><strong>${formatCurrency(client.amount)}</strong></td>
                 </tr>
                 ${client.transfers.map(row => `<tr class="unmatched-report-detail">
                     <td></td>
-                    <td><bdi dir="ltr">${escapeHtml(row.documentNumber)}</bdi></td>
+                    <td>מסמך <bdi dir="ltr">${escapeHtml(row.documentNumber)}</bdi></td>
                     <td></td>
                     <td>${row.paymentDate ? row.paymentDate.toLocaleDateString('he-IL') : 'אין מידע'}</td>
                     <td>${escapeHtml(unmatchedTransferDetailText(row))}</td>
@@ -7803,14 +7936,14 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const tableRows = clients.map(client => `
                 <tr class="client-summary-row">
                     <td style="direction:ltr;text-align:right"><strong>${escapeHtml(client.clientCode)}</strong></td>
-                    <td><strong>${escapeHtml(client.clientName)}</strong></td>
-                    <td style="text-align:center">${client.count.toLocaleString('he-IL')}</td>
-                    <td></td><td>סיכום ללקוח</td>
+                    <td><span class="print-client-name">${escapeHtml(client.clientName)}</span></td>
+                    <td style="text-align:center"><span class="print-count-badge">${client.count.toLocaleString('he-IL')}</span></td>
+                    <td></td><td>סיכום לקוח</td>
                     <td style="direction:ltr;text-align:right;font-weight:700">${formatCurrency(client.amount)}</td>
                 </tr>
                 ${client.transfers.map(row => `<tr class="transfer-detail-row">
                     <td></td>
-                    <td style="direction:ltr;text-align:right">${escapeHtml(row.documentNumber)}</td>
+                    <td style="direction:ltr;text-align:right">מסמך ${escapeHtml(row.documentNumber)}</td>
                     <td></td>
                     <td>${row.paymentDate ? row.paymentDate.toLocaleDateString('he-IL') : 'אין מידע'}</td>
                     <td>${escapeHtml(unmatchedTransferDetailText(row))}</td>
@@ -7819,9 +7952,10 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const win = window.open('', '_blank');
             if (!win) { alert('פתיחת חלון ההדפסה נחסמה.'); return; }
             const title = 'דוח העברות שטרם הותאמו';
-            win.document.write(`<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>${title}</title>${getClientDocumentPrintStyles()}<style>@page{size:A4 landscape;margin:0}.unmatched-print-note{margin:0 0 10px;color:var(--print-muted);font-size:8.5pt}.unmatched-print-table,.unmatched-print-table th,.unmatched-print-table td,.client-summary-row,.client-summary-row strong{font-family:Arial,"Noto Sans Hebrew",sans-serif!important}.unmatched-print-table{font-size:8.2pt}.unmatched-print-table th,.unmatched-print-table td{padding:4px 6px}.unmatched-print-table thead{display:table-header-group}.unmatched-print-table tfoot{display:table-row-group!important}.client-summary-row{background:#eaf2f8;font-weight:700;break-after:avoid;page-break-after:avoid}.transfer-detail-row td{color:#34495e}.transfer-detail-row td:nth-child(2){padding-inline-start:16px}</style></head><body>
+            win.document.write(`<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>${title}</title>${getClientDocumentPrintStyles()}<style>@page{size:A4 landscape;margin:0}body,.document-page,.unmatched-print-table,.unmatched-print-table *{font-family:Arial,"Noto Sans Hebrew",sans-serif!important;font-style:normal;letter-spacing:normal}.unmatched-print-note{margin:0 0 9px;color:var(--print-muted);font-size:8pt}.unmatched-print-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 10px}.unmatched-print-summary div{padding:8px 10px;border:1px solid #cad8e3;border-radius:7px;background:#f5f9fc}.unmatched-print-summary span{display:block;color:#64788b;font-size:7.5pt;font-weight:700}.unmatched-print-summary strong{display:block;margin-top:2px;color:#153f62;font-size:13pt}.unmatched-print-table{font-size:7.8pt;border-collapse:collapse}.unmatched-print-table th,.unmatched-print-table td{padding:4px 6px;border-color:#d6e0e8}.unmatched-print-table th{background:#edf3f7;color:#425d73;font-weight:700}.unmatched-print-table thead{display:table-header-group}.unmatched-print-table tfoot{display:table-row-group!important}.client-summary-row{background:#e6f1f9;font-weight:700;break-after:avoid;page-break-after:avoid;box-shadow:inset -3px 0 #0b67b5}.print-client-name{font-size:8.4pt;font-weight:700;color:#083f6d}.print-count-badge{display:inline-block;min-width:18px;padding:1px 5px;border:1px solid #b6ccdc;border-radius:10px;background:#fff;color:#075a9e}.transfer-detail-row:nth-child(even) td{background:#fbfcfd}.transfer-detail-row td{color:#34495e}.transfer-detail-row td:nth-child(2){padding-inline-start:16px;color:#174f7b;font-weight:700}</style></head><body>
                 ${getClientDocumentPageStart(title)}<h1 class="document-title">${title}</h1><p class="unmatched-print-note">הסכומים מוצגים לאחר היפוך הסימן בקובץ המקור. דוח זה אינפורמטיבי ואינו משפיע על מדדי המערכת.</p>
-                <table class="unmatched-print-table"><thead><tr><th>קוד מרכבה</th><th>לקוח / מספר מסמך</th><th>מספר העברות</th><th>תאריך תשלום</th><th>פרטים</th><th>סכום</th></tr></thead><tbody>${tableRows}</tbody><tfoot><tr style="font-weight:700;background:#eef3f7"><td colspan="2">סה״כ</td><td style="text-align:center">${totalCount.toLocaleString('he-IL')}</td><td colspan="2"></td><td style="direction:ltr;text-align:right">${formatCurrency(totalAmount)}</td></tr></tfoot></table>${getClientDocumentPageEnd()}
+                <div class="unmatched-print-summary"><div><span>לקוחות בדוח</span><strong>${clients.length.toLocaleString('he-IL')}</strong></div><div><span>מספר העברות</span><strong>${totalCount.toLocaleString('he-IL')}</strong></div><div><span>סכום העברות נטו</span><strong>${formatCurrency(totalAmount)}</strong></div></div>
+                <table class="unmatched-print-table"><thead><tr><th>קוד מרכבה</th><th>לקוח / מספר העברה</th><th>מספר העברות</th><th>תאריך תשלום</th><th>פרטי העברה</th><th>סכום</th></tr></thead><tbody>${tableRows}</tbody><tfoot><tr style="font-weight:700;background:#e9eef3"><td colspan="2">סה״כ</td><td style="text-align:center">${totalCount.toLocaleString('he-IL')}</td><td colspan="2"></td><td style="direction:ltr;text-align:right">${formatCurrency(totalAmount)}</td></tr></tfoot></table>${getClientDocumentPageEnd()}
                 <script>window.addEventListener('load',function(){window.focus();setTimeout(function(){window.print()},350)});<\/script></body></html>`);
             win.document.close();
         }
