@@ -34,6 +34,7 @@
         /* כפייה מוחלטת ואחידה של גופן אריאל על כל פריט מלל ואלמנט במערכת */
         html, body, html *, body *, [class*="text-"], h1, h2, h3, h4, h5, h6, button, span, div, p, label, input, select, td, th, a {
             font-family: Arial, Helvetica, sans-serif !important;
+            font-synthesis: none;
         }
         
         /* החרגה של סמלי ה-FontAwesome */
@@ -806,7 +807,7 @@
 
         .source-groups { display:grid; gap:var(--space-5); }
         .source-group { display:grid; gap:var(--space-3); }
-        .source-group__title { display:flex;align-items:center;gap:9px;margin:0;color:var(--brand-active);font-family:Arial,Helvetica,sans-serif!important;font-size:var(--font-size-md);font-style:normal;font-weight:800;letter-spacing:normal; }
+        .source-group__title { display:flex;align-items:center;gap:9px;margin:0;color:var(--brand-active);font-family:Arial,Helvetica,sans-serif!important;font-size:var(--font-size-md);font-style:normal;font-weight:700;letter-spacing:normal;font-synthesis:none; }
         .source-group__title::after { content:"";height:1px;flex:1;background:var(--color-border); }
         .source-grid--queries { grid-template-columns:repeat(3, minmax(0, 1fr)); }
 
@@ -857,6 +858,7 @@
             font-size: var(--font-size-md);
             font-style:normal;
             letter-spacing:normal;
+            font-synthesis:none;
         }
 
         .source-card p {
@@ -910,7 +912,7 @@
         .source-card.is-manual-required .file-action { border-color: var(--color-warning); background: var(--color-warning-bg); }
         .source-card.is-manual-required .file-action__icon { color: var(--color-warning); background: #fff4cf; }
         .invoice-mapping-actions { display:grid;grid-template-columns:1fr 1fr;align-items:stretch;gap:8px; }
-        .invoice-mapping-actions button { display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:32px;padding:5px 7px;border:1px solid #8fb7d8;border-radius:8px;background:#fff;color:var(--brand-active);font-family:Arial,Helvetica,sans-serif!important;font-size:11px;font-style:normal;font-weight:800;letter-spacing:normal;cursor:pointer;white-space:nowrap; }
+        .invoice-mapping-actions button { display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:32px;padding:5px 7px;border:1px solid #8fb7d8;border-radius:8px;background:#fff;color:var(--brand-active);font-family:Arial,Helvetica,sans-serif!important;font-size:12px;font-style:normal;font-weight:700;line-height:1.25;letter-spacing:normal;font-synthesis:none;cursor:pointer;white-space:nowrap; }
         .invoice-mapping-actions button:hover { background:#edf7ff; }
         .invoice-mapping-actions button:disabled { cursor:not-allowed;border-color:#cbd5e1;background:#eef2f6;color:#64748b; }
         .invoice-mapping-status { min-height:14px;color:var(--color-text-muted);font-family:Arial,Helvetica,sans-serif!important;font-size:10px;font-style:normal;line-height:1.3;letter-spacing:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
@@ -1850,42 +1852,42 @@
         .unmatched-transfer-client-section, .unmatched-transfer-summary { font-family:Arial,Helvetica,sans-serif!important; }
         .unmatched-transfer-summary { margin-top:12px;padding:12px 14px;border:1px solid var(--color-border);border-radius:10px;background:#fff;font-family:var(--font-family-base)!important; }
         .unmatched-transfer-summary__heading { display:flex;align-items:center;justify-content:space-between;gap:12px; }
-        .unmatched-transfer-summary__heading h4 { margin:0;color:var(--brand-active);font-family:var(--font-family-base)!important;font-size:14px;font-weight:800; }
+        .unmatched-transfer-summary__heading h4 { margin:0;color:var(--brand-active);font-family:Arial,Helvetica,sans-serif!important;font-size:14px;font-weight:700;font-synthesis:none; }
         .unmatched-transfer-summary__metrics { display:flex;align-items:center;gap:22px;color:#526579;font-size:12px; }
         .unmatched-transfer-summary__metrics strong { color:#20364f;font-size:16px;margin-inline-start:4px; }
         .unmatched-transfer-client-section { margin-top:18px;border:1px solid var(--color-border);border-radius:14px;overflow:hidden;background:#fff;font-family:var(--font-family-base)!important; }
         .unmatched-transfer-client-section__header { display:flex;justify-content:space-between;align-items:center;gap:14px;padding:13px 16px;background:#fff;border-bottom:1px solid var(--color-border); }
-        .unmatched-transfer-client-section__header h3 { margin:0;color:var(--brand-active);font-family:var(--font-family-base)!important;font-size:16px;font-weight:800; }
+        .unmatched-transfer-client-section__header h3 { margin:0;color:var(--brand-active);font-family:Arial,Helvetica,sans-serif!important;font-size:16px;font-weight:700;font-synthesis:none; }
         .unmatched-transfer-client-section__header p { margin:3px 0 0;color:#6b7787;font-size:11px; }
         .unmatched-transfer-client-section__totals { display:flex;gap:18px;color:#526579;font-size:11px;white-space:nowrap; }
         .unmatched-transfer-client-section__totals strong { color:#20364f;font-size:14px;margin-inline-start:3px; }
         .unmatched-report-main { padding:24px;font-family:Arial,"Noto Sans Hebrew",sans-serif!important; }
         .unmatched-report-panel { background:#fff;border:1px solid #d5dee8;border-radius:16px;overflow:hidden;box-shadow:0 7px 22px rgba(26,55,85,.07); }
         .unmatched-report-panel__header { display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 22px 16px;border-bottom:0; }
-        .unmatched-report-panel__header h2,.unmatched-report-panel__header p,.unmatched-report-summary__card span,.unmatched-report-client-name,.unmatched-report-table th,.unmatched-report-table td { font-family:Arial,Helvetica,sans-serif!important;font-style:normal;letter-spacing:normal; }
-        .unmatched-report-panel__header h2 { margin:0;color:#064f8c;font-family:Arial,Helvetica,sans-serif!important;font-size:20px;font-weight:800; }
+        .unmatched-report-panel__header h2,.unmatched-report-panel__header p,.unmatched-report-summary__card span,.unmatched-report-client-name,.unmatched-report-table th,.unmatched-report-table td { font-family:Arial,Helvetica,sans-serif!important;font-style:normal;letter-spacing:normal;font-synthesis:none; }
+        .unmatched-report-panel__header h2 { margin:0;color:#064f8c;font-family:Arial,Helvetica,sans-serif!important;font-size:20px;font-weight:700; }
         .unmatched-report-panel__header p { margin:5px 0 0;color:#607080;font-size:12px;line-height:1.55; }
         .unmatched-report-summary { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:0 22px 20px; }
         .unmatched-report-summary__card { position:relative;padding:14px 16px;border:1px solid #d9e4ed;border-radius:12px;background:#f8fbfd;overflow:hidden; }
         .unmatched-report-summary__card::after { content:"";position:absolute;inset-inline-end:0;top:0;bottom:0;width:4px;background:#0b67b5; }
         .unmatched-report-summary__card span { display:block;color:#657689;font-size:11px;font-weight:700; }
-        .unmatched-report-summary__card strong { display:block;margin-top:5px;color:#11395d;font-family:Arial,"Noto Sans Hebrew",sans-serif!important;font-size:22px;font-weight:800; }
+        .unmatched-report-summary__card strong { display:block;margin-top:5px;color:#11395d;font-family:Arial,Helvetica,sans-serif!important;font-size:22px;font-weight:700;font-synthesis:none; }
         .unmatched-report-table-wrap { overflow-x:auto;border-top:1px solid #dce5ed; }
         .unmatched-report-table { width:100%;border-collapse:separate;border-spacing:0;font-family:Arial,"Noto Sans Hebrew",sans-serif!important; }
-        .unmatched-report-table th,.unmatched-report-table td,.unmatched-report-client-summary,.unmatched-report-client-summary strong { font-family:Arial,"Noto Sans Hebrew",sans-serif!important;font-style:normal;letter-spacing:normal; }
+        .unmatched-report-table th,.unmatched-report-table td,.unmatched-report-client-summary,.unmatched-report-client-summary strong { font-family:Arial,Helvetica,sans-serif!important;font-style:normal;letter-spacing:normal;font-synthesis:none; }
         .unmatched-report-table th,.unmatched-report-table td { padding:11px 16px;border-bottom:1px solid #e5ebf0;text-align:right;vertical-align:middle; }
-        .unmatched-report-table th { position:sticky;top:0;z-index:1;background:#f1f5f8;color:#526579;font-size:11px;font-weight:800; }
+        .unmatched-report-table th { position:sticky;top:0;z-index:1;background:#f1f5f8;color:#526579;font-size:11px;font-weight:700; }
         .unmatched-report-table td { color:#2f465c;font-size:13px; }
         .unmatched-report-table .numeric-cell { direction:ltr;text-align:right;font-variant-numeric:tabular-nums; }
         .unmatched-report-client-summary { background:#e9f3fb;font-weight:700;box-shadow:inset 4px 0 #0b67b5; }
         .unmatched-report-client-summary td { color:#083f6d;padding-top:13px;padding-bottom:13px; }
         .unmatched-report-client-name { display:block;font-family:Arial,"Noto Sans Hebrew",sans-serif!important;font-size:14px;font-style:normal;font-weight:700!important;font-synthesis:none;letter-spacing:normal; }
         .unmatched-report-client-code { color:#60778d;font-size:11px;font-weight:700; }
-        .unmatched-report-count { display:inline-flex;min-width:30px;justify-content:center;padding:3px 8px;border-radius:99px;background:#fff;border:1px solid #bdd3e4;color:#075a9e;font-weight:800; }
+        .unmatched-report-count { display:inline-flex;min-width:30px;justify-content:center;padding:3px 8px;border-radius:99px;background:#fff;border:1px solid #bdd3e4;color:#075a9e;font-weight:700;font-synthesis:none; }
         .unmatched-report-detail:nth-child(even) td { background:#fbfcfd; }
         .unmatched-report-detail td { color:#40566d;font-size:12px; }
         .unmatched-report-detail td:nth-child(2) { padding-inline-start:26px;color:#174f7b;font-weight:700; }
-        .unmatched-report-total { background:#e9eef3;font-weight:800; }
+        .unmatched-report-total { background:#e9eef3;font-weight:700;font-synthesis:none; }
         .unmatched-report-total td { border-top:2px solid #b9c8d5;color:#153c5e; }
         @media (max-width:760px) { .unmatched-transfer-summary__heading,.unmatched-transfer-client-section__header{align-items:flex-start;flex-direction:column}.unmatched-transfer-summary__metrics,.unmatched-transfer-client-section__totals{flex-wrap:wrap;gap:9px 16px}.unmatched-report-main{padding:12px}.unmatched-report-panel__header{align-items:flex-start;flex-direction:column}.unmatched-report-summary{grid-template-columns:1fr;padding-inline:14px}.unmatched-report-table th,.unmatched-report-table td{padding-inline:10px} }
 
@@ -1962,7 +1964,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.3 · 3 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.4 · 3 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -8255,7 +8257,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const win = window.open('', '_blank');
             if (!win) { alert('פתיחת חלון ההדפסה נחסמה.'); return; }
             const title = 'דוח העברות שטרם הותאמו';
-            win.document.write(`<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>${title}</title>${getClientDocumentPrintStyles()}<style>@page{size:A4 landscape;margin:0}body,.document-page,.unmatched-print-table,.unmatched-print-table *{font-family:Arial,"Noto Sans Hebrew",sans-serif!important;font-style:normal;letter-spacing:normal}.unmatched-print-note{margin:0 0 9px;color:var(--print-muted);font-size:8pt}.unmatched-print-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 10px}.unmatched-print-summary div{padding:8px 10px;border:1px solid #cad8e3;border-radius:7px;background:#f5f9fc}.unmatched-print-summary span{display:block;color:#64788b;font-size:7.5pt;font-weight:700}.unmatched-print-summary strong{display:block;margin-top:2px;color:#153f62;font-size:13pt}.unmatched-print-table{font-size:7.8pt;border-collapse:collapse}.unmatched-print-table th,.unmatched-print-table td{padding:4px 6px;border-color:#d6e0e8}.unmatched-print-table th{background:#edf3f7;color:#425d73;font-weight:700}.unmatched-print-table thead{display:table-header-group}.unmatched-print-table tfoot{display:table-row-group!important}.client-summary-row{background:#e6f1f9;font-weight:700;break-after:avoid;page-break-after:avoid;box-shadow:inset -3px 0 #0b67b5}.print-client-name{font-size:8.4pt;font-weight:700;color:#083f6d}.print-count-badge{display:inline-block;min-width:18px;padding:1px 5px;border:1px solid #b6ccdc;border-radius:10px;background:#fff;color:#075a9e}.transfer-detail-row:nth-child(even) td{background:#fbfcfd}.transfer-detail-row td{color:#34495e}.transfer-detail-row td:nth-child(2){padding-inline-start:16px;color:#174f7b;font-weight:700}</style></head><body>
+            win.document.write(`<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>${title}</title>${getClientDocumentPrintStyles()}<style>@page{size:A4 landscape;margin:0}body,.document-page,.unmatched-print-table,.unmatched-print-table *{font-family:Arial,Helvetica,sans-serif!important;font-style:normal;letter-spacing:normal;font-synthesis:none}.unmatched-print-note{margin:0 0 9px;color:var(--print-muted);font-size:8pt}.unmatched-print-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 10px}.unmatched-print-summary div{padding:8px 10px;border:1px solid #cad8e3;border-radius:7px;background:#f5f9fc}.unmatched-print-summary span{display:block;color:#64788b;font-size:7.5pt;font-weight:700}.unmatched-print-summary strong{display:block;margin-top:2px;color:#153f62;font-size:13pt}.unmatched-print-table{font-size:7.8pt;border-collapse:collapse}.unmatched-print-table th,.unmatched-print-table td{padding:4px 6px;border-color:#d6e0e8}.unmatched-print-table th{background:#edf3f7;color:#425d73;font-weight:700}.unmatched-print-table thead{display:table-header-group}.unmatched-print-table tfoot{display:table-row-group!important}.client-summary-row{background:#e6f1f9;font-weight:700;break-after:avoid;page-break-after:avoid;box-shadow:inset -3px 0 #0b67b5}.print-client-name{font-size:8.4pt;font-weight:700;color:#083f6d}.print-count-badge{display:inline-block;min-width:18px;padding:1px 5px;border:1px solid #b6ccdc;border-radius:10px;background:#fff;color:#075a9e}.transfer-detail-row:nth-child(even) td{background:#fbfcfd}.transfer-detail-row td{color:#34495e}.transfer-detail-row td:nth-child(2){padding-inline-start:16px;color:#174f7b;font-weight:700}</style></head><body>
                 ${getClientDocumentPageStart(title)}<h1 class="document-title">${title}</h1><p class="unmatched-print-note">הסכומים מוצגים לאחר היפוך הסימן בקובץ המקור. דוח זה אינפורמטיבי ואינו משפיע על מדדי המערכת.</p>
                 <div class="unmatched-print-summary"><div><span>לקוחות בדוח</span><strong>${clients.length.toLocaleString('he-IL')}</strong></div><div><span>מספר העברות</span><strong>${totalCount.toLocaleString('he-IL')}</strong></div><div><span>סכום העברות נטו</span><strong>${formatCurrency(totalAmount)}</strong></div></div>
                 <table class="unmatched-print-table"><thead><tr><th>קוד מרכבה</th><th>לקוח / מספר העברה</th><th>מספר העברות</th><th>תאריך תשלום</th><th>פרטי העברה</th><th>סכום</th></tr></thead><tbody>${tableRows}</tbody><tfoot><tr style="font-weight:700;background:#e9eef3"><td colspan="2">סה״כ</td><td style="text-align:center">${totalCount.toLocaleString('he-IL')}</td><td colspan="2"></td><td style="direction:ltr;text-align:right">${formatCurrency(totalAmount)}</td></tr></tfoot></table>${getClientDocumentPageEnd()}
