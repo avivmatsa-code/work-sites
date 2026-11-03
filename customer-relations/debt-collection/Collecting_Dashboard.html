@@ -901,6 +901,11 @@
         .invoice-file-indicator--missing { color:#94a3b8;background:#f8fafc;border-color:#dbe3ea; }
         .invoice-file-indicator__count { position:absolute;inset-inline-start:-5px;top:-6px;min-width:16px;height:16px;padding:0 4px;border-radius:9px;background:#047857;color:#fff;font-size:9px;font-weight:800;line-height:16px;text-align:center; }
         .invoice-files-list { display:grid;gap:9px;max-height:55vh;overflow:auto;margin-top:14px; }
+        .invoice-preview-dialog { width:min(1180px, 96vw); height:min(900px, 92vh); overflow:hidden; display:flex; flex-direction:column; }
+        .invoice-preview-dialog .ui-dialog__body { flex:1; min-height:0; padding:0; background:#eef2f6; }
+        .invoice-preview-frame { display:block; width:100%; height:100%; min-height:68vh; border:0; background:#fff; }
+        .invoice-preview-dialog .ui-dialog__footer { align-items:center; gap:10px; padding-top:12px; }
+        .invoice-preview-dialog .ui-dialog__footer a { text-decoration:none; }
         .invoice-files-list button { display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:11px 13px;border:1px solid var(--color-border);border-radius:10px;background:#fff;color:var(--color-text);text-align:right;cursor:pointer; }
         .invoice-files-list button:hover { border-color:#86d6aa;background:#f0fdf4; }
         .invoice-files-list button i { color:#047857; }
@@ -1934,7 +1939,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.0 · 3 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.1 · 3 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -1959,6 +1964,24 @@
             </div>
             <div class="ui-dialog__footer">
                 <button type="button" class="button-secondary" onclick="closeUiDialog('invoice-files-dialog')">סגור</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Invoice preview dialog -->
+    <div id="invoice-preview-dialog" class="ui-dialog-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="invoice-preview-title" onclick="closeInvoicePreviewFromBackdrop(event)">
+        <section class="ui-dialog invoice-preview-dialog">
+            <div class="ui-dialog__header">
+                <h2 id="invoice-preview-title">קובץ החשבונית</h2>
+                <button type="button" class="dialog-close" onclick="closeInvoicePreviewDialog()" aria-label="סגירת קובץ החשבונית"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+            </div>
+            <div class="ui-dialog__body">
+                <iframe id="invoice-preview-frame" class="invoice-preview-frame" title="תצוגת קובץ החשבונית"></iframe>
+            </div>
+            <div class="ui-dialog__footer">
+                <a id="invoice-preview-open" class="button-primary" href="#" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> פתיחה בכרטיסייה חדשה</a>
+                <a id="invoice-preview-download" class="button-secondary" href="#" download><i class="fa-solid fa-download" aria-hidden="true"></i> הורדה</a>
+                <button type="button" class="button-secondary" onclick="closeInvoicePreviewDialog()">סגור</button>
             </div>
         </section>
     </div>
@@ -8754,6 +8777,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
         const DATA_FOLDER_HANDLE_KEY = 'collecting-data-folder';
         const INVOICE_FOLDER_HANDLE_KEY = 'invoice-files-root-folder';
         let invoiceFolderHandle = null;
+        let invoicePreviewObjectUrl = '';
         let bulkFolderLoadInProgress = false;
 
         function normalizeSourceFileName(fileName) {
@@ -8911,7 +8935,8 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
         }
 
         async function getAuthorizedInvoiceFolderHandle(requestIfMissing = true) {
-            const handle = invoiceFolderHandle;
+            const handle = invoiceFolderHandle || await getSavedInvoiceFolderHandle();
+            if (handle) invoiceFolderHandle = handle;
             if (handle && typeof handle.queryPermission === 'function') {
                 let permission = await handle.queryPermission({ mode: 'read' });
                 if (permission !== 'granted' && typeof handle.requestPermission === 'function') permission = await handle.requestPermission({ mode: 'read' });
@@ -8942,6 +8967,49 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             for (const folderName of pathParts.slice(0, -1)) currentDirectory = await currentDirectory.getDirectoryHandle(folderName);
             const fileHandle = await currentDirectory.getFileHandle(pathParts[pathParts.length - 1]);
             return fileHandle.getFile();
+        }
+
+        function closeInvoicePreviewDialog() {
+            closeUiDialog('invoice-preview-dialog');
+            const frame = document.getElementById('invoice-preview-frame');
+            if (frame) frame.removeAttribute('src');
+            if (invoicePreviewObjectUrl) URL.revokeObjectURL(invoicePreviewObjectUrl);
+            invoicePreviewObjectUrl = '';
+        }
+
+        function closeInvoicePreviewFromBackdrop(event) {
+            if (event.target === event.currentTarget) closeInvoicePreviewDialog();
+        }
+
+        function showInvoicePreview(file) {
+            if (invoicePreviewObjectUrl) URL.revokeObjectURL(invoicePreviewObjectUrl);
+            invoicePreviewObjectUrl = URL.createObjectURL(file);
+            const title = document.getElementById('invoice-preview-title');
+            const frame = document.getElementById('invoice-preview-frame');
+            const openLink = document.getElementById('invoice-preview-open');
+            const downloadLink = document.getElementById('invoice-preview-download');
+            if (title) title.textContent = file.name || 'קובץ החשבונית';
+            if (frame) frame.src = invoicePreviewObjectUrl;
+            if (openLink) openLink.href = invoicePreviewObjectUrl;
+            if (downloadLink) {
+                downloadLink.href = invoicePreviewObjectUrl;
+                downloadLink.download = file.name || 'invoice.pdf';
+            }
+            openUiDialog('invoice-preview-dialog');
+        }
+
+        function getInvoiceOpenErrorMessage(error, directoryHandle, entry) {
+            const selectedFolder = directoryHandle?.name ? '"' + directoryHandle.name + '"' : 'לא נבחרה';
+            if (error?.name === 'NotAllowedError' || error?.name === 'SecurityError') {
+                return 'הגישה לתיקיית החשבוניות לא אושרה. יש לעבור למסך מקורות הנתונים ולאשר מחדש גישה לתיקייה S:\\חשבונות - שוטפים.';
+            }
+            if (error?.name === 'NotFoundError' || error?.name === 'TypeMismatchError') {
+                return 'הקובץ לא נמצא מתוך תיקיית השורש שנבחרה (' + selectedFolder + '). יש לבחור במסך מקורות הנתונים את התיקייה S:\\חשבונות - שוטפים ולוודא שהרשת זמינה.\n\nהנתיב שנרשם במיפוי:\n' + String(entry?.path || 'לא נמצא נתיב');
+            }
+            if (!directoryHandle) {
+                return 'לא אושרה גישה לתיקיית החשבוניות. במסך מקורות הנתונים יש ללחוץ על "אישור גישה לתיקייה" ולבחור את S:\\חשבונות - שוטפים.';
+            }
+            return 'לא ניתן לפתוח את קובץ החשבונית מתוך התיקייה ' + selectedFolder + '. יש לוודא שהקובץ זמין ברשת או לאשר מחדש את תיקיית השורש במסך מקורות הנתונים.';
         }
 
         function invoiceFileIndicator(documentNumber) {
@@ -8975,19 +9043,15 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const documentNumber = decodeURIComponent(encodedDocumentNumber);
             const entry = getInvoiceFileEntries(documentNumber)[entryIndex];
             if (!entry) return;
-            const popup = window.open('', '_blank');
-            if (popup) popup.document.write('<html dir="rtl" lang="he"><body style="font-family:Arial;padding:30px">טוען את קובץ החשבונית...</body></html>');
+            let directoryHandle = null;
             try {
-                const directoryHandle = await getAuthorizedInvoiceFolderHandle(true);
+                directoryHandle = await getAuthorizedInvoiceFolderHandle(true);
                 if (!directoryHandle) throw new Error('לא אושרה גישה לתיקיית החשבוניות.');
                 const file = await resolveMappedInvoiceFile(entry, directoryHandle);
-                const objectUrl = URL.createObjectURL(file);
-                if (popup) popup.location.replace(objectUrl); else window.open(objectUrl, '_blank', 'noopener');
-                window.setTimeout(() => URL.revokeObjectURL(objectUrl), 120000);
                 closeUiDialog('invoice-files-dialog');
+                showInvoicePreview(file);
             } catch (error) {
-                if (popup) popup.close();
-                alert('לא ניתן לפתוח את קובץ החשבונית. יש לוודא שנבחרה תיקיית השורש המתאימה ושהקובץ זמין ברשת.');
+                alert(getInvoiceOpenErrorMessage(error, directoryHandle, entry));
                 console.info('פתיחת קובץ החשבונית נכשלה.', error);
             }
         }
@@ -9239,7 +9303,10 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
 
             document.addEventListener('keydown', event => {
                 if (event.key !== 'Escape') return;
-                document.querySelectorAll('.ui-dialog-backdrop.flex').forEach(dialog => closeUiDialog(dialog.id));
+                document.querySelectorAll('.ui-dialog-backdrop.flex').forEach(dialog => {
+                    if (dialog.id === 'invoice-preview-dialog') closeInvoicePreviewDialog();
+                    else closeUiDialog(dialog.id);
+                });
                 closeSuiteMenu();
             });
         }
@@ -9249,7 +9316,6 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
     </script>
 </body>
 </html>
-
 
 
 
