@@ -806,24 +806,24 @@
 
         .source-groups { display:grid; gap:var(--space-5); }
         .source-group { display:grid; gap:var(--space-3); }
-        .source-group__title { display:flex;align-items:center;gap:9px;margin:0;color:var(--brand-active);font-size:var(--font-size-md);font-weight:800; }
+        .source-group__title { display:flex;align-items:center;gap:9px;margin:0;color:var(--brand-active);font-family:Arial,Helvetica,sans-serif!important;font-size:var(--font-size-md);font-style:normal;font-weight:800;letter-spacing:normal; }
         .source-group__title::after { content:"";height:1px;flex:1;background:var(--color-border); }
-        .source-grid--queries { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+        .source-grid--queries { grid-template-columns:repeat(3, minmax(0, 1fr)); }
 
         .source-card {
-            min-height: 196px;
-            height: 100%;
+            min-height: 214px;
+            height: 214px;
             border: 1px solid var(--color-border);
             border-radius: var(--radius-lg);
             background: var(--color-surface);
             display: grid;
-            grid-template-rows: minmax(82px, auto) auto;
-            gap:var(--space-3);
-            padding: var(--space-4);
+            grid-template-rows: minmax(54px, auto) auto;
+            gap:7px;
+            padding:12px;
             box-shadow: var(--shadow-panel);
         }
 
-        .source-card--mapping { grid-template-rows:auto auto auto; }
+        .source-card--mapping { grid-template-rows:auto auto auto auto; }
         .source-card--future { border-style:dashed;background:#f8fafc;box-shadow:none; }
         .source-card--future .source-card__icon { background:#eef2f6;color:#738396; }
         .source-card--future .source-card__badge { background:#eef2f6;color:#64748b; }
@@ -853,14 +853,17 @@
 
         .source-card h3 {
             margin: 0;
+            font-family:Arial,Helvetica,sans-serif!important;
             font-size: var(--font-size-md);
+            font-style:normal;
+            letter-spacing:normal;
         }
 
         .source-card p {
             margin: 4px 0 0;
             color: var(--color-text-muted);
             font-size: 12px;
-            line-height: 1.5;
+            line-height: 1.35;
         }
 
         .source-card__badge {
@@ -880,7 +883,7 @@
 
         .source-card .file-action {
             align-self: end;
-            min-height: 54px;
+            min-height: 48px;
         }
 
         .source-card .file-action small {
@@ -906,15 +909,11 @@
         .source-bulk-loader .button-primary:disabled { opacity: .68; cursor: wait; }
         .source-card.is-manual-required .file-action { border-color: var(--color-warning); background: var(--color-warning-bg); }
         .source-card.is-manual-required .file-action__icon { color: var(--color-warning); background: #fff4cf; }
-        .invoice-folder-access { display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border:1px solid var(--color-border);border-radius:10px;background:#f8fafc; }
-        .invoice-folder-access button { display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;padding:7px 11px;border:1px solid #8fb7d8;border-radius:8px;background:#fff;color:var(--brand-active);font-size:12px;font-weight:700;cursor:pointer; }
-        .invoice-folder-access button:hover { background:#edf7ff; }
-        .invoice-folder-access small { color:var(--color-text-muted);font-size:11px;line-height:1.4; }
-        .invoice-mapping-tools { display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px;padding-top:2px; }
-        .invoice-mapping-tools button { display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:8px 11px;border:1px solid #8fb7d8;border-radius:8px;background:#fff;color:var(--brand-active);font-size:12px;font-weight:800;cursor:pointer; }
-        .invoice-mapping-tools button:hover { background:#edf7ff; }
-        .invoice-mapping-tools button:disabled { cursor:not-allowed;border-color:#cbd5e1;background:#eef2f6;color:#64748b; }
-        .invoice-mapping-tools small { color:var(--color-text-muted);font-size:11px;line-height:1.45; }
+        .invoice-mapping-actions { display:grid;grid-template-columns:1fr 1fr;align-items:stretch;gap:8px; }
+        .invoice-mapping-actions button { display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:32px;padding:5px 7px;border:1px solid #8fb7d8;border-radius:8px;background:#fff;color:var(--brand-active);font-family:Arial,Helvetica,sans-serif!important;font-size:11px;font-style:normal;font-weight:800;letter-spacing:normal;cursor:pointer;white-space:nowrap; }
+        .invoice-mapping-actions button:hover { background:#edf7ff; }
+        .invoice-mapping-actions button:disabled { cursor:not-allowed;border-color:#cbd5e1;background:#eef2f6;color:#64748b; }
+        .invoice-mapping-status { min-height:14px;color:var(--color-text-muted);font-family:Arial,Helvetica,sans-serif!important;font-size:10px;font-style:normal;line-height:1.3;letter-spacing:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
         .mapping-updater-path { direction:ltr;display:block;margin-top:12px;padding:10px 12px;border:1px solid var(--color-border);border-radius:9px;background:#f8fafc;color:#334155;font-size:12px;overflow-wrap:anywhere;text-align:left; }
         .invoice-document-cell { display:inline-flex;align-items:center;gap:8px; }
         .invoice-file-indicator { display:inline-flex;align-items:center;justify-content:center;position:relative;width:29px;height:29px;border-radius:8px;border:1px solid transparent;font-size:13px;vertical-align:middle; }
@@ -1863,7 +1862,8 @@
         .unmatched-report-main { padding:24px;font-family:Arial,"Noto Sans Hebrew",sans-serif!important; }
         .unmatched-report-panel { background:#fff;border:1px solid #d5dee8;border-radius:16px;overflow:hidden;box-shadow:0 7px 22px rgba(26,55,85,.07); }
         .unmatched-report-panel__header { display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 22px 16px;border-bottom:0; }
-        .unmatched-report-panel__header h2 { margin:0;color:#064f8c;font-family:Arial,"Noto Sans Hebrew",sans-serif!important;font-size:20px;font-weight:800; }
+        .unmatched-report-panel__header h2,.unmatched-report-panel__header p,.unmatched-report-summary__card span,.unmatched-report-client-name,.unmatched-report-table th,.unmatched-report-table td { font-family:Arial,Helvetica,sans-serif!important;font-style:normal;letter-spacing:normal; }
+        .unmatched-report-panel__header h2 { margin:0;color:#064f8c;font-family:Arial,Helvetica,sans-serif!important;font-size:20px;font-weight:800; }
         .unmatched-report-panel__header p { margin:5px 0 0;color:#607080;font-size:12px;line-height:1.55; }
         .unmatched-report-summary { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:0 22px 20px; }
         .unmatched-report-summary__card { position:relative;padding:14px 16px;border:1px solid #d9e4ed;border-radius:12px;background:#f8fbfd;overflow:hidden; }
@@ -1962,7 +1962,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.2 · 3 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.3 · 3 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -2241,7 +2241,7 @@
                 <article id="invoice-mapping-source-card" class="source-card source-card--mapping">
                     <div class="source-card__heading">
                         <span class="source-card__icon"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i></span>
-                        <div><h3>מיפוי חשבוניות ברשת</h3><p>קישורים לקובצי החשבוניות לפי מספר המסמך החשבונאי. המקור משמש במסכים ובטיוטות דוא״ל בלבד.</p></div>
+                        <div><h3>מיפוי חשבוניות ברשת</h3><p>קישורים לקבצים לפי מספר המסמך. לפתיחה נדרשת הרשאה לתיקיית השורש שבה שמורים קובצי החשבוניות.</p></div>
                         <span class="source-card__badge source-card__badge--optional">רשות</span>
                     </div>
                     <input type="file" id="invoice-mapping-uploader" class="hidden" accept=".xlsx,.xls" onchange="processInvoiceMappingExcel(event)">
@@ -2249,14 +2249,12 @@
                         <span class="file-action__icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></span>
                         <span><strong>בחירת קובץ מיפוי חשבוניות ברשת</strong><small id="invoice-mapping-file-status">טרם נטען</small></span>
                     </label>
-                    <div id="invoice-folder-access" class="invoice-folder-access">
-                        <small id="invoice-folder-access-status">נדרשת הרשאה חד־פעמית לתיקיית השורש שבה שמורים קובצי החשבוניות: <bdi>S:\חשבונות - שוטפים</bdi>.</small>
+                    <div id="invoice-folder-access" class="invoice-mapping-actions">
                         <button type="button" onclick="authorizeInvoiceFilesFolder()"><i class="fa-solid fa-folder-open" aria-hidden="true"></i>בחירת תיקיית השורש</button>
-                    </div>
-                    <div class="invoice-mapping-tools">
                         <button id="invoice-mapping-update-button" type="button" onclick="prepareInvoiceMappingUpdate()"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>עדכון מיפוי החשבוניות</button>
-                        <small id="invoice-mapping-update-status">הפעלת כלי המיפוי השמור ברשת ויצירת קובץ מיפוי עדכני.</small>
                     </div>
+                    <small id="invoice-folder-access-status" class="invoice-mapping-status">תיקיית השורש: <bdi>S:\חשבונות - שוטפים</bdi></small>
+                    <small id="invoice-mapping-update-status" class="invoice-mapping-status hidden"></small>
                 </article>
 
                 <article class="source-card source-card--future" aria-label="קובץ אנשי קשר, תכנון עתידי">
@@ -8965,7 +8963,12 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             } catch (error) { return null; }
         }
 
-        function setInvoiceFolderAccessStatus(message) { const status = document.getElementById('invoice-folder-access-status'); if (status) status.textContent = message; }
+        function setInvoiceFolderAccessStatus(message) {
+            const status = document.getElementById('invoice-folder-access-status');
+            const updateStatus = document.getElementById('invoice-mapping-update-status');
+            if (status) { status.textContent = message; status.classList.remove('hidden'); }
+            if (updateStatus) updateStatus.classList.add('hidden');
+        }
 
         async function refreshInvoiceFolderAccessStatus() {
             if (!invoiceMappingLoaded) return;
@@ -9052,11 +9055,16 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
         function confirmInvoiceMappingUpdaterStarted() {
             const button = document.getElementById('invoice-mapping-update-button');
             const status = document.getElementById('invoice-mapping-update-status');
+            const folderStatus = document.getElementById('invoice-folder-access-status');
             if (button) {
                 button.disabled = true;
                 button.innerHTML = '<i class="fa-solid fa-spinner" aria-hidden="true"></i>כלי המיפוי הופעל';
             }
-            if (status) status.textContent = 'ההרצה נמשכת כ־10 דקות. בסיומה יש לטעון את קובץ המיפוי החדש למערכת.';
+            if (folderStatus) folderStatus.classList.add('hidden');
+            if (status) {
+                status.textContent = 'ההרצה נמשכת כ־10 דקות. בסיומה יש לטעון את קובץ המיפוי החדש למערכת.';
+                status.classList.remove('hidden');
+            }
             closeUiDialog('invoice-mapping-updater-dialog');
         }
 
