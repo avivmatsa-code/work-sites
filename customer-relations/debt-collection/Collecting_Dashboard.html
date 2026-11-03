@@ -889,6 +889,21 @@
         .source-bulk-loader .button-primary:disabled { opacity: .68; cursor: wait; }
         .source-card.is-manual-required .file-action { border-color: var(--color-warning); background: var(--color-warning-bg); }
         .source-card.is-manual-required .file-action__icon { color: var(--color-warning); background: #fff4cf; }
+        .invoice-folder-access { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding:10px 12px;border:1px solid var(--color-border);border-radius:10px;background:#f8fafc; }
+        .invoice-folder-access button { display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;padding:7px 11px;border:1px solid #8fb7d8;border-radius:8px;background:#fff;color:var(--brand-active);font-size:12px;font-weight:700;cursor:pointer; }
+        .invoice-folder-access button:hover { background:#edf7ff; }
+        .invoice-folder-access small { color:var(--color-text-muted);font-size:11px;line-height:1.4; }
+        .invoice-document-cell { display:inline-flex;align-items:center;gap:8px; }
+        .invoice-file-indicator { display:inline-flex;align-items:center;justify-content:center;position:relative;width:29px;height:29px;border-radius:8px;border:1px solid transparent;font-size:13px;vertical-align:middle; }
+        button.invoice-file-indicator { cursor:pointer; }
+        .invoice-file-indicator--available { color:#047857;background:#ecfdf5;border-color:#86d6aa; }
+        .invoice-file-indicator--available:hover { color:#065f46;background:#d1fae5;border-color:#34d399; }
+        .invoice-file-indicator--missing { color:#94a3b8;background:#f8fafc;border-color:#dbe3ea; }
+        .invoice-file-indicator__count { position:absolute;inset-inline-start:-5px;top:-6px;min-width:16px;height:16px;padding:0 4px;border-radius:9px;background:#047857;color:#fff;font-size:9px;font-weight:800;line-height:16px;text-align:center; }
+        .invoice-files-list { display:grid;gap:9px;max-height:55vh;overflow:auto;margin-top:14px; }
+        .invoice-files-list button { display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:11px 13px;border:1px solid var(--color-border);border-radius:10px;background:#fff;color:var(--color-text);text-align:right;cursor:pointer; }
+        .invoice-files-list button:hover { border-color:#86d6aa;background:#f0fdf4; }
+        .invoice-files-list button i { color:#047857; }
 
         .query-source-note {
             display: flex;
@@ -1919,7 +1934,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.7.1 · 26 באוקטובר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.0 · 3 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -1927,6 +1942,23 @@
             </div>
             <div class="ui-dialog__footer">
                 <button type="button" class="button-secondary" onclick="closeUiDialog('about-dialog')">סגור</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Invoice files dialog -->
+    <div id="invoice-files-dialog" class="ui-dialog-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="invoice-files-title" onclick="closeDialogFromBackdrop(event, 'invoice-files-dialog')">
+        <section class="ui-dialog">
+            <div class="ui-dialog__header">
+                <h2 id="invoice-files-title">קובצי החשבונית ברשת</h2>
+                <button type="button" class="dialog-close" onclick="closeUiDialog('invoice-files-dialog')" aria-label="סגירת רשימת הקבצים"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+            </div>
+            <div class="ui-dialog__body">
+                <p id="invoice-files-description" class="control-label" style="margin:0;"></p>
+                <div id="invoice-files-list" class="invoice-files-list"></div>
+            </div>
+            <div class="ui-dialog__footer">
+                <button type="button" class="button-secondary" onclick="closeUiDialog('invoice-files-dialog')">סגור</button>
             </div>
         </section>
     </div>
@@ -2137,6 +2169,22 @@
                         <span class="file-action__icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></span>
                         <span><strong>בחירת קובץ העברות שטרם הותאמו</strong><small id="unmatched-transfers-file-status">טרם נטען</small></span>
                     </label>
+                </article>
+                <article id="invoice-mapping-source-card" class="source-card">
+                    <div class="source-card__heading">
+                        <span class="source-card__icon"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i></span>
+                        <div><h3>מיפוי חשבוניות ברשת</h3><p>קישורים לקובצי החשבוניות לפי מספר המסמך החשבונאי. המקור משמש במסכים ובטיוטות דוא״ל בלבד.</p></div>
+                        <span class="source-card__badge source-card__badge--optional">רשות</span>
+                    </div>
+                    <input type="file" id="invoice-mapping-uploader" class="hidden" accept=".xlsx,.xls" onchange="processInvoiceMappingExcel(event)">
+                    <label for="invoice-mapping-uploader" id="invoice-mapping-file-action" class="file-action" tabindex="0">
+                        <span class="file-action__icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></span>
+                        <span><strong>בחירת קובץ מיפוי חשבוניות ברשת</strong><small id="invoice-mapping-file-status">טרם נטען</small></span>
+                    </label>
+                    <div id="invoice-folder-access" class="invoice-folder-access hidden">
+                        <small id="invoice-folder-access-status">כדי לפתוח ולצרף חשבוניות יש לאשר גישה חד־פעמית לתיקיית החשבוניות ברשת.</small>
+                        <button type="button" onclick="authorizeInvoiceFilesFolder()"><i class="fa-solid fa-folder-open" aria-hidden="true"></i>אישור גישה לתיקייה</button>
+                    </div>
                 </article>
                 <article id="query-online-source-card" class="source-card">
                     <div class="source-card__heading">
@@ -3018,6 +3066,8 @@
         let revenueDb = []; 
         let historicalRevenueDb = [];
         let unmatchedTransfersDb = [];
+        let invoiceFileMap = new Map();
+        let invoiceMappingLoaded = false;
         let queryOnlineDb = [];
         let queryBatchDb = [];
         let querySelectedClientId = null;
@@ -5148,7 +5198,7 @@
                             : `<span class="bg-red-100 text-red-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-triangle-exclamation ml-1"></i>בפיגור</span>`;
 
                         html += `<tr class="${rowBg}">
-                            <td class="p-4 font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;">${r.doc} ${statusBadge}</td>
+                            <td class="p-4 font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;"><span class="invoice-document-cell"><bdi dir="ltr">${r.doc}</bdi>${invoiceFileIndicator(r.doc)}</span> ${statusBadge}</td>
                             <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.dueDate.toLocaleDateString('he-IL')}</td>
                             <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.desc}</td>
                             <td class="p-4 font-bold text-left text-slate-900" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(r.amount)}</td>
@@ -5181,7 +5231,7 @@
                         }
 
                         html += `<tr class="${rowBg}">
-                            <td class="p-4 font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;">${r.doc}</td>
+                            <td class="p-4 font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;"><span class="invoice-document-cell"><bdi dir="ltr">${r.doc}</bdi>${invoiceFileIndicator(r.doc)}</span></td>
                             <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.regDate.toLocaleDateString('he-IL')}</td>
                             <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.dueDate.toLocaleDateString('he-IL')}</td>
                             <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.desc}</td>
@@ -6139,6 +6189,87 @@ function getClientProfileMetrics(orgName) {
             `;
         }
 
+        function bytesToBase64(bytes) {
+            let binary = '';
+            const chunkSize = 32768;
+            for (let index = 0; index < bytes.length; index += chunkSize) binary += String.fromCharCode(...bytes.subarray(index, Math.min(index + chunkSize, bytes.length)));
+            return btoa(binary);
+        }
+
+        function textToBase64(value) { return bytesToBase64(new TextEncoder().encode(String(value ?? ''))); }
+        function wrapBase64(value) { return String(value || '').match(/.{1,76}/g)?.join('\r\n') || ''; }
+        function safeDownloadFileName(value) { return String(value || 'מסמך').replace(/[\\/:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim(); }
+
+        async function collectDebtInvoiceAttachments(overdueRows) {
+            const result = { attachments: [], missingDocuments: [], inaccessibleFiles: [] };
+            const requestedEntries = [];
+            const seenPaths = new Set();
+            const uniqueDocuments = [...new Set(overdueRows.map(row => normalizeInvoiceDocumentNumber(row.doc)).filter(Boolean))];
+            uniqueDocuments.forEach(documentNumber => {
+                const entries = getInvoiceFileEntries(documentNumber);
+                if (!entries.length) { result.missingDocuments.push(documentNumber); return; }
+                entries.forEach(entry => {
+                    const pathKey = String(entry.path).replace(/\//g, '\\').toLocaleLowerCase('he');
+                    if (seenPaths.has(pathKey)) return;
+                    seenPaths.add(pathKey);
+                    requestedEntries.push({ documentNumber, entry });
+                });
+            });
+            if (!requestedEntries.length) return result;
+            const directoryHandle = await getAuthorizedInvoiceFolderHandle(true);
+            if (!directoryHandle) {
+                result.inaccessibleFiles.push(...requestedEntries.map(item => item.entry.name));
+                return result;
+            }
+            for (const item of requestedEntries) {
+                try {
+                    const file = await resolveMappedInvoiceFile(item.entry, directoryHandle);
+                    result.attachments.push({ documentNumber: item.documentNumber, file });
+                } catch (error) {
+                    result.inaccessibleFiles.push(item.entry.name);
+                    console.info('לא ניתן לצרף את קובץ החשבונית ' + item.entry.name, error);
+                }
+            }
+            return result;
+        }
+
+        function buildDebtEmailBody(orgName, typeText, overdueRows, total) {
+            const rowsHtml = overdueRows.map(row => `<tr><td style="padding:8px;border:1px solid #d8e1e8"><bdi dir="ltr">${escapeHtml(row.doc)}</bdi></td><td style="padding:8px;border:1px solid #d8e1e8">${escapeHtml(row.dueDate.toLocaleDateString('he-IL'))}</td><td style="padding:8px;border:1px solid #d8e1e8">${escapeHtml(row.desc)}</td><td style="padding:8px;border:1px solid #d8e1e8;text-align:left">${escapeHtml(formatCurrency(row.amount))}</td></tr>`).join('');
+            return `<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"></head><body style="font-family:Arial,Helvetica,sans-serif;color:#24384b;line-height:1.65"><p>לכבוד:<br><strong style="font-size:18px">${escapeHtml(orgName)}</strong></p><p>שלום רב,</p><p>להלן פירוט החשבוניות והחיובים הפתוחים עבור ${escapeHtml(typeText)} שטרם הותאמו.</p><div style="margin:18px 0;padding:13px 16px;border:1px solid #ef9a9a;border-right:5px solid #c62828;border-radius:8px;background:#fff7f7;color:#8d1d1d">נכון למועד הפקת מכתב זה טרם הוסדר חוב בסך <strong>${escapeHtml(formatCurrency(total))}</strong>.<br>השירות מותנה בתשלום. נבקשכם להסדיר את החוב בהקדם.</div><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:#eef3f7"><th style="padding:8px;border:1px solid #d8e1e8">מספר מסמך</th><th style="padding:8px;border:1px solid #d8e1e8">מועד פירעון</th><th style="padding:8px;border:1px solid #d8e1e8">תיאור השירות</th><th style="padding:8px;border:1px solid #d8e1e8">סכום</th></tr></thead><tbody>${rowsHtml}<tr style="background:#eef3f7;font-weight:bold"><td colspan="3" style="padding:8px;border:1px solid #d8e1e8">סה״כ לתשלום</td><td style="padding:8px;border:1px solid #d8e1e8;text-align:left">${escapeHtml(formatCurrency(total))}</td></tr></tbody></table><p style="margin-top:20px">לתשלום החוב: <a href="https://ecom.gov.il/voucherspa/input/414">שרת התשלומים הממשלתי</a>.</p><p>אם ברשותכם אסמכתא שהחשבוניות שולמו, פנו אלינו בכתב.</p><p style="margin-top:28px">בכבוד רב,<br><strong>מחלקת שירות לקוחות וגבייה</strong><br>אגף טכנולוגיות דיגיטליות ומידע<br><a href="mailto:customer@mot.gov.il">customer@mot.gov.il</a></p></body></html>`;
+        }
+
+        async function createDebtEmailDraft(orgName, typeText, overdueRows, total) {
+            const attachmentResult = await collectDebtInvoiceAttachments(overdueRows);
+            const boundary = '----=_CollectingDashboard_' + Date.now().toString(36);
+            const subject = 'מכתב חוב - ' + orgName;
+            const mimeParts = ['X-Unsent: 1', 'Date: ' + new Date().toUTCString(), 'To: ', 'Subject: =?UTF-8?B?' + textToBase64(subject) + '?=', 'MIME-Version: 1.0', 'Content-Type: multipart/mixed; boundary="' + boundary + '"', '', '--' + boundary, 'Content-Type: text/html; charset="UTF-8"', 'Content-Transfer-Encoding: base64', '', wrapBase64(textToBase64(buildDebtEmailBody(orgName, typeText, overdueRows, total)))];
+            const usedNames = new Map();
+            for (const attachment of attachmentResult.attachments) {
+                const originalName = safeDownloadFileName(attachment.file.name || ('חשבונית ' + attachment.documentNumber + '.pdf'));
+                const seenCount = usedNames.get(originalName) || 0;
+                usedNames.set(originalName, seenCount + 1);
+                const dotIndex = originalName.lastIndexOf('.');
+                const uniqueName = seenCount === 0 ? originalName : (dotIndex > 0 ? originalName.slice(0, dotIndex) + ' (' + (seenCount + 1) + ')' + originalName.slice(dotIndex) : originalName + ' (' + (seenCount + 1) + ')');
+                const encodedName = encodeURIComponent(uniqueName).replace(/'/g, '%27');
+                const mimeEncodedName = '=?UTF-8?B?' + textToBase64(uniqueName) + '?=';
+                const base64Data = bytesToBase64(new Uint8Array(await attachment.file.arrayBuffer()));
+                mimeParts.push('--' + boundary, 'Content-Type: ' + (attachment.file.type || 'application/pdf') + '; name="' + mimeEncodedName + '"; name*=UTF-8\'\'' + encodedName, 'Content-Transfer-Encoding: base64', 'Content-Disposition: attachment; filename="' + mimeEncodedName + '"; filename*=UTF-8\'\'' + encodedName, '', wrapBase64(base64Data));
+            }
+            mimeParts.push('--' + boundary + '--', '');
+            const downloadUrl = URL.createObjectURL(new Blob([mimeParts.join('\r\n')], { type: 'message/rfc822' }));
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = safeDownloadFileName('מכתב חוב - ' + orgName) + '.eml';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 120000);
+            const notes = ['נוצרה טיוטת דוא״ל עם ' + attachmentResult.attachments.length + ' קובצי חשבונית. יש לפתוח את קובץ ה-EML שהורד כדי להמשיך ב-Outlook.'];
+            if (attachmentResult.missingDocuments.length) notes.push('לא נמצא מיפוי עבור ' + attachmentResult.missingDocuments.length + ' חשבוניות.');
+            if (attachmentResult.inaccessibleFiles.length) notes.push('לא ניתן היה לקרוא ' + attachmentResult.inaccessibleFiles.length + ' קבצים מהרשת.');
+            alert(notes.join('\n'));
+        }
+
         async function generateAction(mode) {
             const clientCode = db.filter(r => r.name === path.orgName).length > 0 ? db.filter(r => r.name === path.orgName)[0].code : '-';
             const typeText = incomeFilter === 'all' ? 'כלל השירותים' : (incomeFilter === 'fees' ? 'אגרות העברת בעלות' : 'שירותי מידע');
@@ -6355,6 +6486,12 @@ function getClientProfileMetrics(orgName) {
             const overdueRows = db.filter(r => r.isOverdue && r.name === path.orgName && isTypeMatch(r));
             overdueRows.sort((a, b) => a.dueDate - b.dueDate);
             const total = overdueRows.reduce((s, r) => s + r.amount, 0);
+
+            if (mode === 'email' && invoiceMappingLoaded) {
+                toggleExportModal(false);
+                await createDebtEmailDraft(path.orgName, typeText, overdueRows, total);
+                return;
+            }
 
             const win = window.open('', '_blank');
             if (!win) {
@@ -7569,12 +7706,91 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             }
         }
 
+        function normalizeInvoiceDocumentNumber(value) {
+            if (typeof value === 'number' && Number.isFinite(value)) return String(Math.trunc(value));
+            return String(value ?? '').replace(/\u00a0/g, ' ').trim().replace(/\.0+$/, '');
+        }
+
+        function extractInvoiceFilePath(cell) {
+            if (!cell) return '';
+            if (cell.l?.Target) return String(cell.l.Target).trim();
+            const formula = String(cell.f || cell.v || '').trim().replace(/^=/, '');
+            const hyperlinkMatch = formula.match(/^HYPERLINK\(\s*"((?:[^"]|"")*)"/i);
+            if (hyperlinkMatch) return hyperlinkMatch[1].replace(/""/g, '"').trim();
+            const value = String(cell.v || '').trim();
+            return /^(?:[a-z]:\\|\\\\|file:)/i.test(value) ? value : '';
+        }
+
+        function parseInvoiceMappingWorkbook(arrayBuffer) {
+            const workbook = XLSX.read(arrayBuffer, { type: 'array', cellFormula: true });
+            if (!workbook.SheetNames?.length) throw new Error('הקובץ אינו מכיל גיליון נתונים.');
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            if (!sheet || !sheet['!ref']) throw new Error('הקובץ ריק או שלא ניתן לקרוא את הגיליון הראשון.');
+            const range = XLSX.utils.decode_range(sheet['!ref']);
+            let headerRow = -1;
+            let documentColumn = -1;
+            let linkColumn = -1;
+            for (let rowIndex = range.s.r; rowIndex <= Math.min(range.e.r, range.s.r + 15); rowIndex += 1) {
+                for (let columnIndex = range.s.c; columnIndex <= range.e.c; columnIndex += 1) {
+                    const cell = sheet[XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex })];
+                    const header = String(cell?.v ?? '').replace(/\u00a0/g, ' ').trim();
+                    if (header === 'מספר המסמך החשבונאי') documentColumn = columnIndex;
+                    if (header === 'קישור לפתיחת הקובץ') linkColumn = columnIndex;
+                }
+                if (documentColumn >= 0 && linkColumn >= 0) { headerRow = rowIndex; break; }
+                documentColumn = -1;
+                linkColumn = -1;
+            }
+            if (headerRow < 0) throw new Error('חסרות העמודות "מספר המסמך החשבונאי" או "קישור לפתיחת הקובץ".');
+            const mapping = new Map();
+            for (let rowIndex = headerRow + 1; rowIndex <= range.e.r; rowIndex += 1) {
+                const documentCell = sheet[XLSX.utils.encode_cell({ r: rowIndex, c: documentColumn })];
+                const linkCell = sheet[XLSX.utils.encode_cell({ r: rowIndex, c: linkColumn })];
+                const documentNumber = normalizeInvoiceDocumentNumber(documentCell?.v);
+                const rawPath = extractInvoiceFilePath(linkCell);
+                if (!documentNumber || !rawPath) continue;
+                const filePath = rawPath.replace(/^file:\/{2,3}/i, '').replace(/\//g, '\\');
+                if (!mapping.has(documentNumber)) mapping.set(documentNumber, []);
+                const entries = mapping.get(documentNumber);
+                if (!entries.some(entry => entry.path.toLocaleLowerCase('he') === filePath.toLocaleLowerCase('he'))) {
+                    entries.push({ path: filePath, name: filePath.split('\\').filter(Boolean).pop() || ('חשבונית ' + documentNumber) });
+                }
+            }
+            if (mapping.size === 0) throw new Error('לא נמצאו בקובץ קישורים תקינים לחשבוניות.');
+            return mapping;
+        }
+
+        function processInvoiceMappingExcel(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            clearFileLoadError();
+            const reader = new FileReader();
+            reader.onload = evt => {
+                try {
+                    invoiceFileMap = parseInvoiceMappingWorkbook(evt.target.result);
+                    invoiceMappingLoaded = true;
+                    markDataSourceLoaded('invoice-mapping', file.name);
+                    document.getElementById('invoice-folder-access')?.classList.remove('hidden');
+                    refreshInvoiceFolderAccessStatus();
+                    if (currentLevel === 2 && currentScreen === 'debt') renderView();
+                } catch (error) {
+                    invoiceFileMap = new Map();
+                    invoiceMappingLoaded = false;
+                    showFileLoadError('invoice-mapping', error?.message || 'מבנה הקובץ אינו תקין או שלא ניתן לקרוא אותו.');
+                }
+            };
+            reader.onerror = () => showFileLoadError('invoice-mapping', 'לא ניתן לקרוא את הקובץ שנבחר.');
+            reader.readAsArrayBuffer(file);
+            event.target.value = '';
+        }
+
         function showFileLoadError(fileType, message) {
             const sourceNames = {
                 debt: 'קובץ החובות',
                 revenue: 'קובץ ההכנסות',
                 historical: 'קובץ החשבוניות שהותאמו בשנת העבודה',
                 'unmatched-transfers': 'קובץ ההעברות שטרם הותאמו',
+                'invoice-mapping': 'קובץ מיפוי החשבוניות ברשת',
                 'query-online': 'קובץ שאילתות האון ליין',
                 'query-batch': 'קובץ שאילתות האצווה'
             };
@@ -8490,6 +8706,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             revenue: { action: 'revenue-file-action', status: 'revenue-file-status', card: 'revenue-source-card' },
             historical: { action: 'historical-file-action', status: 'historical-file-status', card: 'historical-source-card' },
             'unmatched-transfers': { action: 'unmatched-transfers-file-action', status: 'unmatched-transfers-file-status', card: 'unmatched-transfers-source-card' },
+            'invoice-mapping': { action: 'invoice-mapping-file-action', status: 'invoice-mapping-file-status', card: 'invoice-mapping-source-card' },
             'query-online': { action: 'query-online-file-action', status: 'query-online-file-status', card: 'query-online-source-card' },
             'query-batch': { action: 'query-batch-file-action', status: 'query-batch-file-status', card: 'query-batch-source-card' }
         };
@@ -8511,6 +8728,11 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                 load: file => processUnmatchedTransfersExcel({ target: { files: [file], value: '' } })
             },
             {
+                type: 'invoice-mapping',
+                matches: name => name.includes('מיפוי חשבוניות ברשת'),
+                load: file => processInvoiceMappingExcel({ target: { files: [file], value: '' } })
+            },
+            {
                 type: 'query-online',
                 matches: name => name.includes('שאילתות און ליין'),
                 load: file => processQueryExcel({ target: { files: [file], value: '' } }, 'online')
@@ -8530,6 +8752,8 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
         const DATA_FOLDER_DB_NAME = 'collecting-dashboard-file-access';
         const DATA_FOLDER_DB_STORE = 'handles';
         const DATA_FOLDER_HANDLE_KEY = 'collecting-data-folder';
+        const INVOICE_FOLDER_HANDLE_KEY = 'invoice-files-root-folder';
+        let invoiceFolderHandle = null;
         let bulkFolderLoadInProgress = false;
 
         function normalizeSourceFileName(fileName) {
@@ -8621,6 +8845,150 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                 return handle;
             } catch (error) {
                 return null;
+            }
+        }
+
+        async function saveInvoiceFolderHandle(directoryHandle) {
+            try {
+                const database = await openDataFolderDatabase();
+                await new Promise((resolve, reject) => {
+                    const transaction = database.transaction(DATA_FOLDER_DB_STORE, 'readwrite');
+                    transaction.objectStore(DATA_FOLDER_DB_STORE).put(directoryHandle, INVOICE_FOLDER_HANDLE_KEY);
+                    transaction.oncomplete = resolve;
+                    transaction.onerror = () => reject(transaction.error);
+                });
+                database.close();
+            } catch (error) { console.info('לא ניתן לשמור את הרשאת תיקיית החשבוניות.', error); }
+        }
+
+        async function getSavedInvoiceFolderHandle() {
+            try {
+                const database = await openDataFolderDatabase();
+                const handle = await new Promise((resolve, reject) => {
+                    const request = database.transaction(DATA_FOLDER_DB_STORE, 'readonly').objectStore(DATA_FOLDER_DB_STORE).get(INVOICE_FOLDER_HANDLE_KEY);
+                    request.onsuccess = () => resolve(request.result || null);
+                    request.onerror = () => reject(request.error);
+                });
+                database.close();
+                return handle;
+            } catch (error) { return null; }
+        }
+
+        function setInvoiceFolderAccessStatus(message) { const status = document.getElementById('invoice-folder-access-status'); if (status) status.textContent = message; }
+
+        async function refreshInvoiceFolderAccessStatus() {
+            if (!invoiceMappingLoaded) return;
+            const handle = invoiceFolderHandle || await getSavedInvoiceFolderHandle();
+            if (handle) invoiceFolderHandle = handle;
+            if (!handle || typeof handle.queryPermission !== 'function') {
+                setInvoiceFolderAccessStatus('כדי לפתוח ולצרף חשבוניות יש לאשר גישה חד־פעמית לתיקיית החשבוניות ברשת.');
+                return;
+            }
+            try {
+                const permission = await handle.queryPermission({ mode: 'read' });
+                setInvoiceFolderAccessStatus(permission === 'granted' ? 'הגישה לתיקיית החשבוניות מאושרת.' : 'קיימת הרשאה שמורה. ייתכן שהדפדפן יבקש לחדש אותה בעת פתיחת קובץ.');
+            } catch (error) { setInvoiceFolderAccessStatus('לא ניתן לבדוק את ההרשאה. אפשר לאשר מחדש את הגישה לתיקייה.'); }
+        }
+
+        async function authorizeInvoiceFilesFolder() {
+            if (!('showDirectoryPicker' in window)) {
+                setInvoiceFolderAccessStatus('הדפדפן אינו מאפשר גישה לתיקיות. יש להשתמש בדפדפן Chrome או Edge.');
+                return null;
+            }
+            try {
+                const directoryHandle = await window.showDirectoryPicker({ id: 'invoice-files-root', mode: 'read' });
+                invoiceFolderHandle = directoryHandle;
+                await saveInvoiceFolderHandle(directoryHandle);
+                setInvoiceFolderAccessStatus('הגישה לתיקייה "' + directoryHandle.name + '" אושרה ונשמרה בדפדפן.');
+                return directoryHandle;
+            } catch (error) {
+                if (error?.name !== 'AbortError') {
+                    setInvoiceFolderAccessStatus('לא ניתן לאשר גישה לתיקייה. אפשר לנסות שוב.');
+                    console.info('בחירת תיקיית החשבוניות נכשלה.', error);
+                }
+                return null;
+            }
+        }
+
+        async function getAuthorizedInvoiceFolderHandle(requestIfMissing = true) {
+            const handle = invoiceFolderHandle;
+            if (handle && typeof handle.queryPermission === 'function') {
+                let permission = await handle.queryPermission({ mode: 'read' });
+                if (permission !== 'granted' && typeof handle.requestPermission === 'function') permission = await handle.requestPermission({ mode: 'read' });
+                if (permission === 'granted') return handle;
+            }
+            return requestIfMissing ? authorizeInvoiceFilesFolder() : null;
+        }
+
+        async function restoreSavedInvoiceFolderHandle() {
+            invoiceFolderHandle = await getSavedInvoiceFolderHandle();
+        }
+
+        function getInvoiceFileEntries(documentNumber) { return invoiceFileMap.get(normalizeInvoiceDocumentNumber(documentNumber)) || []; }
+
+        function getRelativeInvoicePathParts(filePath, directoryHandle) {
+            const parts = String(filePath || '').replace(/^file:\/{2,3}/i, '').replace(/\//g, '\\').split('\\').filter(Boolean);
+            const rootName = String(directoryHandle?.name || '').toLocaleLowerCase('he');
+            const rootIndex = parts.findIndex(part => part.toLocaleLowerCase('he') === rootName);
+            if (rootIndex >= 0) return parts.slice(rootIndex + 1);
+            if (parts.length && /^[a-z]:$/i.test(parts[0])) return parts.slice(1);
+            return parts;
+        }
+
+        async function resolveMappedInvoiceFile(entry, directoryHandle) {
+            const pathParts = getRelativeInvoicePathParts(entry.path, directoryHandle);
+            if (!pathParts.length) throw new Error('נתיב הקובץ אינו תקין.');
+            let currentDirectory = directoryHandle;
+            for (const folderName of pathParts.slice(0, -1)) currentDirectory = await currentDirectory.getDirectoryHandle(folderName);
+            const fileHandle = await currentDirectory.getFileHandle(pathParts[pathParts.length - 1]);
+            return fileHandle.getFile();
+        }
+
+        function invoiceFileIndicator(documentNumber) {
+            if (!invoiceMappingLoaded) return '';
+            const encodedDocument = encodeURIComponent(normalizeInvoiceDocumentNumber(documentNumber));
+            const entries = getInvoiceFileEntries(documentNumber);
+            if (!entries.length) return '<span class="invoice-file-indicator invoice-file-indicator--missing no-print" title="לא נמצא קובץ חשבונית ברשת" aria-label="לא נמצא קובץ חשבונית ברשת"><i class="fa-solid fa-file-circle-xmark" aria-hidden="true"></i></span>';
+            const countBadge = entries.length > 1 ? '<span class="invoice-file-indicator__count">' + entries.length + '</span>' : '';
+            const label = entries.length > 1 ? 'פתיחת ' + entries.length + ' קובצי חשבונית' : 'פתיחת קובץ החשבונית';
+            return '<button type="button" class="invoice-file-indicator invoice-file-indicator--available no-print" title="' + label + '" aria-label="' + label + '" onclick="event.stopPropagation();openInvoiceFiles(\'' + encodedDocument + '\')"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i>' + countBadge + '</button>';
+        }
+
+        function showInvoiceFilesDialog(documentNumber, entries) {
+            const description = document.getElementById('invoice-files-description');
+            const list = document.getElementById('invoice-files-list');
+            const encodedDocument = encodeURIComponent(documentNumber);
+            if (description) description.textContent = 'למסמך ' + documentNumber + ' נמצאו ' + entries.length + ' קבצים. בחרו קובץ לפתיחה.';
+            if (list) list.innerHTML = entries.map((entry, index) => '<button type="button" onclick="openMappedInvoiceFile(\'' + encodedDocument + '\',' + index + ')"><span>' + escapeHtml(entry.name) + '</span><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></button>').join('');
+            openUiDialog('invoice-files-dialog');
+        }
+
+        async function openInvoiceFiles(encodedDocumentNumber) {
+            const documentNumber = decodeURIComponent(encodedDocumentNumber);
+            const entries = getInvoiceFileEntries(documentNumber);
+            if (!entries.length) return;
+            if (entries.length > 1) { showInvoiceFilesDialog(documentNumber, entries); return; }
+            await openMappedInvoiceFile(encodedDocumentNumber, 0);
+        }
+
+        async function openMappedInvoiceFile(encodedDocumentNumber, entryIndex) {
+            const documentNumber = decodeURIComponent(encodedDocumentNumber);
+            const entry = getInvoiceFileEntries(documentNumber)[entryIndex];
+            if (!entry) return;
+            const popup = window.open('', '_blank');
+            if (popup) popup.document.write('<html dir="rtl" lang="he"><body style="font-family:Arial;padding:30px">טוען את קובץ החשבונית...</body></html>');
+            try {
+                const directoryHandle = await getAuthorizedInvoiceFolderHandle(true);
+                if (!directoryHandle) throw new Error('לא אושרה גישה לתיקיית החשבוניות.');
+                const file = await resolveMappedInvoiceFile(entry, directoryHandle);
+                const objectUrl = URL.createObjectURL(file);
+                if (popup) popup.location.replace(objectUrl); else window.open(objectUrl, '_blank', 'noopener');
+                window.setTimeout(() => URL.revokeObjectURL(objectUrl), 120000);
+                closeUiDialog('invoice-files-dialog');
+            } catch (error) {
+                if (popup) popup.close();
+                alert('לא ניתן לפתוח את קובץ החשבונית. יש לוודא שנבחרה תיקיית השורש המתאימה ושהקובץ זמין ברשת.');
+                console.info('פתיחת קובץ החשבונית נכשלה.', error);
             }
         }
 
@@ -8723,7 +9091,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                 }
                 clearFileLoadError();
                 if (manualTypes.length === 0) {
-                    setBulkFolderStatus('הטעינה הושלמה. נטענו הקבצים העדכניים ביותר מכל ששת הסוגים.');
+                    setBulkFolderStatus('הטעינה הושלמה. נטענו הקבצים העדכניים ביותר מכל שבעת הסוגים.');
                 } else {
                     setBulkFolderStatus('הטעינה הושלמה: ' + loadedCount + ' קבצים נטענו. במקורות שלא אותרו או לא נקראו מופיעה ההודעה "יש לטעון ידנית".');
                 }
@@ -8866,6 +9234,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             updateDashboardAccessState();
             syncReportYearLabels();
             navigateToScreen('sources');
+            window.setTimeout(() => restoreSavedInvoiceFolderHandle(), 0);
             window.setTimeout(() => tryAutoLoadSavedDataFolder(), 0);
 
             document.addEventListener('keydown', event => {
