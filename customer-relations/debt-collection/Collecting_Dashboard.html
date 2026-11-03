@@ -793,24 +793,41 @@
             line-height: 1.6;
         }
 
+        .source-screen-main { padding-block:var(--space-4) var(--space-8); }
+        .source-screen-main .screen-intro { margin-block-end:var(--space-3);padding:var(--space-4); }
+        .source-screen-main .source-bulk-loader { margin-block-end:var(--space-4);padding:var(--space-3) var(--space-4); }
+
         .source-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: var(--space-4);
+            gap: var(--space-3);
             align-items: stretch;
         }
 
+        .source-groups { display:grid; gap:var(--space-5); }
+        .source-group { display:grid; gap:var(--space-3); }
+        .source-group__title { display:flex;align-items:center;gap:9px;margin:0;color:var(--brand-active);font-size:var(--font-size-md);font-weight:800; }
+        .source-group__title::after { content:"";height:1px;flex:1;background:var(--color-border); }
+        .source-grid--queries { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+
         .source-card {
-            min-height: 260px;
+            min-height: 196px;
             height: 100%;
             border: 1px solid var(--color-border);
             border-radius: var(--radius-lg);
             background: var(--color-surface);
             display: grid;
-            grid-template-rows: minmax(126px, auto) auto;
-            padding: var(--space-5);
+            grid-template-rows: minmax(82px, auto) auto;
+            gap:var(--space-3);
+            padding: var(--space-4);
             box-shadow: var(--shadow-panel);
         }
+
+        .source-card--mapping { grid-template-rows:auto auto auto; }
+        .source-card--future { border-style:dashed;background:#f8fafc;box-shadow:none; }
+        .source-card--future .source-card__icon { background:#eef2f6;color:#738396; }
+        .source-card--future .source-card__badge { background:#eef2f6;color:#64748b; }
+        .source-card__future-note { align-self:end;display:flex;align-items:center;gap:8px;min-height:52px;padding:10px 12px;border:1px dashed #bac6d2;border-radius:10px;color:#64748b;background:#fff;font-size:12px;font-weight:700; }
 
         .source-card.is-loaded {
             border-color: #86c5a6;
@@ -824,9 +841,9 @@
         }
 
         .source-card__icon {
-            width: 44px;
-            height: 44px;
-            flex: 0 0 44px;
+            width: 38px;
+            height: 38px;
+            flex: 0 0 38px;
             border-radius: var(--radius-md);
             background: var(--brand-subtle);
             color: var(--brand-primary);
@@ -836,7 +853,7 @@
 
         .source-card h3 {
             margin: 0;
-            font-size: var(--font-size-lg);
+            font-size: var(--font-size-md);
         }
 
         .source-card p {
@@ -863,7 +880,7 @@
 
         .source-card .file-action {
             align-self: end;
-            min-height: 68px;
+            min-height: 54px;
         }
 
         .source-card .file-action small {
@@ -889,10 +906,16 @@
         .source-bulk-loader .button-primary:disabled { opacity: .68; cursor: wait; }
         .source-card.is-manual-required .file-action { border-color: var(--color-warning); background: var(--color-warning-bg); }
         .source-card.is-manual-required .file-action__icon { color: var(--color-warning); background: #fff4cf; }
-        .invoice-folder-access { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding:10px 12px;border:1px solid var(--color-border);border-radius:10px;background:#f8fafc; }
+        .invoice-folder-access { display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border:1px solid var(--color-border);border-radius:10px;background:#f8fafc; }
         .invoice-folder-access button { display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;padding:7px 11px;border:1px solid #8fb7d8;border-radius:8px;background:#fff;color:var(--brand-active);font-size:12px;font-weight:700;cursor:pointer; }
         .invoice-folder-access button:hover { background:#edf7ff; }
         .invoice-folder-access small { color:var(--color-text-muted);font-size:11px;line-height:1.4; }
+        .invoice-mapping-tools { display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px;padding-top:2px; }
+        .invoice-mapping-tools button { display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:8px 11px;border:1px solid #8fb7d8;border-radius:8px;background:#fff;color:var(--brand-active);font-size:12px;font-weight:800;cursor:pointer; }
+        .invoice-mapping-tools button:hover { background:#edf7ff; }
+        .invoice-mapping-tools button:disabled { cursor:not-allowed;border-color:#cbd5e1;background:#eef2f6;color:#64748b; }
+        .invoice-mapping-tools small { color:var(--color-text-muted);font-size:11px;line-height:1.45; }
+        .mapping-updater-path { direction:ltr;display:block;margin-top:12px;padding:10px 12px;border:1px solid var(--color-border);border-radius:9px;background:#f8fafc;color:#334155;font-size:12px;overflow-wrap:anywhere;text-align:left; }
         .invoice-document-cell { display:inline-flex;align-items:center;gap:8px; }
         .invoice-file-indicator { display:inline-flex;align-items:center;justify-content:center;position:relative;width:29px;height:29px;border-radius:8px;border:1px solid transparent;font-size:13px;vertical-align:middle; }
         button.invoice-file-indicator { cursor:pointer; }
@@ -1648,7 +1671,7 @@
         .client-ranking-badge { display: inline-flex; margin-block-start: var(--space-4); padding: 6px 10px; border-radius: 99px; background: var(--brand-subtle); color: var(--brand-active); font-size: 11px; font-weight: 700; }
 
         @media (max-width: 1023px) {
-            .source-grid { grid-template-columns: 1fr; }
+            .source-grid, .source-grid--queries { grid-template-columns: 1fr; }
             .source-bulk-loader { align-items: stretch; flex-direction: column; }
             .source-bulk-loader .button-primary { width: 100%; }
             .historical-summary-grid { grid-template-columns: 1fr; }
@@ -1939,7 +1962,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.1 · 3 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.2 · 3 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -1982,6 +2005,25 @@
                 <a id="invoice-preview-open" class="button-primary" href="#" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> פתיחה בכרטיסייה חדשה</a>
                 <a id="invoice-preview-download" class="button-secondary" href="#" download><i class="fa-solid fa-download" aria-hidden="true"></i> הורדה</a>
                 <button type="button" class="button-secondary" onclick="closeInvoicePreviewDialog()">סגור</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Invoice mapping updater instructions -->
+    <div id="invoice-mapping-updater-dialog" class="ui-dialog-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="invoice-mapping-updater-title" onclick="closeDialogFromBackdrop(event, 'invoice-mapping-updater-dialog')">
+        <section class="ui-dialog">
+            <div class="ui-dialog__header">
+                <h2 id="invoice-mapping-updater-title">עדכון מיפוי החשבוניות</h2>
+                <button type="button" class="dialog-close" onclick="closeUiDialog('invoice-mapping-updater-dialog')" aria-label="סגירת הוראות העדכון"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+            </div>
+            <div class="ui-dialog__body">
+                <p style="margin-top:0;line-height:1.65;">מטעמי אבטחה הדפדפן אינו רשאי להפעיל קובץ EXE ישירות מכונן הרשת. נתיב התוכנית הועתק ללוח. פתחו את חלון <b>הפעלה</b> באמצעות <bdi>Win + R</bdi>, הדביקו את הנתיב והפעילו את התוכנית.</p>
+                <code id="invoice-mapping-updater-path" class="mapping-updater-path">S:\Collecting_Data_Files\Invoice_Mapping_App\הפעלת מיפוי חשבוניות ברשת.exe</code>
+                <p id="invoice-mapping-copy-status" class="control-label" style="margin:10px 0 0;" role="status" aria-live="polite"></p>
+            </div>
+            <div class="ui-dialog__footer" style="gap:10px;">
+                <button type="button" class="button-secondary" onclick="copyInvoiceMappingUpdaterPath()"><i class="fa-regular fa-copy" aria-hidden="true"></i> העתקת הנתיב</button>
+                <button type="button" class="button-primary" onclick="confirmInvoiceMappingUpdaterStarted()"><i class="fa-solid fa-check" aria-hidden="true"></i> הפעלתי את התוכנית</button>
             </div>
         </section>
     </div>
@@ -2141,7 +2183,10 @@
                 </button>
             </section>
 
-            <section class="source-grid" aria-label="בחירת קובצי נתונים">
+            <div class="source-groups" aria-label="בחירת קובצי נתונים">
+            <section class="source-group" aria-labelledby="billing-source-group-title">
+                <h3 id="billing-source-group-title" class="source-group__title"><i class="fa-solid fa-file-invoice" aria-hidden="true"></i>קובצי חיובים, גבייה וחשבוניות</h3>
+                <div class="source-grid">
                 <article id="debt-source-card" class="source-card">
                     <div class="source-card__heading">
                         <span class="source-card__icon"><i class="fa-solid fa-file-circle-exclamation" aria-hidden="true"></i></span>
@@ -2193,7 +2238,7 @@
                         <span><strong>בחירת קובץ העברות שטרם הותאמו</strong><small id="unmatched-transfers-file-status">טרם נטען</small></span>
                     </label>
                 </article>
-                <article id="invoice-mapping-source-card" class="source-card">
+                <article id="invoice-mapping-source-card" class="source-card source-card--mapping">
                     <div class="source-card__heading">
                         <span class="source-card__icon"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i></span>
                         <div><h3>מיפוי חשבוניות ברשת</h3><p>קישורים לקובצי החשבוניות לפי מספר המסמך החשבונאי. המקור משמש במסכים ובטיוטות דוא״ל בלבד.</p></div>
@@ -2204,11 +2249,30 @@
                         <span class="file-action__icon"><i class="fa-solid fa-arrow-up-from-bracket" aria-hidden="true"></i></span>
                         <span><strong>בחירת קובץ מיפוי חשבוניות ברשת</strong><small id="invoice-mapping-file-status">טרם נטען</small></span>
                     </label>
-                    <div id="invoice-folder-access" class="invoice-folder-access hidden">
-                        <small id="invoice-folder-access-status">כדי לפתוח ולצרף חשבוניות יש לאשר גישה חד־פעמית לתיקיית החשבוניות ברשת.</small>
-                        <button type="button" onclick="authorizeInvoiceFilesFolder()"><i class="fa-solid fa-folder-open" aria-hidden="true"></i>אישור גישה לתיקייה</button>
+                    <div id="invoice-folder-access" class="invoice-folder-access">
+                        <small id="invoice-folder-access-status">נדרשת הרשאה חד־פעמית לתיקיית השורש שבה שמורים קובצי החשבוניות: <bdi>S:\חשבונות - שוטפים</bdi>.</small>
+                        <button type="button" onclick="authorizeInvoiceFilesFolder()"><i class="fa-solid fa-folder-open" aria-hidden="true"></i>בחירת תיקיית השורש</button>
+                    </div>
+                    <div class="invoice-mapping-tools">
+                        <button id="invoice-mapping-update-button" type="button" onclick="prepareInvoiceMappingUpdate()"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>עדכון מיפוי החשבוניות</button>
+                        <small id="invoice-mapping-update-status">הפעלת כלי המיפוי השמור ברשת ויצירת קובץ מיפוי עדכני.</small>
                     </div>
                 </article>
+
+                <article class="source-card source-card--future" aria-label="קובץ אנשי קשר, תכנון עתידי">
+                    <div class="source-card__heading">
+                        <span class="source-card__icon"><i class="fa-solid fa-address-book" aria-hidden="true"></i></span>
+                        <div><h3>אנשי קשר</h3><p>פרטי קשר של לקוחות לצורך תקשורת, מכתבים ומעקב עתידי.</p></div>
+                        <span class="source-card__badge">עתידי</span>
+                    </div>
+                    <div class="source-card__future-note"><i class="fa-solid fa-clock" aria-hidden="true"></i>טעינת קובץ אנשי קשר תתווסף בגרסה עתידית.</div>
+                </article>
+                </div>
+            </section>
+
+            <section class="source-group" aria-labelledby="queries-source-group-title">
+                <h3 id="queries-source-group-title" class="source-group__title"><i class="fa-solid fa-chart-column" aria-hidden="true"></i>קובצי צריכת שאילתות</h3>
+                <div class="source-grid source-grid--queries">
                 <article id="query-online-source-card" class="source-card">
                     <div class="source-card__heading">
                         <span class="source-card__icon"><i class="fa-solid fa-globe" aria-hidden="true"></i></span>
@@ -2234,7 +2298,9 @@
                         <span><strong>בחירת קובץ שאילתות אצווה</strong><small id="query-batch-file-status">טרם נטען</small></span>
                     </label>
                 </article>
+                </div>
             </section>
+            </div>
 
             <p id="query-source-note" class="query-source-note hidden" role="status" aria-live="polite">
                 <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
@@ -8776,6 +8842,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
         const DATA_FOLDER_DB_STORE = 'handles';
         const DATA_FOLDER_HANDLE_KEY = 'collecting-data-folder';
         const INVOICE_FOLDER_HANDLE_KEY = 'invoice-files-root-folder';
+        const INVOICE_MAPPING_UPDATER_PATH = 'S:\\Collecting_Data_Files\\Invoice_Mapping_App\\הפעלת מיפוי חשבוניות ברשת.exe';
         let invoiceFolderHandle = null;
         let invoicePreviewObjectUrl = '';
         let bulkFolderLoadInProgress = false;
@@ -8905,12 +8972,12 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const handle = invoiceFolderHandle || await getSavedInvoiceFolderHandle();
             if (handle) invoiceFolderHandle = handle;
             if (!handle || typeof handle.queryPermission !== 'function') {
-                setInvoiceFolderAccessStatus('כדי לפתוח ולצרף חשבוניות יש לאשר גישה חד־פעמית לתיקיית החשבוניות ברשת.');
+                setInvoiceFolderAccessStatus('נדרשת הרשאה חד־פעמית לתיקיית השורש שבה שמורים קובצי החשבוניות: S:\\חשבונות - שוטפים.');
                 return;
             }
             try {
                 const permission = await handle.queryPermission({ mode: 'read' });
-                setInvoiceFolderAccessStatus(permission === 'granted' ? 'הגישה לתיקיית החשבוניות מאושרת.' : 'קיימת הרשאה שמורה. ייתכן שהדפדפן יבקש לחדש אותה בעת פתיחת קובץ.');
+                setInvoiceFolderAccessStatus(permission === 'granted' ? 'הגישה לתיקיית השורש של קובצי החשבוניות מאושרת.' : 'קיימת הרשאה שמורה לתיקיית השורש. ייתכן שהדפדפן יבקש לחדש אותה בעת פתיחת קובץ.');
             } catch (error) { setInvoiceFolderAccessStatus('לא ניתן לבדוק את ההרשאה. אפשר לאשר מחדש את הגישה לתיקייה.'); }
         }
 
@@ -8923,7 +8990,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                 const directoryHandle = await window.showDirectoryPicker({ id: 'invoice-files-root', mode: 'read' });
                 invoiceFolderHandle = directoryHandle;
                 await saveInvoiceFolderHandle(directoryHandle);
-                setInvoiceFolderAccessStatus('הגישה לתיקייה "' + directoryHandle.name + '" אושרה ונשמרה בדפדפן.');
+                setInvoiceFolderAccessStatus('הגישה לתיקיית השורש "' + directoryHandle.name + '" אושרה ונשמרה בדפדפן.');
                 return directoryHandle;
             } catch (error) {
                 if (error?.name !== 'AbortError') {
@@ -8947,6 +9014,50 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
 
         async function restoreSavedInvoiceFolderHandle() {
             invoiceFolderHandle = await getSavedInvoiceFolderHandle();
+        }
+
+        async function copyInvoiceMappingUpdaterPath() {
+            let copied = false;
+            try {
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(INVOICE_MAPPING_UPDATER_PATH);
+                    copied = true;
+                }
+            } catch (error) {}
+            if (!copied) {
+                const field = document.createElement('textarea');
+                field.value = INVOICE_MAPPING_UPDATER_PATH;
+                field.setAttribute('readonly', '');
+                field.style.position = 'fixed';
+                field.style.opacity = '0';
+                document.body.appendChild(field);
+                field.select();
+                copied = document.execCommand('copy');
+                field.remove();
+            }
+            const status = document.getElementById('invoice-mapping-copy-status');
+            if (status) status.textContent = copied ? 'הנתיב הועתק. הדביקו אותו בחלון ההפעלה של Windows או בשורת הכתובת בסייר הקבצים.' : 'לא ניתן להעתיק אוטומטית. סמנו והעתיקו את הנתיב המוצג.';
+            return copied;
+        }
+
+        async function prepareInvoiceMappingUpdate() {
+            const path = document.getElementById('invoice-mapping-updater-path');
+            if (path) path.textContent = INVOICE_MAPPING_UPDATER_PATH;
+            const status = document.getElementById('invoice-mapping-copy-status');
+            if (status) status.textContent = '';
+            openUiDialog('invoice-mapping-updater-dialog');
+            await copyInvoiceMappingUpdaterPath();
+        }
+
+        function confirmInvoiceMappingUpdaterStarted() {
+            const button = document.getElementById('invoice-mapping-update-button');
+            const status = document.getElementById('invoice-mapping-update-status');
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<i class="fa-solid fa-spinner" aria-hidden="true"></i>כלי המיפוי הופעל';
+            }
+            if (status) status.textContent = 'ההרצה נמשכת כ־10 דקות. בסיומה יש לטעון את קובץ המיפוי החדש למערכת.';
+            closeUiDialog('invoice-mapping-updater-dialog');
         }
 
         function getInvoiceFileEntries(documentNumber) { return invoiceFileMap.get(normalizeInvoiceDocumentNumber(documentNumber)) || []; }
