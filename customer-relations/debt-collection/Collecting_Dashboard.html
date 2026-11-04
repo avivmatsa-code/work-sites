@@ -1147,14 +1147,22 @@
         }
 
         .historical-detail-panel { margin-block-start: var(--space-5); }
+        .historical-detail-panel .historical-panel__header { flex-wrap: wrap; }
         .historical-detail-panel .historical-panel__body { max-height: 560px; }
         .historical-detail-panel thead { position: sticky; inset-block-start: 0; z-index: 2; }
+
+        .historical-detail-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-3);
+            margin-inline-start: auto;
+        }
 
         .historical-search {
             display: flex;
             align-items: center;
             gap: var(--space-2);
-            margin-inline-start: auto;
         }
 
         .historical-search label {
@@ -1176,6 +1184,13 @@
         .historical-search input:focus {
             border-color: var(--brand-active);
             outline: 3px solid var(--brand-soft);
+        }
+
+        .historical-detail-total td {
+            background: #eef3f7;
+            color: var(--color-text);
+            font-weight: 700;
+            border-block-start: 2px solid var(--color-border-strong);
         }
 
         .summary-link {
@@ -1964,7 +1979,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.4 · 3 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.5 · 4 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -2489,9 +2504,14 @@
                     <div class="historical-panel__header">
                         <i class="fa-solid fa-list-check text-blue-600" aria-hidden="true"></i>
                         <h3>פירוט החשבוניות שנגבו השנה</h3>
-                        <div class="historical-search no-print">
-                            <label for="historical-customer-search">חיפוש לקוח</label>
-                            <input id="historical-customer-search" type="search" placeholder="שם לקוח או מספר לקוח" oninput="setHistoricalCustomerQuery(this.value)">
+                        <div class="historical-detail-actions no-print">
+                            <div class="historical-search">
+                                <label for="historical-customer-search">חיפוש לקוח</label>
+                                <input id="historical-customer-search" type="search" placeholder="שם לקוח או מספר לקוח" oninput="setHistoricalCustomerQuery(this.value)">
+                            </div>
+                            <button type="button" onclick="printHistoricalDetailReport()" class="button-secondary button-secondary--brand">
+                                <i class="fa-solid fa-print" aria-hidden="true"></i>הפקת דוח
+                            </button>
                         </div>
                     </div>
                     <div class="historical-panel__body">
@@ -6878,29 +6898,93 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                 );
         }
 
-        function renderHistoricalDetailRows(summaryRows) {
-            const detailRows = historicalCustomerQuery
+        function getHistoricalDetailRows(summaryRows = getFilteredHistoricalRows()) {
+            return historicalCustomerQuery
                 ? summaryRows.filter(row =>
                     String(row.name || '').toLocaleLowerCase('he').includes(historicalCustomerQuery)
                     || String(row.code || '').toLocaleLowerCase('he').includes(historicalCustomerQuery)
                 )
                 : summaryRows;
+        }
+
+        function buildHistoricalDetailTableRows(detailRows) {
+            const totalAmount = detailRows.reduce((sum, row) => sum + row.amount, 0);
+            return detailRows.map(row => `
+                <tr>
+                    <td>${formatDisplayDate(row.matchDate)}</td>
+                    <td>${formatDisplayDate(row.documentDate)}</td>
+                    <td><bdi dir="ltr">${escapeHtml(row.code)}</bdi></td>
+                    <td>${escapeHtml(row.name)}</td>
+                    <td>${escapeHtml(row.doc)}</td>
+                    <td>${escapeHtml(row.sector)}</td>
+                    <td>${row.isFee ? 'אגרות העברת בעלות' : 'שירותי מידע'}</td>
+                    <td><strong>${formatCurrency(row.amount)}</strong></td>
+                </tr>
+            `).join('') + `
+                <tr class="historical-detail-total">
+                    <td colspan="6">סה"כ</td>
+                    <td>${detailRows.length.toLocaleString('he-IL')} חשבוניות</td>
+                    <td>${formatCurrency(totalAmount)}</td>
+                </tr>`;
+        }
+
+        function renderHistoricalDetailRows(summaryRows) {
+            const detailRows = getHistoricalDetailRows(summaryRows);
             const body = document.getElementById('historical-detail-table-body');
             if (!body) return;
             body.innerHTML = detailRows.length
-                ? detailRows.map(row => `
-                    <tr>
-                        <td>${formatDisplayDate(row.matchDate)}</td>
-                        <td>${formatDisplayDate(row.documentDate)}</td>
-                        <td><bdi dir="ltr">${escapeHtml(row.code)}</bdi></td>
-                        <td>${escapeHtml(row.name)}</td>
-                        <td>${escapeHtml(row.doc)}</td>
-                        <td>${escapeHtml(row.sector)}</td>
-                        <td>${row.isFee ? 'אגרות העברת בעלות' : 'שירותי מידע'}</td>
-                        <td><strong>${formatCurrency(row.amount)}</strong></td>
-                    </tr>
-                `).join('')
+                ? buildHistoricalDetailTableRows(detailRows)
                 : '<tr><td colspan="8" style="text-align:center;color:#64748b">לא נמצאו חשבוניות ללקוח המבוקש.</td></tr>';
+        }
+
+        function printHistoricalDetailReport() {
+            const rows = getHistoricalDetailRows();
+            if (!rows.length) {
+                alert('לא נמצאו חשבוניות להפקת הדוח בהתאם לחיפוש ולמסננים שנבחרו.');
+                return;
+            }
+
+            const activityLabel = historicalTypeFilter === 'all'
+                ? 'כל תחומי הפעילות'
+                : (historicalTypeFilter === 'fees' ? 'אגרות העברת בעלות' : 'שירותי מידע');
+            const sectorLabel = historicalSectorFilter === 'all' ? 'כל הסקטורים' : historicalSectorFilter;
+            const sourceYearLabel = historicalSourceYear === 'all' ? 'כל שנות המקור' : `שנת מקור ${historicalSourceYear}`;
+            const queryLabel = historicalCustomerQuery ? `חיפוש: ${historicalCustomerQuery}` : 'כל הלקוחות';
+            const totalAmount = rows.reduce((sum, row) => sum + row.amount, 0);
+            const title = `פירוט החשבוניות שנגבו בשנת ${CURRENT_YEAR}`;
+            const win = window.open('', '_blank');
+            if (!win) {
+                alert('פתיחת החלון החדש נחסמה.');
+                return;
+            }
+
+            win.document.write(`
+                <html dir="rtl" lang="he"><head><title>${escapeHtml(title)}</title>
+                    ${getClientDocumentPrintStyles()}
+                    <style>
+                        .historical-detail-total td{background:#eef3f7!important;color:#1f2933;font-weight:700;border-top:2px solid #aebdca}
+                        .historical-detail-filters{text-align:center;color:#526779;margin:-10px 0 18px;font-size:10px}
+                    </style>
+                </head><body>
+                    ${getClientDocumentPageStart(title)}
+                    <h1 class="document-title">${escapeHtml(title)}</h1>
+                    <p class="historical-detail-filters">${escapeHtml(activityLabel)} · ${escapeHtml(sectorLabel)} · ${escapeHtml(sourceYearLabel)} · ${escapeHtml(queryLabel)}</p>
+                    <div class="kpis">
+                        <div class="kpi-card"><div class="kpi-title">מספר לקוחות</div><div class="kpi-value">${countUniqueClients(rows).toLocaleString('he-IL')}</div></div>
+                        <div class="kpi-card"><div class="kpi-title">מספר חשבוניות</div><div class="kpi-value">${rows.length.toLocaleString('he-IL')}</div></div>
+                        <div class="kpi-card"><div class="kpi-title">סכום שנגבה</div><div class="kpi-value" style="color:#0B3C5D">${formatCurrency(totalAmount)}</div></div>
+                    </div>
+                    <section class="report-section">
+                        <table>
+                            <thead><tr><th>תאריך התאמה</th><th>תאריך הפקה</th><th>מספר לקוח</th><th>שם לקוח</th><th>מספר חשבונית</th><th>סקטור</th><th>תחום</th><th>סכום</th></tr></thead>
+                            <tbody>${buildHistoricalDetailTableRows(rows)}</tbody>
+                        </table>
+                    </section>
+                    ${getClientDocumentPageEnd()}
+                    <script>window.addEventListener('load',function(){window.focus();setTimeout(function(){window.print()},350)});<\/script>
+                </body></html>
+            `);
+            win.document.close();
         }
 
         const REPORT_CHART_COLORS = ['#0B3C5D', '#6d43d6', '#10b981', '#e59a11', '#d14b57', '#4f7cac'];
