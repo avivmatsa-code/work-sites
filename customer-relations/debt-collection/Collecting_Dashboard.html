@@ -1879,6 +1879,9 @@
         .unmatched-report-main { padding:24px;font-family:Arial,"Noto Sans Hebrew",sans-serif!important; }
         .unmatched-report-panel { background:#fff;border:1px solid #d5dee8;border-radius:16px;overflow:hidden;box-shadow:0 7px 22px rgba(26,55,85,.07); }
         .unmatched-report-panel__header { display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 22px 16px;border-bottom:0; }
+        .unmatched-report-controls { display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap; }
+        .unmatched-report-filter { display:grid;gap:6px; }
+        .unmatched-report-filter .control-label { margin:0; }
         .unmatched-report-panel__header h2,.unmatched-report-panel__header p,.unmatched-report-summary__card span,.unmatched-report-client-name,.unmatched-report-table th,.unmatched-report-table td { font-family:Arial,Helvetica,sans-serif!important;font-style:normal;letter-spacing:normal;font-synthesis:none; }
         .unmatched-report-panel__header h2 { margin:0;color:#064f8c;font-family:Arial,Helvetica,sans-serif!important;font-size:20px;font-weight:700; }
         .unmatched-report-panel__header p { margin:5px 0 0;color:#607080;font-size:12px;line-height:1.55; }
@@ -1904,7 +1907,7 @@
         .unmatched-report-detail td:nth-child(2) { padding-inline-start:26px;color:#174f7b;font-weight:700; }
         .unmatched-report-total { background:#e9eef3;font-weight:700;font-synthesis:none; }
         .unmatched-report-total td { border-top:2px solid #b9c8d5;color:#153c5e; }
-        @media (max-width:760px) { .unmatched-transfer-summary__heading,.unmatched-transfer-client-section__header{align-items:flex-start;flex-direction:column}.unmatched-transfer-summary__metrics,.unmatched-transfer-client-section__totals{flex-wrap:wrap;gap:9px 16px}.unmatched-report-main{padding:12px}.unmatched-report-panel__header{align-items:flex-start;flex-direction:column}.unmatched-report-summary{grid-template-columns:1fr;padding-inline:14px}.unmatched-report-table th,.unmatched-report-table td{padding-inline:10px} }
+        @media (max-width:760px) { .unmatched-transfer-summary__heading,.unmatched-transfer-client-section__header{align-items:flex-start;flex-direction:column}.unmatched-transfer-summary__metrics,.unmatched-transfer-client-section__totals{flex-wrap:wrap;gap:9px 16px}.unmatched-report-main{padding:12px}.unmatched-report-panel__header{align-items:flex-start;flex-direction:column}.unmatched-report-controls{align-items:flex-start;flex-direction:column}.unmatched-report-summary{grid-template-columns:1fr;padding-inline:14px}.unmatched-report-table th,.unmatched-report-table td{padding-inline:10px} }
 
         /* Admin assistant: a self-contained workspace inside the existing suite shell. */
         .admin-chat-main { width: 100%; max-width: 1500px; margin: 0 auto; padding: 24px 28px 32px; min-height: calc(100vh - var(--sticky-header-height)); }
@@ -1979,7 +1982,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.5 · 4 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.6 · 4 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -2346,7 +2349,17 @@
             <section class="unmatched-report-panel">
                 <div class="unmatched-report-panel__header">
                     <div><h2>ריכוז העברות שטרם הותאמו לפי לקוח</h2><p>הסכומים מוצגים לאחר היפוך הסימן בקובץ המקור. מידע זה אינו משפיע על מדדי המערכת.</p></div>
-                    <button type="button" class="button-secondary button-secondary--brand no-print" onclick="printUnmatchedTransfersReport()"><i class="fa-solid fa-print" aria-hidden="true"></i>הדפסת הדוח</button>
+                    <div class="unmatched-report-controls no-print">
+                        <div class="unmatched-report-filter">
+                            <span class="control-label">סטטוס לקוח</span>
+                            <div class="segmented-control" role="group" aria-label="סינון לפי סטטוס לקוח">
+                                <button id="unmatched-filter-all" type="button" class="active-filter" aria-pressed="true" onclick="setUnmatchedClientActivityFilter('all')">כל הלקוחות</button>
+                                <button id="unmatched-filter-active" type="button" aria-pressed="false" onclick="setUnmatchedClientActivityFilter('active')">לקוחות פעילים</button>
+                                <button id="unmatched-filter-inactive" type="button" aria-pressed="false" onclick="setUnmatchedClientActivityFilter('inactive')">לקוחות לא פעילים</button>
+                            </div>
+                        </div>
+                        <button type="button" class="button-secondary button-secondary--brand" onclick="printUnmatchedTransfersReport()"><i class="fa-solid fa-print" aria-hidden="true"></i>הדפסת הדוח</button>
+                    </div>
                 </div>
                 <div id="unmatched-report-summary" class="unmatched-report-summary" aria-label="סיכום הדוח"></div>
                 <div class="unmatched-report-table-wrap"><table class="unmatched-report-table"><thead><tr><th>קוד מרכבה</th><th>לקוח / מספר העברה</th><th>מספר העברות</th><th>תאריך תשלום</th><th>פרטי העברה</th><th>סכום</th></tr></thead><tbody id="unmatched-report-table-body"></tbody></table></div>
@@ -3175,6 +3188,7 @@
         let revenueDb = []; 
         let historicalRevenueDb = [];
         let unmatchedTransfersDb = [];
+        let unmatchedClientActivityFilter = 'all';
         let invoiceFileMap = new Map();
         let invoiceMappingLoaded = false;
         let queryOnlineDb = [];
@@ -8238,8 +8252,37 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                 : '';
         }
 
+        function getKnownActiveClientCodes() {
+            const activeCodes = new Set();
+            [...db, ...revenueDb, ...historicalRevenueDb].forEach(row => {
+                const code = normalizeClientCodeValue(row.code || row.clientCode);
+                if (code) activeCodes.add(code);
+            });
+            return activeCodes;
+        }
+
+        function unmatchedClientActivityFilterLabel() {
+            if (unmatchedClientActivityFilter === 'active') return 'לקוחות פעילים';
+            if (unmatchedClientActivityFilter === 'inactive') return 'לקוחות לא פעילים';
+            return 'כל הלקוחות';
+        }
+
+        function setUnmatchedClientActivityFilter(value) {
+            if (!['all', 'active', 'inactive'].includes(value)) return;
+            unmatchedClientActivityFilter = value;
+            ['all', 'active', 'inactive'].forEach(option => {
+                const button = document.getElementById(`unmatched-filter-${option}`);
+                if (!button) return;
+                const selected = option === value;
+                button.classList.toggle('active-filter', selected);
+                button.setAttribute('aria-pressed', String(selected));
+            });
+            renderUnmatchedTransfersReport();
+        }
+
         function aggregateUnmatchedTransfers() {
             const clients = new Map();
+            const activeCodes = getKnownActiveClientCodes();
             unmatchedTransfersDb.forEach(row => {
                 const key = row.clientCode;
                 if (!clients.has(key)) clients.set(key, { clientCode:key, clientName:row.clientName, count:0, amount:0, transfers:[] });
@@ -8251,10 +8294,18 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             });
             return [...clients.values()].map(client => ({
                 ...client,
+                isActive: activeCodes.has(normalizeClientCodeValue(client.clientCode)),
                 transfers: client.transfers.sort((a,b) =>
                     (b.paymentDate?.getTime() || b.postingDate?.getTime() || 0) - (a.paymentDate?.getTime() || a.postingDate?.getTime() || 0)
                     || String(a.documentNumber).localeCompare(String(b.documentNumber), 'he', { numeric:true }))
             })).sort((a,b) => String(a.clientCode).localeCompare(String(b.clientCode), 'he', { numeric:true }));
+        }
+
+        function getFilteredUnmatchedTransferClients() {
+            const clients = aggregateUnmatchedTransfers();
+            if (unmatchedClientActivityFilter === 'active') return clients.filter(client => client.isActive);
+            if (unmatchedClientActivityFilter === 'inactive') return clients.filter(client => !client.isActive);
+            return clients;
         }
         function buildUnmatchedTransfersClientSummary(orgName) {
             const rows = getUnmatchedTransfersForClient(orgName);
@@ -8291,7 +8342,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const body = document.getElementById('unmatched-report-table-body');
             const summary = document.getElementById('unmatched-report-summary');
             if (!body) return;
-            const clients = aggregateUnmatchedTransfers();
+            const clients = getFilteredUnmatchedTransferClients();
             const totalCount = clients.reduce((sum,row) => sum + row.count, 0);
             const totalAmount = clients.reduce((sum,row) => sum + row.amount, 0);
             if (summary) summary.innerHTML = `
@@ -8314,14 +8365,20 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                     <td>${escapeHtml(unmatchedTransferDetailText(row))}</td>
                     <td class="numeric-cell">${formatCurrency(row.amount)}</td>
                 </tr>`).join('')}`).join('');
-            body.innerHTML = groupedRows + `<tr class="unmatched-report-total"><td colspan="2">סה״כ</td><td class="numeric-cell">${totalCount.toLocaleString('he-IL')}</td><td colspan="2"></td><td class="numeric-cell">${formatCurrency(totalAmount)}</td></tr>`;
+            body.innerHTML = clients.length
+                ? groupedRows + `<tr class="unmatched-report-total"><td colspan="2">סה״כ</td><td class="numeric-cell">${totalCount.toLocaleString('he-IL')}</td><td colspan="2"></td><td class="numeric-cell">${formatCurrency(totalAmount)}</td></tr>`
+                : `<tr><td colspan="6" style="padding:28px;text-align:center;color:#607080">לא נמצאו לקוחות התואמים לסינון שנבחר.</td></tr>`;
         }
 
         function printUnmatchedTransfersReport() {
-            const clients = aggregateUnmatchedTransfers();
-            if (!clients.length) return;
+            const clients = getFilteredUnmatchedTransferClients();
+            if (!clients.length) {
+                alert('לא נמצאו לקוחות להפקת הדוח בהתאם לסינון שנבחר.');
+                return;
+            }
             const totalCount = clients.reduce((sum,row) => sum + row.count, 0);
             const totalAmount = clients.reduce((sum,row) => sum + row.amount, 0);
+            const filterLabel = unmatchedClientActivityFilterLabel();
             const tableRows = clients.map(client => `
                 <tr class="client-summary-row">
                     <td style="direction:ltr;text-align:right"><strong>${escapeHtml(client.clientCode)}</strong></td>
@@ -8342,7 +8399,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             if (!win) { alert('פתיחת חלון ההדפסה נחסמה.'); return; }
             const title = 'דוח העברות שטרם הותאמו';
             win.document.write(`<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>${title}</title>${getClientDocumentPrintStyles()}<style>@page{size:A4 landscape;margin:0}body,.document-page,.unmatched-print-table,.unmatched-print-table *{font-family:Arial,Helvetica,sans-serif!important;font-style:normal;letter-spacing:normal;font-synthesis:none}.unmatched-print-note{margin:0 0 9px;color:var(--print-muted);font-size:8pt}.unmatched-print-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 10px}.unmatched-print-summary div{padding:8px 10px;border:1px solid #cad8e3;border-radius:7px;background:#f5f9fc}.unmatched-print-summary span{display:block;color:#64788b;font-size:7.5pt;font-weight:700}.unmatched-print-summary strong{display:block;margin-top:2px;color:#153f62;font-size:13pt}.unmatched-print-table{font-size:7.8pt;border-collapse:collapse}.unmatched-print-table th,.unmatched-print-table td{padding:4px 6px;border-color:#d6e0e8}.unmatched-print-table th{background:#edf3f7;color:#425d73;font-weight:700}.unmatched-print-table thead{display:table-header-group}.unmatched-print-table tfoot{display:table-row-group!important}.client-summary-row{background:#e6f1f9;font-weight:700;break-after:avoid;page-break-after:avoid;box-shadow:inset -3px 0 #0b67b5}.print-client-name{font-size:8.4pt;font-weight:700;color:#083f6d}.print-count-badge{display:inline-block;min-width:18px;padding:1px 5px;border:1px solid #b6ccdc;border-radius:10px;background:#fff;color:#075a9e}.transfer-detail-row:nth-child(even) td{background:#fbfcfd}.transfer-detail-row td{color:#34495e}.transfer-detail-row td:nth-child(2){padding-inline-start:16px;color:#174f7b;font-weight:700}</style></head><body>
-                ${getClientDocumentPageStart(title)}<h1 class="document-title">${title}</h1><p class="unmatched-print-note">הסכומים מוצגים לאחר היפוך הסימן בקובץ המקור. דוח זה אינפורמטיבי ואינו משפיע על מדדי המערכת.</p>
+                ${getClientDocumentPageStart(title)}<h1 class="document-title">${title}</h1><p class="unmatched-print-note">סינון: ${escapeHtml(filterLabel)}. הסכומים מוצגים לאחר היפוך הסימן בקובץ המקור. דוח זה אינפורמטיבי ואינו משפיע על מדדי המערכת.</p>
                 <div class="unmatched-print-summary"><div><span>לקוחות בדוח</span><strong>${clients.length.toLocaleString('he-IL')}</strong></div><div><span>מספר העברות</span><strong>${totalCount.toLocaleString('he-IL')}</strong></div><div><span>סכום העברות נטו</span><strong>${formatCurrency(totalAmount)}</strong></div></div>
                 <table class="unmatched-print-table"><thead><tr><th>קוד מרכבה</th><th>לקוח / מספר העברה</th><th>מספר העברות</th><th>תאריך תשלום</th><th>פרטי העברה</th><th>סכום</th></tr></thead><tbody>${tableRows}</tbody><tfoot><tr style="font-weight:700;background:#e9eef3"><td colspan="2">סה״כ</td><td style="text-align:center">${totalCount.toLocaleString('he-IL')}</td><td colspan="2"></td><td style="direction:ltr;text-align:right">${formatCurrency(totalAmount)}</td></tr></tfoot></table>${getClientDocumentPageEnd()}
                 <script>window.addEventListener('load',function(){window.focus();setTimeout(function(){window.print()},350)});<\/script></body></html>`);
