@@ -1916,11 +1916,11 @@
         .invoice-search-panel__header { display:flex;align-items:center;justify-content:space-between;gap:22px;padding:20px 22px;border-bottom:1px solid var(--color-border); }
         .invoice-search-panel__header h2 { margin:0;color:var(--brand-active);font-size:20px;font-weight:700; }
         .invoice-search-panel__header p { margin:5px 0 0;color:var(--color-text-muted);font-size:13px;line-height:1.55; }
-        .invoice-search-form { display:grid;grid-template-columns:minmax(0,1fr) 128px;align-items:end;gap:12px;padding:18px 22px 20px; }
+        .invoice-search-form { display:grid;grid-template-columns:minmax(240px,360px) 128px 100px;align-items:end;justify-content:start;gap:12px;padding:18px 22px 20px; }
         .invoice-search-field { flex:1;display:grid;gap:6px; }
         .invoice-search-field label { color:var(--color-text-muted);font-size:12px;font-weight:700; }
         .invoice-search-field input { width:100%;height:46px;border:1px solid var(--color-border-strong);border-radius:9px;padding:0 13px;direction:ltr;text-align:left;color:var(--color-text);font-size:15px;font-weight:700;box-sizing:border-box; }
-        .invoice-search-form .button-primary { width:100%;height:46px;min-height:46px;justify-content:center;box-sizing:border-box; }
+        .invoice-search-form .button-primary,.invoice-search-form .button-secondary { width:100%;height:46px;min-height:46px;justify-content:center;box-sizing:border-box; }
         .invoice-search-results { display:grid;gap:14px;padding:20px 22px 24px; }
         .invoice-search-empty { padding:38px 22px;text-align:center;color:var(--color-text-muted); }
         .invoice-search-empty i { display:block;margin-bottom:10px;color:#8da0b2;font-size:25px; }
@@ -1935,6 +1935,7 @@
         .invoice-search-detail { min-width:0;min-height:76px;padding:11px 12px;border:1px solid #e1e8ee;border-radius:9px;background:#fbfcfd;box-sizing:border-box; }
         .invoice-search-detail span { display:block;color:#718195;font-size:11px;font-weight:700; }
         .invoice-search-detail strong { display:block;margin-top:4px;color:#20384f;font-size:14px;overflow-wrap:anywhere; }
+        .invoice-search-detail strong[dir="ltr"] { text-align:right; }
         .invoice-search-result__footer { display:flex;justify-content:flex-end;padding:0 16px 15px; }
         .invoice-search-open-file { min-height:36px;padding:0 13px;border:1px solid #75bf99;border-radius:8px;background:#eefaf4;color:#047857;font-size:12px;font-weight:700; }
         @media (max-width:900px) { .invoice-search-panel__header{align-items:stretch;flex-direction:column}.invoice-search-form{min-width:0}.invoice-search-result__body{grid-template-columns:repeat(2,minmax(0,1fr))} }
@@ -2013,7 +2014,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.12 · 9 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.13 · 9 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -2386,8 +2387,9 @@
                     <i class="fa-solid fa-file-invoice" aria-hidden="true"></i>
                 </div>
                 <form class="invoice-search-form" onsubmit="submitInvoiceSearch(event)">
-                    <div class="invoice-search-field"><label for="invoice-search-input">מספר מסמך חשבונאי או מספר מסמך לחיוב</label><input id="invoice-search-input" type="search" inputmode="numeric" autocomplete="off" placeholder="הקלדת מספר מדויק"></div>
+                    <div class="invoice-search-field"><label for="invoice-search-input">מספר מסמך חשבונאי או מספר מסמך לחיוב</label><input id="invoice-search-input" type="search" inputmode="numeric" maxlength="10" autocomplete="off" placeholder="עד 10 ספרות" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"></div>
                     <button type="submit" class="button-primary"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>איתור</button>
+                    <button id="invoice-search-clear" type="button" class="button-secondary hidden" onclick="clearInvoiceSearch()"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i>ניקוי</button>
                 </form>
             </section>
             <section id="invoice-search-results" class="invoice-search-results" aria-live="polite">
@@ -8380,8 +8382,10 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
         function renderInvoiceSearchScreen() {
             const input = document.getElementById('invoice-search-input');
             const results = document.getElementById('invoice-search-results');
+            const clearButton = document.getElementById('invoice-search-clear');
             if (!results) return;
             if (input && input.value !== invoiceSearchQuery) input.value = invoiceSearchQuery;
+            if (clearButton) clearButton.classList.toggle('hidden', !invoiceSearchQuery);
             if (!invoiceSearchQuery) {
                 results.innerHTML = '<div class="invoice-search-empty"><i class="fa-regular fa-keyboard" aria-hidden="true"></i><strong>יש להזין מספר מסמך חשבונאי או מספר מסמך לחיוב.</strong></div>';
                 return;
@@ -8396,6 +8400,14 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             event.preventDefault();
             invoiceSearchQuery = normalizeInvoiceLookupValue(document.getElementById('invoice-search-input')?.value);
             renderInvoiceSearchScreen();
+        }
+
+        function clearInvoiceSearch() {
+            invoiceSearchQuery = '';
+            const input = document.getElementById('invoice-search-input');
+            if (input) input.value = '';
+            renderInvoiceSearchScreen();
+            input?.focus();
         }
 
         function extractInvoiceFilePath(cell) {
