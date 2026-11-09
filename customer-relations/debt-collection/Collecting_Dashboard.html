@@ -2015,7 +2015,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.14 · 9 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.15 · 9 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -6553,6 +6553,18 @@ function getClientProfileMetrics(orgName) {
             return `${baseName}${copySuffix}${extension}`;
         }
 
+        function getInvoiceRowForDownload(documentNumber) {
+            const normalizedDocument = normalizeInvoiceDocumentNumber(documentNumber);
+            const rows = [...db, ...revenueDb, ...historicalRevenueDb].filter(row =>
+                normalizeInvoiceDocumentNumber(row.doc) === normalizedDocument
+            );
+            return rows.find(row => path.orgName && row.name === path.orgName) || rows[0] || {
+                doc: normalizedDocument,
+                name: 'לקוח',
+                desc: 'ללא תיאור'
+            };
+        }
+
         async function createDebtInvoiceDownloadStatusPdf(clientName, statusRows) {
             if (!window.jspdf?.jsPDF || typeof html2canvas === 'undefined') throw new Error('רכיב יצירת דוח ה-PDF לא נטען.');
             const { jsPDF } = window.jspdf;
@@ -9768,7 +9780,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             if (event.target === event.currentTarget) closeInvoicePreviewDialog();
         }
 
-        function showInvoicePreview(file) {
+        function showInvoicePreview(file, downloadName = '') {
             if (invoicePreviewObjectUrl) URL.revokeObjectURL(invoicePreviewObjectUrl);
             invoicePreviewObjectUrl = URL.createObjectURL(file);
             const title = document.getElementById('invoice-preview-title');
@@ -9780,7 +9792,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             if (openLink) openLink.href = invoicePreviewObjectUrl;
             if (downloadLink) {
                 downloadLink.href = invoicePreviewObjectUrl;
-                downloadLink.download = file.name || 'invoice.pdf';
+                downloadLink.download = downloadName || file.name || 'invoice.pdf';
             }
             openUiDialog('invoice-preview-dialog');
         }
@@ -9835,8 +9847,11 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                 directoryHandle = await getAuthorizedInvoiceFolderHandle(true);
                 if (!directoryHandle) throw new Error('לא אושרה גישה לתיקיית החשבוניות.');
                 const file = await resolveMappedInvoiceFile(entry, directoryHandle);
+                const row = getInvoiceRowForDownload(documentNumber);
+                const entries = getInvoiceFileEntries(documentNumber);
+                const downloadName = buildDownloadedInvoiceFileName(row, file.name, entries.length > 1 ? entryIndex + 1 : null);
                 closeUiDialog('invoice-files-dialog');
-                showInvoicePreview(file);
+                showInvoicePreview(file, downloadName);
             } catch (error) {
                 alert(getInvoiceOpenErrorMessage(error, directoryHandle, entry));
                 console.info('פתיחת קובץ החשבונית נכשלה.', error);
