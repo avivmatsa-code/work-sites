@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
@@ -1984,7 +1984,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.9 · 9 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.10 · 9 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -2225,7 +2225,7 @@
                 <article id="revenue-source-card" class="source-card">
                     <div class="source-card__heading">
                         <span class="source-card__icon"><i class="fa-solid fa-file-invoice" aria-hidden="true"></i></span>
-                        <div><h3>הכנסות שנה נוכחית</h3><p>חשבוניות והכנסות שנת העבודה לצורך חישובי חיוב וגבייה.</p></div>
+                        <div><h3>הכנסות שנה נוכחית</h3><p>חשבוניות והכנסות לצורך חישובי חיוב וגבייה. אפשר לטעון יותר משנה אחת, ובלבד שטווח התאריכים יהיה תואם לקובץ החשבוניות שהותאמו.</p></div>
                         <span class="source-card__badge">חובה</span>
                     </div>
                     <input type="file" id="revenue-uploader" class="hidden" accept=".xlsx,.xls" onchange="processRevenueExcel(event)">
@@ -2238,7 +2238,7 @@
                 <article id="historical-source-card" class="source-card">
                     <div class="source-card__heading">
                         <span class="source-card__icon"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i></span>
-                        <div><h3>חשבוניות שהותאמו בשנת העבודה</h3><p>מבנה זהה לקובץ ההכנסות. המקור משמש לניתוח גביית חובות משנים קודמות.</p></div>
+                        <div><h3>חשבוניות שהותאמו בשנת העבודה</h3><p>מבנה זהה לקובץ ההכנסות. אפשר לטעון יותר משנה אחת, ובלבד שטווח התאריכים יהיה תואם לקובץ ההכנסות.</p></div>
                         <span class="source-card__badge source-card__badge--optional">רשות</span>
                     </div>
                     <input type="file" id="historical-uploader" class="hidden" accept=".xlsx,.xls" onchange="processHistoricalRevenueExcel(event)">
@@ -2263,7 +2263,7 @@
                 <article id="invoice-mapping-source-card" class="source-card source-card--mapping">
                     <div class="source-card__heading">
                         <span class="source-card__icon"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i></span>
-                        <div><h3>מיפוי חשבוניות ברשת</h3><p>קישורים לקבצים לפי מספר המסמך. לפתיחה נדרשת הרשאה לתיקיית השורש שבה שמורים קובצי החשבוניות.</p></div>
+                        <div><h3>מיפוי חשבוניות ברשת</h3><p>קישורים לקבצים לפי מספר המסמך. לפתיחה נדרשת הרשאה לכל כונן <bdi>S:\</bdi> כתיקיית השורש.</p></div>
                         <span class="source-card__badge source-card__badge--optional">רשות</span>
                     </div>
                     <input type="file" id="invoice-mapping-uploader" class="hidden" accept=".xlsx,.xls" onchange="processInvoiceMappingExcel(event)">
@@ -2275,7 +2275,7 @@
                         <button type="button" onclick="authorizeInvoiceFilesFolder()"><i class="fa-solid fa-folder-open" aria-hidden="true"></i>בחירת תיקיית השורש</button>
                         <button id="invoice-mapping-update-button" type="button" onclick="prepareInvoiceMappingUpdate()"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>עדכון מיפוי החשבוניות</button>
                     </div>
-                    <small id="invoice-folder-access-status" class="invoice-mapping-status">תיקיית השורש: <bdi>S:\חשבונות - שוטפים</bdi></small>
+                    <small id="invoice-folder-access-status" class="invoice-mapping-status">תיקיית השורש הנדרשת: כל כונן <bdi>S:\</bdi></small>
                     <small id="invoice-mapping-update-status" class="invoice-mapping-status hidden"></small>
                 </article>
 
@@ -4249,60 +4249,7 @@
             return sortClientInvoiceRows(rows, lvl2View);
         }
 
-        function escapeXmlText(value) {
-            return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
-        }
-
-        async function applyInvoiceWorkbookPrintSettings(workbookBytes, sheetName, reportName, lastColumn, lastRow) {
-            if (typeof JSZip === 'undefined') return new Blob([workbookBytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            const zip = await JSZip.loadAsync(workbookBytes);
-            const sheetPath = 'xl/worksheets/sheet1.xml';
-            const sheetFile = zip.file(sheetPath);
-            if (!sheetFile) throw new Error('לא ניתן להגדיר את תצוגת ההדפסה בגיליון שנוצר.');
-            let sheetXml = await sheetFile.async('string');
-            sheetXml = sheetXml.replace(/<sheetView\b([^>]*?)(\/?)>/, (match, attributes, slash) => {
-                const cleanAttributes = attributes.replace(/\srightToLeft="[^"]*"/g, '');
-                return `<sheetView${cleanAttributes} rightToLeft="1"${slash}>`;
-            });
-            if (/<sheetPr\b/.test(sheetXml)) {
-                if (!/<pageSetUpPr\b/.test(sheetXml)) sheetXml = sheetXml.replace('</sheetPr>', '<pageSetUpPr fitToPage="1"/></sheetPr>');
-            } else {
-                sheetXml = sheetXml.replace(/(<worksheet\b[^>]*>)/, '$1<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>');
-            }
-            sheetXml = sheetXml
-                .replace(/<printOptions\b[^>]*\/>/g, '')
-                .replace(/<pageMargins\b[^>]*\/>/g, '')
-                .replace(/<pageSetup\b[^>]*\/>/g, '')
-                .replace(/<headerFooter\b[^>]*>[\s\S]*?<\/headerFooter>/g, '');
-            const printMarkup = `<printOptions horizontalCentered="0" verticalCentered="0"/><pageMargins left="0.3" right="0.3" top="0.65" bottom="0.65" header="0.25" footer="0.25"/><pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="0"/><headerFooter alignWithMargins="1"><oddHeader>${escapeXmlText('&R&"Arial,Bold"&11משרד התחבורה והבטיחות בדרכים&C&"Arial,Bold"&11' + reportName)}</oddHeader><oddFooter>${escapeXmlText('&R&"Arial,Regular"&9מערכת ניהול הכנסות וגבייה&L&"Arial,Regular"&9עמוד &P מתוך &N')}</oddFooter></headerFooter>`;
-            sheetXml = sheetXml.replace('</worksheet>', printMarkup + '</worksheet>');
-            zip.file(sheetPath, sheetXml);
-
-            const workbookPath = 'xl/workbook.xml';
-            const workbookFile = zip.file(workbookPath);
-            if (!workbookFile) throw new Error('לא ניתן להגדיר כותרות חוזרות בגיליון שנוצר.');
-            let workbookXml = await workbookFile.async('string');
-            const safeSheetReference = `'${String(sheetName).replace(/'/g, "''")}'`;
-            const definedNames = `<definedName name="_xlnm.Print_Titles" localSheetId="0">${escapeXmlText(safeSheetReference + '!$1:$4')}</definedName><definedName name="_xlnm.Print_Area" localSheetId="0">${escapeXmlText(safeSheetReference + '!$A$1:$' + lastColumn + '$' + lastRow)}</definedName>`;
-            if (/<definedNames\s*\/>/.test(workbookXml)) workbookXml = workbookXml.replace(/<definedNames\s*\/>/, `<definedNames>${definedNames}</definedNames>`);
-            else if (/<definedNames>/.test(workbookXml)) workbookXml = workbookXml.replace('</definedNames>', definedNames + '</definedNames>');
-            else workbookXml = workbookXml.replace('</workbook>', `<definedNames>${definedNames}</definedNames></workbook>`);
-            zip.file(workbookPath, workbookXml);
-            return zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', compression: 'DEFLATE' });
-        }
-
-        function downloadGeneratedBlob(blob, fileName) {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.setTimeout(() => URL.revokeObjectURL(url), 120000);
-        }
-
-        async function exportDisplayedClientInvoicesToExcel() {
+        function exportDisplayedClientInvoicesToExcel() {
             if (typeof XLSX === 'undefined') {
                 alert('רכיב הייצוא לאקסל לא נטען. יש לרענן את הדף ולנסות שוב.');
                 return;
@@ -4336,74 +4283,22 @@
                 { s: { r: 1, c: 0 }, e: { r: 1, c: headers.length - 1 } }
             ];
             worksheet['!cols'] = [{ wch: 18 }, { wch: 15 }, { wch: 15 }, { wch: 46 }, { wch: 16 }, { wch: 16 }];
-            worksheet['!rows'] = [{ hpt: 25 }, { hpt: 19 }, { hpt: 8 }, { hpt: 24 }, ...dataRows.map(() => ({ hpt: 21 })), { hpt: 24 }];
             worksheet['!views'] = [{ rightToLeft: true }];
-            worksheet['!autofilter'] = { ref: `A4:F${4 + dataRows.length}` };
-            const lightBorder = { style: 'thin', color: { rgb: 'D4DEE7' } };
-            const baseStyle = {
-                font: { name: 'Arial', sz: 10, color: { rgb: '1F2933' } },
-                alignment: { horizontal: 'right', vertical: 'center', readingOrder: 2 },
-                border: { top: lightBorder, bottom: lightBorder }
-            };
             for (let rowIndex = 4; rowIndex < 4 + dataRows.length; rowIndex++) {
-                for (let columnIndex = 0; columnIndex < headers.length; columnIndex++) {
-                    const address = XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex });
-                    const cell = worksheet[address] || (worksheet[address] = { t: 's', v: '' });
-                    cell.s = { ...baseStyle, alignment: { ...baseStyle.alignment } };
-                    if (columnIndex === 0) {
-                        cell.t = 's';
-                        cell.s.alignment.horizontal = 'right';
-                    }
-                    if (columnIndex === 1 || columnIndex === 2 || columnIndex === 4) cell.s.alignment.horizontal = 'center';
-                    if (columnIndex === 1 || columnIndex === 2) cell.z = 'dd/mm/yyyy';
-                    if (columnIndex === amountColumn) {
-                        cell.z = '₪#,##0';
-                        cell.s.alignment.horizontal = 'right';
-                        cell.s.font = { ...cell.s.font, bold: true };
-                    }
-                }
+                [1, 2].forEach(columnIndex => {
+                    const cell = worksheet[XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex })];
+                    if (cell && cell.v instanceof Date && !isNaN(cell.v.getTime())) cell.z = 'dd/mm/yyyy';
+                });
+                const amountCell = worksheet[XLSX.utils.encode_cell({ r: rowIndex, c: amountColumn })];
+                if (amountCell) amountCell.z = '₪#,##0';
             }
-            const titleStyle = { font: { name: 'Arial', sz: 14, bold: true, color: { rgb: '064B8D' } }, alignment: { horizontal: 'center', vertical: 'center', readingOrder: 2 } };
-            const subtitleStyle = { font: { name: 'Arial', sz: 9, bold: true, color: { rgb: '607080' } }, alignment: { horizontal: 'center', vertical: 'center', readingOrder: 2 } };
-            worksheet.A1.s = titleStyle;
-            worksheet.A2.s = subtitleStyle;
-            for (let columnIndex = 0; columnIndex < headers.length; columnIndex++) {
-                const cell = worksheet[XLSX.utils.encode_cell({ r: 3, c: columnIndex })];
-                cell.s = {
-                    fill: { patternType: 'solid', fgColor: { rgb: 'DCEAF5' } },
-                    font: { name: 'Arial', sz: 10, bold: true, color: { rgb: '173F61' } },
-                    alignment: { horizontal: 'center', vertical: 'center', readingOrder: 2 },
-                    border: { top: lightBorder, bottom: lightBorder, left: lightBorder, right: lightBorder }
-                };
-            }
-            for (let rowIndex = 4; rowIndex < 4 + dataRows.length; rowIndex++) {
-                if ((rowIndex - 4) % 2 === 1) {
-                    for (let columnIndex = 0; columnIndex < headers.length; columnIndex++) {
-                        const address = XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex });
-                        const cell = worksheet[address] || (worksheet[address] = { t: 's', v: '', s: { ...baseStyle, alignment: { ...baseStyle.alignment } } });
-                        cell.s.fill = { patternType: 'solid', fgColor: { rgb: 'F8FAFC' } };
-                    }
-                }
-            }
-            const totalRowIndex = sheetData.length - 1;
-            for (let columnIndex = 0; columnIndex < headers.length; columnIndex++) {
-                const address = XLSX.utils.encode_cell({ r: totalRowIndex, c: columnIndex });
-                const cell = worksheet[address] || (worksheet[address] = { t: 's', v: '' });
-                cell.s = {
-                    fill: { patternType: 'solid', fgColor: { rgb: 'E9EEF3' } },
-                    font: { name: 'Arial', sz: 10, bold: true, color: { rgb: '1F2933' } },
-                    alignment: { horizontal: columnIndex === amountColumn ? 'right' : 'right', vertical: 'center', readingOrder: 2 },
-                    border: { top: { style: 'medium', color: { rgb: '9AAFC0' } }, bottom: lightBorder }
-                };
-                if (columnIndex === amountColumn) cell.z = '₪#,##0';
-            }
+            const totalCell = worksheet[XLSX.utils.encode_cell({ r: sheetData.length - 1, c: amountColumn })];
+            if (totalCell) totalCell.z = '₪#,##0';
             const workbook = XLSX.utils.book_new();
             const sheetName = safeDownloadFileName(reportName).slice(0, 31);
             XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
             try {
-                const workbookBytes = XLSX.write(workbook, { bookType: 'xlsx', type: 'array', cellDates: true, cellStyles: true });
-                const polishedWorkbook = await applyInvoiceWorkbookPrintSettings(workbookBytes, sheetName, `${reportName} - ${path.orgName}`, 'F', sheetData.length);
-                downloadGeneratedBlob(polishedWorkbook, `${safeDownloadFileName(reportName + ' - ' + path.orgName)}.xlsx`);
+                XLSX.writeFile(workbook, `${safeDownloadFileName(reportName + ' - ' + path.orgName)}.xlsx`, { cellDates: true });
             } catch (error) {
                 console.error('ייצוא החשבוניות לאקסל נכשל.', error);
                 alert('לא ניתן היה ליצור את קובץ האקסל. יש לרענן את הדף ולנסות שוב.');
@@ -6606,7 +6501,7 @@ function getClientProfileMetrics(orgName) {
                 .debt-download-pdf-page .document-title{margin:13px 0 3px;font-size:19px}.debt-download-pdf-page .report-client{margin:0 0 11px;text-align:center;color:#52677a;font-size:13px;font-weight:700}
                 .debt-download-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 13px}
                 .debt-download-summary div{border:1px solid #c8d6e1;border-radius:8px;background:#f5f8fb;padding:8px 12px;text-align:center}.debt-download-summary span{display:block;color:#607080;font-size:10px;font-weight:700;line-height:1.35}.debt-download-summary strong{display:block;margin-top:3px;color:#064b8d;font-size:18px;line-height:1.1}
-                .debt-download-pdf-page table{margin-top:10px;font-size:9.5px;table-layout:fixed;border-collapse:collapse}.debt-download-pdf-page th,.debt-download-pdf-page td{height:31px;padding:5px 7px!important;vertical-align:middle!important;line-height:1.35;overflow-wrap:anywhere}.debt-download-pdf-page th{height:34px;background:#dfeaf3!important;color:#29465f;text-align:center!important}.debt-download-pdf-page tbody tr:nth-child(even){background:#f8fafc}.debt-download-pdf-page th:nth-child(1){width:12%}.debt-download-pdf-page th:nth-child(2){width:15%}.debt-download-pdf-page th:nth-child(3){width:25%}.debt-download-pdf-page th:nth-child(4){width:10%}.debt-download-pdf-page th:nth-child(5){width:10%}.debt-download-pdf-page th:nth-child(6){width:28%}.download-status-chip{display:inline-flex;align-items:center;justify-content:center;min-width:54px;padding:3px 8px;border-radius:999px;border:1px solid currentColor;font-size:9px;font-weight:700;line-height:1}.status-found{color:#16834f;background:#edf9f3}.status-duplicate{color:#a85e00;background:#fff7e6}.status-missing{color:#c0363f;background:#fff1f2}
+                .debt-download-pdf-page table{margin-top:10px;font-size:9.5px;table-layout:fixed;border-collapse:collapse}.debt-download-pdf-page th,.debt-download-pdf-page td{height:31px;padding:5px 7px!important;vertical-align:middle!important;line-height:1.35;overflow-wrap:anywhere}.debt-download-pdf-page th{height:34px;background:#dfeaf3!important;color:#29465f;text-align:center!important}.debt-download-pdf-page tbody tr:nth-child(even){background:#f8fafc}.debt-download-pdf-page th:nth-child(1){width:12%}.debt-download-pdf-page th:nth-child(2){width:15%}.debt-download-pdf-page th:nth-child(3){width:25%}.debt-download-pdf-page th:nth-child(4){width:10%}.debt-download-pdf-page th:nth-child(5){width:10%}.debt-download-pdf-page th:nth-child(6){width:28%}.download-status-text{font-weight:700;color:#334155}
             </style>` + chunks.map((chunk, pageIndex) => `
                 <section class="debt-download-pdf-page">
                     ${getClientDocumentPageStart(title)}
@@ -6614,7 +6509,7 @@ function getClientProfileMetrics(orgName) {
                     <p class="report-client">${escapeHtml(clientName)}</p>
                     ${pageIndex === 0 ? `<div class="debt-download-summary"><div><span>חשבוניות שנמצאו</span><strong>${foundCount}</strong></div><div><span>חשבוניות עם עותקים כפולים</span><strong>${duplicateCount}</strong></div><div><span>חשבוניות חסרות</span><strong>${missingCount}</strong></div></div>` : ''}
                     <table><thead><tr><th>מספר מסמך</th><th>שם הלקוח</th><th>תיאור השירות</th><th>סטטוס</th><th>מספר עותקים</th><th>שמות הקבצים שנכללו</th></tr></thead><tbody>
-                    ${chunk.map(row => `<tr><td><bdi dir="ltr">${escapeHtml(row.documentNumber)}</bdi></td><td>${escapeHtml(row.clientName)}</td><td>${escapeHtml(row.description)}</td><td style="text-align:center"><span class="download-status-chip ${row.resolvedCount === 0 ? 'status-missing' : (row.resolvedCount > 1 ? 'status-duplicate' : 'status-found')}">${row.resolvedCount === 0 ? 'חסר' : (row.resolvedCount > 1 ? 'כפול' : 'נמצא')}</span></td><td style="text-align:center">${row.resolvedCount}</td><td>${row.fileNames.length ? row.fileNames.map(escapeHtml).join('<br>') : 'לא צורף קובץ'}</td></tr>`).join('')}
+                    ${chunk.map(row => `<tr><td><bdi dir="ltr">${escapeHtml(row.documentNumber)}</bdi></td><td>${escapeHtml(row.clientName)}</td><td>${escapeHtml(row.description)}</td><td style="text-align:center"><span class="download-status-text">${row.resolvedCount === 0 ? 'חסר' : (row.resolvedCount > 1 ? 'כפול' : 'נמצא')}</span></td><td style="text-align:center">${row.resolvedCount}</td><td>${row.fileNames.length ? row.fileNames.map(escapeHtml).join('<br>') : 'לא צורף קובץ'}</td></tr>`).join('')}
                     </tbody></table>
                     ${getClientDocumentPageEnd()}
                 </section>`).join('');
@@ -9529,7 +9424,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const handle = invoiceFolderHandle || await getSavedInvoiceFolderHandle();
             if (handle) invoiceFolderHandle = handle;
             if (!handle || typeof handle.queryPermission !== 'function') {
-                setInvoiceFolderAccessStatus('נדרשת הרשאה חד־פעמית לתיקיית השורש שבה שמורים קובצי החשבוניות: S:\\חשבונות - שוטפים.');
+                setInvoiceFolderAccessStatus('נדרשת הרשאה חד־פעמית לכל כונן S:\\ כתיקיית השורש של קובצי החשבוניות.');
                 return;
             }
             try {
@@ -9547,7 +9442,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                 const directoryHandle = await window.showDirectoryPicker({ id: 'invoice-files-root', mode: 'read' });
                 invoiceFolderHandle = directoryHandle;
                 await saveInvoiceFolderHandle(directoryHandle);
-                setInvoiceFolderAccessStatus('הגישה לתיקיית השורש "' + directoryHandle.name + '" אושרה ונשמרה בדפדפן.');
+                setInvoiceFolderAccessStatus('הגישה לתיקיית השורש שנבחרה אושרה. יש לוודא שנבחר כל כונן S:\\ ולא תיקיית משנה.');
                 return directoryHandle;
             } catch (error) {
                 if (error?.name !== 'AbortError') {
@@ -9674,13 +9569,13 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
         function getInvoiceOpenErrorMessage(error, directoryHandle, entry) {
             const selectedFolder = directoryHandle?.name ? '"' + directoryHandle.name + '"' : 'לא נבחרה';
             if (error?.name === 'NotAllowedError' || error?.name === 'SecurityError') {
-                return 'הגישה לתיקיית החשבוניות לא אושרה. יש לעבור למסך מקורות הנתונים ולאשר מחדש גישה לתיקייה S:\\חשבונות - שוטפים.';
+                return 'הגישה לתיקיית החשבוניות לא אושרה. יש לעבור למסך מקורות הנתונים ולאשר מחדש גישה לכל כונן S:\\.';
             }
             if (error?.name === 'NotFoundError' || error?.name === 'TypeMismatchError') {
-                return 'הקובץ לא נמצא מתוך תיקיית השורש שנבחרה (' + selectedFolder + '). יש לבחור במסך מקורות הנתונים את התיקייה S:\\חשבונות - שוטפים ולוודא שהרשת זמינה.\n\nהנתיב שנרשם במיפוי:\n' + String(entry?.path || 'לא נמצא נתיב');
+                return 'הקובץ לא נמצא מתוך תיקיית השורש שנבחרה (' + selectedFolder + '). יש לבחור במסך מקורות הנתונים את כל כונן S:\\ ולוודא שהרשת זמינה.\n\nהנתיב שנרשם במיפוי:\n' + String(entry?.path || 'לא נמצא נתיב');
             }
             if (!directoryHandle) {
-                return 'לא אושרה גישה לתיקיית החשבוניות. במסך מקורות הנתונים יש ללחוץ על "אישור גישה לתיקייה" ולבחור את S:\\חשבונות - שוטפים.';
+                return 'לא אושרה גישה לתיקיית החשבוניות. במסך מקורות הנתונים יש לבחור את כל כונן S:\\ כתיקיית השורש.';
             }
             return 'לא ניתן לפתוח את קובץ החשבונית מתוך התיקייה ' + selectedFolder + '. יש לוודא שהקובץ זמין ברשת או לאשר מחדש את תיקיית השורש במסך מקורות הנתונים.';
         }
@@ -9989,6 +9884,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
     </script>
 </body>
 </html>
+
 
 
 
