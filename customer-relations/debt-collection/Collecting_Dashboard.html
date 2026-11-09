@@ -1911,6 +1911,34 @@
         .unmatched-report-total td { border-top:2px solid #b9c8d5;color:#153c5e; }
         @media (max-width:760px) { .unmatched-transfer-summary__heading,.unmatched-transfer-client-section__header{align-items:flex-start;flex-direction:column}.unmatched-transfer-summary__metrics,.unmatched-transfer-client-section__totals{flex-wrap:wrap;gap:9px 16px}.unmatched-report-main{padding:12px}.unmatched-report-panel__header{align-items:flex-start;flex-direction:column}.unmatched-report-controls{align-items:flex-start;flex-direction:column}.unmatched-report-summary{grid-template-columns:1fr;padding-inline:14px}.unmatched-report-table th,.unmatched-report-table td{padding-inline:10px} }
 
+        .invoice-search-main { width:min(1500px,calc(100% - 40px));margin-inline:auto;padding:24px 0 40px;font-family:Arial,Helvetica,sans-serif!important; }
+        .invoice-search-panel { border:1px solid var(--color-border);border-radius:16px;background:#fff;box-shadow:var(--shadow-panel);overflow:hidden; }
+        .invoice-search-panel__header { display:flex;align-items:flex-end;justify-content:space-between;gap:22px;padding:22px;border-bottom:1px solid var(--color-border); }
+        .invoice-search-panel__header h2 { margin:0;color:var(--brand-active);font-size:20px;font-weight:700; }
+        .invoice-search-panel__header p { margin:5px 0 0;color:var(--color-text-muted);font-size:13px;line-height:1.55; }
+        .invoice-search-form { display:flex;align-items:flex-end;gap:10px;max-width:680px;padding:18px 22px 20px; }
+        .invoice-search-field { flex:1;display:grid;gap:6px; }
+        .invoice-search-field label { color:var(--color-text-muted);font-size:12px;font-weight:700; }
+        .invoice-search-field input { min-height:44px;border:1px solid var(--color-border-strong);border-radius:9px;padding:0 13px;direction:ltr;text-align:left;color:var(--color-text);font-size:15px;font-weight:700; }
+        .invoice-search-results { display:grid;gap:14px;padding:20px 22px 24px; }
+        .invoice-search-empty { padding:38px 22px;text-align:center;color:var(--color-text-muted); }
+        .invoice-search-empty i { display:block;margin-bottom:10px;color:#8da0b2;font-size:25px; }
+        .invoice-search-result { border:1px solid #d6e1ea;border-radius:13px;background:#fff;overflow:hidden; }
+        .invoice-search-result__header { display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 16px;background:#f4f8fb;border-bottom:1px solid #dce5ec; }
+        .invoice-search-result__header h3 { margin:0;color:#123f64;font-size:16px;font-weight:700; }
+        .invoice-search-result__meta { display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
+        .invoice-search-source,.invoice-search-status { display:inline-flex;align-items:center;min-height:25px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700; }
+        .invoice-search-source { border:1px solid #b7cddd;background:#fff;color:#315875; }
+        .invoice-search-status { border:1px solid #a8cbe7;background:#eaf5ff;color:#075a9e; }
+        .invoice-search-result__body { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;padding:4px 16px 14px; }
+        .invoice-search-detail { min-width:0;padding:12px 10px;border-bottom:1px solid #edf1f4; }
+        .invoice-search-detail span { display:block;color:#718195;font-size:11px;font-weight:700; }
+        .invoice-search-detail strong { display:block;margin-top:4px;color:#20384f;font-size:14px;overflow-wrap:anywhere; }
+        .invoice-search-result__footer { display:flex;justify-content:flex-end;padding:0 16px 15px; }
+        .invoice-search-open-file { min-height:36px;padding:0 13px;border:1px solid #75bf99;border-radius:8px;background:#eefaf4;color:#047857;font-size:12px;font-weight:700; }
+        @media (max-width:900px) { .invoice-search-panel__header{align-items:stretch;flex-direction:column}.invoice-search-form{min-width:0}.invoice-search-result__body{grid-template-columns:repeat(2,minmax(0,1fr))} }
+        @media (max-width:560px) { .invoice-search-main{width:calc(100% - 20px);padding-top:12px}.invoice-search-form{align-items:stretch;flex-direction:column}.invoice-search-result__body{grid-template-columns:1fr} }
+
         /* Admin assistant: a self-contained workspace inside the existing suite shell. */
         .admin-chat-main { width: 100%; max-width: 1500px; margin: 0 auto; padding: 24px 28px 32px; min-height: calc(100vh - var(--sticky-header-height)); }
         .admin-auth-card { max-width: 620px; margin: 48px auto; padding: 28px; border: 1px solid var(--color-border); border-radius: 18px; background: #fff; box-shadow: var(--shadow-card); }
@@ -1984,7 +2012,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.10 · 9 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.11 · 9 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -2109,6 +2137,9 @@
                 <i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i><span>דוח העברות שטרם הותאמו</span>
             </button>
             <div class="suite-sidebar__section-label">כלים</div>
+            <button id="nav-invoice-search" class="suite-nav__item" type="button" onclick="navigateToScreen('invoice-search')" disabled>
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><span>איתור חשבונית</span>
+            </button>
             <button id="nav-admin" class="suite-nav__item" type="button" onclick="navigateToScreen('admin')">
                 <i class="fa-solid fa-comments" aria-hidden="true"></i><span>אדמין</span>
             </button>
@@ -2335,6 +2366,35 @@
         </main>
     </div>
 
+    <!-- INVOICE SEARCH SCREEN -->
+    <div id="invoice-search-container" class="suite-screen hidden flex-col flex-grow">
+        <header class="app-header no-print">
+            <div class="app-header__inner">
+                <div class="government-brand">
+                    <img class="government-logo" src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה והבטיחות בדרכים">
+                    <div><div class="ministry-name">משרד התחבורה והבטיחות בדרכים</div><div class="department-name">אגף טכנולוגיות דיגיטליות ומידע</div></div>
+                </div>
+                <div class="app-identity"><div class="app-title-row"><h1 class="app-title">איתור חשבונית</h1><span class="beta-badge">BETA</span></div><div class="system-date"></div></div>
+                <div class="header-actions" aria-hidden="true"></div>
+            </div>
+        </header>
+        <main class="invoice-search-main flex-grow no-print">
+            <section class="invoice-search-panel" aria-labelledby="invoice-search-title">
+                <div class="invoice-search-panel__header">
+                    <div><h2 id="invoice-search-title">איתור לפי מזהה חשבונית</h2><p>האיתור מתבצע בכל מקורות הנתונים שנטענו. כאשר אותו מזהה נמצא ביותר ממקור אחד, כל ההתאמות מוצגות בנפרד.</p></div>
+                    <i class="fa-solid fa-file-invoice" aria-hidden="true"></i>
+                </div>
+                <form class="invoice-search-form" onsubmit="submitInvoiceSearch(event)">
+                    <div class="invoice-search-field"><label for="invoice-search-input">מספר מסמך חשבונאי או מספר מסמך לחיוב</label><input id="invoice-search-input" type="search" inputmode="numeric" autocomplete="off" placeholder="הקלדת מספר מדויק"></div>
+                    <button type="submit" class="button-primary"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>איתור</button>
+                </form>
+            </section>
+            <section id="invoice-search-results" class="invoice-search-results" aria-live="polite">
+                <div class="invoice-search-empty"><i class="fa-regular fa-keyboard" aria-hidden="true"></i><strong>יש להזין מספר מסמך חשבונאי או מספר מסמך לחיוב.</strong></div>
+            </section>
+        </main>
+    </div>
+
     <!-- UNMATCHED TRANSFERS REPORT SCREEN -->
     <div id="unmatched-transfers-container" class="suite-screen hidden flex-col flex-grow">
         <header class="app-header no-print">
@@ -2531,7 +2591,7 @@
                     </div>
                     <div class="historical-panel__body">
                         <table>
-                            <thead><tr><th>תאריך התאמה</th><th>תאריך הפקה</th><th>מספר לקוח</th><th>שם לקוח</th><th>מספר חשבונית</th><th>סקטור</th><th>תחום</th><th>סכום</th></tr></thead>
+                            <thead><tr><th>תאריך התאמה</th><th>תאריך הפקה</th><th>מספר לקוח</th><th>שם לקוח</th><th>מספר מסמך חשבונאי</th><th>מסמך לחיוב</th><th>סקטור</th><th>תחום</th><th>סכום</th></tr></thead>
                             <tbody id="historical-detail-table-body"></tbody>
                         </table>
                     </div>
@@ -3262,6 +3322,7 @@
         let historicalSectorFilter = 'all';
         let historicalSourceYear = 'all';
         let historicalCustomerQuery = '';
+        let invoiceSearchQuery = '';
         let currentScreen = 'sources';
         const ADMIN_API_KEY_STORAGE_KEY = 'collecting_dashboard_gemini_api_key_v1';
         const ADMIN_MODEL_STORAGE_KEY = 'collecting_dashboard_gemini_model_v1';
@@ -3278,6 +3339,7 @@
         const SUITE_SCREENS = {
             sources: 'data-sources-container',
             admin: 'admin-chat-container',
+            'invoice-search': 'invoice-search-container',
             dashboard: 'dashboard-container',
             debt: 'main-app-container',
             'debtor-finder': 'debtor-finder-container',
@@ -3303,6 +3365,7 @@
             if (screen === 'historical' && (!coreReady || historicalRevenueDb.length === 0)) screen = 'sources';
             if (screen === 'queries' && !queriesReady) screen = 'sources';
             if (screen === 'unmatched-transfers' && unmatchedTransfersDb.length === 0) screen = 'sources';
+            if (screen === 'invoice-search' && !(db.length || revenueDb.length || historicalRevenueDb.length || unmatchedTransfersDb.length)) screen = 'sources';
             if (!SUITE_SCREENS[screen]) screen = 'sources';
 
             Object.values(SUITE_SCREENS).forEach(id => {
@@ -3341,6 +3404,8 @@
                 renderFeesManagementReport();
             } else if (screen === 'unmatched-transfers') {
                 renderUnmatchedTransfersReport();
+            } else if (screen === 'invoice-search') {
+                renderInvoiceSearchScreen();
             } else if (screen === 'admin') {
                 renderAdminAssistant();
             }
@@ -4202,6 +4267,7 @@
                 if (clientInvoiceSort.key === 'description') return String(row.desc || '');
                 if (clientInvoiceSort.key === 'status') return getClientInvoiceStatus(row, view);
                 if (clientInvoiceSort.key === 'amount') return Number(row.amount) || 0;
+                if (clientInvoiceSort.key === 'billingDocument') return normalizeInvoiceDocumentNumber(row.billingDocument);
                 return normalizeInvoiceDocumentNumber(row.doc);
             };
             return [...rows].sort((a, b) => {
@@ -4261,9 +4327,10 @@
             }
             const isDebtView = lvl2View === 'debt';
             const reportName = isDebtView ? 'חשבוניות חוב' : `חיובי שנה נוכחית ${CURRENT_YEAR}`;
-            const headers = ['מספר מסמך', 'תאריך רישום', 'תאריך פירעון', 'תיאור השירות', 'סטטוס', 'סכום בש"ח'];
+            const headers = ['מספר מסמך חשבונאי', 'מסמך לחיוב', 'תאריך רישום', 'תאריך פירעון', 'תיאור השירות', 'סטטוס', 'סכום בש"ח'];
             const dataRows = rows.map(row => [
                 normalizeInvoiceDocumentNumber(row.doc),
+                normalizeInvoiceDocumentNumber(row.billingDocument),
                 isValidDate(row.regDate) ? row.regDate : '',
                 isValidDate(row.dueDate) ? row.dueDate : '',
                 row.desc || '',
@@ -4282,10 +4349,10 @@
                 { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } },
                 { s: { r: 1, c: 0 }, e: { r: 1, c: headers.length - 1 } }
             ];
-            worksheet['!cols'] = [{ wch: 18 }, { wch: 15 }, { wch: 15 }, { wch: 46 }, { wch: 16 }, { wch: 16 }];
+            worksheet['!cols'] = [{ wch: 20 }, { wch: 18 }, { wch: 15 }, { wch: 15 }, { wch: 46 }, { wch: 16 }, { wch: 16 }];
             worksheet['!views'] = [{ rightToLeft: true }];
             for (let rowIndex = 4; rowIndex < 4 + dataRows.length; rowIndex++) {
-                [1, 2].forEach(columnIndex => {
+                [2, 3].forEach(columnIndex => {
                     const cell = worksheet[XLSX.utils.encode_cell({ r: rowIndex, c: columnIndex })];
                     if (cell && cell.v instanceof Date && !isNaN(cell.v.getTime())) cell.z = 'dd/mm/yyyy';
                 });
@@ -5454,7 +5521,7 @@
                 if (lvl2View === 'debt') {
                     html = `<div id="capture-area"><table class="w-full text-right border-collapse rounded-2xl overflow-hidden border border-slate-200 shadow-sm" style="font-family: Arial, Helvetica, sans-serif !important;">
                         <thead class="bg-slate-100 text-xs font-bold border-b text-slate-500 uppercase">
-                            <tr>${clientInvoiceSortHeader('document', 'מספר מסמך')}${clientInvoiceSortHeader('due', 'מועד פירעון')}${clientInvoiceSortHeader('description', 'תיאור השירות')}${clientInvoiceSortHeader('amount', 'סכום בש"ח', 'text-left')}</tr>
+                            <tr>${clientInvoiceSortHeader('document', 'מספר מסמך חשבונאי')}${clientInvoiceSortHeader('billingDocument', 'מסמך לחיוב')}${clientInvoiceSortHeader('due', 'מועד פירעון')}${clientInvoiceSortHeader('description', 'תיאור השירות')}${clientInvoiceSortHeader('amount', 'סכום בש"ח', 'text-left')}</tr>
                         </thead><tbody class="divide-y divide-slate-100 bg-white">`;
                     orgData.forEach(r => {
                         const isFuture = !r.isOverdue;
@@ -5465,6 +5532,7 @@
 
                         html += `<tr class="${rowBg}">
                             <td class="p-4 font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;"><span class="invoice-document-cell"><bdi dir="ltr">${r.doc}</bdi>${invoiceFileIndicator(r.doc)}</span> ${statusBadge}</td>
+                            <td class="p-4 font-bold text-slate-600" style="font-family: Arial, Helvetica, sans-serif !important;"><bdi dir="ltr">${r.billingDocument || '—'}</bdi></td>
                             <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.dueDate.toLocaleDateString('he-IL')}</td>
                             <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.desc}</td>
                             <td class="p-4 font-bold text-left text-slate-900" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(r.amount)}</td>
@@ -5479,7 +5547,7 @@
 
                     html = `<div id="capture-area"><table class="w-full text-right border-collapse rounded-2xl overflow-hidden border border-slate-200 shadow-sm" style="font-family: Arial, Helvetica, sans-serif !important;">
                         <thead class="bg-slate-100 text-xs font-bold border-b text-slate-500 uppercase">
-                            <tr>${clientInvoiceSortHeader('document', 'מספר מסמך')}${clientInvoiceSortHeader('registration', 'תאריך רישום')}${clientInvoiceSortHeader('due', 'מועד פירעון')}${clientInvoiceSortHeader('description', 'תיאור השירות')}${clientInvoiceSortHeader('status', 'סטטוס')}${clientInvoiceSortHeader('amount', 'סכום בש"ח', 'text-left')}</tr>
+                            <tr>${clientInvoiceSortHeader('document', 'מספר מסמך חשבונאי')}${clientInvoiceSortHeader('billingDocument', 'מסמך לחיוב')}${clientInvoiceSortHeader('registration', 'תאריך רישום')}${clientInvoiceSortHeader('due', 'מועד פירעון')}${clientInvoiceSortHeader('description', 'תיאור השירות')}${clientInvoiceSortHeader('status', 'סטטוס')}${clientInvoiceSortHeader('amount', 'סכום בש"ח', 'text-left')}</tr>
                         </thead><tbody class="divide-y divide-slate-100 bg-white">`;
                     
                     orgRevenues.forEach(r => {
@@ -5497,6 +5565,7 @@
 
                         html += `<tr class="${rowBg}">
                             <td class="p-4 font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;"><span class="invoice-document-cell"><bdi dir="ltr">${r.doc}</bdi>${invoiceFileIndicator(r.doc)}</span></td>
+                            <td class="p-4 font-bold text-slate-600" style="font-family: Arial, Helvetica, sans-serif !important;"><bdi dir="ltr">${r.billingDocument || '—'}</bdi></td>
                             <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.regDate.toLocaleDateString('he-IL')}</td>
                             <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.dueDate.toLocaleDateString('he-IL')}</td>
                             <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.desc}</td>
@@ -7227,7 +7296,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                 : summaryRows;
         }
 
-        function buildHistoricalDetailTableRows(detailRows) {
+        function buildHistoricalDetailTableRows(detailRows, includeBillingDocument = true) {
             const totalAmount = detailRows.reduce((sum, row) => sum + row.amount, 0);
             return detailRows.map(row => `
                 <tr>
@@ -7236,13 +7305,14 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                     <td><bdi dir="ltr">${escapeHtml(row.code)}</bdi></td>
                     <td>${escapeHtml(row.name)}</td>
                     <td>${escapeHtml(row.doc)}</td>
+                    ${includeBillingDocument ? `<td><bdi dir="ltr">${escapeHtml(row.billingDocument || '—')}</bdi></td>` : ''}
                     <td>${escapeHtml(row.sector)}</td>
                     <td>${row.isFee ? 'אגרות העברת בעלות' : 'שירותי מידע'}</td>
                     <td><strong>${formatCurrency(row.amount)}</strong></td>
                 </tr>
             `).join('') + `
                 <tr class="historical-detail-total">
-                    <td colspan="6">סה"כ</td>
+                    <td colspan="${includeBillingDocument ? 7 : 6}">סה"כ</td>
                     <td>${detailRows.length.toLocaleString('he-IL')} חשבוניות</td>
                     <td>${formatCurrency(totalAmount)}</td>
                 </tr>`;
@@ -7254,7 +7324,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             if (!body) return;
             body.innerHTML = detailRows.length
                 ? buildHistoricalDetailTableRows(detailRows)
-                : '<tr><td colspan="8" style="text-align:center;color:#64748b">לא נמצאו חשבוניות ללקוח המבוקש.</td></tr>';
+                : '<tr><td colspan="9" style="text-align:center;color:#64748b">לא נמצאו חשבוניות ללקוח המבוקש.</td></tr>';
         }
 
         function printHistoricalDetailReport() {
@@ -7297,7 +7367,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                     <section class="report-section">
                         <table>
                             <thead><tr><th>תאריך התאמה</th><th>תאריך הפקה</th><th>מספר לקוח</th><th>שם לקוח</th><th>מספר חשבונית</th><th>סקטור</th><th>תחום</th><th>סכום</th></tr></thead>
-                            <tbody>${buildHistoricalDetailTableRows(rows)}</tbody>
+                            <tbody>${buildHistoricalDetailTableRows(rows, false)}</tbody>
                         </table>
                     </section>
                     ${getClientDocumentPageEnd()}
@@ -8204,6 +8274,88 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             return String(value ?? '').replace(/\u00a0/g, ' ').trim().replace(/\.0+$/, '');
         }
 
+        function normalizeInvoiceLookupValue(value) {
+            return normalizeInvoiceDocumentNumber(value).replace(/\s+/g, '');
+        }
+
+        function getInvoiceSearchMatches(query) {
+            const key = normalizeInvoiceLookupValue(query);
+            if (!key) return [];
+            const matches = [];
+            const addRows = (rows, source, kind) => rows.forEach(row => {
+                const accountingDocument = kind === 'unmatched' ? row.documentNumber : row.doc;
+                const billingDocument = row.billingDocument || '';
+                if (normalizeInvoiceLookupValue(accountingDocument) !== key && normalizeInvoiceLookupValue(billingDocument) !== key) return;
+                const isUnmatched = kind === 'unmatched';
+                matches.push({
+                    source,
+                    documentType: isUnmatched ? 'DZ' : 'RV',
+                    accountingDocument,
+                    billingDocument,
+                    clientCode: isUnmatched ? row.clientCode : row.code,
+                    clientName: isUnmatched ? row.clientName : row.name,
+                    registrationDate: isUnmatched ? row.postingDate : row.regDate,
+                    dueDate: isUnmatched ? (row.paymentDate || row.dueDate) : row.dueDate,
+                    matchDate: isUnmatched ? null : row.matchDate,
+                    description: isUnmatched ? (row.text || row.reference || row.counterpartyName) : row.desc,
+                    amount: Number(row.amount) || 0,
+                    status: isUnmatched ? 'העברה שטרם הותאמה' : (kind === 'debt' ? (row.isOverdue ? 'בפיגור' : 'עתידי') : (kind === 'historical' ? 'הותאם' : getClientInvoiceStatus(row, 'revenue')))
+                });
+            });
+            addRows(db, 'קובץ חובות', 'debt');
+            addRows(revenueDb, 'הכנסות שנה נוכחית', 'revenue');
+            addRows(historicalRevenueDb, 'חשבוניות שהותאמו בשנה הנוכחית', 'historical');
+            addRows(unmatchedTransfersDb, 'העברות שטרם הותאמו', 'unmatched');
+            return matches;
+        }
+
+        function openInvoiceSearchFile(encodedDocument) {
+            openInvoiceFiles(encodedDocument);
+        }
+
+        function buildInvoiceSearchResult(result, index) {
+            const mappedEntries = result.documentType === 'RV' && invoiceMappingLoaded
+                ? getInvoiceFileEntries(result.accountingDocument)
+                : [];
+            const encodedDocument = encodeURIComponent(normalizeInvoiceDocumentNumber(result.accountingDocument));
+            const fileButton = mappedEntries.length ? `<div class="invoice-search-result__footer"><button type="button" class="invoice-search-open-file" onclick="openInvoiceSearchFile('${escapeHtml(encodedDocument)}')"><i class="fa-regular fa-file-pdf" aria-hidden="true"></i> פתיחת קובץ החשבונית${mappedEntries.length > 1 ? ` (${mappedEntries.length} עותקים)` : ''}</button></div>` : '';
+            const detail = (label, value, ltr = false) => `<div class="invoice-search-detail"><span>${label}</span><strong${ltr ? ' dir="ltr"' : ''}>${escapeHtml(value || 'אין מידע')}</strong></div>`;
+            return `<article class="invoice-search-result">
+                <div class="invoice-search-result__header"><h3>${escapeHtml(result.clientName || 'לקוח ללא שם')}</h3><div class="invoice-search-result__meta"><span class="invoice-search-source">${escapeHtml(result.source)}</span><span class="invoice-search-status">${escapeHtml(result.status)}</span><span class="invoice-search-source">מסמך ${escapeHtml(result.documentType)}</span></div></div>
+                <div class="invoice-search-result__body">
+                    ${detail('מספר מסמך חשבונאי', normalizeInvoiceDocumentNumber(result.accountingDocument), true)}
+                    ${detail('מסמך לחיוב', normalizeInvoiceDocumentNumber(result.billingDocument) || 'אין מידע', true)}
+                    ${detail('מספר לקוח במרכבה', result.clientCode, true)}
+                    ${detail('סכום', formatCurrency(result.amount))}
+                    ${detail('תאריך רישום', result.registrationDate ? result.registrationDate.toLocaleDateString('he-IL') : 'אין מידע')}
+                    ${detail(result.documentType === 'DZ' ? 'תאריך תשלום' : 'מועד פירעון', result.dueDate ? result.dueDate.toLocaleDateString('he-IL') : 'אין מידע')}
+                    ${result.matchDate ? detail('תאריך התאמה', result.matchDate.toLocaleDateString('he-IL')) : ''}
+                    ${detail('תיאור', result.description || 'אין מידע')}
+                </div>${fileButton}
+            </article>`;
+        }
+
+        function renderInvoiceSearchScreen() {
+            const input = document.getElementById('invoice-search-input');
+            const results = document.getElementById('invoice-search-results');
+            if (!results) return;
+            if (input && input.value !== invoiceSearchQuery) input.value = invoiceSearchQuery;
+            if (!invoiceSearchQuery) {
+                results.innerHTML = '<div class="invoice-search-empty"><i class="fa-regular fa-keyboard" aria-hidden="true"></i><strong>יש להזין מספר מסמך חשבונאי או מספר מסמך לחיוב.</strong></div>';
+                return;
+            }
+            const matches = getInvoiceSearchMatches(invoiceSearchQuery);
+            results.innerHTML = matches.length
+                ? `<div style="color:#53687b;font-size:13px;font-weight:700">נמצאו ${matches.length.toLocaleString('he-IL')} התאמות. כל רשומה מוצגת בנפרד לפי מקור הנתונים.</div>${matches.map(buildInvoiceSearchResult).join('')}`
+                : `<div class="invoice-search-empty"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><strong>לא נמצאה חשבונית התואמת למספר שהוזן.</strong></div>`;
+        }
+
+        function submitInvoiceSearch(event) {
+            event.preventDefault();
+            invoiceSearchQuery = normalizeInvoiceLookupValue(document.getElementById('invoice-search-input')?.value);
+            renderInvoiceSearchScreen();
+        }
+
         function extractInvoiceFilePath(cell) {
             if (!cell) return '';
             if (cell.l?.Target) return String(cell.l.Target).trim();
@@ -8326,6 +8478,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                         return {
                             code, name,
                             doc: r['מספר מסמך'] || '-',
+                            billingDocument: r['מסמך לחיוב'] || '',
                             dueDate,
                             regDate,
                             amount: parseFloat(String(r['סכום במטבע מסמך'] || 0).replace(/,/g, '')),
@@ -8415,6 +8568,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                 return {
                     code, name,
                     doc: r['מספר מסמך'] || '-',
+                    billingDocument: r['מסמך לחיוב'] || '',
                     dueDate,
                     regDate,
                     documentDate,
@@ -8498,6 +8652,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                     clientCode: normalizeClientCodeValue(row['לקוח']),
                     clientName: String(row['שם חשבון'] || 'לקוח ללא שם').trim(),
                     documentNumber: String(row['מספר מסמך'] || '-').trim(),
+                    billingDocument: String(row['מסמך לחיוב'] || '').trim(),
                     postingDate: parseExcelDateOrNull(row['תאריך רישום']),
                     paymentDate: parseExcelDateOrNull(row['תאריך תשלום']),
                     dueDate: parseExcelDateOrNull(row['מועד פרעון נטו']),
@@ -8629,6 +8784,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const amount = rows.reduce((sum,row) => sum + (Number(row.amount) || 0), 0);
             const rowHtml = [...rows].sort((a,b) => (b.postingDate?.getTime() || 0) - (a.postingDate?.getTime() || 0)).map(row => `<tr>
                 <td class="p-4 font-bold text-slate-700">${escapeHtml(row.documentNumber)}</td>
+                <td class="p-4 font-bold text-slate-600"><bdi dir="ltr">${escapeHtml(row.billingDocument || '—')}</bdi></td>
                 <td class="p-4">${row.paymentDate ? row.paymentDate.toLocaleDateString('he-IL') : 'אין מידע'}</td>
                 <td class="p-4">${escapeHtml(row.text || row.reference || 'אין מידע')}</td>
                 <td class="p-4">${escapeHtml(row.counterpartyName || 'אין מידע')}</td>
@@ -8636,7 +8792,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             </tr>`).join('');
             return `<section class="unmatched-transfer-client-section no-print" aria-label="פירוט העברות שטרם הותאמו">
                 <div class="unmatched-transfer-client-section__header"><div><h3>העברות שטרם הותאמו</h3><p>מידע אינפורמטיבי ממסמכי DZ. אינו נכלל בסכומי החיובים, החובות או הגבייה.</p></div><div class="unmatched-transfer-client-section__totals"><span>העברות <strong>${rows.length.toLocaleString('he-IL')}</strong></span><span>סכום נטו <strong>${formatCurrency(amount)}</strong></span></div></div>
-                <div style="overflow-x:auto"><table class="w-full text-right border-collapse"><thead class="bg-slate-100 text-xs font-bold text-slate-500"><tr><th class="p-4">מספר מסמך</th><th class="p-4">תאריך תשלום</th><th class="p-4">טקסט</th><th class="p-4">חשבון נגדי</th><th class="p-4 text-left">סכום</th></tr></thead><tbody class="divide-y divide-slate-100 bg-white">${rowHtml}</tbody></table></div>
+                <div style="overflow-x:auto"><table class="w-full text-right border-collapse"><thead class="bg-slate-100 text-xs font-bold text-slate-500"><tr><th class="p-4">מספר מסמך חשבונאי</th><th class="p-4">מסמך לחיוב</th><th class="p-4">תאריך תשלום</th><th class="p-4">טקסט</th><th class="p-4">חשבון נגדי</th><th class="p-4 text-left">סכום</th></tr></thead><tbody class="divide-y divide-slate-100 bg-white">${rowHtml}</tbody></table></div>
             </section>`;
         }
 
@@ -9800,6 +9956,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const queryBatchReady = queryBatchDb.length > 0;
             const queriesReady = queryOnlineReady && queryBatchReady;
             const unmatchedTransfersReady = unmatchedTransfersDb.length > 0;
+            const invoiceSearchReady = db.length > 0 || revenueDb.length > 0 || historicalRevenueDb.length > 0 || unmatchedTransfersReady;
 
             const setAccess = (id, enabled, title) => {
                 const element = document.getElementById(id);
@@ -9816,6 +9973,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             setAccess('nav-fees-management', coreReady, coreReady ? 'פתיחת סקירת אגרות העברת בעלות' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
             setAccess('nav-dashboard-report', coreReady, coreReady ? 'הפקת דוח מאוחד' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
             setAccess('nav-unmatched-transfers', unmatchedTransfersReady, unmatchedTransfersReady ? 'פתיחת דוח העברות שטרם הותאמו' : 'נדרש לטעון קובץ העברות שטרם הותאמו');
+            setAccess('nav-invoice-search', invoiceSearchReady, invoiceSearchReady ? 'פתיחת איתור חשבונית' : 'נדרש לטעון לפחות אחד מקובצי החשבוניות או ההעברות');
             const historicalAccessTitle = historicalReady
                 ? 'פתיחת גביית חובות עבר'
                 : (!coreReady
