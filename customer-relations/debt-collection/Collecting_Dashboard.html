@@ -1336,10 +1336,15 @@
         .direct-debit-cycle-stack { display:grid;gap:18px;margin-top:18px;font-family:Arial,Helvetica,sans-serif!important; }
         .direct-debit-cycle-card { overflow:hidden;border:1px solid #cbd9e4;border-radius:10px;background:#fff;font-family:Arial,Helvetica,sans-serif!important; }
         .direct-debit-cycle-card__header { display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;border-bottom:1px solid #dce6ed;background:#f3f8fc;font-family:Arial,Helvetica,sans-serif!important; }
-        .direct-debit-cycle-card__header h3 { margin:0;color:#0b4f7f;font-family:Arial,Helvetica,sans-serif!important;font-size:17px;font-weight:800; }
+        .direct-debit-cycle-card__header h3 { margin:0;color:var(--brand-active);font-family:var(--font-family-base)!important;font-size:var(--font-size-lg);font-weight:700;line-height:1.35; }
         .direct-debit-cycle-card__summary { display:flex;align-items:center;gap:18px;color:#526476;font-family:Arial,Helvetica,sans-serif!important;font-size:12px;font-weight:700; }
         .direct-debit-cycle-card__summary strong { color:#087f5b;font-family:Arial,Helvetica,sans-serif!important;font-size:14px; }
         .direct-debit-cycle-card table { margin:0;font-family:Arial,Helvetica,sans-serif!important; }
+        .direct-debit-cycle-summary { width:100%;border-collapse:collapse;font-family:var(--font-family-base)!important; }
+        .direct-debit-cycle-summary th,.direct-debit-cycle-summary td { padding:11px 14px;border-bottom:1px solid #dce6ed;text-align:right;vertical-align:middle;font-family:var(--font-family-base)!important; }
+        .direct-debit-cycle-summary th { color:var(--color-text-muted);background:#f7f9fb;font-size:12px;font-weight:700; }
+        .direct-debit-cycle-summary td { color:var(--color-text);font-size:13px; }
+        .direct-debit-cycle-summary tbody tr:last-child td { border-bottom:0;background:#eef3f7;font-weight:700; }
         .current-year-metric-value--billed { color: #0b63c8; }
         .current-year-metric-value--collected,
         .current-year-metric-value--future { color: #087f5b; }
@@ -2025,7 +2030,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.19 · 12 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.20 · 12 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -2446,11 +2451,9 @@
                     <i class="fa-solid fa-calendar-check text-emerald-600" aria-hidden="true"></i>
                     <div><h2 style="font-family:Arial,Helvetica,sans-serif">תשלומים צפויים בהוראות קבע</h2><p id="direct-debit-expected-description" class="summary-count-note"></p></div>
                 </div>
-                <section class="historical-kpis" aria-label="סיכום תשלומים צפויים">
-                    <article class="historical-kpi"><span>סכום צפוי</span><strong id="direct-debit-expected-amount">₪0</strong></article>
-                    <article class="historical-kpi"><span>מספר חשבוניות</span><strong id="direct-debit-expected-count">0</strong></article>
-                    <article class="historical-kpi"><span>מספר לקוחות</span><strong id="direct-debit-expected-clients">0</strong></article>
-                </section>
+                <div class="historical-panel__body" aria-label="סיכום פעימות הוראת הקבע">
+                    <table class="direct-debit-cycle-summary"><thead><tr><th>פעימה</th><th>מועד גבייה</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום צפוי</th></tr></thead><tbody id="direct-debit-cycle-summary-body"></tbody></table>
+                </div>
                 <div id="direct-debit-expected-groups" class="direct-debit-cycle-stack"></div>
             </section>
             <section class="historical-panel mt-6">
@@ -3504,6 +3507,23 @@
             }).join('');
         }
 
+        function directDebitCycleLabel(index) {
+            return ['פעימה ראשונה', 'פעימה שנייה', 'פעימה שלישית', 'פעימה רביעית', 'פעימה חמישית'][index] || `פעימה ${index + 1}`;
+        }
+
+        function buildDirectDebitCycleSummaryRows(rows) {
+            const groups = groupDirectDebitRowsByCollectionDate(rows);
+            if (!groups.length) return '<tr><td colspan="5" style="padding:24px;text-align:center;color:#607080">לא נמצאו פעימות הוראת קבע בהתאם למסנן שנבחר.</td></tr>';
+            const groupRows = groups.map((group, index) => {
+                const amount = group.rows.reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+                const clients = new Set(group.rows.map(row => row.code || row.name)).size;
+                return `<tr><td><strong>${directDebitCycleLabel(index)}</strong></td><td>${group.collectionDate.toLocaleDateString('he-IL')}</td><td>${clients.toLocaleString('he-IL')}</td><td>${group.rows.length.toLocaleString('he-IL')}</td><td>${formatCurrency(amount)}</td></tr>`;
+            }).join('');
+            const totalAmount = rows.reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+            const totalClients = new Set(rows.map(row => row.code || row.name)).size;
+            return groupRows + `<tr class="bg-slate-100 font-bold"><td>סה״כ</td><td>${groups.length.toLocaleString('he-IL')} פעימות</td><td>${totalClients.toLocaleString('he-IL')}</td><td>${rows.length.toLocaleString('he-IL')}</td><td>${formatCurrency(totalAmount)}</td></tr>`;
+        }
+
         function directDebitActivityFilterLabel() {
             if (directDebitActivityFilter === 'fees') return 'אגרות העברת בעלות';
             if (directDebitActivityFilter === 'all') return 'כל תחומי הפעילות';
@@ -3557,10 +3577,11 @@
             const description = document.getElementById('direct-debit-expected-description');
             if (description) description.textContent = `כל החשבוניות המתוכננות להוראת קבע, בחלוקה לפעימות גבייה לפי תאריך.`;
             const expectedGroups = document.getElementById('direct-debit-expected-groups');
+            const expectedSummaryBody = document.getElementById('direct-debit-cycle-summary-body');
             const debtBody = document.getElementById('direct-debit-debt-body');
             if (expectedGroups) expectedGroups.innerHTML = buildDirectDebitCycleCards(expectedRows);
+            if (expectedSummaryBody) expectedSummaryBody.innerHTML = buildDirectDebitCycleSummaryRows(expectedRows);
             if (debtBody) debtBody.innerHTML = buildDirectDebitReportTableRows(debtRows);
-            setSummary('expected', expectedRows);
             setSummary('debt', debtRows);
         }
 
@@ -3578,14 +3599,17 @@
                     return `<section class="cycle-frame"><div class="cycle-frame__header"><h2>פעימת הוראת קבע ${group.collectionDate.toLocaleDateString('he-IL')}${index === 0 ? ' · הקרובה' : ''}</h2><span>${clients.toLocaleString('he-IL')} לקוחות · ${group.rows.length.toLocaleString('he-IL')} חשבוניות · ${formatCurrency(amount)}</span></div><table><thead><tr><th>שם הלקוח</th><th>מספר לקוח במרכבה</th><th>מספר מסמך חשבונאי</th><th>מסמך לחיוב</th><th>מועד פירעון</th><th>מועד גבייה</th><th>תיאור השירות</th><th>סכום</th></tr></thead><tbody>${buildDirectDebitReportTableRows(group.rows)}</tbody></table></section>`;
                 }).join('') : '<p>לא נמצאו תשלומים מתוכננים בהתאם למסנן שנבחר.</p>')
                 : `<table><thead><tr><th>שם הלקוח</th><th>מספר לקוח במרכבה</th><th>מספר מסמך חשבונאי</th><th>מסמך לחיוב</th><th>מועד פירעון</th><th>מועד גבייה בהוראת קבע</th><th>תיאור השירות</th><th>סכום</th></tr></thead><tbody>${buildDirectDebitReportTableRows(rows)}</tbody></table>`;
+            const reportSummary = mode === 'expected'
+                ? `<table class="cycle-summary-table"><thead><tr><th>פעימה</th><th>מועד גבייה</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום צפוי</th></tr></thead><tbody>${buildDirectDebitCycleSummaryRows(rows)}</tbody></table>`
+                : `<section class="report-summary"><div>סכום כולל<strong>${formatCurrency(rows.reduce((sum,row)=>sum+(Number(row.amount)||0),0))}</strong></div><div>מספר חשבוניות<strong>${rows.length.toLocaleString('he-IL')}</strong></div><div>מספר לקוחות<strong>${new Set(rows.map(row=>row.code||row.name)).size.toLocaleString('he-IL')}</strong></div></section>`;
             const win = window.open('', '_blank');
             if (!win) { alert('פתיחת חלון הדוח נחסמה.'); return; }
             win.document.write(`<html dir="rtl" lang="he"><head><title>${escapeHtml(title)}</title>${getClientDocumentPrintStyles()}<style>
-                body,table,th,td,h1,h2,p{font-family:Arial,Helvetica,sans-serif!important}.report-heading{border-bottom:2px solid #0b67b5;padding-bottom:10px;margin-bottom:14px}.report-heading h1{font-size:20px;color:#0b3c5d;margin:0 0 5px}.report-heading p{margin:0;color:#64748b}.report-summary{display:flex;gap:12px;margin:14px 0}.report-summary>div{flex:1;border:1px solid #cbd5e1;border-radius:8px;padding:10px}.report-summary strong{display:block;font-size:18px;margin-top:4px;color:#0b67b5}.print-content table{width:100%;border-collapse:collapse}.print-content th{background:#eaf3fb;color:#0b3c5d}.print-content th,.print-content td{border:1px solid #d5dee7;vertical-align:middle;text-align:right}.print-content td:last-child,.print-content th:last-child{text-align:left}.cycle-frame{margin:14px 0 18px;border:1px solid #cbd9e4;border-radius:8px;overflow:hidden;break-inside:avoid}.cycle-frame__header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 11px;background:#f3f8fc;border-bottom:1px solid #dce6ed}.cycle-frame__header h2{margin:0;color:#0b4f7f;font-size:13pt}.cycle-frame__header span{color:#526476;font-size:8.5pt;font-weight:700}
+                body,table,th,td,h1,h2,p{font-family:Arial,Helvetica,sans-serif!important}.report-heading{border-bottom:2px solid #0b67b5;padding-bottom:10px;margin-bottom:14px}.report-heading h1{font-size:20px;color:#0b3c5d;margin:0 0 5px}.report-heading p{margin:0;color:#64748b}.report-summary{display:flex;gap:12px;margin:14px 0}.report-summary>div{flex:1;border:1px solid #cbd5e1;border-radius:8px;padding:10px}.report-summary strong{display:block;font-size:18px;margin-top:4px;color:#0b67b5}.print-content table{width:100%;border-collapse:collapse}.print-content th{background:#eaf3fb;color:#0b3c5d}.print-content th,.print-content td{border:1px solid #d5dee7;vertical-align:middle;text-align:right}.print-content td:last-child,.print-content th:last-child{text-align:left}.cycle-summary-table{width:100%;margin:14px 0 18px;border-collapse:collapse}.cycle-summary-table th,.cycle-summary-table td{padding:8px 10px;border:1px solid #d5dee7;text-align:right;vertical-align:middle}.cycle-summary-table th{background:#eaf3fb;color:#0b3c5d;font-weight:700}.cycle-summary-table tbody tr:last-child td{background:#eef3f7;font-weight:700}.cycle-frame{margin:14px 0 18px;border:1px solid #cbd9e4;border-radius:8px;overflow:hidden;break-inside:avoid}.cycle-frame__header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 11px;background:#f3f8fc;border-bottom:1px solid #dce6ed}.cycle-frame__header h2{margin:0;color:#0b4f7f;font-family:Arial,Helvetica,sans-serif!important;font-size:11pt;font-weight:700;line-height:1.35}.cycle-frame__header span{color:#526476;font-size:8.5pt;font-weight:700}
                 @page{size:A4 landscape;margin:0}
             </style></head><body>${getClientDocumentPageStart(title)}
                 <section class="report-heading"><h1>${escapeHtml(title)}</h1><p>${escapeHtml(subtitle)}</p></section>
-                <section class="report-summary"><div>סכום כולל<strong>${formatCurrency(rows.reduce((sum,row)=>sum+(Number(row.amount)||0),0))}</strong></div><div>מספר חשבוניות<strong>${rows.length.toLocaleString('he-IL')}</strong></div><div>מספר לקוחות<strong>${new Set(rows.map(row=>row.code||row.name)).size.toLocaleString('he-IL')}</strong></div></section>
+                ${reportSummary}
                 ${reportBody}
                 ${getClientDocumentPageEnd()}<script>window.addEventListener('load',()=>setTimeout(()=>window.print(),350));<\/script></body></html>`);
             win.document.close();
