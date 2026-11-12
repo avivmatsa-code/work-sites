@@ -1326,10 +1326,13 @@
         .current-year-metric-note {
             align-self: end;
             color: #8b9bb0;
+            font-family: Arial, Helvetica, sans-serif !important;
             font-size: 10px;
             font-weight: 700;
             line-height: 1.35;
         }
+        .current-year-metric-note__direct-debit { display:block;margin-top:3px;color:#087f5b;font-family:Arial,Helvetica,sans-serif!important;font-weight:700; }
+        .direct-debit-due-note { display:block;margin-top:3px;color:#087f5b;font-family:Arial,Helvetica,sans-serif!important;font-size:10px;font-weight:700;line-height:1.3; }
         .current-year-metric-value--billed { color: #0b63c8; }
         .current-year-metric-value--collected,
         .current-year-metric-value--future { color: #087f5b; }
@@ -2015,7 +2018,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.15 · 9 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.16 · 12 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -2138,6 +2141,9 @@
             </button>
             <button id="nav-unmatched-transfers" class="suite-nav__item" type="button" onclick="navigateToScreen('unmatched-transfers')" disabled>
                 <i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i><span>דוח העברות שטרם הותאמו</span>
+            </button>
+            <button id="nav-direct-debit" class="suite-nav__item" type="button" onclick="navigateToScreen('direct-debit')" disabled>
+                <i class="fa-solid fa-building-columns" aria-hidden="true"></i><span>דוחות הוראת קבע</span>
             </button>
             <div class="suite-sidebar__section-label">כלים</div>
             <button id="nav-invoice-search" class="suite-nav__item" type="button" onclick="navigateToScreen('invoice-search')" disabled>
@@ -2399,6 +2405,48 @@
         </main>
     </div>
 
+    <!-- DIRECT DEBIT REPORTS SCREEN -->
+    <div id="direct-debit-container" class="suite-screen hidden flex-col flex-grow">
+        <header class="app-header no-print">
+            <div class="app-header__inner">
+                <div class="government-brand">
+                    <img class="government-logo" src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה והבטיחות בדרכים">
+                    <div><div class="ministry-name">משרד התחבורה והבטיחות בדרכים</div><div class="department-name">אגף טכנולוגיות דיגיטליות ומידע</div></div>
+                </div>
+                <div class="app-identity"><div class="app-title-row"><h1 class="app-title">דוחות הוראת קבע</h1><span class="beta-badge">BETA</span></div><div class="system-date"></div></div>
+                <div class="header-actions" aria-hidden="true"></div>
+            </div>
+        </header>
+        <main class="historical-screen-main flex-grow" style="font-family:Arial,Helvetica,sans-serif">
+            <section class="historical-panel">
+                <div class="historical-panel__header">
+                    <i class="fa-solid fa-calendar-check text-emerald-600" aria-hidden="true"></i>
+                    <div><h2 style="font-family:Arial,Helvetica,sans-serif">תשלומים צפויים בהוראת הקבע הקרובה</h2><p id="direct-debit-expected-description" class="summary-count-note"></p></div>
+                    <button type="button" class="button-secondary button-secondary--brand no-print" onclick="printDirectDebitReport('expected')"><i class="fa-solid fa-print" aria-hidden="true"></i>הפקת דוח</button>
+                </div>
+                <section class="historical-kpis" aria-label="סיכום תשלומים צפויים">
+                    <article class="historical-kpi"><span>סכום צפוי</span><strong id="direct-debit-expected-amount">₪0</strong></article>
+                    <article class="historical-kpi"><span>מספר חשבוניות</span><strong id="direct-debit-expected-count">0</strong></article>
+                    <article class="historical-kpi"><span>מספר לקוחות</span><strong id="direct-debit-expected-clients">0</strong></article>
+                </section>
+                <div class="historical-panel__body"><table><thead><tr><th>שם הלקוח</th><th>מספר לקוח במרכבה</th><th>מספר מסמך חשבונאי</th><th>מסמך לחיוב</th><th>מועד פירעון</th><th>מועד גבייה צפוי</th><th>תיאור השירות</th><th>סכום</th></tr></thead><tbody id="direct-debit-expected-body"></tbody></table></div>
+            </section>
+            <section class="historical-panel mt-6">
+                <div class="historical-panel__header">
+                    <i class="fa-solid fa-triangle-exclamation text-red-600" aria-hidden="true"></i>
+                    <div><h2 style="font-family:Arial,Helvetica,sans-serif">חובות של לקוחות הוראת קבע</h2><p class="summary-count-note">חשבוניות שמועד הגבייה שלהן בהוראת קבע כבר חלף.</p></div>
+                    <button type="button" class="button-secondary button-secondary--brand no-print" onclick="printDirectDebitReport('debt')"><i class="fa-solid fa-print" aria-hidden="true"></i>הפקת דוח</button>
+                </div>
+                <section class="historical-kpis" aria-label="סיכום חובות הוראת קבע">
+                    <article class="historical-kpi"><span>חוב בפיגור</span><strong id="direct-debit-debt-amount" style="color:#c51e2b">₪0</strong></article>
+                    <article class="historical-kpi"><span>מספר חשבוניות</span><strong id="direct-debit-debt-count">0</strong></article>
+                    <article class="historical-kpi"><span>מספר לקוחות</span><strong id="direct-debit-debt-clients">0</strong></article>
+                </section>
+                <div class="historical-panel__body"><table><thead><tr><th>שם הלקוח</th><th>מספר לקוח במרכבה</th><th>מספר מסמך חשבונאי</th><th>מסמך לחיוב</th><th>מועד פירעון</th><th>מועד גבייה בהוראת קבע</th><th>תיאור השירות</th><th>סכום</th></tr></thead><tbody id="direct-debit-debt-body"></tbody></table></div>
+            </section>
+        </main>
+    </div>
+
     <!-- UNMATCHED TRANSFERS REPORT SCREEN -->
     <div id="unmatched-transfers-container" class="suite-screen hidden flex-col flex-grow">
         <header class="app-header no-print">
@@ -2640,7 +2688,7 @@
                 <article class="historical-kpi"><span>חיובים שהופקו</span><strong id="management-kpi-billed">₪0</strong><small>סך החיובים שהופקו בשנת העבודה</small></article>
                 <article class="historical-kpi"><span id="management-collection-title">גבייה שוטפת</span><strong id="management-kpi-collected">₪0</strong><small class="collection-card-breakdown"><span>חשבוניות <b class="report-year-label"></b><b id="management-current-year-collected">₪0</b></span><span id="management-transition-part">דצמבר <b class="previous-year-label"></b><b id="management-transition-collected">₪0</b></span></small></article>
                 <article class="historical-kpi"><span>חוב בפיגור</span><strong id="management-kpi-overdue">₪0</strong><small>חשבוניות פתוחות שמועד פירעונן עבר</small></article>
-                <article class="historical-kpi"><span>צפי גבייה עתידי</span><strong id="management-kpi-future">₪0</strong><small>חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></article>
+                <article class="historical-kpi"><span>צפי גבייה עתידי</span><strong id="management-kpi-future">₪0</strong><small id="management-kpi-future-note">חשבוניות פתוחות שמועד פירעונן טרם הגיע או ממתינות להוראת קבע</small></article>
             </section>
             <section class="past-debt-summary" aria-label="חוב משנים קודמות בשירותי מידע">
                 <article id="management-historical-card" class="past-debt-card past-debt-card--collected hidden"><span>נגבה בשנת <b class="report-year-label"></b></span><strong id="management-historical-collected">₪0</strong><small>חובות משנים קודמות שנגבו בשנת העבודה</small></article>
@@ -2792,7 +2840,7 @@
                 <article class="historical-kpi"><span>חיובים שהופקו</span><strong id="fees-management-kpi-billed">₪0</strong><small>סך החיובים שהופקו בשנת העבודה</small></article>
                 <article class="historical-kpi"><span id="fees-management-collection-title">גבייה שוטפת</span><strong id="fees-management-kpi-collected">₪0</strong><small class="collection-card-breakdown"><span>חשבוניות <b class="report-year-label"></b><b id="fees-management-current-year-collected">₪0</b></span><span id="fees-management-transition-part">דצמבר <b class="previous-year-label"></b><b id="fees-management-transition-collected">₪0</b></span></small></article>
                 <article class="historical-kpi"><span>חוב בפיגור</span><strong id="fees-management-kpi-overdue">₪0</strong><small>חשבוניות פתוחות שמועד פירעונן עבר</small></article>
-                <article class="historical-kpi"><span>צפי גבייה עתידי</span><strong id="fees-management-kpi-future">₪0</strong><small>חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></article>
+                <article class="historical-kpi"><span>צפי גבייה עתידי</span><strong id="fees-management-kpi-future">₪0</strong><small id="fees-management-kpi-future-note">חשבוניות פתוחות שמועד פירעונן טרם הגיע או ממתינות להוראת קבע</small></article>
             </section>
             <section class="past-debt-summary" aria-label="חוב משנים קודמות באגרות העברת בעלות">
                 <article id="fees-management-historical-card" class="past-debt-card past-debt-card--collected hidden"><span>נגבה בשנת <b class="report-year-label"></b></span><strong id="fees-management-historical-collected">₪0</strong><small>חובות משנים קודמות שנגבו בשנת העבודה</small></article>
@@ -3319,6 +3367,141 @@
         let CURRENT_YEAR = TODAY.getFullYear();
         const FEE_KEYWORDS = ['אגרה', 'אגרות', 'בעלות', 'רישיון'];
 
+        function getDirectDebitCollectionDate(dueDate) {
+            if (!isValidDate(dueDate)) return null;
+            const due = new Date(dueDate);
+            due.setHours(0, 0, 0, 0);
+            let collectionDate = new Date(due.getFullYear(), due.getMonth(), 17);
+            collectionDate.setHours(0, 0, 0, 0);
+            if (collectionDate <= due) collectionDate = new Date(due.getFullYear(), due.getMonth() + 1, 17);
+            collectionDate.setHours(0, 0, 0, 0);
+            return collectionDate;
+        }
+
+        function getUpcomingDirectDebitDate(referenceDate = TODAY) {
+            const reference = new Date(referenceDate);
+            reference.setHours(0, 0, 0, 0);
+            const candidate = new Date(reference.getFullYear(), reference.getMonth(), 17);
+            candidate.setHours(0, 0, 0, 0);
+            return reference <= candidate ? candidate : new Date(reference.getFullYear(), reference.getMonth() + 1, 17);
+        }
+
+        function isDirectDebitAwaitingCollection(row, referenceDate = TODAY) {
+            if (!row?.isDirectDebit || !isValidDate(row.dueDate)) return false;
+            const reference = new Date(referenceDate);
+            reference.setHours(0, 0, 0, 0);
+            const collectionDate = row.directDebitCollectionDate || getDirectDebitCollectionDate(row.dueDate);
+            return row.dueDate < reference && isValidDate(collectionDate) && reference <= collectionDate;
+        }
+
+        function isInvoiceOverdue(dueDate, isDirectDebit = false, referenceDate = TODAY) {
+            if (!isValidDate(dueDate)) return false;
+            const reference = new Date(referenceDate);
+            reference.setHours(0, 0, 0, 0);
+            if (dueDate >= reference) return false;
+            if (!isDirectDebit) return true;
+            const collectionDate = getDirectDebitCollectionDate(dueDate);
+            return isValidDate(collectionDate) && reference > collectionDate;
+        }
+
+        function isUpcomingDirectDebitInvoice(row, referenceDate = TODAY) {
+            if (!row?.isDirectDebit || !isValidDate(row.dueDate)) return false;
+            const collectionDate = row.directDebitCollectionDate || getDirectDebitCollectionDate(row.dueDate);
+            const upcomingDate = getUpcomingDirectDebitDate(referenceDate);
+            return isValidDate(collectionDate) && collectionDate.getTime() === upcomingDate.getTime() && !row.isOverdue;
+        }
+
+        function sumUpcomingDirectDebit(rows, referenceDate = TODAY) {
+            return rows.filter(row => isUpcomingDirectDebitInvoice(row, referenceDate)).reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+        }
+
+        function formatLocalIsoDate(date) {
+            if (!isValidDate(date)) return null;
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        function formatInvoiceDueDate(row, options = {}) {
+            if (!isValidDate(row?.dueDate)) return 'אין מידע';
+            const dateText = row.dueDate.toLocaleDateString('he-IL');
+            if (!isDirectDebitAwaitingCollection(row)) return dateText;
+            const collectionDate = row.directDebitCollectionDate || getDirectDebitCollectionDate(row.dueDate);
+            const note = `לתשלום בהוראת קבע ב-${collectionDate.toLocaleDateString('he-IL')}`;
+            if (options.plainText) return `${dateText} (${note})`;
+            return `${dateText}<span class="direct-debit-due-note">${note}</span>`;
+        }
+
+        function getDirectDebitReportRows(mode) {
+            const rows = mode === 'debt'
+                ? db.filter(row => row.isDirectDebit && row.isOverdue)
+                : db.filter(row => isUpcomingDirectDebitInvoice(row));
+            return rows.slice().sort((a, b) => {
+                const dateDiff = (a.directDebitCollectionDate?.getTime() || 0) - (b.directDebitCollectionDate?.getTime() || 0);
+                return dateDiff || String(a.name || '').localeCompare(String(b.name || ''), 'he') || String(a.doc || '').localeCompare(String(b.doc || ''), 'he');
+            });
+        }
+
+        function buildDirectDebitReportTableRows(rows, includeTotal = true) {
+            const body = rows.map(row => {
+                const collectionDate = row.directDebitCollectionDate || getDirectDebitCollectionDate(row.dueDate);
+                return `<tr>
+                    <td><strong>${escapeHtml(row.name || '')}</strong></td>
+                    <td><bdi dir="ltr">${escapeHtml(row.code || getClientCode(row.name) || '')}</bdi></td>
+                    <td><bdi dir="ltr">${escapeHtml(String(row.doc || ''))}</bdi></td>
+                    <td><bdi dir="ltr">${escapeHtml(String(row.billingDocument || ''))}</bdi></td>
+                    <td>${isValidDate(row.dueDate) ? row.dueDate.toLocaleDateString('he-IL') : 'אין מידע'}</td>
+                    <td>${isValidDate(collectionDate) ? collectionDate.toLocaleDateString('he-IL') : 'אין מידע'}</td>
+                    <td>${escapeHtml(row.desc || '')}</td>
+                    <td>${formatCurrency(Number(row.amount) || 0)}</td>
+                </tr>`;
+            }).join('');
+            if (!includeTotal || !rows.length) return body || '<tr><td colspan="8" style="text-align:center;color:#64748b">לא נמצאו חשבוניות להצגה.</td></tr>';
+            const total = rows.reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+            return body + `<tr class="bg-slate-100 font-bold"><td colspan="6">סה״כ</td><td>${rows.length.toLocaleString('he-IL')} חשבוניות</td><td>${formatCurrency(total)}</td></tr>`;
+        }
+
+        function renderDirectDebitReports() {
+            const expectedRows = getDirectDebitReportRows('expected');
+            const debtRows = getDirectDebitReportRows('debt');
+            const upcomingDate = getUpcomingDirectDebitDate();
+            const setSummary = (prefix, rows) => {
+                const amount = rows.reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+                const amountElement = document.getElementById(`direct-debit-${prefix}-amount`);
+                const countElement = document.getElementById(`direct-debit-${prefix}-count`);
+                const clientsElement = document.getElementById(`direct-debit-${prefix}-clients`);
+                if (amountElement) amountElement.textContent = formatCurrency(amount);
+                if (countElement) countElement.textContent = rows.length.toLocaleString('he-IL');
+                if (clientsElement) clientsElement.textContent = new Set(rows.map(row => row.code || row.name)).size.toLocaleString('he-IL');
+            };
+            const description = document.getElementById('direct-debit-expected-description');
+            if (description) description.textContent = `חשבוניות הצפויות להיגבות במחזור הוראת הקבע של ${upcomingDate.toLocaleDateString('he-IL')}.`;
+            const expectedBody = document.getElementById('direct-debit-expected-body');
+            const debtBody = document.getElementById('direct-debit-debt-body');
+            if (expectedBody) expectedBody.innerHTML = buildDirectDebitReportTableRows(expectedRows);
+            if (debtBody) debtBody.innerHTML = buildDirectDebitReportTableRows(debtRows);
+            setSummary('expected', expectedRows);
+            setSummary('debt', debtRows);
+        }
+
+        function printDirectDebitReport(mode) {
+            const rows = getDirectDebitReportRows(mode);
+            const upcomingDate = getUpcomingDirectDebitDate();
+            const title = mode === 'debt' ? 'דוח חובות של לקוחות הוראת קבע' : 'דוח תשלומים צפויים בהוראת הקבע הקרובה';
+            const subtitle = mode === 'debt'
+                ? 'חשבוניות שמועד הגבייה שלהן בהוראת קבע כבר חלף'
+                : `מחזור הגבייה הצפוי בתאריך ${upcomingDate.toLocaleDateString('he-IL')}`;
+            const win = window.open('', '_blank');
+            if (!win) { alert('פתיחת חלון הדוח נחסמה.'); return; }
+            win.document.write(`<html dir="rtl" lang="he"><head><title>${escapeHtml(title)}</title>${getClientDocumentPrintStyles()}<style>
+                body,table,th,td,h1,h2,p{font-family:Arial,Helvetica,sans-serif!important}.report-heading{border-bottom:2px solid #0b67b5;padding-bottom:10px;margin-bottom:14px}.report-heading h1{font-size:20px;color:#0b3c5d;margin:0 0 5px}.report-heading p{margin:0;color:#64748b}.report-summary{display:flex;gap:12px;margin:14px 0}.report-summary>div{flex:1;border:1px solid #cbd5e1;border-radius:8px;padding:10px}.report-summary strong{display:block;font-size:18px;margin-top:4px;color:#0b67b5}.print-content table{width:100%;border-collapse:collapse}.print-content th{background:#eaf3fb;color:#0b3c5d}.print-content th,.print-content td{border:1px solid #d5dee7;vertical-align:middle;text-align:right}.print-content td:last-child,.print-content th:last-child{text-align:left}
+                @page{size:A4 landscape;margin:0}
+            </style></head><body>${getClientDocumentPageStart(title)}
+                <section class="report-heading"><h1>${escapeHtml(title)}</h1><p>${escapeHtml(subtitle)}</p></section>
+                <section class="report-summary"><div>סכום כולל<strong>${formatCurrency(rows.reduce((sum,row)=>sum+(Number(row.amount)||0),0))}</strong></div><div>מספר חשבוניות<strong>${rows.length.toLocaleString('he-IL')}</strong></div><div>מספר לקוחות<strong>${new Set(rows.map(row=>row.code||row.name)).size.toLocaleString('he-IL')}</strong></div></section>
+                <table><thead><tr><th>שם הלקוח</th><th>מספר לקוח במרכבה</th><th>מספר מסמך חשבונאי</th><th>מסמך לחיוב</th><th>מועד פירעון</th><th>מועד גבייה בהוראת קבע</th><th>תיאור השירות</th><th>סכום</th></tr></thead><tbody>${buildDirectDebitReportTableRows(rows)}</tbody></table>
+                ${getClientDocumentPageEnd()}<script>window.addEventListener('load',()=>setTimeout(()=>window.print(),350));<\/script></body></html>`);
+            win.document.close();
+        }
+
         // Historical collections screen state. All dates are evaluated
         // relative to CURRENT_YEAR so changing the work year recalculates
         // both the matching year and the December cutoff dynamically.
@@ -3351,6 +3534,7 @@
             queries: 'queries-container',
             management: 'management-container',
             'fees-management': 'fees-management-container',
+            'direct-debit': 'direct-debit-container',
             'unmatched-transfers': 'unmatched-transfers-container'
         };
 
@@ -3365,7 +3549,7 @@
             }
             const coreReady = db.length > 0 && revenueDb.length > 0;
             const queriesReady = queryOnlineDb.length > 0 && queryBatchDb.length > 0;
-            if ((screen === 'dashboard' || screen === 'debt' || screen === 'debtor-finder' || screen === 'management' || screen === 'fees-management') && !coreReady) screen = 'sources';
+            if ((screen === 'dashboard' || screen === 'debt' || screen === 'debtor-finder' || screen === 'management' || screen === 'fees-management' || screen === 'direct-debit') && !coreReady) screen = 'sources';
             if (screen === 'historical' && (!coreReady || historicalRevenueDb.length === 0)) screen = 'sources';
             if (screen === 'queries' && !queriesReady) screen = 'sources';
             if (screen === 'unmatched-transfers' && unmatchedTransfersDb.length === 0) screen = 'sources';
@@ -3406,6 +3590,8 @@
                 renderManagementReport();
             } else if (screen === 'fees-management') {
                 renderFeesManagementReport();
+            } else if (screen === 'direct-debit') {
+                renderDirectDebitReports();
             } else if (screen === 'unmatched-transfers') {
                 renderUnmatchedTransfersReport();
             } else if (screen === 'invoice-search') {
@@ -3772,7 +3958,7 @@
             const currentOpen = debts.filter(row => isValidDate(row.dueDate) && row.dueDate.getFullYear() === CURRENT_YEAR).reduce((sum,row) => sum + (Number(row.amount) || 0), 0);
             const transition = historicalRevenueDb.length ? getYearTransitionRows(row => adminActivityMatches(row, activity) && adminSectorMatches(row, sector)).reduce((sum,row) => sum + row.amount, 0) : 0;
             const historicalCollected = historicalRevenueDb.length ? getEligibleHistoricalRows().filter(row => adminActivityMatches(row, activity) && adminSectorMatches(row, sector)).reduce((sum,row) => sum + row.amount, 0) : null;
-            return { year:CURRENT_YEAR, activity, sector, clients:new Set([...debts,...revenues].map(row => row.code)).size, billed, currentYearCollected:Math.max(0,billed-currentOpen), previousDecemberCollected:transition, ongoingCollected:Math.max(0,billed-currentOpen)+transition, historicalCollected, overdueDebt:overdue, futurePayments:future, openInvoices:debts.length, loadedSources:{ debts:Boolean(db.length), revenues:Boolean(revenueDb.length), historical:Boolean(historicalRevenueDb.length), queries:Boolean(queryOnlineDb.length && queryBatchDb.length), unmatchedTransfers:Boolean(unmatchedTransfersDb.length) } };
+            return { year:CURRENT_YEAR, activity, sector, clients:new Set([...debts,...revenues].map(row => row.code)).size, billed, currentYearCollected:Math.max(0,billed-currentOpen), previousDecemberCollected:transition, ongoingCollected:Math.max(0,billed-currentOpen)+transition, historicalCollected, overdueDebt:overdue, futurePayments:future, upcomingDirectDebit:sumUpcomingDirectDebit(debts), upcomingDirectDebitDate:formatLocalIsoDate(getUpcomingDirectDebitDate()), openInvoices:debts.length, loadedSources:{ debts:Boolean(db.length), revenues:Boolean(revenueDb.length), historical:Boolean(historicalRevenueDb.length), queries:Boolean(queryOnlineDb.length && queryBatchDb.length), unmatchedTransfers:Boolean(unmatchedTransfersDb.length) } };
         }
 
         function adminClientOverview(args = {}) {
@@ -3789,7 +3975,7 @@
             const overdueRows = debts.filter(row => row.isOverdue);
             const futureRows = debts.filter(row => !row.isOverdue);
             const queryRows = getAllQueryData().filter(row => row.clientId === normalizeClientCodeValue(getClientCode(name)));
-            return { ok:true, name, clientCode:getClientCode(name), payerCodes:getPayerCodes(name), sector:getCustomerSector(name), directDebit:hasDirectDebit(name), year:CURRENT_YEAR, billed, currentYearCollected:Math.max(0,billed-currentOpen), previousDecemberCollected:transition, ongoingCollected:Math.max(0,billed-currentOpen)+transition, historicalCollected, overdueDebt:overdueRows.reduce((sum,row)=>sum+row.amount,0), futurePayments:futureRows.reduce((sum,row)=>sum+row.amount,0), overdueInvoices:overdueRows.length, futureInvoices:futureRows.length, oldestDueDate:overdueRows.filter(row=>isValidDate(row.dueDate)).sort((a,b)=>a.dueDate-b.dueDate)[0]?.dueDate?.toISOString().slice(0,10) || null, unmatchedTransfers:getUnmatchedTransfersForClient(name).length, queryConsumption:queryRows.length ? queryRows.reduce((sum,row)=>sum+row.amount,0) : null };
+            return { ok:true, name, clientCode:getClientCode(name), payerCodes:getPayerCodes(name), sector:getCustomerSector(name), directDebit:hasDirectDebit(name), year:CURRENT_YEAR, billed, currentYearCollected:Math.max(0,billed-currentOpen), previousDecemberCollected:transition, ongoingCollected:Math.max(0,billed-currentOpen)+transition, historicalCollected, overdueDebt:overdueRows.reduce((sum,row)=>sum+row.amount,0), futurePayments:futureRows.reduce((sum,row)=>sum+row.amount,0), upcomingDirectDebit:sumUpcomingDirectDebit(debts), upcomingDirectDebitDate:formatLocalIsoDate(getUpcomingDirectDebitDate()), overdueInvoices:overdueRows.length, futureInvoices:futureRows.length, oldestDueDate:formatLocalIsoDate(overdueRows.filter(row=>isValidDate(row.dueDate)).sort((a,b)=>a.dueDate-b.dueDate)[0]?.dueDate), unmatchedTransfers:getUnmatchedTransfersForClient(name).length, queryConsumption:queryRows.length ? queryRows.reduce((sum,row)=>sum+row.amount,0) : null };
         }
 
         function adminFindClients(args = {}) {
@@ -3808,7 +3994,52 @@
             if (status === 'overdue') rows = rows.filter(row => row.isOverdue);
             if (status === 'future') rows = rows.filter(row => !row.isOverdue);
             rows = rows.sort((a,b) => (a.dueDate?.getTime() || 0) - (b.dueDate?.getTime() || 0)).slice(0,limit);
-            return { client:resolved.name, status, count:rows.length, invoices:rows.map(row => ({ document:String(row.doc), dueDate:isValidDate(row.dueDate)?row.dueDate.toISOString().slice(0,10):null, description:String(row.desc||''), amount:Number(row.amount)||0, overdue:Boolean(row.isOverdue) })) };
+            return { client:resolved.name, status, count:rows.length, invoices:rows.map(row => ({ document:String(row.doc), billingDocument:String(row.billingDocument||''), dueDate:formatLocalIsoDate(row.dueDate), expectedDirectDebitDate:formatLocalIsoDate(row.directDebitCollectionDate), description:String(row.desc||''), amount:Number(row.amount)||0, directDebit:Boolean(row.isDirectDebit), awaitingDirectDebit:isDirectDebitAwaitingCollection(row), overdue:Boolean(row.isOverdue) })) };
+        }
+
+        function normalizeInvoiceSearchText(value) {
+            return String(value || '').toLocaleLowerCase('he').replace(/["'׳״`\-–—_.,;:()[\]{}\/\\\s]/g, '');
+        }
+
+        function adminSearchInvoiceText(args = {}) {
+            const query = String(args.query || '').trim();
+            if (!query) return { ok:false, error:'יש להזין טקסט לחיפוש.' };
+            const queryKey = normalizeInvoiceSearchText(query);
+            const dataset = ['issued','open','matched','all'].includes(args.dataset) ? args.dataset : 'issued';
+            const activity = args.activity || 'all';
+            const requestedSector = args.sector || 'all';
+            const requestedYear = Number(args.year) || null;
+            const limit = Math.min(Math.max(Number(args.limit) || 100, 1), 300);
+            const sources = [];
+            const addRows = (rows, source) => rows.forEach(row => sources.push({ row, source }));
+            if (dataset === 'issued' || dataset === 'all') addRows(revenueDb, 'חיובים שהופקו');
+            if (dataset === 'open' || dataset === 'all') addRows(db, 'חשבוניות פתוחות');
+            if (dataset === 'matched' || dataset === 'all') addRows(historicalRevenueDb, 'חשבוניות שהותאמו');
+            const seen = new Set();
+            const matches = sources.filter(item => {
+                const row = item.row;
+                const uniqueKey = `${item.source}|${row.doc}|${row.code}|${row.amount}`;
+                if (seen.has(uniqueKey)) return false;
+                seen.add(uniqueKey);
+                if (!adminGenericActivityMatches(row, activity)) return false;
+                const sector = adminRowSector(row);
+                if (requestedSector !== 'all' && sector !== requestedSector) return false;
+                const year = item.source === 'חשבוניות שהותאמו'
+                    ? adminAnalysisYear(row, 'document', ['match'])
+                    : (item.source === 'חיובים שהופקו' ? adminAnalysisYear(row, 'report', ['document']) : adminAnalysisYear(row, 'due', ['document']));
+                if (requestedYear && year !== requestedYear) return false;
+                const searchableText = [row.desc, row.name, row.doc, row.billingDocument, row.counterpartyName].map(normalizeInvoiceSearchText).join('|');
+                return searchableText.includes(queryKey);
+            }).map(item => {
+                const row = item.row;
+                const year = item.source === 'חשבוניות שהותאמו'
+                    ? adminAnalysisYear(row, 'document', ['match'])
+                    : (item.source === 'חיובים שהופקו' ? adminAnalysisYear(row, 'report', ['document']) : adminAnalysisYear(row, 'due', ['document']));
+                return { source:item.source, document:String(row.doc||''), billingDocument:String(row.billingDocument||''), client:String(row.name||''), clientCode:String(row.code||''), sector:adminRowSector(row), year, description:String(row.desc||''), amount:Number(row.amount)||0 };
+            });
+            const byYear = [...matches.reduce((map,row)=>map.set(row.year,(map.get(row.year)||0)+1),new Map()).entries()].sort((a,b)=>(b[0]||0)-(a[0]||0)).map(([year,count])=>({year,count}));
+            const bySector = [...matches.reduce((map,row)=>map.set(row.sector,(map.get(row.sector)||0)+1),new Map()).entries()].sort((a,b)=>b[1]-a[1]).map(([sector,count])=>({sector,count}));
+            return { query, dataset, count:matches.length, totalAmount:matches.reduce((sum,row)=>sum+row.amount,0), byYear, bySector, truncated:matches.length>limit, invoices:matches.slice(0,limit) };
         }
 
         function adminFindDebtors(args = {}) {
@@ -3863,6 +4094,7 @@
             {name:'find_clients',description:'מחפש לקוחות לפי חלק משם או מספר מרכבה.',parameters:{type:'OBJECT',properties:{query:{type:'STRING'},limit:{type:'NUMBER'}},required:['query']}},
             {name:'get_client_overview',description:'מחזיר תמונת מצב מלאה של לקוח.',parameters:{type:'OBJECT',properties:{client:{type:'STRING'},activity:{type:'STRING',enum:['all','info','fees']}},required:['client']}},
             {name:'list_client_invoices',description:'מחזיר חשבוניות פתוחות, בפיגור או עתידיות של לקוח.',parameters:{type:'OBJECT',properties:{client:{type:'STRING'},status:{type:'STRING',enum:['open','overdue','future']},activity:{type:'STRING',enum:['all','info','fees']},limit:{type:'NUMBER'}},required:['client']}},
+            {name:'search_invoice_text',description:'מחפש בתוך הטקסט ותיאור השירות של החשבוניות ומחזיר ספירה, סכום, פילוח ורשימת חשבוניות. חובה להשתמש בכלי זה לשאלות כגון כמה חשבוניות יצאו לנת״צ, לטוקנים או לכל שירות או מונח אחר.',parameters:{type:'OBJECT',properties:{query:{type:'STRING',description:'המילה או הביטוי לחיפוש בטקסט החשבונית'},dataset:{type:'STRING',enum:['issued','open','matched','all'],description:'issued לחיובים שהופקו; open לפתוחות; matched למותאמות; all לכל המקורות'},activity:{type:'STRING',enum:['all','info','fees']},sector:{type:'STRING'},year:{type:'NUMBER'},limit:{type:'NUMBER'}},required:['query']}},
             {name:'find_debtors',description:'מאתר לקוחות לפי מספר חשבוניות וגובה חוב בפיגור, עם מסנני פעילות, סקטור ושנים.',parameters:{type:'OBJECT',properties:{min_invoices:{type:'NUMBER'},min_amount:{type:'NUMBER'},activity:{type:'STRING',enum:['all','info','fees']},sector:{type:'STRING'},from_year:{type:'NUMBER'},to_year:{type:'NUMBER'},limit:{type:'NUMBER'}}}},
             {name:'get_monthly_summary',description:'מחזיר סיכום חודשי של חיובים, גבייה ויתרה לשנה, לכלל הנתונים או ללקוח.',parameters:{type:'OBJECT',properties:{year:{type:'NUMBER'},client:{type:'STRING'},activity:{type:'STRING',enum:['all','info','fees']}}}},
             {name:'show_chart',description:'מציג גרף בשיחה. יש להשתמש רק בערכים שהוחזרו מכלי נתונים.',parameters:{type:'OBJECT',properties:{title:{type:'STRING'},labels:{type:'ARRAY',items:{type:'STRING'}},values:{type:'ARRAY',items:{type:'NUMBER'}},dataset_label:{type:'STRING'},chart_type:{type:'STRING',enum:['bar','line','doughnut']}},required:['title','labels','values']}},
@@ -3879,6 +4111,7 @@
             if(name==='find_clients')return adminFindClients(args);
             if(name==='get_client_overview')return adminClientOverview(args);
             if(name==='list_client_invoices')return adminListInvoices(args);
+            if(name==='search_invoice_text')return adminSearchInvoiceText(args);
             if(name==='find_debtors')return adminFindDebtors(args);
             if(name==='get_monthly_summary')return adminMonthlySummary(args);
             if(name==='show_chart')return queueAdminChart(args);
@@ -3899,7 +4132,7 @@
 - גבייה שוטפת: גבייה מחשבוניות שנת העבודה ועוד גביית דצמבר של השנה הקודמת.
 - גביית חובות עבר: חשבוניות שהופקו לפני דצמבר של השנה הקודמת והותאמו בשנת העבודה. זהו מדד נפרד שאינו נכלל בגבייה השוטפת.
 - חוב בפיגור: חשבוניות פתוחות שמועד הפירעון שלהן עבר.
-- תשלומים עתידיים או צפי גבייה עתידי: חשבוניות פתוחות שמועד פירעונן טרם הגיע.
+- תשלומים עתידיים או צפי גבייה עתידי: חשבוניות פתוחות שמועד גבייתן טרם הגיע. אצל לקוח בהוראת קבע, גם חשבונית שמועד פירעונה חלף נשארת בצפי עד שיעבור ה־17 הראשון שלאחר מועד הפירעון; רק מהיום שלאחר אותו 17 היא חוב בפיגור.
 - חוב משנים קודמות: יתרת חשבוניות פתוחות משנות עבודה קודמות.
 - העברות שטרם הותאמו: מסמכי DZ אינפורמטיביים; הם אינם נכללים בסכומי החיובים, החובות או הגבייה.
 - תחום פעילות info פירושו שירותי מידע; fees פירושו אגרות העברת בעלות; all פירושו הכול.
@@ -3907,6 +4140,8 @@
 סקטורי הלקוחות במערכת הם בדיוק: משרדי ממשלה; רשויות וחברות ממשלתיות; רשויות מקומיות; לקוחות פרטיים. הסיווג נקבע לפי שם הלקוח בלוגיקת המערכת. לכל שאלה על סקטור של לקוח השתמש בחיפוש או בתמונת הלקוח; לכל שאלה מסכמת או השוואה בין סקטורים השתמש בכלי get_sector_summary. אין להסיק סקטור באופן עצמאי.
 
 כללי ניתוח ופילוח: בכל בקשה לפילוח לפי סקטור, שנה או שילוב ביניהם השתמש בכלי get_data_breakdown. הוא מכסה את המדדים billed (חיובים), current_collection (גבייה מחשבוניות השנה), ongoing_collection (גבייה שוטפת כולל דצמבר קודם), open_debt (חוב פתוח), overdue_debt (חוב בפיגור), future_payments (תשלומים עתידיים), historical_open_debt (חוב פתוח משנים קודמות), historical_collected (גביית חובות עבר), matched_invoices (חשבוניות שהותאמו), query_consumption (צריכת שאילתות) ו-unmatched_transfers (העברות שטרם הותאמו). ברירת המחדל auto משתמשת בשנת הדיווח לחיובים ולגבייה, בשנת הפירעון לחובות, בשנת החוב לגביית חובות עבר, בשנת ההתאמה לחשבוניות שהותאמו ובשנת התשלום להעברות. אם המשתמש שואל באיזו שנה בוצעה גביית העבר, השתמש ב-year_basis match; אם הוא שואל מאיזו שנת חוב נגבה, השתמש ב-year_basis document. אין לחשב פילוחים בעצמך מתוצאות חלקיות.
+
+לשאלות המבוססות על מלל החשבונית או תיאור השירות, לרבות ספירת חשבוניות שבהן מופיעים מונחים כגון נת״צ או טוקנים, השתמש תמיד בכלי search_invoice_text. ברירת המחדל היא dataset=issued כדי לספור חשבוניות שהופקו; אם המשתמש מבקש חשבוניות פתוחות או מותאמות בחר את המקור המתאים. אין להסיק ספירה מרשימה חלקית.
 
 הסתמך רק על תוצאות הכלים ועל נתונים שנמסרו בשיחה; לעולם אל תמציא מספרים. כל החישובים העסקיים חייבים להיעשות בכלים ולא בחישוב חופשי. הצג סכומים בשקלים וטבלאות בפורמט Markdown כשזה מועיל. אם שם לקוח אינו חד משמעי, השתמש בחיפוש ובקש בחירה. להפקת מסמך או פתיחת לקוח השתמש בכלי המתאים; הפעולה תוצג למשתמש ככפתור אישור. אין אפשרות לשלוח דוא״ל בשלב זה, ולכן אם התבקשת לשלוח, הסבר שאפשר להכין ולהוריד את המסמך בלבד. אל תבקש, תציג או תחזיר את סיסמת האדמין או את ערכה. ציין במפורש כאשר מקור נתונים רלוונטי לא נטען.`;
         }
@@ -4257,10 +4492,10 @@
         }
 
         function getClientInvoiceStatus(row, view = lvl2View) {
-            if (view === 'debt') return row.isOverdue ? 'בפיגור' : 'עתידי';
+            if (view === 'debt') return row.isOverdue ? 'בפיגור' : (isDirectDebitAwaitingCollection(row) ? 'לתשלום בהוראת קבע' : 'עתידי');
             const matchingDebt = db.find(debt => debt.name === row.name && normalizeInvoiceDocumentNumber(debt.doc) === normalizeInvoiceDocumentNumber(row.doc));
             if (!matchingDebt) return 'שולם';
-            return matchingDebt.isOverdue ? 'פתוח' : 'עתידי (פתוח)';
+            return matchingDebt.isOverdue ? 'פתוח' : (isDirectDebitAwaitingCollection(matchingDebt) ? 'לתשלום בהוראת קבע' : 'עתידי (פתוח)');
         }
 
         function sortClientInvoiceRows(rows, view = lvl2View) {
@@ -4525,7 +4760,7 @@
                         <article ${actionAttributes('future')}>
                             <span class="current-year-metric-label">צפי גבייה עתידי<i class="fa-solid fa-clock" aria-hidden="true"></i></span>
                             <strong id="${prefix}-metric-future" class="current-year-metric-value current-year-metric-value--future">${formatCurrency(metrics.future)}</strong>
-                            <small class="current-year-metric-note">חשבוניות פתוחות שמועד פירעונן טרם הגיע</small>
+                            <small class="current-year-metric-note">חשבוניות שמועד פירעונן טרם הגיע או ממתינות להוראת קבע<span class="current-year-metric-note__direct-debit">מתוכן בהוראת הקבע הקרובה: ${formatCurrency(metrics.nextDirectDebit || 0)}</span></small>
                         </article>
                     </div>
                 </div>
@@ -4560,6 +4795,7 @@
                 collectionComposition,
                 overdue: debtOverdue,
                 future: debtFuture,
+                nextDirectDebit: sumUpcomingDirectDebit(db.filter(isDashboardMatch)),
                 pastOpen: dashPastDebts.reduce((sum, row) => sum + row.amount, 0)
             });
 
@@ -4794,6 +5030,7 @@
                 const totalDebt = dRows.reduce((acc, r) => acc + r.amount, 0);
                 const debtOverdue = dRows.filter(r => r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
                 const debtFuture = dRows.filter(r => !r.isOverdue).reduce((acc, r) => acc + r.amount, 0);
+                const nextDirectDebit = sumUpcomingDirectDebit(db.filter(isDashboardMatch));
                 const totalCollected = Math.max(0, totalBilled - totalDebt);
                 const collectionComposition = getCollectionComposition(totalCollected, isDashboardMatch);
                 const transitionCollected = collectionComposition.transitionCollected;
@@ -4820,7 +5057,7 @@
                             <div class="kpi-card"><div class="kpi-title">חיובים שהופקו</div><div class="kpi-value" style="color:#1e3a8a">${formatCurrency(totalBilled)}</div></div>
                             <div class="kpi-card"><div class="kpi-title">גבייה שוטפת</div><div class="kpi-value" style="color:#047857">${formatCurrency(currentCollectionTotal)}</div>${buildCollectionCardBreakdown(collectionComposition)}</div>
                             <div class="kpi-card"><div class="kpi-title">חוב בפיגור</div><div class="kpi-value" style="color:#b91c1c">${formatCurrency(debtOverdue)}</div></div>
-                            <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${formatCurrency(debtFuture)}</div></div>
+                            <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${formatCurrency(debtFuture)}</div><small class="kpi-note">מתוכו בהוראת הקבע הקרובה: ${formatCurrency(nextDirectDebit)}</small></div>
                         </div>
                         <h3>חיובים וגבייה לפי חודש הפקת החשבונית</h3>
                         <table>
@@ -4894,6 +5131,7 @@
                 collectionComposition,
                 overdue: currentYearOverdue,
                 future: currentYearFuture,
+                nextDirectDebit: sumUpcomingDirectDebit(db.filter(isTypeMatch)),
                 pastOpen: pastYearsOverdue
             }, { interactive: true });
 
@@ -5531,13 +5769,13 @@
                         const isFuture = !r.isOverdue;
                         const rowBg = isFuture ? 'bg-emerald-50/50 hover:bg-emerald-100/50 transition-all text-emerald-950' : 'hover:bg-blue-50 transition-colors';
                         const statusBadge = isFuture 
-                            ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-clock ml-1"></i>עתידי</span>` 
+                            ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-clock ml-1"></i>${isDirectDebitAwaitingCollection(r) ? 'לתשלום בהוראת קבע' : 'עתידי'}</span>`
                             : `<span class="bg-red-100 text-red-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-triangle-exclamation ml-1"></i>בפיגור</span>`;
 
                         html += `<tr class="${rowBg}">
                             <td class="p-4 font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;"><span class="invoice-document-cell"><bdi dir="ltr">${r.doc}</bdi>${invoiceFileIndicator(r.doc)}</span> ${statusBadge}</td>
                             <td class="p-4 font-bold text-slate-600" style="font-family: Arial, Helvetica, sans-serif !important;"><bdi dir="ltr">${r.billingDocument || '—'}</bdi></td>
-                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.dueDate.toLocaleDateString('he-IL')}</td>
+                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${formatInvoiceDueDate(r)}</td>
                             <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.desc}</td>
                             <td class="p-4 font-bold text-left text-slate-900" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(r.amount)}</td>
                         </tr>`;
@@ -5555,8 +5793,9 @@
                         </thead><tbody class="divide-y divide-slate-100 bg-white">`;
                     
                     orgRevenues.forEach(r => {
-                        const isUnpaidDebt = db.some(d => d.doc === r.doc);
-                        const isFuture = isUnpaidDebt && !db.find(d => d.doc === r.doc).isOverdue;
+                        const matchingDebt = db.find(d => d.doc === r.doc);
+                        const isUnpaidDebt = Boolean(matchingDebt);
+                        const isFuture = isUnpaidDebt && !matchingDebt.isOverdue;
 
                         const rowBg = isUnpaidDebt ? 'bg-red-50/70 hover:bg-red-100 transition-all text-red-900' : 'hover:bg-blue-50 transition-colors';
                         
@@ -5571,7 +5810,7 @@
                             <td class="p-4 font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;"><span class="invoice-document-cell"><bdi dir="ltr">${r.doc}</bdi>${invoiceFileIndicator(r.doc)}</span></td>
                             <td class="p-4 font-bold text-slate-600" style="font-family: Arial, Helvetica, sans-serif !important;"><bdi dir="ltr">${r.billingDocument || '—'}</bdi></td>
                             <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.regDate.toLocaleDateString('he-IL')}</td>
-                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.dueDate.toLocaleDateString('he-IL')}</td>
+                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${formatInvoiceDueDate(matchingDebt || r)}</td>
                             <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.desc}</td>
                             <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${statusBadge}</td>
                             <td class="p-4 font-bold text-left" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(r.amount)}</td>
@@ -5620,6 +5859,7 @@ function getClientProfileMetrics(orgName) {
             const collectionComposition = getCollectionComposition(currentYearCollected, row => row.name === orgName && isTypeMatch(row));
             const overdueDebt = overdueRows.reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
             const futurePayments = futureRows.reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+            const nextDirectDebit = sumUpcomingDirectDebit(clientRows);
             const collectionRate = currentYearCharges > 0 ? currentYearCollected / currentYearCharges * 100 : null;
             const validOverdueDates = overdueRows.filter(row => isValidDate(row.dueDate)).map(row => row.dueDate);
             const oldestDueDate = validOverdueDates.length ? new Date(Math.min(...validOverdueDates.map(date => date.getTime()))) : null;
@@ -5639,6 +5879,7 @@ function getClientProfileMetrics(orgName) {
                 pastOpenDebt,
                 overdueDebt,
                 futurePayments,
+                nextDirectDebit,
                 collectionRate,
                 oldestDueDate,
                 maximumDays,
@@ -5680,7 +5921,7 @@ function getClientProfileMetrics(orgName) {
                     <article class="client-profile-kpi"><div class="client-profile-kpi__label"><span>חיובים בשנת ${CURRENT_YEAR}</span><i class="fa-solid fa-file-invoice-dollar"></i></div><strong>${formatCurrency(metrics.currentYearCharges)}</strong><small>סך החשבוניות שהופקו בשנת העבודה</small></article>
                     <article class="client-profile-kpi client-profile-kpi--collection"><div class="client-profile-kpi__label"><span>גבייה שוטפת</span><i class="fa-solid fa-circle-check"></i></div><strong>${formatCurrency(metrics.totalCollected)}</strong>${buildCollectionCardBreakdown(metrics.collectionComposition)}</article>
                     <article class="client-profile-kpi client-profile-kpi--debt"><div class="client-profile-kpi__label"><span>חוב בפיגור</span><i class="fa-solid fa-triangle-exclamation"></i></div><strong>${formatCurrency(metrics.overdueDebt)}</strong><small>חשבוניות פתוחות שמועד פירעונן עבר</small></article>
-                    <article class="client-profile-kpi client-profile-kpi--future"><div class="client-profile-kpi__label"><span>תשלומים עתידיים</span><i class="fa-solid fa-clock"></i></div><strong>${formatCurrency(metrics.futurePayments)}</strong><small>חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></article>
+                    <article class="client-profile-kpi client-profile-kpi--future"><div class="client-profile-kpi__label"><span>תשלומים עתידיים</span><i class="fa-solid fa-clock"></i></div><strong>${formatCurrency(metrics.futurePayments)}</strong><small class="current-year-metric-note">חשבוניות שטרם הגיע מועד גבייתן${metrics.nextDirectDebit ? `<span class="current-year-metric-note__direct-debit">בהוראת הקבע הקרובה: ${formatCurrency(metrics.nextDirectDebit)}</span>` : ''}</small></article>
                     <article class="client-profile-kpi"><div class="client-profile-kpi__label"><span>שיעור גבייה</span><i class="fa-solid fa-percent"></i></div><strong>${metrics.collectionRate === null ? 'אין נתון' : metrics.collectionRate.toFixed(1) + '%'}</strong><small>גבייה מחשבוניות ${CURRENT_YEAR} מתוך החיובים בשנה</small></article>
                 </div>
                 ${buildClientPastDebtSummary(metrics)}
@@ -6272,7 +6513,7 @@ function getClientProfileMetrics(orgName) {
                                     <tr>
                                         <td>${r.name}</td>
                                         <td>${r.doc}${futureLabel}</td>
-                                        <td>${r.dueDate.toLocaleDateString('he-IL')}</td>
+                                        <td>${formatInvoiceDueDate(r)}</td>
                                         <td>${r.desc}</td>
                                         <td style="text-align: left; font-weight: bold;">${formatCurrency(r.amount)}</td>
                                     </tr>
@@ -6748,7 +6989,7 @@ function getClientProfileMetrics(orgName) {
         }
 
         function buildDebtEmailBody(orgName, typeText, overdueRows, total) {
-            const rowsHtml = overdueRows.map(row => `<tr><td style="padding:8px;border:1px solid #d8e1e8"><bdi dir="ltr">${escapeHtml(row.doc)}</bdi></td><td style="padding:8px;border:1px solid #d8e1e8">${escapeHtml(row.dueDate.toLocaleDateString('he-IL'))}</td><td style="padding:8px;border:1px solid #d8e1e8">${escapeHtml(row.desc)}</td><td style="padding:8px;border:1px solid #d8e1e8;text-align:left">${escapeHtml(formatCurrency(row.amount))}</td></tr>`).join('');
+            const rowsHtml = overdueRows.map(row => `<tr><td style="padding:8px;border:1px solid #d8e1e8"><bdi dir="ltr">${escapeHtml(row.doc)}</bdi></td><td style="padding:8px;border:1px solid #d8e1e8">${escapeHtml(formatInvoiceDueDate(row, { plainText:true }))}</td><td style="padding:8px;border:1px solid #d8e1e8">${escapeHtml(row.desc)}</td><td style="padding:8px;border:1px solid #d8e1e8;text-align:left">${escapeHtml(formatCurrency(row.amount))}</td></tr>`).join('');
             return `<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"></head><body style="font-family:Arial,Helvetica,sans-serif;color:#24384b;line-height:1.65"><p>לכבוד:<br><strong style="font-size:18px">${escapeHtml(orgName)}</strong></p><p>שלום רב,</p><p>להלן פירוט החשבוניות והחיובים הפתוחים עבור ${escapeHtml(typeText)} שטרם הותאמו.</p><div style="margin:18px 0;padding:13px 16px;border:1px solid #ef9a9a;border-right:5px solid #c62828;border-radius:8px;background:#fff7f7;color:#8d1d1d">נכון למועד הפקת מכתב זה טרם הוסדר חוב בסך <strong>${escapeHtml(formatCurrency(total))}</strong>.<br>השירות מותנה בתשלום. נבקשכם להסדיר את החוב בהקדם.</div><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:#eef3f7"><th style="padding:8px;border:1px solid #d8e1e8">מספר מסמך</th><th style="padding:8px;border:1px solid #d8e1e8">מועד פירעון</th><th style="padding:8px;border:1px solid #d8e1e8">תיאור השירות</th><th style="padding:8px;border:1px solid #d8e1e8">סכום</th></tr></thead><tbody>${rowsHtml}<tr style="background:#eef3f7;font-weight:bold"><td colspan="3" style="padding:8px;border:1px solid #d8e1e8">סה״כ לתשלום</td><td style="padding:8px;border:1px solid #d8e1e8;text-align:left">${escapeHtml(formatCurrency(total))}</td></tr></tbody></table><p style="margin-top:20px">לתשלום החוב: <a href="https://ecom.gov.il/voucherspa/input/414">שרת התשלומים הממשלתי</a>.</p><p>אם ברשותכם אסמכתא שהחשבוניות שולמו, פנו אלינו בכתב.</p><p style="margin-top:28px">בכבוד רב,<br><strong>מחלקת שירות לקוחות וגבייה</strong><br>אגף טכנולוגיות דיגיטליות ומידע<br><a href="mailto:customer@mot.gov.il">customer@mot.gov.il</a></p></body></html>`;
         }
 
@@ -6857,7 +7098,7 @@ function getClientProfileMetrics(orgName) {
                                     ${pastYearsDebts.map(r => `
                                         <tr>
                                             <td>${r.doc}</td>
-                                            <td>${r.dueDate.toLocaleDateString('he-IL')}</td>
+                                            <td>${formatInvoiceDueDate(r)}</td>
                                             <td>${r.desc}</td>
                                             <td style="text-align:left; font-bold; color:#b91c1c;">${formatCurrency(r.amount)}</td>
                                         </tr>
@@ -7041,7 +7282,7 @@ function getClientProfileMetrics(orgName) {
                     </section>
                     
                     <table><thead><tr><th>מספר מסמך</th><th>מועד פירעון</th><th>תיאור השירות</th><th style="text-align:left">סכום בש"ח</th></tr></thead>
-                    <tbody>${overdueRows.map(r => `<tr><td>${r.doc}</td><td>${r.dueDate.toLocaleDateString('he-IL')}</td><td>${r.desc}</td><td style="text-align:left">${formatCurrency(r.amount)}</td></tr>`).join('')}
+                    <tbody>${overdueRows.map(r => `<tr><td>${r.doc}</td><td>${formatInvoiceDueDate(r)}</td><td>${r.desc}</td><td style="text-align:left">${formatCurrency(r.amount)}</td></tr>`).join('')}
                     <tr style="font-bold; background:#eee"><td colspan="3">סה"כ לתשלום</td><td style="text-align:left">${formatCurrency(total)}</td></tr></tbody></table>
                     
                     <div class="payment-section" style="page-break-inside: avoid; break-inside: avoid; margin-top: 30px;">
@@ -7707,6 +7948,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const totalFuture = currentDebts
                 .filter(row => !row.isOverdue)
                 .reduce((sum, row) => sum + row.amount, 0);
+            const nextDirectDebit = sumUpcomingDirectDebit(db.filter(row => !row.isFee));
             const totalCollected = Math.max(0, totalBilled - totalDebt);
             const collectionRate = totalBilled > 0 ? totalCollected / totalBilled * 100 : 0;
             const transitionCollected = sumYearTransitionCollections(row => !row.isFee);
@@ -7787,7 +8029,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             });
 
             return {
-                totalBilled, totalDebt, totalOverdue, totalFuture, totalCollected, transitionCollected, collectionRate,
+                totalBilled, totalDebt, totalOverdue, totalFuture, nextDirectDebit, totalCollected, transitionCollected, collectionRate,
                 monthlyBilled, monthlyCollected, sectorRows, debtYears, debtSectors,
                 pastDebts, historicalRows, historicalYears, historicalSectors
             };
@@ -7803,6 +8045,8 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             updateCollectionComposition('management', collectionComposition);
             document.getElementById('management-kpi-overdue').textContent = formatCurrency(data.totalOverdue);
             document.getElementById('management-kpi-future').textContent = formatCurrency(data.totalFuture);
+            const futureNote = document.getElementById('management-kpi-future-note');
+            if (futureNote) futureNote.innerHTML = `חשבוניות שטרם הגיע מועד גבייתן<span class="current-year-metric-note__direct-debit">מתוכן בהוראת הקבע הקרובה: ${formatCurrency(data.nextDirectDebit)}</span>`;
             document.getElementById('management-past-open').textContent = formatCurrency(data.pastDebts.reduce((sum, row) => sum + row.amount, 0));
 
             document.getElementById('management-monthly-table-body').innerHTML = MONTH_NAMES.map((month, index) => {
@@ -7984,7 +8228,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                             <div class="kpi-card"><div class="kpi-title">חיובים שהופקו</div><div class="kpi-value" style="color:#0B3C5D">${document.getElementById('management-kpi-billed').textContent}</div><small class="kpi-note">סך החיובים שהופקו בשנת העבודה</small></div>
                             <div class="kpi-card"><div class="kpi-title">גבייה שוטפת</div><div class="kpi-value" style="color:#047857">${formatCurrency(collectionComposition.ongoingCollected)}</div>${buildCollectionCardBreakdown(collectionComposition)}</div>
                             <div class="kpi-card"><div class="kpi-title">חוב בפיגור</div><div class="kpi-value" style="color:#b91c1c">${document.getElementById('management-kpi-overdue').textContent}</div><small class="kpi-note">חשבוניות פתוחות שמועד פירעונן עבר</small></div>
-                            <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${document.getElementById('management-kpi-future').textContent}</div><small class="kpi-note">חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></div>
+                            <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${document.getElementById('management-kpi-future').textContent}</div><small class="kpi-note">חשבוניות שטרם הגיע מועד גבייתן<br>מתוכן בהוראת הקבע הקרובה: ${formatCurrency(data.nextDirectDebit)}</small></div>
                         </div>
                         ${buildPastDebtSummary(data.pastDebts.reduce((sum, row) => sum + row.amount, 0), collectionComposition)}
                         ${analysisBlock('חיובים וגבייה לפי חודש הפקת החשבונית', '<tr><th>חודש הפקת החשבונית</th><th>סכום חיובים</th><th>נגבה עד כה</th><th>שיעור גבייה</th></tr>', 'management-monthly-table-body', chartImages.monthly, 'גרף חיובים וגבייה בחודשי שנת העבודה')}
@@ -8018,6 +8262,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const totalDebt = currentDebts.reduce((sum, row) => sum + row.amount, 0);
             const totalOverdue = currentDebts.filter(row => row.isOverdue).reduce((sum, row) => sum + row.amount, 0);
             const totalFuture = currentDebts.filter(row => !row.isOverdue).reduce((sum, row) => sum + row.amount, 0);
+            const nextDirectDebit = sumUpcomingDirectDebit(db.filter(row => row.isFee));
             const totalCollected = Math.max(0, totalBilled - totalDebt);
             const collectionRate = totalBilled > 0 ? totalCollected / totalBilled * 100 : 0;
             const transitionCollected = sumYearTransitionCollections(row => row.isFee);
@@ -8085,7 +8330,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             );
 
             return {
-                totalBilled, totalOverdue, totalFuture, totalCollected, transitionCollected, collectionRate,
+                totalBilled, totalOverdue, totalFuture, nextDirectDebit, totalCollected, transitionCollected, collectionRate,
                 monthlyBilled, monthlyCollected, pastDebts, debtYears,
                 historicalRows, historicalYears, entityRows
             };
@@ -8100,6 +8345,8 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             updateCollectionComposition('fees-management', collectionComposition);
             document.getElementById('fees-management-kpi-overdue').textContent = formatCurrency(data.totalOverdue);
             document.getElementById('fees-management-kpi-future').textContent = formatCurrency(data.totalFuture);
+            const futureNote = document.getElementById('fees-management-kpi-future-note');
+            if (futureNote) futureNote.innerHTML = `חשבוניות שטרם הגיע מועד גבייתן<span class="current-year-metric-note__direct-debit">מתוכן בהוראת הקבע הקרובה: ${formatCurrency(data.nextDirectDebit)}</span>`;
             document.getElementById('fees-management-past-open').textContent = formatCurrency(data.pastDebts.reduce((sum, row) => sum + row.amount, 0));
 
             document.getElementById('fees-management-monthly-table-body').innerHTML = MONTH_NAMES.map((month, index) => {
@@ -8215,7 +8462,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                     <div class="kpi-card"><div class="kpi-title">חיובים שהופקו</div><div class="kpi-value" style="color:#0B3C5D">${formatCurrency(data.totalBilled)}</div><small class="kpi-note">סך החיובים שהופקו בשנת העבודה</small></div>
                     <div class="kpi-card"><div class="kpi-title">גבייה שוטפת</div><div class="kpi-value" style="color:#047857">${formatCurrency(collectionComposition.ongoingCollected)}</div>${buildCollectionCardBreakdown(collectionComposition)}</div>
                     <div class="kpi-card"><div class="kpi-title">חוב בפיגור</div><div class="kpi-value" style="color:#b91c1c">${formatCurrency(data.totalOverdue)}</div><small class="kpi-note">חשבוניות פתוחות שמועד פירעונן עבר</small></div>
-                    <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${formatCurrency(data.totalFuture)}</div><small class="kpi-note">חשבוניות פתוחות שמועד פירעונן טרם הגיע</small></div>
+                    <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${formatCurrency(data.totalFuture)}</div><small class="kpi-note">חשבוניות שטרם הגיע מועד גבייתן<br>מתוכן בהוראת הקבע הקרובה: ${formatCurrency(data.nextDirectDebit)}</small></div>
                  </div>
                  ${buildPastDebtSummary(data.pastDebts.reduce((sum, row) => sum + row.amount, 0), collectionComposition)}
                  ${analysisBlock('חיובים וגבייה לפי חודש הפקת החשבונית', '<tr><th>חודש הפקת החשבונית</th><th>סכום חיובים</th><th>נגבה עד כה</th><th>שיעור גבייה</th></tr>', 'fees-management-monthly-table-body', monthlyImage, 'גרף חיובים וגבייה בחודשי שנת העבודה')}`,
@@ -8550,6 +8797,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                         const desc = r['טקסט'] || r['תיאור'] || r['תיאור השירות'] || '';
                         const counterAccount = String(r['שם חשבון נגדי'] || '').trim();
                         const paymentMethod = String(r['שיטת תשלום'] || '').trim().toUpperCase();
+                        const isDirectDebit = paymentMethod === 'M';
                         return {
                             code, name,
                             doc: r['מספר מסמך'] || '-',
@@ -8560,9 +8808,10 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                             desc,
                             counterAccount,
                             paymentMethod,
-                            isDirectDebit: paymentMethod === 'M',
+                            isDirectDebit,
+                            directDebitCollectionDate: isDirectDebit ? getDirectDebitCollectionDate(dueDate) : null,
                             isFee: FEE_KEYWORDS.some(kw => counterAccount.includes(kw)),
-                            isOverdue: dueDate < TODAY,
+                            isOverdue: isInvoiceOverdue(dueDate, isDirectDebit),
                             sector: getCustomerSector(name)
                         };
                     });
@@ -10050,6 +10299,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             setAccess('nav-management', coreReady, coreReady ? 'פתיחת דוח ההנהלה' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
             setAccess('nav-fees-management', coreReady, coreReady ? 'פתיחת סקירת אגרות העברת בעלות' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
             setAccess('nav-dashboard-report', coreReady, coreReady ? 'הפקת דוח מאוחד' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
+            setAccess('nav-direct-debit', coreReady, coreReady ? 'פתיחת דוחות הוראת קבע' : 'נדרש לטעון קובץ חובות וקובץ הכנסות');
             setAccess('nav-unmatched-transfers', unmatchedTransfersReady, unmatchedTransfersReady ? 'פתיחת דוח העברות שטרם הותאמו' : 'נדרש לטעון קובץ העברות שטרם הותאמו');
             setAccess('nav-invoice-search', invoiceSearchReady, invoiceSearchReady ? 'פתיחת איתור חשבונית' : 'נדרש לטעון לפחות אחד מקובצי החשבוניות או ההעברות');
             const historicalAccessTitle = historicalReady
