@@ -1,0 +1,39 @@
+<!doctype html><html lang="he" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מחשבון אגרת רישיון רכב | מערכת לניהול אגרות</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f7fa;color:#17324b;font:16px/1.65 system-ui,Arial,sans-serif}header{background:#12476f;color:white;padding:20px max(20px,calc((100vw - 980px)/2));white-space:normal}header a{color:white}main{max-width:1020px;margin:auto;padding:24px 18px 48px}h1{margin:4px 0 6px;font-size:clamp(26px,5vw,40px);line-height:1.2}h2{font-size:20px;margin:0 0 12px}p{margin:8px 0}.badge{display:inline-block;border-radius:20px;padding:3px 12px;background:#e3eff8;color:#144e77;font-size:14px;font-weight:700}.card,fieldset{background:white;border:1px solid #d8e3eb;border-radius:12px;margin:18px 0;padding:16px 20px;min-width:0}legend{font-weight:800;padding:0 8px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px}label{display:block;font-weight:650}select,input{font:inherit;width:100%;padding:8px;border:1px solid #8ba6b9;border-radius:6px;background:white;color:#17324b;min-height:44px}small{display:block;color:#455e72;font-weight:400}.actions{display:flex;gap:10px;flex-wrap:wrap}button{font:inherit;font-weight:700;border-radius:7px;padding:9px 18px;border:1px solid #125c8f;background:#125c8f;color:white;cursor:pointer}.secondary{background:white;color:#125c8f}a{color:#125c8f}.total{font-size:32px;font-weight:800}.warn{border-inline-start:5px solid #aa6100}.result{border-inline-start:5px solid #17724d}table{border-collapse:collapse;width:100%}th,td{padding:7px;border-bottom:1px solid #e1e8ee;text-align:start}th:last-child,td:last-child{text-align:end;white-space:nowrap}summary{cursor:pointer;font-weight:700}[hidden]{display:none!important}:focus-visible{outline:3px solid #226b9e;outline-offset:3px}@media print{header a,form,.print{display:none!important}body{background:white}main{padding:0}}
+</style>
+<header><strong>מערכת לניהול אגרות · משרד התחבורה והבטיחות בדרכים</strong><br><a href="./">חזרה לקטלוג האגרות</a></header>
+<main><span class="badge">מחירון מ־1.4.2026 · אומדן</span><h1>מחשבון אגרת רישיון רכב</h1><p>היעזרו ברישיון הרכב ובפרטי הזכאות שאושרו. המחשבון אינו מבקש מספר רכב או תעודת זהות ואינו בודק נתונים במרשם.</p>
+<form id="form">
+<fieldset><legend>1. סוג הרכב והתקופה</legend><div class="grid">
+<label>מועד החיוב לפי רשות הרישוי<input name="date" type="date" required><small>מחירון זמין: 1.4.2026–31.3.2027, בכפוף לעדכוני תעריף.</small></label>
+<label>סוג הרכב לפי הרישיון<select name="type" required></select></label>
+<label>תקופת רישיון שאושרה<select name="months" required></select><small>לתקופה קצרה: מספר חודשי החיוב, כולל חלק מחודש.</small></label>
+<label data-field="year">שנת סיווג לפי הרישיון<select name="year" required></select><small>שנת הייצור או העלייה לכביש, לפי שנת הסיווג שבחידוש.</small></label>
+<label data-field="group">קבוצת מחיר ברישיון<select name="group" required></select></label>
+<label data-field="price">מחיר רשמי לדגם בש״ח<input name="price" type="number" min="1" step="0.01" required><small>לרישום ראשון של הדגם ב־2026 בלבד; לא מחיר העסקה או מחיר יד שנייה.</small></label>
+<label data-field="engine">סוג מנוע<select name="engine" required></select></label>
+<label data-field="weight">משקל כולל מותר<select name="weight" required></select></label>
+<label data-field="cc">נפח או סוג מנוע<select name="cc" required></select></label>
+<label data-field="seats">מושבי נוסעים, ללא הנהג<select name="seats" required></select></label>
+</div></fieldset>
+<fieldset><legend>2. בעלות וזכאות</legend><div class="grid">
+<label>מצב החיוב<select name="case" required></select></label>
+<label>אגרה מופחתת שאושרה לרכב זה<select name="elig" required></select></label>
+<label>הפרש בעקבות בעלות קודמת<select name="prior" required></select><small>למשל ביטול הנחה של הבעלים הקודם. מספר בעלים קודמים אינו קלט למחירון.</small></label>
+<label data-field="difference">הפרש שטרם שולם לפי שובר רשמי<input name="difference" type="number" min="0" step="0.01" required><small>יוצג בנפרד; אין להזין אגרת העברת בעלות.</small></label>
+<label data-field="reserve">זכאות מילואים שנקבעה לרכב ולמועד<select name="reserve"></select><small>לפי הזכאות לרכב אחד, ולא לפי זהות הנהג בלבד. אם לא ברור, בחרו ״לא ידוע״.</small></label>
+<label data-field="use">ייעוד להוראת נהיגה ברישיון<select name="use"></select></label>
+<label data-field="safety">שלב הפחתת מערכות בטיחות שאושר<select name="safety"></select><small>רק אם הרשות אישרה זכאות לשלב זה; התקנה כשלעצמה אינה מספיקה.</small></label>
+<label data-field="ffv">הפחתת רכב גמיש תדלוק (FFV)<select name="ffv"></select><small>לפי הוראת הרישום הראשונה בארץ לרכב גמיש תדלוק, אם התנאי חל על הרכב.</small></label>
+<label data-field="broadcast">תוספת תאגיד השידור בשובר<select name="broadcast"></select><small>במקרה זה יש לבדוק תחולה בשובר או מול רשות הרישוי.</small></label>
+<label data-field="broadcastAmount">סכום תוספת השידור בשובר<input name="broadcastAmount" type="number" min="0" step="0.01" required></label>
+<label>אופן הפקת החידוש<select name="channel"></select></label>
+</div></fieldset>
+<div class="actions"><button type="submit">חשב אגרה</button><button class="secondary" type="reset">נקה בחירות</button></div>
+</form>
+<section class="card" id="result" aria-live="polite" tabindex="-1" hidden></section>
+<details class="card"><summary>מקורות והיקף החישוב</summary><p>החישוב מתבסס על חלק ג׳ לתוספת הראשונה ועל הודעת תוספת השידור. בחיוב אישי, לרבות הפרשי מדד, ההודעה במערכת רשות הרישוי קובעת. דמי מבחן הרישוי והעברת בעלות הם תשלומים נפרדים.</p>
+<ul><li><a href="https://www.gov.il/he/pages/car_fees_2026">פרסומי תעריפי אפריל 2026 והודעות ברשומות</a></li><li><a href="https://www.gov.il/he/service/car_licence_renewal">חידוש רישיון ובדיקת סכום החיוב</a></li><li><a href="https://www.gov.il/he/service/ownership-vehicles-transfer">העברת בעלות והפרשי אגרה</a></li><li><a href="https://www.gov.il/he/service/exemptions_from_vehicle_license_fee">זכאות לאגרה מופחתת או להחזר</a></li></ul></details>
+</main><script src="vehicle-rules.js"></script><script src="vehicle-form.js"></script></html>
