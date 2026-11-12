@@ -2018,7 +2018,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.16 · 12 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.17 · 12 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -2417,12 +2417,27 @@
                 <div class="header-actions" aria-hidden="true"></div>
             </div>
         </header>
+        <section class="workspace-toolbar no-print" aria-label="מסנני דוחות הוראת קבע">
+            <div class="workspace-toolbar__inner">
+                <div class="workspace-control">
+                    <span class="control-label">תחום פעילות</span>
+                    <div class="segmented-control" role="group" aria-label="סינון דוחות הוראת קבע לפי תחום פעילות">
+                        <button id="direct-debit-filter-info" type="button" class="active-filter" aria-pressed="true" onclick="setDirectDebitActivityFilter('info')">שירותי מידע</button>
+                        <button id="direct-debit-filter-fees" type="button" aria-pressed="false" onclick="setDirectDebitActivityFilter('fees')">אגרות העברת בעלות</button>
+                        <button id="direct-debit-filter-all" type="button" aria-pressed="false" onclick="setDirectDebitActivityFilter('all')">הכול</button>
+                    </div>
+                </div>
+                <div class="dashboard-toolbar__actions">
+                    <button type="button" class="button-secondary button-secondary--brand" onclick="printDirectDebitReport('expected')"><i class="fa-solid fa-print" aria-hidden="true"></i>הפקת דוח תשלומים צפויים</button>
+                    <button type="button" class="button-secondary button-secondary--brand" onclick="printDirectDebitReport('debt')"><i class="fa-solid fa-print" aria-hidden="true"></i>הפקת דוח חובות</button>
+                </div>
+            </div>
+        </section>
         <main class="historical-screen-main flex-grow" style="font-family:Arial,Helvetica,sans-serif">
             <section class="historical-panel">
                 <div class="historical-panel__header">
                     <i class="fa-solid fa-calendar-check text-emerald-600" aria-hidden="true"></i>
                     <div><h2 style="font-family:Arial,Helvetica,sans-serif">תשלומים צפויים בהוראת הקבע הקרובה</h2><p id="direct-debit-expected-description" class="summary-count-note"></p></div>
-                    <button type="button" class="button-secondary button-secondary--brand no-print" onclick="printDirectDebitReport('expected')"><i class="fa-solid fa-print" aria-hidden="true"></i>הפקת דוח</button>
                 </div>
                 <section class="historical-kpis" aria-label="סיכום תשלומים צפויים">
                     <article class="historical-kpi"><span>סכום צפוי</span><strong id="direct-debit-expected-amount">₪0</strong></article>
@@ -2435,7 +2450,6 @@
                 <div class="historical-panel__header">
                     <i class="fa-solid fa-triangle-exclamation text-red-600" aria-hidden="true"></i>
                     <div><h2 style="font-family:Arial,Helvetica,sans-serif">חובות של לקוחות הוראת קבע</h2><p class="summary-count-note">חשבוניות שמועד הגבייה שלהן בהוראת קבע כבר חלף.</p></div>
-                    <button type="button" class="button-secondary button-secondary--brand no-print" onclick="printDirectDebitReport('debt')"><i class="fa-solid fa-print" aria-hidden="true"></i>הפקת דוח</button>
                 </div>
                 <section class="historical-kpis" aria-label="סיכום חובות הוראת קבע">
                     <article class="historical-kpi"><span>חוב בפיגור</span><strong id="direct-debit-debt-amount" style="color:#c51e2b">₪0</strong></article>
@@ -2470,6 +2484,13 @@
                                 <button id="unmatched-filter-all" type="button" class="active-filter" aria-pressed="true" onclick="setUnmatchedClientActivityFilter('all')">כל הלקוחות</button>
                                 <button id="unmatched-filter-active" type="button" aria-pressed="false" onclick="setUnmatchedClientActivityFilter('active')">לקוחות פעילים</button>
                                 <button id="unmatched-filter-inactive" type="button" aria-pressed="false" onclick="setUnmatchedClientActivityFilter('inactive')">לקוחות לא פעילים</button>
+                            </div>
+                        </div>
+                        <div class="unmatched-report-filter">
+                            <span class="control-label">משרדי ממשלה</span>
+                            <div class="segmented-control" role="group" aria-label="סינון משרדי ממשלה לפי קוד מרכבה">
+                                <button id="unmatched-government-exclude" type="button" class="active-filter" aria-pressed="true" onclick="setUnmatchedGovernmentFilter('exclude')">ללא משרדי ממשלה</button>
+                                <button id="unmatched-government-all" type="button" aria-pressed="false" onclick="setUnmatchedGovernmentFilter('all')">הכול</button>
                             </div>
                         </div>
                         <button type="button" class="button-secondary button-secondary--brand" onclick="printUnmatchedTransfersReport()"><i class="fa-solid fa-print" aria-hidden="true"></i>הדפסת הדוח</button>
@@ -3313,6 +3334,8 @@
         let historicalRevenueDb = [];
         let unmatchedTransfersDb = [];
         let unmatchedClientActivityFilter = 'all';
+        let unmatchedGovernmentFilter = 'exclude';
+        let directDebitActivityFilter = 'info';
         let invoiceFileMap = new Map();
         let invoiceMappingLoaded = false;
         let queryOnlineDb = [];
@@ -3434,10 +3457,29 @@
             const rows = mode === 'debt'
                 ? db.filter(row => row.isDirectDebit && row.isOverdue)
                 : db.filter(row => isUpcomingDirectDebitInvoice(row));
-            return rows.slice().sort((a, b) => {
+            return rows.filter(row => directDebitActivityFilter === 'all' || (directDebitActivityFilter === 'fees' ? row.isFee : !row.isFee)).sort((a, b) => {
                 const dateDiff = (a.directDebitCollectionDate?.getTime() || 0) - (b.directDebitCollectionDate?.getTime() || 0);
                 return dateDiff || String(a.name || '').localeCompare(String(b.name || ''), 'he') || String(a.doc || '').localeCompare(String(b.doc || ''), 'he');
             });
+        }
+
+        function directDebitActivityFilterLabel() {
+            if (directDebitActivityFilter === 'fees') return 'אגרות העברת בעלות';
+            if (directDebitActivityFilter === 'all') return 'כל תחומי הפעילות';
+            return 'שירותי מידע';
+        }
+
+        function setDirectDebitActivityFilter(value) {
+            if (!['info', 'fees', 'all'].includes(value)) return;
+            directDebitActivityFilter = value;
+            ['info', 'fees', 'all'].forEach(option => {
+                const button = document.getElementById(`direct-debit-filter-${option}`);
+                if (!button) return;
+                const selected = option === value;
+                button.classList.toggle('active-filter', selected);
+                button.setAttribute('aria-pressed', String(selected));
+            });
+            renderDirectDebitReports();
         }
 
         function buildDirectDebitReportTableRows(rows, includeTotal = true) {
@@ -3486,9 +3528,9 @@
             const rows = getDirectDebitReportRows(mode);
             const upcomingDate = getUpcomingDirectDebitDate();
             const title = mode === 'debt' ? 'דוח חובות של לקוחות הוראת קבע' : 'דוח תשלומים צפויים בהוראת הקבע הקרובה';
-            const subtitle = mode === 'debt'
+            const subtitle = (mode === 'debt'
                 ? 'חשבוניות שמועד הגבייה שלהן בהוראת קבע כבר חלף'
-                : `מחזור הגבייה הצפוי בתאריך ${upcomingDate.toLocaleDateString('he-IL')}`;
+                : `מחזור הגבייה הצפוי בתאריך ${upcomingDate.toLocaleDateString('he-IL')}`) + ` · תחום פעילות: ${directDebitActivityFilterLabel()}`;
             const win = window.open('', '_blank');
             if (!win) { alert('פתיחת חלון הדוח נחסמה.'); return; }
             win.document.write(`<html dir="rtl" lang="he"><head><title>${escapeHtml(title)}</title>${getClientDocumentPrintStyles()}<style>
@@ -9052,11 +9094,28 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             return 'כל הלקוחות';
         }
 
+        function unmatchedGovernmentFilterLabel() {
+            return unmatchedGovernmentFilter === 'exclude' ? 'ללא משרדי ממשלה' : 'כולל משרדי ממשלה';
+        }
+
         function setUnmatchedClientActivityFilter(value) {
             if (!['all', 'active', 'inactive'].includes(value)) return;
             unmatchedClientActivityFilter = value;
             ['all', 'active', 'inactive'].forEach(option => {
                 const button = document.getElementById(`unmatched-filter-${option}`);
+                if (!button) return;
+                const selected = option === value;
+                button.classList.toggle('active-filter', selected);
+                button.setAttribute('aria-pressed', String(selected));
+            });
+            renderUnmatchedTransfersReport();
+        }
+
+        function setUnmatchedGovernmentFilter(value) {
+            if (!['exclude', 'all'].includes(value)) return;
+            unmatchedGovernmentFilter = value;
+            ['exclude', 'all'].forEach(option => {
+                const button = document.getElementById(`unmatched-government-${option}`);
                 if (!button) return;
                 const selected = option === value;
                 button.classList.toggle('active-filter', selected);
@@ -9087,7 +9146,8 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
         }
 
         function getFilteredUnmatchedTransferClients() {
-            const clients = aggregateUnmatchedTransfers();
+            let clients = aggregateUnmatchedTransfers();
+            if (unmatchedGovernmentFilter === 'exclude') clients = clients.filter(client => !String(client.clientCode || '').startsWith('1'));
             if (unmatchedClientActivityFilter === 'active') return clients.filter(client => client.isActive);
             if (unmatchedClientActivityFilter === 'inactive') return clients.filter(client => !client.isActive);
             return clients;
@@ -9164,7 +9224,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             }
             const totalCount = clients.reduce((sum,row) => sum + row.count, 0);
             const totalAmount = clients.reduce((sum,row) => sum + row.amount, 0);
-            const filterLabel = unmatchedClientActivityFilterLabel();
+            const filterLabel = `${unmatchedClientActivityFilterLabel()} · ${unmatchedGovernmentFilterLabel()}`;
             const tableRows = clients.map(client => `
                 <tr class="client-summary-row">
                     <td style="direction:ltr;text-align:right"><strong>${escapeHtml(client.clientCode)}</strong></td>
