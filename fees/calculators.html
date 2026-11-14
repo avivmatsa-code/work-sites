@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>מחשבוני אגרות | מערכת לניהול אגרות</title>
+  <meta name="description" content="כל מחשבוני האגרות של משרד התחבורה במקום אחד: רישוי רכב, נהיגה, מוסך, כלי טיס וכלי שיט.">
+  <link rel="canonical" href="https://avivmatsa-code.github.io/work-sites/fees/calculators.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="he_IL">
+  <meta property="og:site_name" content="מערכת לניהול אגרות">
+  <meta property="og:title" content="מחשבוני אגרות משרד התחבורה">
+  <meta property="og:description" content="חישוב אגרות רישוי רכב, נהיגה, מוסך, כלי טיס וכלי שיט לפי תעריפי 2026.">
+  <meta property="og:url" content="https://avivmatsa-code.github.io/work-sites/fees/calculators.html">
+  <meta property="og:image" content="https://avivmatsa-code.github.io/work-sites/fees/calculators-share.png">
+  <meta property="og:image:secure_url" content="https://avivmatsa-code.github.io/work-sites/fees/calculators-share.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1734">
+  <meta property="og:image:height" content="909">
+  <meta property="og:image:alt" content="מחשבוני אגרות לתחומי רכב, נהיגה, מוסך, תעופה ושיט">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="מחשבוני אגרות משרד התחבורה">
+  <meta name="twitter:description" content="כל מחשבוני האגרות במקום אחד">
+  <meta name="twitter:image" content="https://avivmatsa-code.github.io/work-sites/fees/calculators-share.png">
+  <style>
+    :root{--blue:#0969c3;--dark:#064b8d;--bg:#f5f7f9;--border:#d5dee6;--muted:#607080;--subtle:#eaf5ff}
+    *{box-sizing:border-box}html,body,button{font-family:Arial,Helvetica,sans-serif}body{margin:0;background:var(--bg);color:#1f2933;font-size:16px;line-height:1.55}a{color:var(--blue)}
+    header{background:var(--dark);color:#fff;padding:20px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand strong{display:block;font-size:23px}.brand span{display:block;margin-top:4px;font-size:14px;opacity:.88}.year{border:1px solid #ffffff70;border-radius:20px;padding:7px 14px;font-size:14px}
+    .layout{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:calc(100vh - 88px)}aside{background:#fff;border-left:1px solid var(--border);padding:22px 14px}aside h2{font-size:13px;color:var(--muted);padding:0 12px;margin:12px 0 7px}aside a{display:block;text-decoration:none;color:#435569;border-radius:7px;padding:11px 12px;margin:3px 0;font-size:14px}aside a:hover,aside a:focus-visible,aside a.active{background:var(--subtle);color:var(--blue)}aside a.active{font-weight:700;border-inline-start:3px solid var(--blue)}
+    main{max-width:1250px;width:100%;margin:0 auto;padding:34px 38px 60px}.crumb{font-size:14px;color:var(--muted);margin-bottom:18px}.crumb a{text-decoration:none}h1{font-size:34px;line-height:1.2;margin:0 0 10px;color:#17324b}.lead{font-size:18px;color:#52677a;margin:0 0 28px}
+    .hero{background:linear-gradient(135deg,#075aa8,#0d83d6);color:#fff;border-radius:16px;padding:28px 32px;margin-bottom:26px;display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:center;overflow:hidden;box-shadow:0 8px 28px #064b8d20}.hero h2{font-size:25px;margin:0 0 8px}.hero p{margin:0;opacity:.94}.hero img{width:100%;height:145px;object-fit:cover;border-radius:10px;border:1px solid #ffffff45}
+    .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.card{background:#fff;border:1px solid var(--border);border-top:4px solid var(--blue);border-radius:10px;padding:22px;min-height:220px;display:flex;flex-direction:column;text-decoration:none;color:inherit;box-shadow:0 2px 8px #0f23370a;transition:transform .16s,border-color .16s,box-shadow .16s}.card:hover,.card:focus-visible{transform:translateY(-4px);border-color:var(--blue);box-shadow:0 10px 25px #0f233718}.icon{width:48px;height:48px;border-radius:12px;background:var(--subtle);color:var(--blue);display:grid;place-items:center;font-size:26px}.card h2{font-size:21px;margin:16px 0 8px;color:#17324b}.card p{color:#52677a;margin:0 0 18px}.card strong{margin-top:auto;color:var(--blue)}.notice{margin-top:26px;padding:16px 19px;background:#fff7e6;border-inline-start:4px solid #a86400;border-radius:8px;font-size:14px}
+    :focus-visible{outline:3px solid #35a3ff;outline-offset:3px}@media(max-width:950px){.cards{grid-template-columns:repeat(2,1fr)}.hero{grid-template-columns:1fr 230px}.layout{grid-template-columns:210px 1fr}main{padding:28px 22px}}@media(max-width:700px){header{padding:17px 18px}.brand strong{font-size:19px}.layout{display:block}aside{border:0;border-bottom:1px solid var(--border)}aside .secondary-nav{display:none}main{padding:24px 16px 45px}.hero{grid-template-columns:1fr;padding:22px}.hero img{height:130px}.cards{grid-template-columns:1fr}h1{font-size:28px}}@media print{aside,.hero{display:none}.layout{display:block}main{padding:0}.card{break-inside:avoid;box-shadow:none}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><strong>משרד התחבורה והבטיחות בדרכים</strong><span>מערכת לניהול אגרות · אגף טכנולוגיות דיגיטליות ומידע</span></div>
+    <span class="year">תעריפי 2026</span>
+  </header>
+  <div class="layout">
+    <aside aria-label="ניווט במערכת">
+      <h2>ניווט במערכת</h2>
+      <a href="./">▦ &nbsp; כל קבוצות האגרות</a>
+      <a class="active" href="./calculators.html" aria-current="page">◫ &nbsp; כל מחשבוני האגרות</a>
+      <div class="secondary-nav">
+        <h2>מחשבוני אגרות</h2>
+        <a href="./vehicle-calculator.html">מחשבון רישוי רכב</a>
+        <a href="./driver-calculator.html">מחשבון רישוי נהיגה</a>
+        <a href="./garage-calculator.html">מחשבון רישוי מוסך</a>
+        <a href="./aircraft-calculator.html">מחשבון רישוי כלי טיס</a>
+        <a href="./vessel-calculator.html">מחשבון רישוי כלי שיט</a>
+        <h2>מידע נוסף</h2>
+        <a href="./">דוחות, הגדרות ואודות</a>
+      </div>
+    </aside>
+    <main>
+      <div class="crumb"><a href="./">מערכת לניהול אגרות</a> / מחשבוני אגרות</div>
+      <h1>מחשבוני אגרות</h1>
+      <p class="lead">בחרו את תחום הרישוי והשלימו את הנתונים הנדרשים לקבלת אומדן מפורט.</p>
+      <section class="hero" aria-label="מידע על המחשבונים">
+        <div><h2>כל החישובים במקום אחד</h2><p>המחשבונים משלבים תעריפי בסיס, תוספות, הפחתות, תקופות וכללי עיגול לפי תעריפי 2026.</p></div>
+        <img src="calculators-share.png" alt="המחשה של תחומי המחשבונים: רכב, נהיגה, מוסך, תעופה ושיט">
+      </section>
+      <section class="cards" aria-label="רשימת מחשבוני האגרות">
+        <a class="card" href="./vehicle-calculator.html"><span class="icon" aria-hidden="true">🚗</span><h2>רישוי רכב</h2><p>חישוב אגרת רישיון רכב לפי סוג הרכב, משקל, שנת רישום, בעלות וזכאויות.</p><strong>לפתיחת המחשבון ←</strong></a>
+        <a class="card" href="./driver-calculator.html"><span class="icon" aria-hidden="true">🪪</span><h2>רישוי נהיגה</h2><p>חידוש והנפקת רישיון, כפל רישיון, בחינות, תקופות וזכאויות מאושרות.</p><strong>לפתיחת המחשבון ←</strong></a>
+        <a class="card" href="./garage-calculator.html"><span class="icon" aria-hidden="true">🔧</span><h2>רישוי מוסך</h2><p>רישיון להפעלת מוסך, ניהול מקצועי, סוגי מוסך, בחינות והעתקי רישיון.</p><strong>לפתיחת המחשבון ←</strong></a>
+        <a class="card" href="./aircraft-calculator.html"><span class="icon" aria-hidden="true">✈️</span><h2>רישוי כלי טיס</h2><p>רישום, כושר טיסה, תעודות סוג וייצור, יצוא ושירותים בארץ ובחו״ל.</p><strong>לפתיחת המחשבון ←</strong></a>
+        <a class="card" href="./vessel-calculator.html"><span class="icon" aria-hidden="true">⚓</span><h2>רישוי כלי שיט</h2><p>בדיקות, היתרי שיט, רישיונות, תפוסה, הספק, אורך ומדידות חוזרות.</p><strong>לפתיחת המחשבון ←</strong></a>
+      </section>
+      <div class="notice"><strong>לתשומת לב:</strong> תוצאת המחשבון היא אומדן. הסכום המחייב נקבע בדרישת התשלום שמפיקה הרשות המוסמכת.</div>
+    </main>
+  </div>
+</body>
+</html>
