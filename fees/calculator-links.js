@@ -21,6 +21,8 @@ window.FEE_CALCULATOR_LINKS={"7-42": {"domain": "garage", "preset": {"service": 
   style.textContent=`
     html,body,button,input,select,textarea{font-family:Arial,Helvetica,sans-serif!important}
     body{--shell-blue:var(--calc-color,#125c8f);--shell-border:#d5dee6;--shell-muted:#607080}
+    .calculator-layout legend{font-family:Arial,Helvetica,sans-serif!important;font-size:16px!important;font-weight:700!important;line-height:1.5!important}
+    .calculator-layout label{font-weight:700}
     body>header{padding:14px 28px;justify-content:flex-start;min-height:82px}
     body>header .government-logo{width:84px;height:60px;object-fit:contain;background:#fff;border:1px solid #d5dee6;border-radius:8px;padding:5px}
     body>header>div{line-height:1.45}
