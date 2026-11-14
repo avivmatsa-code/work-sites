@@ -36,12 +36,16 @@ function init(){f.date.value=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Jer
 form.addEventListener('change',update);
 form.addEventListener('input',()=>{result.hidden=true;});
 form.addEventListener('reset',()=>setTimeout(init,0));
-const fmt=n=>new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS',maximumFractionDigits:2,minimumFractionDigits:0}).format(n);
+const fmt=n=>new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS',maximumFractionDigits:0,minimumFractionDigits:0}).format(n);
 form.addEventListener('submit',e=>{
  e.preventDefault();const v=Object.fromEntries(new FormData(form));const r=estimate(v);result.hidden=false;result.className='card '+(r.reason?'warn':'result');
  if(r.reason){result.innerHTML='<h2>נדרש בירור לפני קביעת סכום</h2><p></p><a href="https://www.gov.il/he/service/car_licence_renewal">לשירות חידוש רישיון רכב</a>';result.querySelector('p').textContent=r.reason;}
  else {result.innerHTML='<h2>אומדן אגרת רישוי</h2><div class="total">'+fmt(r.total)+'</div><table><thead><tr><th>רכיב החישוב</th><th>סכום</th></tr></thead><tbody></tbody></table>'+ (r.extra?'<p><b>הפרש לפי שובר שהוזן:</b> '+fmt(r.extra)+' · <b>סה״כ משוער:</b> '+fmt(r.total+r.extra)+'</p>':'')+'<p>הסכום לתשלום נקבע במערכת רשות הרישוי. דמי טסט והעברת בעלות אינם כלולים.</p><button class="print secondary" type="button">הדפסה</button>';
- for(const [label,n] of r.lines){const tr=result.querySelector('tbody').insertRow();tr.insertCell().textContent=label;tr.insertCell().textContent=fmt(n);}result.querySelector('button').onclick=()=>window.print();}
+ for(const [label,n] of r.lines){const tr=result.querySelector('tbody').insertRow();tr.insertCell().textContent=label;tr.insertCell().textContent=fmt(n);}const stamp=document.createElement('p');stamp.textContent='הופק: '+new Date().toLocaleString('he-IL')+' · מועד החיוב: '+v.date;result.prepend(stamp);const inputs=document.createElement('dl');for(const el of form.elements){if(!el.name||el.disabled)continue;const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=el.closest('label')?.childNodes[0]?.textContent||el.name;dd.textContent=el.tagName==='SELECT'?el.selectedOptions[0]?.textContent:el.value;inputs.append(dt,dd);}result.append(inputs);result.querySelector('button').onclick=()=>window.print();}
  result.focus();
 });
 init();
+
+const incoming=new URLSearchParams(location.search).get('fee');
+if(incoming&&window.FEE_CALCULATOR_LINKS?.[incoming]?.domain==='vehicle'){const back=document.querySelector('#back-fee');back.hidden=false;back.href='./#fee/'+encodeURIComponent(incoming);const preset=window.FEE_CALCULATOR_LINKS[incoming].preset||{};if(preset.type){f.type.value=preset.type;update();}}
+document.querySelector('#field-search').addEventListener('input',e=>{const q=e.target.value.trim();for(const l of form.querySelectorAll('label'))l.classList.toggle('found',!!q&&l.textContent.includes(q));});

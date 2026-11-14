@@ -2,7 +2,7 @@
 const bands=[[1266,1109,972,849],[1610,1404,1230,1076],[1941,1698,1487,1297],[2315,1968,1674,1422],[2651,2184,1802,1490],[3764,2823,2117,1585],[5364,3753,2627,1840]];
 const limits=[117000,141000,167000,188000,244000,347000,Infinity];
 const vehicle={light:'פרטי או מסחרי עד 3,500 ק״ג',heavy:'מסחרי מעל 3,500 ק״ג, רכב עבודה או רכב ייעודי לפי פרט 3',bike:'אופנוע, תלת אופנוע או אופנוע עם רכב צדי',bus:'אוטובוס או טיולית',taxi:'מונית או רכב סיור ברישיון',tractor:'טרקטור',trailer:'גרור להובלת טובין',semi:'נתמך',classic:'רכב הרשום כאספנות',special:'סיווג אחר או לא ידוע'};
-const periodStart='2026-04-01',periodEnd='2027-03-31';
+const periodStart='2026-04-01',periodEnd='2026-12-31';
 function estimate(v){
  const fail=reason=>({reason}); const lines=[];
  if(!v.date||v.date<periodStart||v.date>periodEnd)return fail('מועד החיוב מחוץ לתקופת מחירון אפריל 2026.');
@@ -51,8 +51,8 @@ function estimate(v){
  for(const [label,n] of reductions){const floor=13;const applied=Math.min(n,Math.max(0,subtotal-floor));subtotal-=applied;lines.push([label+' (לאחר תקרת ההפחתה)',-applied]);}
  if(broadcast)lines.push(['תוספת תאגיד השידור',broadcast]);
  if(v.channel==='clerk')lines.push(['חידוש באמצעות פקיד רשות הרישוי',32]);
- let total=lines.reduce((t,l)=>t+l[1],0);total=Math.round((total+Number.EPSILON)*100)/100;
+ let total=lines.reduce((t,l)=>t+l[1],0);total=Math.round(total);
  let extra=0;if(v.prior==='known'){extra=Number(v.difference);if(v.difference===''||!Number.isFinite(extra)||extra<0)return fail('יש להזין הפרש תקף מהשובר הרשמי.');}
- return {total,extra,lines};
+ return {total,extra:Math.round(extra),lines};
 }
 if(typeof module!=='undefined')module.exports={estimate,bands};
