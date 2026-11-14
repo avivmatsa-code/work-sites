@@ -50,7 +50,7 @@ window.FEE_CALCULATOR_LINKS={"7-42": {"domain": "garage", "preset": {"service": 
   const aside=document.createElement('aside');
   aside.className='calculator-sidebar';
   aside.setAttribute('aria-label','ניווט במערכת');
-  aside.innerHTML=`<h2>ניווט במערכת</h2><a href="./">▦ &nbsp; כל קבוצות האגרות</a>
+  aside.innerHTML=`<h2>ניווט במערכת</h2><a href="./">▦ &nbsp; כל קבוצות האגרות</a><a href="./calculators.html">◫ &nbsp; כל מחשבוני האגרות</a>
     <div class="group-links"><h2>קבוצות האגרות</h2>${groups.map(([id,label])=>`<a href="./#group/${id}">${label}</a>`).join('')}</div>
     <h2>מחשבוני אגרות</h2>${calculators.map(([id,file,label])=>`<a href="./${file}"${id===domain?' aria-current="page"':''}>${label}</a>`).join('')}
     <h2>דוחות</h2><a href="./">תמונת מצב האגרות</a><a href="./">פערים בתעריפי 2026</a>
