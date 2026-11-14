@@ -20,17 +20,17 @@ const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const money=n=>new Intl.NumberFormat('he-IL',{style:'currency',currency:'ILS',maximumFractionDigits:0,minimumFractionDigits:0}).format(n);
 fields.innerHTML=schema.map(s=>`<label data-key="${s.key}">${s.label}${s.values?`<select name="${s.key}" required><option value="">בחרו…</option>${s.values.map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select>`:`<input name="${s.key}" type="number" min="${s.min}" step="${s.step}" required>`}${s.hint?`<small>${s.hint}</small>`:''}</label>`).join('');
 const values=()=>Object.fromEntries(new FormData(form));
-function update(){const v=Object.fromEntries([...form.elements].filter(x=>x.name).map(x=>[x.name,x.value]));schema.forEach(s=>{const el=form.elements[s.key],on=s.when(v);el.closest('label').hidden=!on;el.disabled=!on;});result.hidden=true;document.querySelector('#print-result').disabled=true;}
+function update(){const v=Object.fromEntries([...form.elements].filter(x=>x.name).map(x=>[x.name,x.value]));schema.forEach(s=>{const el=form.elements.namedItem(s.key),on=s.when(v);el.closest('label').hidden=!on;el.disabled=!on;});result.hidden=true;document.querySelector('#print-result').disabled=true;}
 form.addEventListener('input',update);form.addEventListener('change',update);
 form.addEventListener('reset',()=>setTimeout(update));
 const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());form.elements.date.value=today;
 const links=window.FEE_CALCULATOR_LINKS||{};const fee=new URLSearchParams(location.search).get('fee');
-if(fee&&links[fee]?.domain===domain){for(const [k,v] of Object.entries(links[fee].preset||{}))if(form.elements[k])form.elements[k].value=v;document.querySelector('#back-fee').href='./#fee/'+encodeURIComponent(fee);document.querySelector('#back-fee').hidden=false;}
+if(fee&&links[fee]?.domain===domain){for(const [k,v] of Object.entries(links[fee].preset||{}))if(form.elements.namedItem(k))form.elements.namedItem(k).value=v;document.querySelector('#back-fee').href='./#fee/'+encodeURIComponent(fee);document.querySelector('#back-fee').hidden=false;}
 update();
 form.addEventListener('submit',e=>{e.preventDefault();if(!form.reportValidity())return;const v=values();if(v.clerk!=='yes')v.clerkExempt='no';const r=FeeEngine.calculate(domain,v);result.hidden=false;result.classList.toggle('warn',!!r.reason);document.querySelector('#print-result').disabled=!!r.reason;
  if(r.reason){result.innerHTML=`<h2>נדרש מידע נוסף</h2><p>${esc(r.reason)}</p>`;return;}
- const inputs=[['מועד החיוב',v.date],...schema.filter(s=>!form.elements[s.key].disabled).map(s=>[s.label,s.values?s.values.find(o=>o[0]===v[s.key])?.[1]:v[s.key]])];
+ const inputs=[['מועד החיוב',v.date],...schema.filter(s=>!form.elements.namedItem(s.key).disabled).map(s=>[s.label,s.values?s.values.find(o=>o[0]===v[s.key])?.[1]:v[s.key]])];
  result.innerHTML=`<h2>דוח חישוב — ${names[domain]}</h2><p>מועד הפקה: ${new Date().toLocaleString('he-IL')} · מועד חיוב: ${esc(v.date)}</p><div class="total">${money(r.total)}</div><p>אומדן לפי הנתונים שהוזנו. הסכום לתשלום נקבע בדרישת התשלום של הרשות.</p><table><thead><tr><th>רכיב החישוב</th><th>סכום</th></tr></thead><tbody>${r.lines.map(l=>`<tr><td>${esc(l.label)}</td><td>${money(l.value)}</td></tr>`).join('')}<tr><th>סה״כ לאחר עיגול לשקל</th><th>${money(r.total)}</th></tr></tbody></table><p class="muted">העיגול מתבצע בסיום החישוב; הצגת הרכיבים בשקלים שלמים עשויה ליצור הפרש של שקל בסיכום התצוגה.</p>${r.notes.map(n=>`<p>${esc(n)}</p>`).join('')}<h3>נתוני החישוב</h3><dl>${inputs.map(([k,val])=>`<dt>${esc(k)}</dt><dd>${esc(val??'')}</dd>`).join('')}</dl><p><a href="${esc(r.source)}" target="_blank" rel="noopener">מקור התעריפים והכללים</a></p>`;
  result.scrollIntoView({behavior:'smooth',block:'start'});
 });
-document.querySelector('#field-search').addEventListener('input',e=>{const q=e.target.value.trim();schema.forEach(s=>form.elements[s.key].closest('label').classList.toggle('found',!!q&&(s.label+' '+(s.hint||'')).includes(q)));});
+document.querySelector('#field-search').addEventListener('input',e=>{const q=e.target.value.trim();schema.forEach(s=>form.elements.namedItem(s.key).closest('label').classList.toggle('found',!!q&&(s.label+' '+(s.hint||'')).includes(q)));});
