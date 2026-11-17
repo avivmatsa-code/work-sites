@@ -1345,6 +1345,21 @@
         .direct-debit-cycle-summary th { color:var(--color-text-muted);background:#f7f9fb;font-size:12px;font-weight:700; }
         .direct-debit-cycle-summary td { color:var(--color-text);font-size:13px; }
         .direct-debit-cycle-summary tbody tr:last-child td { border-bottom:0;background:#eef3f7;font-weight:700; }
+        .client-action-group { position:relative; }
+        .client-action-trigger { display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:8px 16px;border:0;border-radius:12px;color:#fff;font-family:Arial,Helvetica,sans-serif!important;font-size:14px;font-weight:700;box-shadow:0 4px 10px rgba(15,52,80,.12);transition:background-color .18s ease,transform .18s ease; }
+        .client-action-trigger:hover { transform:translateY(-1px); }
+        .client-action-trigger:disabled { cursor:wait;opacity:.72;transform:none; }
+        .client-action-trigger--documents { background:#4f46b8; }
+        .client-action-trigger--documents:hover { background:#4338a6; }
+        .client-action-trigger--files { background:#087f5b; }
+        .client-action-trigger--files:hover { background:#066b4d; }
+        .client-action-menu { position:absolute;z-index:60;top:calc(100% + 7px);left:0;min-width:255px;padding:6px;border:1px solid #cbd8e2;border-radius:10px;background:#fff;box-shadow:0 14px 32px rgba(18,48,70,.17); }
+        .client-action-menu button { width:100%;display:flex;align-items:center;gap:10px;padding:10px 11px;border:0;border-radius:7px;background:transparent;color:#24465f;font-family:Arial,Helvetica,sans-serif!important;font-size:12px;font-weight:700;text-align:right;white-space:nowrap; }
+        .client-action-menu button:hover { background:#edf5fa;color:#075ea8; }
+        .client-action-menu button:disabled { cursor:not-allowed;background:transparent;color:#9aa8b2; }
+        .client-action-menu button i { width:18px;text-align:center;color:#2876aa; }
+        .client-action-menu button:disabled i { color:#aeb9c1; }
+        @media (max-width:760px) { .client-action-menu { right:0;left:auto;min-width:235px; } }
         .current-year-metric-value--billed { color: #0b63c8; }
         .current-year-metric-value--collected,
         .current-year-metric-value--future { color: #087f5b; }
@@ -2030,7 +2045,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.21 · 16 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.22 · 17 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -3130,8 +3145,8 @@
 
                         <!-- מסנן פירוט חשבוניות לקוח (Level 2) -->
                         <div id="lvl2-filter-container" class="hidden flex bg-slate-200 p-1 rounded-xl items-center shadow-inner">
-                            <button onclick="setLvl2View('debt')" id="l2-debt" class="px-3 py-1 text-[11px] font-bold rounded-lg bg-white shadow-sm transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">חשבוניות חוב</button>
-                            <button onclick="setLvl2View('revenue')" id="l2-revenue" class="px-3 py-1 text-[11px] font-bold rounded-lg transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">חיובי שנה נוכחית</button>
+                            <button onclick="setLvl2View('debt')" id="l2-debt" class="px-3 py-1 text-[11px] font-bold rounded-lg bg-white shadow-sm transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">חשבוניות פתוחות</button>
+                            <button onclick="setLvl2View('revenue')" id="l2-revenue" class="px-3 py-1 text-[11px] font-bold rounded-lg transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">כל החיובים</button>
                         </div>
 
                         <!-- אפשרות הצגת אחוז חוב -->
@@ -3158,26 +3173,26 @@
                             <i class="fa-solid fa-file-invoice-dollar ml-2"></i> ייצוא רשימה ל-PDF
                         </button>
 
-                        <button id="btn-letter" onclick="toggleExportModal(true, 'debt')" class="hidden bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-indigo-700 transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">
-                            <i class="fa-solid fa-file-invoice-dollar ml-2"></i> הפק מכתב חוב
-                        </button>
-
-                        <button id="btn-annual-report" onclick="toggleExportModal(true, 'annual')" class="hidden bg-emerald-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-emerald-700 transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">
-                            <i class="fa-solid fa-file-invoice ml-2"></i> הפק דוח ללקוח
-                        </button>
-
                         <div id="client-invoice-actions" class="hidden items-center gap-2 flex-wrap" style="margin-right:auto;">
-                            <button id="btn-export-invoices-excel" onclick="exportDisplayedClientInvoicesToExcel()" class="bg-emerald-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-emerald-700 transition-all" style="font-family: Arial, Helvetica, sans-serif !important;">
-                                <i class="fa-solid fa-file-excel ml-2"></i> ייצוא חשבוניות לאקסל
-                            </button>
-
-                            <button id="btn-download-unpaid-invoices" onclick="downloadAllUnpaidInvoiceFiles()" class="bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-blue-700 transition-all disabled:opacity-60 disabled:cursor-wait" style="font-family: Arial, Helvetica, sans-serif !important;">
-                                <i class="fa-solid fa-file-zipper ml-2"></i> הורדת חשבוניות שטרם שולמו
-                            </button>
-
-                            <button id="btn-download-all-client-invoices" onclick="downloadAllClientInvoiceFiles()" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-indigo-700 transition-all disabled:opacity-60 disabled:cursor-wait" style="font-family: Arial, Helvetica, sans-serif !important;">
-                                <i class="fa-solid fa-box-archive ml-2"></i> הורדת כל חשבוניות הלקוח
-                            </button>
+                            <div class="client-action-group">
+                                <button id="btn-document-actions" type="button" class="client-action-trigger client-action-trigger--documents" onclick="toggleClientActionMenu('client-document-menu', event)" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fa-solid fa-file-lines" aria-hidden="true"></i>הפקת מסמכים<i class="fa-solid fa-chevron-down text-[10px]" aria-hidden="true"></i>
+                                </button>
+                                <div id="client-document-menu" class="client-action-menu hidden" role="menu">
+                                    <button id="btn-letter" type="button" onclick="openClientDocumentExport('debt')" role="menuitem"><i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i>הפקת מכתב חוב</button>
+                                    <button id="btn-annual-report" type="button" onclick="openClientDocumentExport('annual')" role="menuitem"><i class="fa-solid fa-file-invoice" aria-hidden="true"></i>הפקת דוח ללקוח</button>
+                                </div>
+                            </div>
+                            <div class="client-action-group">
+                                <button id="btn-file-actions" type="button" class="client-action-trigger client-action-trigger--files" onclick="toggleClientActionMenu('client-file-menu', event)" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fa-solid fa-download" aria-hidden="true"></i>הורדת קבצים<i class="fa-solid fa-chevron-down text-[10px]" aria-hidden="true"></i>
+                                </button>
+                                <div id="client-file-menu" class="client-action-menu hidden" role="menu">
+                                    <button id="btn-export-invoices-excel" type="button" onclick="closeClientActionMenus();exportDisplayedClientInvoicesToExcel()" role="menuitem"><i class="fa-solid fa-file-excel" aria-hidden="true"></i>ייצוא חשבוניות לאקסל</button>
+                                    <button id="btn-download-unpaid-invoices" type="button" onclick="closeClientActionMenus();downloadAllUnpaidInvoiceFiles()" role="menuitem"><i class="fa-solid fa-file-zipper" aria-hidden="true"></i>הורדת חשבוניות שטרם שולמו</button>
+                                    <button id="btn-download-all-client-invoices" type="button" onclick="closeClientActionMenus();downloadAllClientInvoiceFiles()" role="menuitem"><i class="fa-solid fa-box-archive" aria-hidden="true"></i>הורדת כל חשבוניות הלקוח</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3423,12 +3438,21 @@
             return reference <= candidate ? candidate : new Date(reference.getFullYear(), reference.getMonth() + 1, 17);
         }
 
+        function getDirectDebitResultAvailabilityDate(collectionDate) {
+            if (!isValidDate(collectionDate)) return null;
+            const availabilityDate = new Date(collectionDate);
+            availabilityDate.setHours(0, 0, 0, 0);
+            availabilityDate.setDate(availabilityDate.getDate() + 1);
+            return availabilityDate;
+        }
+
         function isDirectDebitAwaitingCollection(row, referenceDate = TODAY) {
             if (!row?.isDirectDebit || !isValidDate(row.dueDate)) return false;
             const reference = new Date(referenceDate);
             reference.setHours(0, 0, 0, 0);
             const collectionDate = row.directDebitCollectionDate || getDirectDebitCollectionDate(row.dueDate);
-            return row.dueDate < reference && isValidDate(collectionDate) && reference <= collectionDate;
+            const resultAvailabilityDate = getDirectDebitResultAvailabilityDate(collectionDate);
+            return row.dueDate < reference && isValidDate(resultAvailabilityDate) && reference < resultAvailabilityDate;
         }
 
         function isDirectDebitScheduled(row) {
@@ -3444,7 +3468,8 @@
             if (dueDate >= reference) return false;
             if (!isDirectDebit) return true;
             const collectionDate = getDirectDebitCollectionDate(dueDate);
-            return isValidDate(collectionDate) && reference > collectionDate;
+            const resultAvailabilityDate = getDirectDebitResultAvailabilityDate(collectionDate);
+            return isValidDate(resultAvailabilityDate) && reference >= resultAvailabilityDate;
         }
 
         function isUpcomingDirectDebitInvoice(row, referenceDate = TODAY) {
@@ -4249,7 +4274,7 @@
 - גבייה שוטפת: גבייה מחשבוניות שנת העבודה ועוד גביית דצמבר של השנה הקודמת.
 - גביית חובות עבר: חשבוניות שהופקו לפני דצמבר של השנה הקודמת והותאמו בשנת העבודה. זהו מדד נפרד שאינו נכלל בגבייה השוטפת.
 - חוב בפיגור: חשבוניות פתוחות שמועד הפירעון שלהן עבר.
-- תשלומים עתידיים או צפי גבייה עתידי: חשבוניות פתוחות שמועד גבייתן טרם הגיע. אצל לקוח בהוראת קבע, גם חשבונית שמועד פירעונה חלף נשארת בצפי עד שיעבור ה־17 הראשון שלאחר מועד הפירעון; רק מהיום שלאחר אותו 17 היא חוב בפיגור.
+- תשלומים עתידיים או צפי גבייה עתידי: חשבוניות פתוחות שמועד גבייתן טרם הגיע. אצל לקוח בהוראת קבע, גם חשבונית שמועד פירעונה חלף נשארת בצפי במהלך כל יום ה־17 הראשון שלאחר מועד הפירעון, משום שתוצאת הגבייה מתקבלת רק למחרת; רק מתחילת יום ה־18 היא חוב בפיגור אם נותרה פתוחה.
 - חוב משנים קודמות: יתרת חשבוניות פתוחות משנות עבודה קודמות.
 - העברות שטרם הותאמו: מסמכי DZ אינפורמטיביים; הם אינם נכללים בסכומי החיובים, החובות או הגבייה.
 - תחום פעילות info פירושו שירותי מידע; fees פירושו אגרות העברת בעלות; all פירושו הכול.
@@ -4599,6 +4624,27 @@
             renderView();
         }
 
+        function closeClientActionMenus() {
+            document.querySelectorAll('.client-action-menu').forEach(menu => menu.classList.add('hidden'));
+            ['btn-document-actions', 'btn-file-actions'].forEach(id => document.getElementById(id)?.setAttribute('aria-expanded', 'false'));
+        }
+
+        function toggleClientActionMenu(menuId, event) {
+            event?.stopPropagation();
+            const menu = document.getElementById(menuId);
+            if (!menu) return;
+            const shouldOpen = menu.classList.contains('hidden');
+            closeClientActionMenus();
+            if (!shouldOpen) return;
+            menu.classList.remove('hidden');
+            event?.currentTarget?.setAttribute('aria-expanded', 'true');
+        }
+
+        function openClientDocumentExport(context) {
+            closeClientActionMenus();
+            toggleExportModal(true, context);
+        }
+
         function compareInvoiceDocumentNumbers(first, second) {
             const a = normalizeInvoiceDocumentNumber(first);
             const b = normalizeInvoiceDocumentNumber(second);
@@ -4612,7 +4658,46 @@
             if (view === 'debt') return row.isOverdue ? 'בפיגור' : (isDirectDebitScheduled(row) ? 'ישולם בהוראת קבע' : 'עתידי');
             const matchingDebt = db.find(debt => debt.name === row.name && normalizeInvoiceDocumentNumber(debt.doc) === normalizeInvoiceDocumentNumber(row.doc));
             if (!matchingDebt) return 'שולם';
-            return matchingDebt.isOverdue ? 'פתוח' : (isDirectDebitScheduled(matchingDebt) ? 'ישולם בהוראת קבע' : 'עתידי (פתוח)');
+            return matchingDebt.isOverdue ? 'בפיגור' : (isDirectDebitScheduled(matchingDebt) ? 'ישולם בהוראת קבע' : 'עתידי');
+        }
+
+        function clientInvoiceStatusBadge(row, view = lvl2View) {
+            const status = getClientInvoiceStatus(row, view);
+            if (status === 'שולם') return '<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold" style="font-family:Arial,Helvetica,sans-serif!important"><i class="fa-solid fa-circle-check ml-1"></i>שולם</span>';
+            if (status === 'בפיגור') return '<span class="bg-red-100 text-red-800 text-[10px] px-2 py-0.5 rounded-full font-bold" style="font-family:Arial,Helvetica,sans-serif!important"><i class="fa-solid fa-triangle-exclamation ml-1"></i>בפיגור</span>';
+            if (status === 'ישולם בהוראת קבע') return '<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold" style="font-family:Arial,Helvetica,sans-serif!important"><i class="fa-solid fa-building-columns ml-1"></i>ישולם בהוראת קבע</span>';
+            return '<span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded-full font-bold" style="font-family:Arial,Helvetica,sans-serif!important"><i class="fa-solid fa-clock ml-1"></i>עתידי</span>';
+        }
+
+        function clientInvoiceRowClass(row, view = lvl2View) {
+            const status = getClientInvoiceStatus(row, view);
+            if (status === 'בפיגור') return 'bg-red-50/40 hover:bg-red-100/60 transition-colors';
+            if (status === 'עתידי' || status === 'ישולם בהוראת קבע') return 'bg-emerald-50/40 hover:bg-emerald-100/60 transition-colors';
+            return 'hover:bg-blue-50 transition-colors';
+        }
+
+        function buildClientInvoiceTable(rows, view = lvl2View) {
+            const body = rows.map(row => {
+                const matchingDebt = view === 'revenue'
+                    ? db.find(debt => debt.name === row.name && normalizeInvoiceDocumentNumber(debt.doc) === normalizeInvoiceDocumentNumber(row.doc))
+                    : row;
+                const dueDateRow = matchingDebt || row;
+                return `<tr class="${clientInvoiceRowClass(row, view)}">
+                    <td class="p-4 font-bold text-slate-700" style="font-family:Arial,Helvetica,sans-serif!important"><span class="invoice-document-cell"><bdi dir="ltr">${row.doc}</bdi>${invoiceFileIndicator(row.doc)}</span></td>
+                    <td class="p-4 font-bold text-slate-600" style="font-family:Arial,Helvetica,sans-serif!important"><bdi dir="ltr">${row.billingDocument || '—'}</bdi></td>
+                    <td class="p-4" style="font-family:Arial,Helvetica,sans-serif!important">${isValidDate(row.regDate) ? row.regDate.toLocaleDateString('he-IL') : '—'}</td>
+                    <td class="p-4" style="font-family:Arial,Helvetica,sans-serif!important">${formatInvoiceDueDate(dueDateRow)}</td>
+                    <td class="p-4" style="font-family:Arial,Helvetica,sans-serif!important">${row.desc || '—'}</td>
+                    <td class="p-4" style="font-family:Arial,Helvetica,sans-serif!important">${clientInvoiceStatusBadge(row, view)}</td>
+                    <td class="p-4 font-bold text-left text-slate-900" style="font-family:Arial,Helvetica,sans-serif!important">${formatCurrency(row.amount)}</td>
+                </tr>`;
+            }).join('');
+            const total = rows.reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+            return `<div id="capture-area"><table class="w-full text-right border-collapse rounded-2xl overflow-hidden border border-slate-200 shadow-sm" style="font-family:Arial,Helvetica,sans-serif!important">
+                <thead class="bg-slate-100 text-xs font-bold border-b text-slate-500 uppercase"><tr>${clientInvoiceSortHeader('document', 'מספר מסמך חשבונאי')}${clientInvoiceSortHeader('billingDocument', 'מסמך לחיוב')}${clientInvoiceSortHeader('registration', 'תאריך רישום')}${clientInvoiceSortHeader('due', 'מועד פירעון')}${clientInvoiceSortHeader('description', 'תיאור השירות')}${clientInvoiceSortHeader('status', 'סטטוס')}${clientInvoiceSortHeader('amount', 'סכום בש"ח', 'text-left')}</tr></thead>
+                <tbody class="divide-y divide-slate-100 bg-white">${body || '<tr><td colspan="7" class="p-8 text-center text-slate-500">לא נמצאו חשבוניות להצגה.</td></tr>'}</tbody>
+                <tfoot><tr class="bg-slate-100 border-t border-slate-300 font-bold"><td colspan="5" class="p-4" style="font-family:Arial,Helvetica,sans-serif!important">סה"כ</td><td class="p-4" style="font-family:Arial,Helvetica,sans-serif!important">${rows.length.toLocaleString('he-IL')} חשבוניות</td><td class="p-4 text-left" style="font-family:Arial,Helvetica,sans-serif!important">${formatCurrency(total)}</td></tr></tfoot>
+            </table></div>`;
         }
 
         function sortClientInvoiceRows(rows, view = lvl2View) {
@@ -5613,6 +5698,7 @@
         }
 
         function renderView() {
+            closeClientActionMenus();
             const view = document.getElementById('drilldown-viewport');
             const title = document.getElementById('view-title');
             const back = document.getElementById('btn-back');
@@ -5861,6 +5947,15 @@
                 clientInvoiceActions.classList.remove('hidden');
                 clientInvoiceActions.classList.add('flex');
                 title.innerHTML = `${path.orgName} ${clientCodeBadge(path.orgName)} ${payerCodeBadge(path.orgName)} ${directDebitBadge(path.orgName)} ${unmatchedTransferBadge(path.orgName)}`;
+                const revenueViewButton = document.getElementById('l2-revenue');
+                if (revenueViewButton) revenueViewButton.textContent = `כל חיובי ${CURRENT_YEAR}`;
+                const downloadUnpaidButton = document.getElementById('btn-download-unpaid-invoices');
+                const downloadAllButton = document.getElementById('btn-download-all-client-invoices');
+                [downloadUnpaidButton, downloadAllButton].forEach(button => {
+                    if (!button) return;
+                    button.disabled = !invoiceMappingLoaded;
+                    button.title = invoiceMappingLoaded ? '' : 'יש לטעון תחילה את קובץ מיפוי החשבוניות במסך מקורות הנתונים';
+                });
 
                 if (hasRevenue) {
                     lvl2FilterContainer.classList.remove('hidden');
@@ -5878,62 +5973,13 @@
                 let html = "";
 
                 if (lvl2View === 'debt') {
-                    html = `<div id="capture-area"><table class="w-full text-right border-collapse rounded-2xl overflow-hidden border border-slate-200 shadow-sm" style="font-family: Arial, Helvetica, sans-serif !important;">
-                        <thead class="bg-slate-100 text-xs font-bold border-b text-slate-500 uppercase">
-                            <tr>${clientInvoiceSortHeader('document', 'מספר מסמך חשבונאי')}${clientInvoiceSortHeader('billingDocument', 'מסמך לחיוב')}${clientInvoiceSortHeader('due', 'מועד פירעון')}${clientInvoiceSortHeader('description', 'תיאור השירות')}${clientInvoiceSortHeader('amount', 'סכום בש"ח', 'text-left')}</tr>
-                        </thead><tbody class="divide-y divide-slate-100 bg-white">`;
-                    orgData.forEach(r => {
-                        const isFuture = !r.isOverdue;
-                        const rowBg = isFuture ? 'bg-emerald-50/50 hover:bg-emerald-100/50 transition-all text-emerald-950' : 'hover:bg-blue-50 transition-colors';
-                        const statusBadge = isFuture 
-                            ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-clock ml-1"></i>${isDirectDebitScheduled(r) ? 'ישולם בהוראת קבע' : 'עתידי'}</span>`
-                            : `<span class="bg-red-100 text-red-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-triangle-exclamation ml-1"></i>בפיגור</span>`;
-
-                        html += `<tr class="${rowBg}">
-                            <td class="p-4 font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;"><span class="invoice-document-cell"><bdi dir="ltr">${r.doc}</bdi>${invoiceFileIndicator(r.doc)}</span> ${statusBadge}</td>
-                            <td class="p-4 font-bold text-slate-600" style="font-family: Arial, Helvetica, sans-serif !important;"><bdi dir="ltr">${r.billingDocument || '—'}</bdi></td>
-                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${formatInvoiceDueDate(r)}</td>
-                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.desc}</td>
-                            <td class="p-4 font-bold text-left text-slate-900" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(r.amount)}</td>
-                        </tr>`;
-                    });
-                    html += `</tbody></table></div>`;
+                    html = buildClientInvoiceTable(orgData, 'debt');
                     
                     const activeOrgDebts = data.filter(r => r.name === path.orgName);
                     updateAnalytics(activeOrgDebts);
                 } else {
                     const orgRevenues = sortClientInvoiceRows(revenueDb.filter(r => r.name === path.orgName && getRevenueYear(r) === CURRENT_YEAR && isTypeMatch(r)), 'revenue');
-
-                    html = `<div id="capture-area"><table class="w-full text-right border-collapse rounded-2xl overflow-hidden border border-slate-200 shadow-sm" style="font-family: Arial, Helvetica, sans-serif !important;">
-                        <thead class="bg-slate-100 text-xs font-bold border-b text-slate-500 uppercase">
-                            <tr>${clientInvoiceSortHeader('document', 'מספר מסמך חשבונאי')}${clientInvoiceSortHeader('billingDocument', 'מסמך לחיוב')}${clientInvoiceSortHeader('registration', 'תאריך רישום')}${clientInvoiceSortHeader('due', 'מועד פירעון')}${clientInvoiceSortHeader('description', 'תיאור השירות')}${clientInvoiceSortHeader('status', 'סטטוס')}${clientInvoiceSortHeader('amount', 'סכום בש"ח', 'text-left')}</tr>
-                        </thead><tbody class="divide-y divide-slate-100 bg-white">`;
-                    
-                    orgRevenues.forEach(r => {
-                        const matchingDebt = db.find(d => d.doc === r.doc);
-                        const isUnpaidDebt = Boolean(matchingDebt);
-                        const isFuture = isUnpaidDebt && !matchingDebt.isOverdue;
-
-                        const rowBg = isUnpaidDebt ? 'bg-red-50/70 hover:bg-red-100 transition-all text-red-900' : 'hover:bg-blue-50 transition-colors';
-                        
-                        let statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-circle-check ml-1"></i>שולם</span>`;
-                        if (isUnpaidDebt) {
-                            statusBadge = isFuture 
-                                ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-clock ml-1"></i>${isDirectDebitScheduled(matchingDebt) ? 'ישולם בהוראת קבע' : 'עתידי (פתוח)'}</span>`
-                                : `<span class="bg-red-100 text-red-800 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-triangle-exclamation ml-1"></i>פתוח</span>`;
-                        }
-
-                        html += `<tr class="${rowBg}">
-                            <td class="p-4 font-bold text-slate-700" style="font-family: Arial, Helvetica, sans-serif !important;"><span class="invoice-document-cell"><bdi dir="ltr">${r.doc}</bdi>${invoiceFileIndicator(r.doc)}</span></td>
-                            <td class="p-4 font-bold text-slate-600" style="font-family: Arial, Helvetica, sans-serif !important;"><bdi dir="ltr">${r.billingDocument || '—'}</bdi></td>
-                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.regDate.toLocaleDateString('he-IL')}</td>
-                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${formatInvoiceDueDate(matchingDebt || r)}</td>
-                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${r.desc}</td>
-                            <td class="p-4" style="font-family: Arial, Helvetica, sans-serif !important;">${statusBadge}</td>
-                            <td class="p-4 font-bold text-left" style="font-family: Arial, Helvetica, sans-serif !important;">${formatCurrency(r.amount)}</td>
-                        </tr>`;
-                    });
-                    html += `</tbody></table></div>`;
+                    html = buildClientInvoiceTable(orgRevenues, 'revenue');
                     
                     const activeOrgDebts = data.filter(r => r.name === path.orgName);
                     updateAnalytics(activeOrgDebts);
@@ -6305,6 +6351,7 @@ function getClientProfileMetrics(orgName) {
             if (box && !box.contains(e.target) && e.target !== input) {
                 box.classList.add('hidden');
             }
+            if (!e.target.closest('.client-action-group')) closeClientActionMenus();
         });
 
         function selectSector(id) { path.sector = id; currentLevel = 1; renderView(); }
@@ -6976,6 +7023,7 @@ function getClientProfileMetrics(orgName) {
 
         async function downloadClientInvoiceFiles({ buttonId, rows, emptyMessage, reportTitle, zipTitle }) {
             const button = document.getElementById(buttonId);
+            const groupTrigger = document.getElementById('btn-file-actions');
             if (!path.orgName) return;
             if (!invoiceMappingLoaded) {
                 alert('כדי להוריד את קובצי החשבוניות יש לטעון תחילה את קובץ מיפוי החשבוניות במסך מקורות הנתונים.');
@@ -6998,9 +7046,14 @@ function getClientProfileMetrics(orgName) {
                 uniqueRows.push(row);
             });
             const originalButtonHtml = button?.innerHTML || '';
+            const originalTriggerHtml = groupTrigger?.innerHTML || '';
             if (button) {
                 button.disabled = true;
                 button.innerHTML = '<i class="fa-solid fa-spinner fa-spin ml-2"></i> מכין קובץ ZIP...';
+            }
+            if (groupTrigger) {
+                groupTrigger.disabled = true;
+                groupTrigger.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>מכין קובץ ZIP...';
             }
             try {
                 const directoryHandle = await getAuthorizedInvoiceFolderHandle(true);
@@ -7069,6 +7122,10 @@ function getClientProfileMetrics(orgName) {
                 if (button) {
                     button.disabled = false;
                     button.innerHTML = originalButtonHtml;
+                }
+                if (groupTrigger) {
+                    groupTrigger.disabled = false;
+                    groupTrigger.innerHTML = originalTriggerHtml;
                 }
             }
         }
@@ -10532,6 +10589,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                     if (dialog.id === 'invoice-preview-dialog') closeInvoicePreviewDialog();
                     else closeUiDialog(dialog.id);
                 });
+                closeClientActionMenus();
                 closeSuiteMenu();
             });
         }
