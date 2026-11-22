@@ -2045,7 +2045,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.25 · 17 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.26 · 22 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -2166,6 +2166,7 @@
             <button id="nav-dashboard-report" class="suite-nav__item" type="button" onclick="closeSuiteMenu(); printDashboardAll()" disabled>
                 <i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>דוח מאוחד הכנסות וגבייה בשנה הנוכחית</span>
             </button>
+            <button id="nav-matched" class="suite-nav__item" type="button" onclick="navigateToScreen('matched')"><i class="fa-solid fa-calendar-check"></i><span>גבייה לפי תאריך התאמה</span></button>
             <button id="nav-unmatched-transfers" class="suite-nav__item" type="button" onclick="navigateToScreen('unmatched-transfers')" disabled>
                 <i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i><span>דוח העברות שטרם הותאמו</span>
             </button>
@@ -2486,6 +2487,13 @@
         </main>
     </div>
 
+    <section id="matched-container" class="suite-screen hidden flex-col flex-grow" dir="rtl">
+      <main class="unmatched-report-main"><section class="unmatched-report-panel">
+      <div class="unmatched-report-panel__header"><div class="unmatched-report-controls" id="mr-controls"></div><button class="btn-secondary" id="mr-print" onclick="mrPrint()">הדפס דוח</button></div>
+      <div style="padding:0 20px 20px"><p id="mr-note" role="status"></p><div id="mr-summary" class="unmatched-report-summary"></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px"><figure><figcaption>סכום שהותאם בתקופה (₪)</figcaption><div style="height:240px"><canvas id="mr-bar"></canvas></div></figure><figure><figcaption>גבייה מצטברת בטווח (₪)</figcaption><div style="height:240px"><canvas id="mr-line"></canvas></div></figure></div>
+      <h2>פירוט חשבוניות</h2><div id="mr-detail"></div></div></section></main>
+    </section>
     <!-- UNMATCHED TRANSFERS REPORT SCREEN -->
     <div id="unmatched-transfers-container" class="suite-screen hidden flex-col flex-grow">
         <header class="app-header no-print">
@@ -3742,6 +3750,7 @@
             management: 'management-container',
             'fees-management': 'fees-management-container',
             'direct-debit': 'direct-debit-container',
+            matched: 'matched-container',
             'unmatched-transfers': 'unmatched-transfers-container'
         };
 
@@ -3799,6 +3808,8 @@
                 renderFeesManagementReport();
             } else if (screen === 'direct-debit') {
                 renderDirectDebitReports();
+            } else if (screen === 'matched') {
+                showMatched();
             } else if (screen === 'unmatched-transfers') {
                 renderUnmatchedTransfersReport();
             } else if (screen === 'invoice-search') {
@@ -9505,6 +9516,91 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
          * the same canonical schema as current-year revenue, but is stored in a
          * separate collection so it cannot alter existing dashboard totals.
          */
+        // Matching-date reporting is independent of legacy payment-date fallbacks.
+        const mr = {rows:null, invalid:0, min:'', from:'', to:'', one:false, activity:'הכל', sector:'הכל', client:'', unit:'יום', focus:'', sort:0, dir:-1, page:0, charts:[]};
+        const mrCols=['תאריך התאמה','שם לקוח','קוד מרכבה','מספר מסמך חשבונאי','מסמך לחיוב','תאריך הפקה','תיאור','סכום (₪)'];
+        const mrEl=id=>document.getElementById('mr-'+id);
+        const mrIso=d=>d.toISOString().slice(0,10);
+        const mrDay=s=>new Date(s+'T00:00:00Z');
+        const mrLabel=s=>s?s.split('-').reverse().join('.'):'—';
+        const mrMoney=c=>(c/100).toLocaleString('he-IL',{minimumFractionDigits:2,maximumFractionDigits:2});
+        function mrDate(v){
+            if(v instanceof Date && isValidDate(v)) return formatLocalIsoDate(v);
+            if(typeof v==='number' && v>0 && v<2958466) return mrIso(new Date(Date.UTC(1899,11,30)+Math.floor(v)*86400000));
+            let s=String(v??'').trim(), parts=s.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/);
+            if(parts)s=parts[3]+'-'+parts[2].padStart(2,'0')+'-'+parts[1].padStart(2,'0');
+            if(!/^\d{4}-\d{2}-\d{2}$/.test(s))return '';
+            const d=mrDay(s);return isValidDate(d)&&mrIso(d)===s?s:'';
+        }
+        function mrLoad(raw){
+            mr.rows=[];mr.invalid=0;mr.focus='';mr.page=0;
+            for(const r of raw){
+                const code=String(r['לקוח']??'').trim(), type=String(r['סוג מסמך']??'').trim();
+                if(!/^\d{8}$/.test(code)||(type&&type!=='RV'))continue;
+                const date=mrDate(r['תאריך התאמה']||r['תאריך התאמה נטו']);
+                const val=String(r['סכום במטבע מסמך']??r['סכום']??'').replace(/,/g,'').trim();
+                const doc=normalizeInvoiceDocumentNumber(r['מספר מסמך']), bill=normalizeInvoiceDocumentNumber(getBillingDocumentValue(r));
+                if(!date||!val||!Number.isFinite(Number(val))||(!doc&&!bill)){mr.invalid++;continue}
+                const name=String(r['שם חשבון']||r['שם לקוח']||''), issued=mrDate(r['תאריך מסמך']||r['תאריך רישום']);
+                const cells=[date,name,code,doc,bill,issued,String(r['טקסט']||r['תיאור']||''),Math.round(Number(val)*100)];
+                mr.rows.push({cells,id:code+'|'+(bill?'b'+bill:'a'+doc+'|'+(r['שנת כספים']||issued.slice(0,4))),sector:getCustomerSector(name),activity:FEE_KEYWORDS.some(k=>String(r['שם חשבון נגדי']||'').includes(k))?'אגרות העברת בעלות':'שירותי מידע'});
+            }
+            mr.rows.sort((a,b)=>a.cells[0].localeCompare(b.cells[0]));
+            mr.min=mr.rows[0]?.cells[0]||'';const today=formatLocalIsoDate(new Date());
+            mr.to=mr.min>today?mr.min:today;mr.from=mrIso(new Date(+mrDay(mr.to)-6*86400000));if(mr.from<mr.min)mr.from=mr.min;
+            mr.one=false;
+        }
+        function mrBucket(s){if(mr.unit==='חודש')return s.slice(0,7)+'-01';if(mr.unit==='שבוע'){const d=mrDay(s);d.setUTCDate(d.getUTCDate()-d.getUTCDay());return mrIso(d)}return s}
+        function mrModel(){
+            const rows=mr.rows.filter(({cells:c,activity,sector})=>c[0]>=mr.from&&c[0]<=mr.to&&(mr.activity==='הכל'||activity===mr.activity)&&(mr.sector==='הכל'||sector===mr.sector)&&(!mr.client||(c[1]+' · '+c[2]).includes(mr.client.trim())));
+            const daily=new Map(), buckets=new Map();let total=0;
+            for(let d=mrDay(mr.from);mrIso(d)<=mr.to;d.setUTCDate(d.getUTCDate()+1)){const day=mrIso(d);daily.set(day,0);buckets.set(mrBucket(day),0)}
+            for(const {cells:c} of rows){const k=mrBucket(c[0]);daily.set(c[0],daily.get(c[0])+c[7]);buckets.set(k,buckets.get(k)+c[7]);total+=c[7]}
+            const details=rows.filter(r=>!mr.focus||mrBucket(r.cells[0])===mr.focus);
+            const coll=new Intl.Collator('he',{numeric:true});details.sort((a,b)=>mr.dir*(mr.sort===7?a.cells[7]-b.cells[7]:coll.compare(a.cells[mr.sort],b.cells[mr.sort])));
+            return {rows,total,details,daily,buckets};
+        }
+        function mrFilters(){
+            const wrap=mrEl('controls');
+            const select=(key,label,opts,active)=>'<label>'+label+'<select data-key="'+key+'">'+opts.map(v=>'<option '+(v===active?'selected':'')+'>'+escapeHtml(v)+'</option>').join('')+'</select></label>';
+            wrap.innerHTML=select('activity','תחום פעילות',['הכל','שירותי מידע','אגרות העברת בעלות'],mr.activity)+select('sector','סקטור',['הכל','משרדי ממשלה','רשויות וחברות ממשלתיות','רשויות מקומיות','לקוחות פרטיים'],mr.sector)+select('mode','תקופה',['טווח תאריכים','יום בודד'],mr.one?'יום בודד':'טווח תאריכים')+['from',...(mr.one?[]:['to'])].map(k=>'<label>'+(k==='to'?'עד תאריך':mr.one?'תאריך':'מתאריך')+'<input type="date" data-key="'+k+'" min="'+mr.min+'" value="'+mr[k]+'" required></label>').join('')+select('unit','עמודות לפי',['יום','שבוע','חודש'],mr.unit)+'<label>איתור לקוח<input type="search" list="mr-clients" placeholder="שם או קוד מרכבה" id="mr-client"></label><datalist id="mr-clients">'+[...new Set((mr.rows||[]).map(r=>r.cells[1]+' · '+r.cells[2]))].map(v=>'<option value="'+escapeHtml(v)+'"></option>').join('')+'</datalist>';
+            wrap.querySelectorAll('select,input').forEach(el=>{el.style.cssText='display:block;padding:6px;border:1px solid #bdcdda;border-radius:5px;background:white';el.disabled=!mr.min});
+            mrEl('client').value=mr.client;mrEl('client').oninput=e=>{mr.client=e.target.value;mr.focus='';mr.page=0;mrRender()};
+            wrap.onchange=e=>{const k=e.target.dataset.key,v=e.target.value;if(!k)return;
+              if(k==='from'||k==='to'){if(!mrDate(v)||v<mr.min||(!mr.one&&(k==='to'?v<mr.from:v>mr.to))){e.target.value=mr[k];alert('יש לבחור תאריכים בסדר עולה, החל מ־'+mrLabel(mr.min));return}mr[k]=v;if(mr.one)mr.to=v}
+              else if(k==='mode'){mr.one=v==='יום בודד';if(mr.one)mr.to=mr.from}else mr[k]=v;
+              mr.focus='';mr.page=0;mrFilters();mrRender()};
+        }
+        function showMatched(){
+            const host=document.getElementById('matched-container');if(!host.querySelector('header')){const h=document.querySelector('#unmatched-transfers-container header').cloneNode(true);h.querySelector('h1').textContent='גבייה לפי תאריך התאמה';host.prepend(h)}
+            mrFilters();mrRender();
+        }
+        function mrTable(rows,print=false){
+            return '<table class="unmatched-report-table"><thead><tr>'+mrCols.map((l,i)=>'<th>'+(print?l:'<button onclick="mrSort('+i+')">'+l+(mr.sort===i?(mr.dir===1?' ▲':' ▼'):'')+'</button>')+'</th>').join('')+'</tr></thead><tbody>'+rows.map(({cells})=>'<tr>'+cells.map((v,i)=>'<td>'+(i===7?mrMoney(v):i===0||i===5?mrLabel(v):escapeHtml(String(v)))+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
+        }
+        function mrSort(i){mr.dir=mr.sort===i?-mr.dir:1;mr.sort=i;mr.page=0;mrDetail(mrModel())}
+        function mrDetail({details}){
+            const pages=Math.max(1,Math.ceil(details.length/100));mr.page=Math.min(pages-1,Math.max(0,mr.page));
+            mrEl('detail').innerHTML=(mr.focus?'פירוט לעמודה: '+mrLabel(mr.focus)+' <button onclick="mr.focus=\'\';mr.page=0;mrDetail(mrModel())">חזרה לכל התקופה</button>':'')+'<div style="overflow:auto">'+mrTable(details.slice(mr.page*100,mr.page*100+100))+'</div><p>סה״כ לפירוט: ₪'+mrMoney(details.reduce((s,r)=>s+r.cells[7],0))+' · '+details.length+' שורות</p><button '+(!mr.page?'disabled':'')+' onclick="mr.page--;mrDetail(mrModel())">הקודם</button> · עמוד '+(mr.page+1)+' מתוך '+pages+' · <button '+(mr.page+1===pages?'disabled':'')+' onclick="mr.page++;mrDetail(mrModel())">הבא</button>';
+        }
+        function mrRender(){
+            mr.charts.forEach(c=>c.destroy());mr.charts=[];mrEl('summary').innerHTML='';mrEl('detail').innerHTML='';mrEl('print').disabled=!mr.min;
+            const warning=mr.invalid?'לא נכללו '+mr.invalid+' שורות מקור ללא תאריך התאמה, מזהה או סכום תקינים. ':'';
+            mrEl('note').textContent=(mr.rows===null?'יש לטעון קובץ חשבוניות שהותאמו.':!mr.min?'אין רשומות התאמה תקינות בקובץ. ':'')+warning;if(!mr.min)return;
+            const model=mrModel(),{rows,total,buckets,daily}=model;
+            mrEl('note').textContent=warning+(rows.length?'לחיצה על עמודה תציג את החשבוניות המרכיבות אותה.':'לא נמצאו התאמות בחתך שנבחר.');
+            mrEl('summary').innerHTML=[['סכום שהותאם','₪'+mrMoney(total)],['חשבוניות',new Set(rows.map(r=>r.id)).size],['לקוחות',new Set(rows.map(r=>r.cells[2])).size]].map(([l,v])=>'<div class="unmatched-report-summary__card"><span>'+l+'</span><strong>'+v+'</strong></div>').join('');
+            mrDetail(model);let running=0;
+            for(const [id,series] of [['bar',buckets],['line',daily]]){
+              const keys=[...series.keys()], bar=id==='bar';
+              mr.charts.push(new Chart(mrEl(id),{type:id,data:{labels:keys.map(mrLabel),datasets:[{label:bar?'סכום בתקופה':'סכום מצטבר',data:[...series.values()].map(v=>(bar?v:running+=v)/100),fill:!bar,pointRadius:keys.length===1?3:0,borderColor:'#0966a4',backgroundColor:bar?'#0966a4':'rgba(9,102,164,.18)'}]},options:{animation:false,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:8}},y:{beginAtZero:true}},onClick:(_,items)=>{if(bar&&items.length){mr.focus=keys[items[0].index];mr.page=0;mrDetail(mrModel())}}}}));
+            }
+        }
+
+        function mrPrint(){if(!mr.min)return;const m=mrModel();if(m.details.length>=1000&&!confirm('הדוח כולל '+m.details.length+' שורות. להמשיך להדפסה?'))return;
+          const w=window.open('','_blank');if(!w)return;const title='גבייה לפי תאריך התאמה',filters=[mrLabel(mr.from)+' – '+mrLabel(mr.to),mr.activity,mr.sector,mr.client||'כל הלקוחות','עמודות לפי '+mr.unit].map(escapeHtml).join(' · ');
+          w.document.write('<html lang="he" dir="rtl"><head><title>'+title+'</title>'+getClientDocumentPrintStyles()+'<style>body{font-family:Arial} th,td{padding:3px} thead{display:table-header-group} tr{break-inside:avoid}</style></head><body>'+getClientDocumentPageStart(title)+'<h2>'+title+'</h2><p>'+filters+'</p><p>'+escapeHtml(mrEl('summary').innerText)+' · '+escapeHtml(mrEl('note').textContent.split('לחיצה')[0])+'</p>'+mr.charts.map((c,i)=>'<figure style="display:inline-block;width:46%;margin:1%"><figcaption>'+(i?'סכום מצטבר':'סכום בתקופה')+' (₪)</figcaption><img style="width:100%" src="'+c.toBase64Image()+'"></figure>').join('')+'<h3>פירוט חשבוניות'+(mr.focus?' לעמודה '+mrLabel(mr.focus):'')+'</h3>'+mrTable(m.details,true)+'<p>סה״כ לפירוט: ₪'+mrMoney(m.details.reduce((s,r)=>s+r.cells[7],0))+'</p>'+getClientDocumentPageEnd()+'</body></html>');w.document.close();w.focus();w.print();
+        }
         function processHistoricalRevenueExcel(e) {
             const file = e.target.files?.[0];
             if (!file) return;
@@ -9515,6 +9611,8 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                 try {
                     const rows = getSpreadsheetRows(evt.target.result);
                     const parsedHistorical = parseRevenueRows(rows);
+                    mrLoad(rows);
+                    if(currentScreen==='matched')showMatched();
                     const usableRows = parsedHistorical.filter(row =>
                         isValidDate(row.matchDate) && isValidDate(row.documentDate)
                     );
