@@ -2045,7 +2045,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.29 · 22 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.30 · 22 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -2492,7 +2492,7 @@
       <main class="unmatched-report-main"><section class="unmatched-report-panel">
       <div class="unmatched-report-panel__header"><div class="unmatched-report-controls" id="mr-controls"></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="button-secondary button-secondary--brand" id="mr-graphs" onclick="mrPrint(true)"><i class="fa-solid fa-print"></i>הדפס גרפים בלבד</button><button class="button-secondary button-secondary--brand" id="mr-print" onclick="mrPrint(false)"><i class="fa-solid fa-print"></i>הדפס דוח מלא</button></div></div>
       <div style="padding:0 20px 20px"><p id="mr-note" role="status"></p><div id="mr-summary" class="unmatched-report-summary"></div>
-      <div id="mr-plots" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px;margin-block:16px"><figure style="min-width:0;margin:0;padding:16px;border:1px solid #cbd8e5;border-radius:8px"><figcaption style="font-weight:700;margin-bottom:12px">סכום שהותאם בתקופה (₪)</figcaption><label>קיבוץ עמודות לפי <select id="mr-unit"><option>יום</option><option>שבוע</option><option>חודש</option></select></label><div style="height:230px"><canvas id="mr-bar"></canvas></div></figure><figure style="min-width:0;margin:0;padding:16px;border:1px solid #cbd8e5;border-radius:8px"><figcaption style="font-weight:700;margin-bottom:12px">סכום גבייה מצטברת (ש"ח)</figcaption><div style="height:230px"><canvas id="mr-line"></canvas></div></figure><figure style="min-width:0;margin:0;padding:16px;border:1px solid #cbd8e5;border-radius:8px"><figcaption style="font-weight:700;margin-bottom:12px">סה"כ חשבוניות שהותאמו במצטבר</figcaption><div style="height:230px"><canvas id="mr-count"></canvas></div></figure></div>
+      <div id="mr-plots" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px;margin-block:16px"><figure style="min-width:0;margin:0;padding:16px;border:1px solid #cbd8e5;border-radius:8px"><figcaption style="font-weight:700;margin-bottom:12px">סכום שהותאם בתקופה (₪)</figcaption><label>קיבוץ עמודות לפי <select id="mr-unit"><option>יום</option><option>שבוע</option><option>חודש</option></select></label><div style="height:230px"><canvas id="mr-bar"></canvas></div></figure><figure style="min-width:0;margin:0;padding:16px;border:1px solid #cbd8e5;border-radius:8px"><figcaption style="font-weight:700;margin-bottom:12px">סכום גבייה מצטברת (₪)</figcaption><div style="height:230px"><canvas id="mr-line"></canvas></div></figure><figure style="min-width:0;margin:0;padding:16px;border:1px solid #cbd8e5;border-radius:8px"><figcaption style="font-weight:700;margin-bottom:12px">סה"כ חשבוניות שהותאמו במצטבר</figcaption><div style="height:230px"><canvas id="mr-count"></canvas></div></figure></div>
       <h2>פירוט חשבוניות</h2><div id="mr-detail"></div></div></section></main>
     </section>
     <style>
@@ -2917,7 +2917,7 @@
                             </div>
                         </article>
                         <article class="historical-panel">
-                            <div class="management-chart-wrap"><canvas id="fees-management-monthly-chart"></canvas></div>
+                            <div class="management-chart-wrap"><canvas id="fees-management-monthly-chart" aria-labelledby="fees-management-monthly-title"></canvas></div>
                         </article>
                     </div>
                 </div>
@@ -2934,7 +2934,7 @@
                             </div>
                         </article>
                         <article class="historical-panel">
-                            <div class="management-chart-wrap"><canvas id="fees-management-debt-years-chart"></canvas></div>
+                            <div class="management-chart-wrap"><canvas id="fees-management-debt-years-chart" aria-labelledby="fees-management-open-debts-title"></canvas></div>
                         </article>
                     </div>
                 </div>
@@ -2951,7 +2951,7 @@
                             </div>
                         </article>
                         <article class="historical-panel">
-                            <div class="management-chart-wrap"><canvas id="fees-management-historical-years-chart"></canvas></div>
+                            <div class="management-chart-wrap"><canvas id="fees-management-historical-years-chart" aria-labelledby="fees-management-closed-debts-title"></canvas></div>
                         </article>
                     </div>
                 </div>
@@ -3223,7 +3223,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
                         <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 tracking-tight" id="lbl-years-pie" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-chart-pie ml-2 text-blue-500"></i>פילוח חובות לפי שנים</h3>
-                        <div class="h-64 flex justify-center"><canvas id="yearsChart"></canvas></div>
+                        <div class="h-64 flex justify-center"><canvas id="yearsChart" aria-labelledby="lbl-years-pie"></canvas></div>
                     </div>
                     <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 overflow-x-auto">
                         <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 tracking-tight" id="lbl-years-table" style="font-family: Arial, Helvetica, sans-serif !important;"><i class="fa-solid fa-table ml-2 text-blue-500"></i>ריכוז חובות לפי שנים</h3>
@@ -3318,11 +3318,11 @@
                 </div>
 
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col min-h-[480px] page-break">
-                    <h3 class="font-bold text-slate-700 mb-3 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
+                    <h3 id="dash-monthly-chart-title" class="font-bold text-slate-700 mb-3 border-b pb-2 tracking-tight" style="font-family: Arial, Helvetica, sans-serif !important;">
                         <i class="fa-solid fa-chart-column ml-2 text-emerald-600"></i>חיובים מול גבייה בחודשי שנת העבודה
                     </h3>
                     <div class="flex-grow relative h-[380px] min-h-[380px]">
-                        <canvas id="dashChartCanvas"></canvas>
+                        <canvas id="dashChartCanvas" aria-labelledby="dash-monthly-chart-title"></canvas>
                     </div>
                 </div>
             </div>
@@ -9620,6 +9620,17 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             }
         }
 
+        function getChartDisplayTitle(chart) {
+            const canvas = chart.canvas;
+            const labelledBy = (canvas.getAttribute('aria-labelledby') || '').split(/\s+/)
+                .map(id => document.getElementById(id)?.textContent || '').join(' ').trim();
+            const panel = canvas.closest('figure, .historical-panel, .client-insight-card, .query-panel, .query-year-block');
+            const heading = panel?.querySelector('figcaption, .historical-panel__header h3, :scope > h3, :scope > h4');
+            const configured = chart.options?.plugins?.title?.text;
+            return (labelledBy || heading?.textContent?.trim() || canvas.getAttribute('aria-label') ||
+                (Array.isArray(configured) ? configured.join(' ') : configured) || 'גרף מוגדל').replace(/\s+/g, ' ').trim();
+        }
+
         // Intercept background clicks only. Data and legend clicks keep their normal chart handlers.
         document.addEventListener('click',event=>{
             const canvas=event.target;if(!(canvas instanceof HTMLCanvasElement))return;
@@ -9627,9 +9638,9 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const box=canvas.getBoundingClientRect(),x=(event.clientX-box.left)*chart.width/box.width,y=(event.clientY-box.top)*chart.height/box.height;
             if(chart.legend?.legendHitBoxes?.some(b=>x>=b.left&&x<=b.left+b.width&&y>=b.top&&y<=b.top+b.height))return;
             event.stopImmediatePropagation();
-            const dialog=document.createElement('dialog');dialog.setAttribute('aria-label','גרף מוגדל');dialog.className='ui-dialog invoice-preview-dialog';dialog.style.cssText='position:fixed;inset:0;margin:auto;max-width:96vw;max-height:92vh;padding:0';
-            dialog.innerHTML='<div class="ui-dialog__header"><h2></h2><button type="button" class="dialog-close" aria-label="סגירת הגרף"><i class="fa-solid fa-xmark"></i></button></div><div class="ui-dialog__body" style="position:relative;background:white;padding:16px"><canvas style="pointer-events:none"></canvas></div>';
-            dialog.querySelector('h2').textContent=canvas.closest('figure')?.querySelector('figcaption')?.textContent||canvas.getAttribute('aria-label')||'גרף מוגדל';
+            const dialog=document.createElement('dialog');dialog.setAttribute('aria-labelledby','chart-zoom-title');dialog.className='ui-dialog invoice-preview-dialog';dialog.style.cssText='position:fixed;inset:0;margin:auto;max-width:96vw;max-height:92vh;padding:0';
+            dialog.innerHTML='<div class="ui-dialog__header"><h2 id="chart-zoom-title"></h2><button type="button" class="dialog-close" aria-label="סגירת הגרף"><i class="fa-solid fa-xmark"></i></button></div><div class="ui-dialog__body" style="position:relative;background:white;padding:16px"><canvas style="pointer-events:none"></canvas></div>';
+            dialog.querySelector('h2').textContent=getChartDisplayTitle(chart);
             document.body.append(dialog);dialog.showModal();
             const copy=Chart.helpers.clone, opts=copy(chart.config.options||{});
             const zoom=new Chart(dialog.querySelector('canvas'),{type:chart.config.type,data:copy(chart.data),options:{...opts,events:[],animation:false,responsive:true,maintainAspectRatio:false,devicePixelRatio:Math.max(2,window.devicePixelRatio||1),onClick:null,onHover:null,plugins:{...opts.plugins,tooltip:{enabled:false}}}});
@@ -9643,7 +9654,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const clone=Chart.helpers.clone;
             const plot=new Chart(canvas,{type:chart.config.type,data:clone(chart.data),options:{...clone(chart.config.options),responsive:false,devicePixelRatio:2,animation:false,events:[]}});
             try {
-                const caption=chart.canvas.closest('figure').querySelector('figcaption').textContent;
+                const caption=getChartDisplayTitle(chart);
                 return '<figure><figcaption>'+escapeHtml(caption)+'</figcaption><img width="440" height="245" alt="'+escapeHtml(caption)+'" src="'+plot.toBase64Image()+'"></figure>';
             } finally {plot.destroy()}
         }
