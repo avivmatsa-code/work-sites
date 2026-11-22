@@ -2045,7 +2045,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.28 · 22 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.29 · 22 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -2492,10 +2492,12 @@
       <main class="unmatched-report-main"><section class="unmatched-report-panel">
       <div class="unmatched-report-panel__header"><div class="unmatched-report-controls" id="mr-controls"></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="button-secondary button-secondary--brand" id="mr-graphs" onclick="mrPrint(true)"><i class="fa-solid fa-print"></i>הדפס גרפים בלבד</button><button class="button-secondary button-secondary--brand" id="mr-print" onclick="mrPrint(false)"><i class="fa-solid fa-print"></i>הדפס דוח מלא</button></div></div>
       <div style="padding:0 20px 20px"><p id="mr-note" role="status"></p><div id="mr-summary" class="unmatched-report-summary"></div>
-      <div id="mr-plots" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px;margin-block:16px"><figure style="min-width:0;margin:0;padding:16px;border:1px solid #cbd8e5;border-radius:8px"><figcaption style="font-weight:700;margin-bottom:12px">סכום שהותאם בתקופה (₪)</figcaption><label>קיבוץ עמודות לפי <select id="mr-unit"><option>יום</option><option>שבוע</option><option>חודש</option></select></label><div style="height:230px"><canvas id="mr-bar"></canvas></div></figure><figure style="min-width:0;margin:0;padding:16px;border:1px solid #cbd8e5;border-radius:8px"><figcaption style="font-weight:700;margin-bottom:12px">גבייה מצטברת (₪)</figcaption><div style="height:230px"><canvas id="mr-line"></canvas></div></figure><figure style="min-width:0;margin:0;padding:16px;border:1px solid #cbd8e5;border-radius:8px"><figcaption style="font-weight:700;margin-bottom:12px">חשבוניות שהותאמו במצטבר</figcaption><div style="height:230px"><canvas id="mr-count"></canvas></div></figure></div>
+      <div id="mr-plots" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px;margin-block:16px"><figure style="min-width:0;margin:0;padding:16px;border:1px solid #cbd8e5;border-radius:8px"><figcaption style="font-weight:700;margin-bottom:12px">סכום שהותאם בתקופה (₪)</figcaption><label>קיבוץ עמודות לפי <select id="mr-unit"><option>יום</option><option>שבוע</option><option>חודש</option></select></label><div style="height:230px"><canvas id="mr-bar"></canvas></div></figure><figure style="min-width:0;margin:0;padding:16px;border:1px solid #cbd8e5;border-radius:8px"><figcaption style="font-weight:700;margin-bottom:12px">סכום גבייה מצטברת (ש"ח)</figcaption><div style="height:230px"><canvas id="mr-line"></canvas></div></figure><figure style="min-width:0;margin:0;padding:16px;border:1px solid #cbd8e5;border-radius:8px"><figcaption style="font-weight:700;margin-bottom:12px">סה"כ חשבוניות שהותאמו במצטבר</figcaption><div style="height:230px"><canvas id="mr-count"></canvas></div></figure></div>
       <h2>פירוט חשבוניות</h2><div id="mr-detail"></div></div></section></main>
     </section>
     <style>
+    .mr-total{display:flex;align-items:center;gap:16px;padding:12px 16px;background:#eef3f7;border-block-start:2px solid #bdcddc;color:#183b57}.mr-total b{margin-inline-start:auto}.mr-dd{display:inline-block;padding:2px 6px;border:1px solid #aacae1;border-radius:5px;color:#165479;font:700 11px Arial;white-space:nowrap}.mr-pager{display:flex;align-items:center;gap:12px;margin-block-start:10px}
+    #mr-controls>.workspace-control{display:flex;flex-direction:column;justify-content:flex-end;gap:5px;margin:0}#mr-controls .control-label{margin:0}#mr-controls #mr-clear{height:40px;min-height:0;padding:0 10px;line-height:1;font-size:13px;align-self:flex-end}
     #mr-controls{align-items:flex-end;gap:14px} #mr-controls input:not([type=date]),#mr-controls select,#mr-controls .button-secondary{height:40px;box-sizing:border-box} #mr-controls input:not([type=date]),#mr-controls select{border:1px solid #c5d4e4;background:white;border-radius:6px;padding:0 10px;font:400 14px Arial;color:#173958} #mr-controls select{display:block} .mr-date-box{display:flex;position:relative}.mr-date-box input[type=text]{width:150px;text-align:right;padding-left:32px!important}.mr-calendar{position:absolute;left:4px;top:4px;width:30px;height:32px;display:grid;place-items:center;color:#1266a2}.mr-calendar input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}.mr-calendar input::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%} #mr-detail>p,#mr-note{font:normal 14px/1.5 Arial;color:#526579} #matched-container .unmatched-report-panel{overflow:visible}
     </style>
     <!-- UNMATCHED TRANSFERS REPORT SCREEN -->
@@ -9549,7 +9551,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                 if(!date||!val||!Number.isFinite(Number(val))||(!doc&&!bill)){mr.invalid++;continue}
                 const name=String(r['שם חשבון']||r['שם לקוח']||''), issued=mrDate(r['תאריך מסמך']||r['תאריך רישום']);
                 const cells=[date,name,code,doc,bill,issued,String(r['טקסט']||r['תיאור']||''),Math.round(Number(val)*100)];
-                mr.rows.push({cells,id:code+'|'+(bill?'b'+bill:'a'+doc+'|'+(r['שנת כספים']||issued.slice(0,4))),sector:getCustomerSector(name),activity:FEE_KEYWORDS.some(k=>String(r['שם חשבון נגדי']||'').includes(k))?'אגרות העברת בעלות':'שירותי מידע'});
+                mr.rows.push({cells,directDebit:String(r['שיטת תשלום']||'').trim().toUpperCase()==='M',id:code+'|'+(bill?'b'+bill:'a'+doc+'|'+(r['שנת כספים']||issued.slice(0,4))),sector:getCustomerSector(name),activity:FEE_KEYWORDS.some(k=>String(r['שם חשבון נגדי']||'').includes(k))?'אגרות העברת בעלות':'שירותי מידע'});
             }
             mr.rows.sort((a,b)=>a.cells[0].localeCompare(b.cells[0]));
             mr.min=mr.rows[0]?.cells[0]||'';const today=formatLocalIsoDate(new Date());
@@ -9586,7 +9588,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             wrap.querySelectorAll('input[type=date]').forEach(el=>el.onclick=()=>{try{el.showPicker?.()}catch{}});
             wrap.onchange=e=>{const k=e.target.dataset.key,v=(k==='from'||k==='to')?mrDate(e.target.value):e.target.value;if(!k)return;
               if(k==='from'||k==='to'){if(!mrDate(v)||v<mr.min||(!mr.one&&(k==='to'?v<mr.from:v>mr.to))){mrFilters();alert('יש לבחור תאריכים בסדר עולה, החל מ־'+mrLabel(mr.min));return}mr[k]=v;if(mr.one)mr.to=v}
-              else if(k==='mode'){mr.one=v==='יום בודד';if(mr.one)mr.to=mr.from}else mr[k]=v;
+              else if(k==='mode'){mr.one=v==='יום בודד';if(mr.one)mr.from=mr.to}else mr[k]=v;
               mr.focus='';mr.page=0;mrFilters();mrRender()};
         }
         function showMatched(){
@@ -9594,12 +9596,13 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             mrFilters();mrRender();
         }
         function mrTable(rows,print=false){
-            return '<table class="unmatched-report-table"><thead><tr>'+mrCols.map((l,i)=>'<th>'+(print?l:'<button onclick="mrSort('+i+')">'+l+(mr.sort===i?(mr.dir===1?' ▲':' ▼'):'')+'</button>')+'</th>').join('')+'</tr></thead><tbody>'+rows.map(({cells})=>'<tr>'+cells.map((v,i)=>'<td>'+(i===7?mrMoney(v):i===0||i===5?mrLabel(v):escapeHtml(String(v)))+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
+            return '<table class="unmatched-report-table"><thead><tr>'+mrCols.map((l,i)=>'<th>'+(print?l:'<button onclick="mrSort('+i+')">'+l+(mr.sort===i?(mr.dir===1?' ▲':' ▼'):'')+'</button>')+'</th>').join('')+'</tr></thead><tbody>'+rows.map(({cells,directDebit})=>'<tr>'+cells.map((v,i)=>'<td>'+(i===7?mrMoney(v):i===0||i===5?mrLabel(v):escapeHtml(String(v)))+(i===3&&directDebit?' <small class="mr-dd">הוראת קבע</small>':'')+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
         }
         function mrSort(i){mr.dir=mr.sort===i?-mr.dir:1;mr.sort=i;mr.page=0;mrDetail(mrModel())}
+        function mrDetailTotal(details){return '<div class="mr-total"><strong>סה״כ לפירוט</strong><span>'+details.length.toLocaleString('he-IL')+' שורות</span><b>₪'+mrMoney(details.reduce((s,r)=>s+r.cells[7],0))+'</b></div>'}
         function mrDetail({details}){
             const pages=Math.max(1,Math.ceil(details.length/100));mr.page=Math.min(pages-1,Math.max(0,mr.page));
-            mrEl('detail').innerHTML='<div style="background:#eef5fb;border:1px solid #cadbea;border-radius:6px;padding:12px;margin:10px 0"><strong>מסנני הפירוט: </strong>'+[mrLabel(mr.from)+(mr.from===mr.to?'':' – '+mrLabel(mr.to)),'תחום פעילות: '+mr.activity,'סקטור: '+mr.sector,'לקוח: '+(mr.client||'הכול')].map(escapeHtml).join(' · ')+'<br><strong>מציג '+(details.length?mr.page*100+1:0)+'–'+Math.min(details.length,(mr.page+1)*100)+' מתוך '+details.length.toLocaleString('he-IL')+' שורות</strong> (עד 100 בעמוד)</div>'+(mr.focus?'פירוט לעמודה: '+mrLabel(mr.focus)+' <button class="button-secondary button-secondary--brand" onclick="mr.focus=\'\';mr.page=0;mrRender()">חזרה לכל התקופה</button>':'')+'<div style="overflow:auto">'+mrTable(details.slice(mr.page*100,mr.page*100+100))+'</div><p>סה״כ לפירוט: ₪'+mrMoney(details.reduce((s,r)=>s+r.cells[7],0))+' · '+details.length+' שורות</p><button class="button-secondary" '+(!mr.page?'disabled':'')+' onclick="mr.page--;mrDetail(mrModel())">הקודם</button> · עמוד '+(mr.page+1)+' מתוך '+pages+' · <button class="button-secondary" '+(mr.page+1===pages?'disabled':'')+' onclick="mr.page++;mrDetail(mrModel())">הבא</button>';
+            mrEl('detail').innerHTML='<div style="background:#eef5fb;border:1px solid #cadbea;border-radius:6px;padding:12px;margin:10px 0"><strong>מסנני הפירוט: </strong>'+[mrLabel(mr.from)+(mr.from===mr.to?'':' – '+mrLabel(mr.to)),'תחום פעילות: '+mr.activity,'סקטור: '+mr.sector,'לקוח: '+(mr.client||'הכול')].map(escapeHtml).join(' · ')+'<br><strong>מציג '+(details.length?mr.page*100+1:0)+'–'+Math.min(details.length,(mr.page+1)*100)+' מתוך '+details.length.toLocaleString('he-IL')+' שורות</strong> (עד 100 בעמוד)</div>'+(mr.focus?'פירוט לעמודה: '+mrLabel(mr.focus)+' <button class="button-secondary button-secondary--brand" onclick="mr.focus=\'\';mr.page=0;mrRender()">חזרה לכל התקופה</button>':'')+'<div style="overflow:auto">'+mrTable(details.slice(mr.page*100,mr.page*100+100))+'</div>'+mrDetailTotal(details)+(pages===1?'':'<nav class="mr-pager">'+(mr.page>0?'<button class="button-secondary" onclick="mr.page--;mrDetail(mrModel())">הקודם</button>':'')+'<span>עמוד '+(mr.page+1)+' מתוך '+pages+'</span>'+(mr.page+1<pages?'<button class="button-secondary" onclick="mr.page++;mrDetail(mrModel())">הבא</button>':'')+'</nav>');
         }
         function mrRender(){
             mr.charts.forEach(c=>c.destroy());mr.charts=[];mrEl('summary').innerHTML='';mrEl('detail').innerHTML='';mrEl('print').disabled=!mr.min;
@@ -9634,9 +9637,31 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             dialog.oncancel=e=>e.preventDefault();dialog.onclose=()=>{zoom.destroy();dialog.remove()};const close=dialog.querySelector('button');close.onclick=()=>dialog.close();close.focus();
         },true);
 
-        function mrPrint(graphsOnly=false){if(!mr.min||(graphsOnly&&!mr.charts.length))return;const m=mrModel();if(!graphsOnly&&m.details.length>=1000&&!confirm('הדוח כולל '+m.details.length+' שורות. להמשיך להדפסה?'))return;
-          const w=window.open('','_blank');if(!w)return;const title='גבייה לפי תאריך התאמה',filters=[mrLabel(mr.from)+' – '+mrLabel(mr.to),mr.activity,mr.sector,mr.client||'כל הלקוחות','עמודות לפי '+mr.unit].map(escapeHtml).join(' · ');
-          w.document.write('<html lang="he" dir="rtl"><head><title>'+title+'</title>'+getClientDocumentPrintStyles()+'<style>body{font-family:Arial} th,td{padding:3px} thead{display:table-header-group} tr{break-inside:avoid}</style></head><body>'+getClientDocumentPageStart(title)+'<h2>'+title+'</h2><p>'+filters+'</p><p>'+escapeHtml(mrEl('summary').innerText)+' · '+escapeHtml(mrEl('note').textContent.split('לחיצה')[0])+'</p>'+mr.charts.map((c,i)=>'<figure style="display:inline-block;width:46%;margin:1%;padding:8px;border:1px solid #cbd8e5;border-radius:6px;break-inside:avoid"><figcaption>'+(['סכום בתקופה (₪)','גבייה מצטברת (₪)','חשבוניות שהותאמו במצטבר'][i])+'</figcaption><img style="width:100%" src="'+c.toBase64Image()+'"></figure>').join('')+(graphsOnly?'':'<h3>פירוט חשבוניות'+(mr.focus?' לעמודה '+mrLabel(mr.focus):'')+'</h3>'+mrTable(m.details,true)+'<p>סה״כ לפירוט: ₪'+mrMoney(m.details.reduce((s,r)=>s+r.cells[7],0))+'</p>')+getClientDocumentPageEnd()+'</body></html>');w.document.close();w.focus();w.print();
+        function mrPrintPlot(chart){
+            // Render at print resolution, independent of the screen canvas size or popup focus.
+            const canvas=document.createElement('canvas');canvas.width=440;canvas.height=245;
+            const clone=Chart.helpers.clone;
+            const plot=new Chart(canvas,{type:chart.config.type,data:clone(chart.data),options:{...clone(chart.config.options),responsive:false,devicePixelRatio:2,animation:false,events:[]}});
+            try {
+                const caption=chart.canvas.closest('figure').querySelector('figcaption').textContent;
+                return '<figure><figcaption>'+escapeHtml(caption)+'</figcaption><img width="440" height="245" alt="'+escapeHtml(caption)+'" src="'+plot.toBase64Image()+'"></figure>';
+            } finally {plot.destroy()}
+        }
+        async function mrPrint(graphsOnly=false){
+            if(!mr.min||(graphsOnly&&!mr.charts.length))return;
+            const m=mrModel();if(!graphsOnly&&m.details.length>=1000&&!confirm('הדוח כולל '+m.details.length+' שורות. להמשיך להדפסה?'))return;
+            const w=window.open('','_blank');if(!w)return;
+            try {
+                const title='גבייה לפי תאריך התאמה',filters=[mr.from===mr.to?mrLabel(mr.to):mrLabel(mr.from)+' – '+mrLabel(mr.to),mr.activity,mr.sector,mr.client||'כל הלקוחות',...(mr.charts.length?['עמודות לפי '+mr.unit]:[])].map(escapeHtml).join(' · ');
+                const cards=Array.from(mrEl('summary').children,card=>'<div class="kpi-card"><div class="kpi-title">'+escapeHtml(card.firstElementChild.textContent)+'</div><div class="kpi-value">'+escapeHtml(card.lastElementChild.textContent)+'</div></div>').join('');
+                const plots=mr.charts.length?'<div class="mr-print-plots">'+mr.charts.map(mrPrintPlot).join('')+'</div>':'';
+                const detail=graphsOnly?'':'<h3>פירוט חשבוניות'+(mr.focus?' לעמודה '+mrLabel(mr.focus):'')+'</h3>'+mrTable(m.details,true)+mrDetailTotal(m.details);
+                const css='<style>@page{size:A4 landscape;margin:0}.mr-print-plots{display:flex;gap:8px;break-inside:avoid}.mr-print-plots figure{flex:1;min-width:0;margin:0;border:1px solid var(--print-border);border-radius:6px;padding:8px}.mr-print-plots figcaption{font-size:11px;font-weight:700}.mr-print-plots img{display:block;width:100%;height:auto}.print-content .unmatched-report-table th,.print-content .unmatched-report-table td{padding:4px 6px}.mr-total{display:flex;gap:16px;align-items:center;padding:8px 12px;background:#eef3f7;border-top:2px solid #bdcddc;color:#183b57;break-inside:avoid}.mr-total b{margin-inline-start:auto}.mr-dd{white-space:nowrap;color:#165479;border:1px solid #aacae1;border-radius:4px;padding:1px 4px}</style>';
+                w.document.write('<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>'+title+'</title>'+getClientDocumentPrintStyles()+css+'</head><body>'+getClientDocumentPageStart(title)+'<h2 class="document-title">'+title+'</h2><p>'+filters+'</p><div class="kpis">'+cards+'</div>'+plots+detail+getClientDocumentPageEnd()+'</body></html>');w.document.close();
+                await Promise.all(Array.from(w.document.querySelectorAll('.mr-print-plots img'),im=>im.decode()));
+                await w.document.fonts.ready;
+                if(!w.closed){w.focus();w.print()}
+            } catch(err){if(!w.closed)w.close();console.error('Matched report printing',err);alert('לא ניתן היה להכין את הדוח להדפסה. יש לנסות שנית.')}
         }
         function processHistoricalRevenueExcel(e) {
             const file = e.target.files?.[0];
@@ -10816,7 +10841,6 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
     </script>
 </body>
 </html>
-
 
 
 
