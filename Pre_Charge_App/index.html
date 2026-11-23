@@ -4134,24 +4134,41 @@ function openOnlineFileBrowser(replaceAll) {
 }
 
 function parseOnlineSheetRows(sheetRows, fileName) {
+  if (!sheetRows || sheetRows.length === 0) return [];
+  const hRow = sheetRows[0]?.cols || sheetRows[0] || {};
+  let colMap = { year: "B", month: "C", payerCode: "D", clientName: "E", quantity: "F", sku: "G", merkavaCode: "H" };
+
+  for (const [colLet, text] of Object.entries(hRow)) {
+    const t = String(text || "").trim();
+    if (t === "שנה") colMap.year = colLet;
+    else if (t === "חודש פעילות" || t === "חודש") colMap.month = colLet;
+    else if (t.includes("קוד גורם")) colMap.payerCode = colLet;
+    else if (t === "גורם" || t === "שם גורם" || t === "שם הלקוח" || t === "לקוח") colMap.clientName = colLet;
+    else if (t.includes("כמות")) colMap.quantity = colLet;
+    else if (t.includes("מק\"ט") || t.includes("מקט")) colMap.sku = colLet;
+    else if (t.includes("מרכבה")) colMap.merkavaCode = colLet;
+  }
+
   const parsed = [];
   let rowSeq = 0;
   for (let i = 0; i < sheetRows.length; i++) {
     const r = sheetRows[i];
-    const cols = r.cols;
-    if (i === 0 && (cols.B === "שנה" || cols.D === "קוד גורם משלם")) continue;
+    const cols = r?.cols || r || {};
+    if (i === 0 && (cols[colMap.year] === "שנה" || cols[colMap.payerCode] === "קוד גורם משלם" || cols.B === "שנה")) continue;
 
-    const payerCode = (cols.D || "").trim();
-    const clientName = (cols.E || "").trim().replace(/\s{2,}/g, " ");
-    if (!payerCode && !clientName) continue;
+    const payerCode = (cols[colMap.payerCode] || "").trim();
+    const clientName = (cols[colMap.clientName] || "").trim().replace(/\s{2,}/g, " ");
+    const qtyRaw = (cols[colMap.quantity] || "").replace(/,/g, "").trim();
+    if (!payerCode && !clientName && !qtyRaw) continue;
+    if (payerCode === "קוד גורם משלם" || clientName === "גורם") continue;
 
-    const year = (cols.B || "").trim() || "2025";
-    const monthRaw = (cols.C || "").trim() || "01";
+    const year = (cols[colMap.year] || "").trim() || "2026";
+    const monthRaw = (cols[colMap.month] || "").trim() || "01";
     const month = String(parseInt(monthRaw, 10) || monthRaw).padStart(2, "0");
     const monthKey = `${year}-${month}`;
-    const quantity = parseInt((cols.F || "0").replace(/,/g, ""), 10) || 0;
-    const sku = (cols.G || "").trim() || "8001398";
-    const merkavaCode = (cols.H || "").trim();
+    const quantity = parseInt(qtyRaw || "0", 10) || 0;
+    const sku = (cols[colMap.sku] || "").trim() || "8001398";
+    const merkavaCode = (cols[colMap.merkavaCode] || "").trim();
     const amountToPay = Number((quantity * ONLINE_QUERY_UNIT_PRICE).toFixed(2));
     rowSeq++;
 
