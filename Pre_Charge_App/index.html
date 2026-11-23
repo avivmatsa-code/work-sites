@@ -6,7 +6,7 @@
 <title>מערכת להכנת נתונים לחיוב לקוחות | משרד התחבורה והבטיחות בדרכים</title>
 
 <style>
-/* AMIS Clear UI — Design Tokens v0.4 */
+/* AMIS Clear UI - Design Tokens v0.4 */
 
 :root {
   /* Typography */
@@ -45,7 +45,7 @@
   --color-border: #d5dee6;
   --color-border-strong: #aebdca;
 
-  /* Semantic colors — unchanged across themes */
+  /* Semantic colors - unchanged across themes */
   --color-success: #16834f;
   --color-success-bg: #edf7f1;
   --color-warning: #a86400;
@@ -209,7 +209,7 @@
     flex-direction: column;
   }
 
-  /* Header (AMIS MOT Standard v0.5 — Solid #072f5b, No Gradients) */
+  /* Header (AMIS MOT Standard v0.5 - Solid #072f5b, No Gradients) */
   .app-header {
     background-color: var(--header-bg);
     color: #ffffff;
@@ -699,7 +699,7 @@
     border-right: 4px solid var(--color-warning);
   }
 
-  /* KPI Grid — Standalone cards directly in .kpi-grid (No Card-in-Card!) */
+  /* KPI Grid - Standalone cards directly in .kpi-grid (No Card-in-Card!) */
   .kpi-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1336,7 +1336,7 @@
 </head>
 <body>
 
-<!-- Header — AMIS Clear UI v0.5 / Ministry profile -->
+<!-- Header - AMIS Clear UI v0.5 / Ministry profile -->
 <header class="app-header">
   <div class="header-right">
     <button id="btnMobileMenu" class="mobile-menu-btn" aria-expanded="false" aria-controls="appSidebar" aria-label="פתיחת תפריט" onclick="toggleMobileSidebar()">☰</button>
@@ -1424,28 +1424,28 @@
     <div class="nav-group">
       <div class="nav-group-title">דוחות</div>
       <button id="navRepUnified" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenUnifiedReport" onclick="navigateScreen('screenUnifiedReport', this)">
-        <span>דוח בקרה — חיובים מאוחד</span>
+        <span>דוח בקרה - חיובים מאוחד</span>
       </button>
       <button id="navRepBatch" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenBatchReport" onclick="navigateScreen('screenBatchReport', this)">
-        <span>דוח בקרה — שאילתות אצוות</span>
+        <span>דוח בקרה - שאילתות אצוות</span>
       </button>
       <button id="navRepOnline" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenOnlineReport" onclick="navigateScreen('screenOnlineReport', this)">
-        <span>דוח בקרה — שאילתות און ליין</span>
+        <span>דוח בקרה - שאילתות און ליין</span>
       </button>
       <button id="navRepPhoto" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenPhotoReport" onclick="navigateScreen('screenPhotoReport', this)">
-        <span>דוח בקרה — תחנות צילום</span>
+        <span>דוח בקרה - תחנות צילום</span>
       </button>
       <button id="navRepTests" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenTestsReport" onclick="navigateScreen('screenTestsReport', this)">
-        <span>דוח בקרה — מבחנים עיוניים</span>
+        <span>דוח בקרה - מבחנים עיוניים</span>
       </button>
       <button id="navRepCourses" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenCoursesReport" onclick="navigateScreen('screenCoursesReport', this)">
-        <span>דוח בקרה — חיוב קורסים</span>
+        <span>דוח בקרה - חיוב קורסים</span>
       </button>
       <button id="navRepTelAviv" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenTelAvivReport" onclick="navigateScreen('screenTelAvivReport', this)">
-        <span>דוח בקרה — חיובים לתל אביב</span>
+        <span>דוח בקרה - חיובים לתל אביב</span>
       </button>
       <button id="navRepBtl" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenBtlReport" onclick="navigateScreen('screenBtlReport', this)">
-        <span>דוח בקרה — ביטוח לאומי</span>
+        <span>דוח בקרה - ביטוח לאומי</span>
       </button>
     </div>
 
@@ -1509,12 +1509,12 @@
     </div>
 
     <!-- ===================================================================
-         SCREEN 0A: מקורות הנתונים (Central Smart Data Sources Loader — Active on Startup)
+         SCREEN 0A: מקורות הנתונים (Central Smart Data Sources Loader - Active on Startup)
          =================================================================== -->
     <div id="screenDataSources" class="screen-pane active">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">מקורות הנתונים — טעינה מרכזית וזיהוי אוטומטי של קבצי חיוב</h1>
+          <h1 class="workspace-screen-title">מקורות הנתונים - טעינה מרכזית וזיהוי אוטומטי של קבצי חיוב</h1>
           <div class="workspace-screen-subtitle">גרור או בחר קובץ אחד או יותר (קבצי Excel ודוחות PDF מכל הסוגים). המערכת תזהה לבד כל קובץ, תנתח אותו, ותפתח אוטומטית בתפריט את המסכים המתאימים ואת מסך החיובים המאוחד.</div>
         </div>
         <div class="toolbar-actions" id="centralHeaderToolbar" style="display:none;">
@@ -1527,7 +1527,7 @@
       <section class="dropzone-card" aria-label="איזור טעינה מרכזי לכל סוגי הקבצים">
         <div id="centralDropZone" class="dropzone-area" tabindex="0" role="button" aria-label="גרור קבצי אקסל ו-PDF לכאן או לחץ לפתיחת חלונית בחירת קבצים" onclick="if(event.target.tagName !== 'BUTTON') openCentralFileBrowser()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCentralFileBrowser();}">
           <div class="dropzone-icon">📥</div>
-          <div class="dropzone-title">איזור טעינה מרכזי חכם — קבצי אקסל (.xlsx) ודוחות PDF (.pdf)</div>
+          <div class="dropzone-title">איזור טעינה מרכזי חכם - קבצי אקסל (.xlsx) ודוחות PDF (.pdf)</div>
           <div class="dropzone-subtitle" id="centralDropZoneSubtitle">
             ניתן לגרור לכאן בבת אחת קבצים מכל הסוגים: שאילתות אצוות (.xlsx), שאילתות און ליין (.xlsx), תחנות צילום (.xlsx), מבחנים עיוניים (.pdf), חיוב קורסים (.pdf), ודוחות פניות #AUTODCH לתל אביב וביטוח לאומי (.pdf).
             המערכת מזהה אוטומטית את מבנה הקובץ ופותחת בתפריט את המסכים הרלוונטיים.
@@ -1601,7 +1601,7 @@
     <div id="screenUnified" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">מסך החיובים המאוחד — ריכוז כלל הלקוחות והספקים מכל מקורות הנתונים</h1>
+          <h1 class="workspace-screen-title">מסך החיובים המאוחד - ריכוז כלל הלקוחות והספקים מכל מקורות הנתונים</h1>
           <div class="workspace-screen-subtitle">ריכוז סך החיובים לכל לקוח בהתאם לכלל הקבצים שנטענו במערכת | לחיצה (קליק אחד) על שורת לקוח פותחת פירוט מלא לפי נושאי החיוב ומרכיביהם</div>
         </div>
         <div class="toolbar-actions">
@@ -1688,12 +1688,12 @@
     </div>
 
     <!-- ===================================================================
-         SCREEN 0C: דוח בקרה — חיובים מאוחד
+         SCREEN 0C: דוח בקרה - חיובים מאוחד
          =================================================================== -->
     <div id="screenUnifiedReport" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">דוח בקרה והתאמה — מסך החיובים המאוחד</h1>
+          <h1 class="workspace-screen-title">דוח בקרה והתאמה - מסך החיובים המאוחד</h1>
           <div class="workspace-screen-subtitle">דוח מרוכז להנהלת חשבונות וגבייה: ריכוז חיובי כל הלקוחות מכל מקורות הנתונים שנטענו</div>
         </div>
         <div class="toolbar-actions">
@@ -1737,7 +1737,7 @@
     <div id="screenBatch" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">שאילתות אצוות — הכנת נתונים לחיוב לקוחות</h1>
+          <h1 class="workspace-screen-title">שאילתות אצוות - הכנת נתונים לחיוב לקוחות</h1>
           <div class="workspace-screen-subtitle">טעינת קובץ שאילתות אצווה (היום בחודש בעמודה I), איחוד לשורה אחת לכל לקוח וחישוב הכמות החודשית המלאה לחיוב</div>
         </div>
         <div class="toolbar-actions" id="batchHeaderToolbar" style="display:none;">
@@ -1753,7 +1753,7 @@
       <section class="dropzone-card" aria-label="איזור טעינת קובץ שאילתות אצווה">
         <div id="batchDropZone" class="dropzone-area" tabindex="0" role="button" aria-label="גרור קובץ שאילתות אצווה לכאן או לחץ לפתיחת חלונית בחירת קובץ" onclick="if(event.target.tagName !== 'BUTTON') openBatchFileBrowser(false)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openBatchFileBrowser(false);}">
           <div class="dropzone-icon">📂</div>
-          <div class="dropzone-title">טעינת קובץ שאילתות אצוות (.xlsx) — שמירת נתונים מצטברת בסשן</div>
+          <div class="dropzone-title">טעינת קובץ שאילתות אצוות (.xlsx) - שמירת נתונים מצטברת בסשן</div>
           <div class="dropzone-subtitle" id="batchDropZoneSubtitle">
             גרור לכאן קובץ אקסל (אחד או יותר) של שאילתות אצוות, או לחץ על הכפתור לפתיחת חלונית הדפדפן ובחירת הקובץ מהמחשב.
             כל קובץ נוסף שייטען יישמר בזיכרון הסשן לצד הקבצים הקודמים ויאפשר סינון ביניהם.
@@ -1788,7 +1788,7 @@
               <label for="selBatchMerkava">סינון בקרה / קוד מרכבה</label>
               <select id="selBatchMerkava" class="form-control" onchange="onBatchFilterChange()">
                 <option value="ALL">כל הלקוחות</option>
-                <option value="SUSPECT">חשד לטעות — כמות זהה בתאריכים סמוכים (!)</option>
+                <option value="SUSPECT">חשד לטעות - כמות זהה בתאריכים סמוכים (!)</option>
                 <option value="VALID">בעלי קוד מרכבה תקין</option>
                 <option value="MISSING">ללא קוד מרכבה (00000000)</option>
               </select>
@@ -1816,7 +1816,7 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">טבלת ריכוז שאילתות אצוות לחיוב — שורה אחת ללקוח</div>
+              <div class="card-title">טבלת ריכוז שאילתות אצוות לחיוב - שורה אחת ללקוח</div>
               <div class="card-subtitle">לחיצה (קליק אחד) על שורת הלקוח פותחת את הפירוט היומי שלו | סימן קריאה אדום (❗) מתריע על כמות זהה בתאריכים סמוכים באותו חודש</div>
             </div>
             <div style="display:flex; gap:8px;">
@@ -1849,12 +1849,12 @@
     </div>
 
     <!-- ===================================================================
-         SCREEN 1B: שאילתות און ליין (Online Queries — No Row Grouping)
+         SCREEN 1B: שאילתות און ליין (Online Queries - No Row Grouping)
          =================================================================== -->
     <div id="screenOnline" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">שאילתות און ליין — הכנת נתונים לחיוב לקוחות (ללא קיבוץ שורות)</h1>
+          <h1 class="workspace-screen-title">שאילתות און ליין - הכנת נתונים לחיוב לקוחות (ללא קיבוץ שורות)</h1>
           <div class="workspace-screen-subtitle">הצגת כל שורות החיוב של שאילתות און ליין כפי שהתקבלו בקובץ (ללא קיבוץ שורות וללא תלות בקוד תשובה) וחישוב סכום לתשלום לפי 6.93 ₪ לשאילתה</div>
         </div>
         <div class="toolbar-actions" id="onlineHeaderToolbar" style="display:none;">
@@ -1869,7 +1869,7 @@
       <section class="dropzone-card" aria-label="איזור טעינת קובץ שאילתות און ליין">
         <div id="onlineDropZone" class="dropzone-area" tabindex="0" role="button" aria-label="גרור קובץ שאילתות און ליין לכאן או לחץ לפתיחת חלונית בחירת קובץ" onclick="if(event.target.tagName !== 'BUTTON') openOnlineFileBrowser(false)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openOnlineFileBrowser(false);}">
           <div class="dropzone-icon">🌐</div>
-          <div class="dropzone-title">טעינת קובץ שאילתות און ליין (.xlsx) — תמיכה במספר קבצים ובמספר חודשים בקובץ</div>
+          <div class="dropzone-title">טעינת קובץ שאילתות און ליין (.xlsx) - תמיכה במספר קבצים ובמספר חודשים בקובץ</div>
           <div class="dropzone-subtitle" id="onlineDropZoneSubtitle">
             גרור לכאן קובץ אקסל (אחד או יותר) של שאילתות און ליין (ללא קוד תשובה), או טען דרך מסך "מקורות הנתונים".
             כל השורות מוצגות כפי שהן (ללא קיבוץ), נשמרות בזיכרון הסשן, ומחושבות לפי תעריף 6.93 ₪ לשאילתה.
@@ -1929,7 +1929,7 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">טבלת שאילתות און ליין לחיוב — ללא קיבוץ שורות (6.93 ₪ לשאילתה)</div>
+              <div class="card-title">טבלת שאילתות און ליין לחיוב - ללא קיבוץ שורות (6.93 ₪ לשאילתה)</div>
               <div class="card-subtitle">לחיצה (קליק אחד) על כל שורת לקוח פותחת חלונית פירוט של כלל שורות החיוב של אותו לקוח</div>
             </div>
             <div style="display:flex; gap:8px;">
@@ -1962,12 +1962,12 @@
     </div>
 
     <!-- ===================================================================
-         SCREEN 1C: דוח בקרה — שאילתות און ליין
+         SCREEN 1C: דוח בקרה - שאילתות און ליין
          =================================================================== -->
     <div id="screenOnlineReport" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">דוח בקרה והתאמה לחיוב — שאילתות און ליין</h1>
+          <h1 class="workspace-screen-title">דוח בקרה והתאמה לחיוב - שאילתות און ליין</h1>
           <div class="workspace-screen-subtitle">דוח מרוכז להנהלת חשבונות וגבייה: פירוט כל שורות החיוב של שאילתות און ליין לפי 6.93 ₪ לשאילתה</div>
         </div>
         <div class="toolbar-actions">
@@ -1987,7 +1987,7 @@
         <div class="kpi-grid" id="onlineReportKpiGrid"></div>
         <div class="card">
           <div class="card-header">
-            <div class="card-title">טבלת בקרת שורות לחיוב — שאילתות און ליין</div>
+            <div class="card-title">טבלת בקרת שורות לחיוב - שאילתות און ליין</div>
           </div>
           <div class="table-container">
             <table id="tblOnlineReport">
@@ -2015,12 +2015,12 @@
     </div>
 
     <!-- ===================================================================
-         SCREEN 2: תחנות צילום (Photo Stations — Pivot Matrix Table Only)
+         SCREEN 2: תחנות צילום (Photo Stations - Pivot Matrix Table Only)
          =================================================================== -->
     <div id="screenPhoto" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">תחנות צילום — ריכוז שאילתות לפי חודש, שירות וספק</h1>
+          <h1 class="workspace-screen-title">תחנות צילום - ריכוז שאילתות לפי חודש, שירות וספק</h1>
           <div class="workspace-screen-subtitle">טעינת קבצי פעילות תחנות צילום (אופטיקה הלפרין ומרמנת ב-3 תחומי שירות) והצגת טבלת הסיכום. לחיצה על כל מספר בטבלה פותחת פירוט ברמת סניפים.</div>
         </div>
         <div class="toolbar-actions" id="photoHeaderToolbar" style="display:none;">
@@ -2038,7 +2038,7 @@
           <div class="dropzone-icon">🗂️</div>
           <div class="dropzone-title">טעינת קבצי תחנות צילום (.xlsx)</div>
           <div class="dropzone-subtitle" id="photoDropZoneSubtitle">
-            גרור לכאן את קבצי האקסל של תחנות הצילום (צילום נהגים, רישיונות בינלאומיים, רישיונות משיטים — עבור אופטיקה הלפרין ומרמנת), או לחץ לפתיחת חלונית הדפדפן ובחירת הקבצים.
+            גרור לכאן את קבצי האקסל של תחנות הצילום (צילום נהגים, רישיונות בינלאומיים, רישיונות משיטים - עבור אופטיקה הלפרין ומרמנת), או לחץ לפתיחת חלונית הדפדפן ובחירת הקבצים.
           </div>
           <div class="dropzone-actions">
             <button type="button" class="btn btn-primary" onclick="event.stopPropagation(); openPhotoFileBrowser(false)">📂 פתיחת חלונית לבחירת קבצים (Browse)</button>
@@ -2107,7 +2107,7 @@
                   <th colspan="3" style="text-align:center; border-left:1px solid var(--border-color);">צילום נהגים (₪)</th>
                   <th colspan="3" style="text-align:center; border-left:1px solid var(--border-color);">רישיונות בינלאומיים (₪)</th>
                   <th colspan="3" style="text-align:center; border-left:1px solid var(--border-color);">רישיונות משיטים (₪)</th>
-                  <th colspan="3" style="text-align:center;">סה"כ לתשלום — כל השירותים (₪)</th>
+                  <th colspan="3" style="text-align:center;">סה"כ לתשלום - כל השירותים (₪)</th>
                 </tr>
                 <tr>
                   <th>הלפרין</th>
@@ -2136,12 +2136,12 @@
     </div>
 
     <!-- ===================================================================
-         SCREEN 3: דוח בקרה — שאילתות אצוות (09A–09C Mandatory Report Structure)
+         SCREEN 3: דוח בקרה - שאילתות אצוות (09A-09C Mandatory Report Structure)
          =================================================================== -->
     <div id="screenBatchReport" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">דוח בקרה והתאמה לחיוב — שאילתות אצוות</h1>
+          <h1 class="workspace-screen-title">דוח בקרה והתאמה לחיוב - שאילתות אצוות</h1>
           <div class="workspace-screen-subtitle">דוח מרוכז להנהלת חשבונות וגבייה: השוואת רשומות יומיות מול שורות חיוב מאוחדות ללקוח</div>
         </div>
         <div class="toolbar-actions">
@@ -2162,7 +2162,7 @@
 
         <div class="card">
           <div class="card-header">
-            <div class="card-title">טבלת בקרת לקוחות לחיוב — שאילתות אצוות</div>
+            <div class="card-title">טבלת בקרת לקוחות לחיוב - שאילתות אצוות</div>
           </div>
           <div class="table-container">
             <table id="tblBatchReport">
@@ -2190,12 +2190,12 @@
     </div>
 
     <!-- ===================================================================
-         SCREEN 4: דוח בקרה — תחנות צילום (09A–09C Mandatory Report Structure)
+         SCREEN 4: דוח בקרה - תחנות צילום (09A-09C Mandatory Report Structure)
          =================================================================== -->
     <div id="screenPhotoReport" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">דוח בקרה והתאמה לחיוב — תחנות צילום</h1>
+          <h1 class="workspace-screen-title">דוח בקרה והתאמה לחיוב - תחנות צילום</h1>
           <div class="workspace-screen-subtitle">ריכוז פניות ל-MF לפי תחנות צילום (סניפים) ב-3 תחומי השירות עבור אופטיקה הלפרין ומרמנת</div>
         </div>
         <div class="toolbar-actions">
@@ -2245,12 +2245,12 @@
     </div>
 
     <!-- ===================================================================
-         SCREEN 5: חיובים לתל אביב (Tel Aviv Municipality — #AUTODCH PDF)
+         SCREEN 5: חיובים לתל אביב (Tel Aviv Municipality - #AUTODCH PDF)
          =================================================================== -->
     <div id="screenTelAviv" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">חיובים לעיריית תל אביב — חילוץ מדוחות פניות משרד התחבורה (#AUTODCH PDF)</h1>
+          <h1 class="workspace-screen-title">חיובים לעיריית תל אביב - חילוץ מדוחות פניות משרד התחבורה (#AUTODCH PDF)</h1>
           <div class="workspace-screen-subtitle">חילוץ אוטומטי מדוחות ה-PDF החודשיים עבור עיריית תל אביב (גורם 113000000177 ארנונה, גורם 855 חניה ומוביליטי, וגורם 113000000857 מגער) וחישוב הסכום לתשלום (6.93 ₪)</div>
         </div>
         <div class="toolbar-actions" id="tlvHeaderToolbar" style="display:none;">
@@ -2291,9 +2291,9 @@
               <label for="selTlvCode">גורם / תת-דוח בעיריית תל אביב</label>
               <select id="selTlvCode" class="form-control" onchange="onTlvFilterChange()">
                 <option value="ALL">כל הגורמים (113000000177, 855, 113000000857)</option>
-                <option value="113000000177">113000000177 — שלטון מקומי / ארנונה</option>
-                <option value="855">855 — שלטון מקומי / חניה ומוביליטי</option>
-                <option value="113000000857">113000000857 — מגער / און-ליין</option>
+                <option value="113000000177">113000000177 - שלטון מקומי / ארנונה</option>
+                <option value="855">855 - שלטון מקומי / חניה ומוביליטי</option>
+                <option value="113000000857">113000000857 - מגער / און-ליין</option>
               </select>
             </div>
             <div class="form-field">
@@ -2319,7 +2319,7 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">טבלת ריכוז שורות לחיוב כספי — עיריית תל אביב (תעריף 2026: 6.93 ₪)</div>
+              <div class="card-title">טבלת ריכוז שורות לחיוב כספי - עיריית תל אביב (תעריף 2026: 6.93 ₪)</div>
               <div class="card-subtitle">ריכוז הפעולות החייבות בתשלום מתוך דוחות ה-PDF לפי חודש דיווח, קוד לקוח ומק"ט חיוב</div>
             </div>
             <div style="display:flex; gap:8px;">
@@ -2383,12 +2383,12 @@
     </div>
 
     <!-- ===================================================================
-         SCREEN 6: חיובים לביטוח הלאומי (National Insurance — #AUTODCH PDF)
+         SCREEN 6: חיובים לביטוח הלאומי (National Insurance - #AUTODCH PDF)
          =================================================================== -->
     <div id="screenBtl" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">חיובים למוסד לביטוח הלאומי — חילוץ מדוחות פניות משרד התחבורה (#AUTODCH PDF)</h1>
+          <h1 class="workspace-screen-title">חיובים למוסד לביטוח הלאומי - חילוץ מדוחות פניות משרד התחבורה (#AUTODCH PDF)</h1>
           <div class="workspace-screen-subtitle">חילוץ אוטומטי מדוחות ה-PDF החודשיים עבור המוסד לביטוח לאומי (111000000550 ביטוח לאומי - אכיפה) וחישוב הסכום לתשלום (6.93 ₪)</div>
         </div>
         <div class="toolbar-actions" id="btlHeaderToolbar" style="display:none;">
@@ -2458,8 +2458,8 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">טבלת ריכוז שורות לחיוב כספי — המוסד לביטוח הלאומי (111000000550 | תעריף 2026: 6.93 ₪)</div>
-              <div class="card-subtitle">ריכוז הפעולות החייבות בתשלום (פרטי רכב, רישום עיקול ברכב, הוספת עיקול בצמ"ה — מק"ט 8001384)</div>
+              <div class="card-title">טבלת ריכוז שורות לחיוב כספי - המוסד לביטוח הלאומי (111000000550 | תעריף 2026: 6.93 ₪)</div>
+              <div class="card-subtitle">ריכוז הפעולות החייבות בתשלום (פרטי רכב, רישום עיקול ברכב, הוספת עיקול בצמ"ה - מק"ט 8001384)</div>
             </div>
             <div style="display:flex; gap:8px;">
               <button class="btn btn-success" onclick="exportBtlToExcel()">📥 ייצוא לאקסל (.xlsx)</button>
@@ -2522,12 +2522,12 @@
     </div>
 
     <!-- ===================================================================
-         SCREEN 7: דוח בקרה — חיובים לתל אביב
+         SCREEN 7: דוח בקרה - חיובים לתל אביב
          =================================================================== -->
     <div id="screenTelAvivReport" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">דוח בקרה והתאמה לחיוב — עיריית תל אביב</h1>
+          <h1 class="workspace-screen-title">דוח בקרה והתאמה לחיוב - עיריית תל אביב</h1>
           <div class="workspace-screen-subtitle">דוח מרוכז להנהלת חשבונות וגבייה: ריכוז החיובים לעיריית תל אביב שחולצו מדוחות ה-PDF החודשיים (#AUTODCH)</div>
         </div>
         <div class="toolbar-actions">
@@ -2547,7 +2547,7 @@
         <div class="kpi-grid" id="tlvReportKpiGrid"></div>
         <div class="card">
           <div class="card-header">
-            <div class="card-title">טבלת בקרת חיובים כספיים — עיריית תל אביב (6.93 ₪)</div>
+            <div class="card-title">טבלת בקרת חיובים כספיים - עיריית תל אביב (6.93 ₪)</div>
           </div>
           <div class="table-container">
             <table id="tblTlvReport">
@@ -2577,12 +2577,12 @@
     </div>
 
     <!-- ===================================================================
-         SCREEN 8: דוח בקרה — חיובים לביטוח הלאומי
+         SCREEN 8: דוח בקרה - חיובים לביטוח הלאומי
          =================================================================== -->
     <div id="screenBtlReport" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">דוח בקרה והתאמה לחיוב — המוסד לביטוח הלאומי</h1>
+          <h1 class="workspace-screen-title">דוח בקרה והתאמה לחיוב - המוסד לביטוח הלאומי</h1>
           <div class="workspace-screen-subtitle">דוח מרוכז להנהלת חשבונות וגבייה: ריכוז החיובים למוסד לביטוח לאומי (111000000550) שחולצו מדוחות ה-PDF החודשיים (#AUTODCH)</div>
         </div>
         <div class="toolbar-actions">
@@ -2602,7 +2602,7 @@
         <div class="kpi-grid" id="btlReportKpiGrid"></div>
         <div class="card">
           <div class="card-header">
-            <div class="card-title">טבלת בקרת חיובים כספיים — המוסד לביטוח הלאומי (111000000550 | 6.93 ₪)</div>
+            <div class="card-title">טבלת בקרת חיובים כספיים - המוסד לביטוח הלאומי (111000000550 | 6.93 ₪)</div>
           </div>
           <div class="table-container">
             <table id="tblBtlReport">
@@ -2632,12 +2632,12 @@
     </div>
 
     <!-- ===================================================================
-         SCREEN 9: מבחנים עיוניים (Theory Tests — PDF)
+         SCREEN 9: מבחנים עיוניים (Theory Tests - PDF)
          =================================================================== -->
     <div id="screenTests" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">מבחנים עיוניים — ריכוז שאילתות ותשלומים לפי ספק וחודש (PDF)</h1>
+          <h1 class="workspace-screen-title">מבחנים עיוניים - ריכוז שאילתות ותשלומים לפי ספק וחודש (PDF)</h1>
           <div class="workspace-screen-subtitle">קליטת דוחות PDF חודשיים של מבחנים עיוניים לזכיין (כגון מעוף, אנקורי, אורט) והצגת סך שאילתות (נבחנים) לספק לחודש, תעריף ותשלום</div>
         </div>
         <div class="toolbar-actions" id="testsHeaderToolbar" style="display:none;">
@@ -2681,7 +2681,7 @@
               </select>
             </div>
             <div class="form-field">
-              <label for="numTestsTariff">תעריף ליחידה (₪) — מק"ט 8002290</label>
+              <label for="numTestsTariff">תעריף ליחידה (₪) - מק"ט 8002290</label>
               <div style="display:flex; gap:8px;">
                 <input type="number" id="numTestsTariff" class="form-control" step="0.01" min="0" value="4.20" oninput="onTestsFilterChange()">
                 <button type="button" class="btn" onclick="setTestsTariff(4.20)" title="תעריף מבחן עיוני (4.20 ₪)">4.20 ₪</button>
@@ -2703,7 +2703,7 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">טבלת ריכוז מבחנים עיוניים לחיוב — סך שאילתות (נבחנים) לספק לחודש, תעריף ותשלום</div>
+              <div class="card-title">טבלת ריכוז מבחנים עיוניים לחיוב - סך שאילתות (נבחנים) לספק לחודש, תעריף ותשלום</div>
               <div class="card-subtitle">לחיצה על כל שורת ספק פותחת פירוט מלא של הנבחנים לפי שפות הבחינה (עברית, ערבית, אנגלית, רוסית, צרפתית, ספרדית, אמהרית ושמע)</div>
             </div>
             <div style="display:flex; gap:8px;">
@@ -2769,12 +2769,12 @@
     </div>
 
     <!-- ===================================================================
-         SCREEN 10: קורסים (Courses Billing — PDF NK2015F2 / NK2015FP)
+         SCREEN 10: קורסים (Courses Billing - PDF NK2015F2 / NK2015FP)
          =================================================================== -->
     <div id="screenCourses" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">חיוב קורסים — ריכוז שאילתות ותשלומים לפי ספק וחודש (PDF)</h1>
+          <h1 class="workspace-screen-title">חיוב קורסים - ריכוז שאילתות ותשלומים לפי ספק וחודש (PDF)</h1>
           <div class="workspace-screen-subtitle">קליטת דוחות PDF חודשיים של קורסי רענון וקורסי נהיגה נכונה (רשת עמל, מיב"ע, אורט, אנקורי) | תעריף עד 07/2026: 18.20 ₪ | תעריף מ-08/2026: 6.93 ₪</div>
         </div>
         <div class="toolbar-actions" id="coursesHeaderToolbar" style="display:none;">
@@ -2840,7 +2840,7 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">טבלת ריכוז חיוב קורסים לפי ספק וחודש — סך שאילתות לספק לחודש, תעריף ותשלום</div>
+              <div class="card-title">טבלת ריכוז חיוב קורסים לפי ספק וחודש - סך שאילתות לספק לחודש, תעריף ותשלום</div>
               <div class="card-subtitle">לחיצה על כל שורת ספק פותחת את פירוט הקורסים המלא (בסיסיים, מתקדמים, רענון) והתפלגות מועדי הדיווח מתוך ה-PDF</div>
             </div>
             <div style="display:flex; gap:8px;">
@@ -2858,8 +2858,8 @@
                   <th>קורסי נהיגה נכונה (8001400)</th>
                   <th>סך שאילתות (קורסים) לספק לחודש</th>
                   <th>תעריף ליחידה (₪)</th>
-                  <th>תשלום — קורסי רענון (₪)</th>
-                  <th>תשלום — נהיגה נכונה (₪)</th>
+                  <th>תשלום - קורסי רענון (₪)</th>
+                  <th>תשלום - נהיגה נכונה (₪)</th>
                   <th>סה"כ תשלום לספק לחודש (₪)</th>
                 </tr>
               </thead>
@@ -2903,12 +2903,12 @@
     </div>
 
     <!-- ===================================================================
-         SCREEN 11: דוח בקרה — מבחנים עיוניים
+         SCREEN 11: דוח בקרה - מבחנים עיוניים
          =================================================================== -->
     <div id="screenTestsReport" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">דוח בקרה והתאמה לחיוב — מבחנים עיוניים</h1>
+          <h1 class="workspace-screen-title">דוח בקרה והתאמה לחיוב - מבחנים עיוניים</h1>
           <div class="workspace-screen-subtitle">דוח מרוכז להנהלת חשבונות וגבייה: סך שאילתות (נבחנים), תעריף ותשלום לזכייני המבחנים העיוניים</div>
         </div>
         <div class="toolbar-actions">
@@ -2928,7 +2928,7 @@
         <div class="kpi-grid" id="testsReportKpiGrid"></div>
         <div class="card">
           <div class="card-header">
-            <div class="card-title">טבלת בקרת חיובים — מבחנים עיוניים לזכיין</div>
+            <div class="card-title">טבלת בקרת חיובים - מבחנים עיוניים לזכיין</div>
           </div>
           <div class="table-container">
             <table id="tblTestsReport">
@@ -2957,12 +2957,12 @@
     </div>
 
     <!-- ===================================================================
-         SCREEN 12: דוח בקרה — חיוב קורסים
+         SCREEN 12: דוח בקרה - חיוב קורסים
          =================================================================== -->
     <div id="screenCoursesReport" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">דוח בקרה והתאמה לחיוב — קורסי רענון ונהיגה נכונה</h1>
+          <h1 class="workspace-screen-title">דוח בקרה והתאמה לחיוב - קורסי רענון ונהיגה נכונה</h1>
           <div class="workspace-screen-subtitle">דוח מרוכז להנהלת חשבונות וגבייה: סך שאילתות (קורסים) לספק לחודש, תעריף ותשלום</div>
         </div>
         <div class="toolbar-actions">
@@ -2982,7 +2982,7 @@
         <div class="kpi-grid" id="coursesReportKpiGrid"></div>
         <div class="card">
           <div class="card-header">
-            <div class="card-title">טבלת בקרת חיובים — קורסי רענון וקורסי נהיגה נכונה לפי ספק וחודש</div>
+            <div class="card-title">טבלת בקרת חיובים - קורסי רענון וקורסי נהיגה נכונה לפי ספק וחודש</div>
           </div>
           <div class="table-container">
             <table id="tblCoursesReport">
@@ -2995,8 +2995,8 @@
                   <th>קורסי נהיגה נכונה (8001400)</th>
                   <th>סך שאילתות (קורסים) לספק לחודש</th>
                   <th>תעריף ליחידה (₪)</th>
-                  <th>תשלום — קורסי רענון (₪)</th>
-                  <th>תשלום — נהיגה נכונה (₪)</th>
+                  <th>תשלום - קורסי רענון (₪)</th>
+                  <th>תשלום - נהיגה נכונה (₪)</th>
                   <th>סה"כ תשלום לספק לחודש (₪)</th>
                 </tr>
               </thead>
@@ -3029,7 +3029,7 @@
 <div id="themeSettingsModal" class="modal-backdrop" onclick="if(event.target===this) closeThemeModal()">
   <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="themeModalTitle">
     <div class="dialog-header">
-      <h2 id="themeModalTitle">הגדרות תצוגה — בחירת ערכת נושא</h2>
+      <h2 id="themeModalTitle">הגדרות תצוגה - בחירת ערכת נושא</h2>
       <button class="dialog-close-btn" onclick="closeThemeModal()" aria-label="סגור">✕</button>
     </div>
     <div class="dialog-body">
@@ -3069,7 +3069,7 @@
       </div>
 
       <div class="about-credit-box">
-        <div style="font-size:14px; font-weight:700; color:var(--text-primary);">Aviv Matsa – Smart Information Systems</div>
+        <div style="font-size:14px; font-weight:700; color:var(--text-primary);">Aviv Matsa - Smart Information Systems</div>
         <div style="font-size:13px; color:var(--text-secondary); margin-top:4px;">המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית. © 2026</div>
       </div>
     </div>
@@ -4119,7 +4119,7 @@ function renderBatchScreens() {
 
     const totalRowHtml = `
       <tr class="total-row">
-        <td colspan="5">סה"כ כללי לחיוב (${fmtNum(clients.length)} שורות לקוח — תקופות: ${escHtml(periods)})</td>
+        <td colspan="5">סה"כ כללי לחיוב (${fmtNum(clients.length)} שורות לקוח - תקופות: ${escHtml(periods)})</td>
         <td>8001394</td>
         <td class="num">${fmtNum(totalQueries)}</td>
         <td class="num">${fmtCurrency(totalAmount)}</td>
@@ -4166,7 +4166,7 @@ function openBatchClientDrilldown(payerCode, year, month) {
       <div class="status-banner danger" style="margin-bottom:16px;">
         <div style="display:flex; align-items:center; gap:8px; font-weight:700;">
           <span class="suspect-alert-icon" style="margin-right:0;">!</span>
-          <span>חשד לטעות / כפילות: נמצאו שורות עם מספר זהה של כמויות בתאריכים סמוכים — ${escHtml(suspectList.join(" | "))}</span>
+          <span>חשד לטעות / כפילות: נמצאו שורות עם מספר זהה של כמויות בתאריכים סמוכים - ${escHtml(suspectList.join(" | "))}</span>
         </div>
       </div>
     `;
@@ -4222,7 +4222,7 @@ function openBatchClientDrilldown(payerCode, year, month) {
     </table>
   </div>`;
 
-  openDrillModal(`פירוט יומי ללקוח — ${first.clientName} (חודש ${first.month}/${first.year})`, html);
+  openDrillModal(`פירוט יומי ללקוח - ${first.clientName} (חודש ${first.month}/${first.year})`, html);
 }
 
 async function handleBatchFilesUpload(fileList, replaceExisting) {
@@ -4371,7 +4371,7 @@ function exportBatchToExcel() {
 }
 
 /* =========================================================================
-   DOMAIN 1B: שאילתות און ליין (ONLINE QUERIES — NO ROW GROUPING, 6.93 ₪)
+   DOMAIN 1B: שאילתות און ליין (ONLINE QUERIES - NO ROW GROUPING, 6.93 ₪)
    ========================================================================= */
 function openOnlineFileBrowser(replaceAll) {
   if (replaceAll) {
@@ -4662,7 +4662,7 @@ function renderOnlineScreens() {
 
     const totalRowHtml = `
       <tr class="total-row">
-        <td colspan="5">סה"כ כללי לחיוב (${fmtNum(rows.length)} שורות חיוב — תקופות: ${escHtml(periods)})</td>
+        <td colspan="5">סה"כ כללי לחיוב (${fmtNum(rows.length)} שורות חיוב - תקופות: ${escHtml(periods)})</td>
         <td>${uniqueSkus === 1 ? escHtml(rows[0].sku) : `${uniqueSkus} מק"טים`}</td>
         <td class="num">${fmtNum(totalQueries)}</td>
         <td class="num">${fmtCurrency(totalAmount)}</td>
@@ -4745,7 +4745,7 @@ function openOnlineClientDrilldown(payerCode, year, month, clickedRowId) {
     </table>
   </div>`;
 
-  openDrillModal(`פירוט שורות שאילתות און ליין — ${first.clientName} (${first.payerCode})`, html);
+  openDrillModal(`פירוט שורות שאילתות און ליין - ${first.clientName} (${first.payerCode})`, html);
 }
 
 async function handleOnlineFilesUpload(fileList, replaceExisting) {
@@ -4862,7 +4862,7 @@ function exportOnlineToExcel() {
 }
 
 /* =========================================================================
-   DOMAIN 2: תחנות צילום (PHOTO STATIONS — PIVOT MATRIX & 6.93 ₪ PAYMENT ROW)
+   DOMAIN 2: תחנות צילום (PHOTO STATIONS - PIVOT MATRIX & 6.93 ₪ PAYMENT ROW)
    ========================================================================= */
 const PHOTO_QUERY_UNIT_PRICE = 6.93;
 
@@ -5063,7 +5063,7 @@ function renderPhotoScreens() {
     navBadge.textContent = "ממתין";
     navBadge.className = "badge badge-muted";
     document.getElementById("photoDropZoneSubtitle").textContent =
-      "גרור לכאן את קבצי האקסל של תחנות הצילום (צילום נהגים, רישיונות בינלאומיים, רישיונות משיטים — עבור אופטיקה הלפרין ומרמנת), או לחץ לפתיחת חלונית הדפדפן ובחירת הקבצים.";
+      "גרור לכאן את קבצי האקסל של תחנות הצילום (צילום נהגים, רישיונות בינלאומיים, רישיונות משיטים - עבור אופטיקה הלפרין ומרמנת), או לחץ לפתיחת חלונית הדפדפן ובחירת הקבצים.";
     return;
   }
 
@@ -5074,7 +5074,7 @@ function renderPhotoScreens() {
   navBadge.className = "badge badge-success";
 
   document.getElementById("photoDropZoneSubtitle").textContent =
-    `נטענו ${photoState.files.length} קבצים (${months.length} חודשי דיווח) — מוצגות 2 טבלאות: טבלת שאילתות וטבלת תשלומים (6.93 ₪). לחץ על כל מספר לפירוט סניפים.`;
+    `נטענו ${photoState.files.length} קבצים (${months.length} חודשי דיווח) - מוצגות 2 טבלאות: טבלת שאילתות וטבלת תשלומים (6.93 ₪). לחץ על כל מספר לפירוט סניפים.`;
 
   const matrix = {};
   for (const mk of months) {
@@ -5126,18 +5126,18 @@ function renderPhotoScreens() {
     queriesMatrixHtml += `
       <tr>
         <td style="font-weight:700;">${escHtml(formatMonthLabelHeb(mk))}</td>
-        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'צילום נהגים', 'אופטיקה הלפרין')" title="לחץ לפירוט סניפי אופטיקה הלפרין — צילום נהגים">${fmtNum(dH)}</td>
-        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'צילום נהגים', 'מרמנת')" title="לחץ לפירוט סניפי מרמנת — צילום נהגים">${fmtNum(dM)}</td>
-        <td class="clickable-num-bold" style="border-left:1px solid var(--border-color);" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'צילום נהגים', 'ALL')" title="לחץ לפירוט כלל הסניפים — צילום נהגים">${fmtNum(dT)}</td>
-        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'רישיונות בינלאומיים', 'אופטיקה הלפרין')" title="לחץ לפירוט סניפי אופטיקה הלפרין — רישיונות בינלאומיים">${fmtNum(iH)}</td>
-        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'רישיונות בינלאומיים', 'מרמנת')" title="לחץ לפירוט סניפי מרמנת — רישיונות בינלאומיים">${fmtNum(iM)}</td>
-        <td class="clickable-num-bold" style="border-left:1px solid var(--border-color);" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'רישיונות בינלאומיים', 'ALL')" title="לחץ לפירוט כלל הסניפים — רישיונות בינלאומיים">${fmtNum(iT)}</td>
-        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'צילום משיטים', 'אופטיקה הלפרין')" title="לחץ לפירוט סניפי אופטיקה הלפרין — רישיונות משיטים">${fmtNum(sH)}</td>
-        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'צילום משיטים', 'מרמנת')" title="לחץ לפירוט סניפי מרמנת — רישיונות משיטים">${fmtNum(sM)}</td>
-        <td class="clickable-num-bold" style="border-left:1px solid var(--border-color);" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'צילום משיטים', 'ALL')" title="לחץ לפירוט כלל הסניפים — רישיונות משיטים">${fmtNum(sT)}</td>
-        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'ALL', 'אופטיקה הלפרין')" title="לחץ לפירוט סניפי אופטיקה הלפרין — כל השירותים">${fmtNum(rH)}</td>
-        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'ALL', 'מרמנת')" title="לחץ לפירוט סניפי מרמנת — כל השירותים">${fmtNum(rM)}</td>
-        <td class="clickable-num-bold" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'ALL', 'ALL')" title="לחץ לפירוט כלל הסניפים — כל השירותים">${fmtNum(rT)}</td>
+        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'צילום נהגים', 'אופטיקה הלפרין')" title="לחץ לפירוט סניפי אופטיקה הלפרין - צילום נהגים">${fmtNum(dH)}</td>
+        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'צילום נהגים', 'מרמנת')" title="לחץ לפירוט סניפי מרמנת - צילום נהגים">${fmtNum(dM)}</td>
+        <td class="clickable-num-bold" style="border-left:1px solid var(--border-color);" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'צילום נהגים', 'ALL')" title="לחץ לפירוט כלל הסניפים - צילום נהגים">${fmtNum(dT)}</td>
+        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'רישיונות בינלאומיים', 'אופטיקה הלפרין')" title="לחץ לפירוט סניפי אופטיקה הלפרין - רישיונות בינלאומיים">${fmtNum(iH)}</td>
+        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'רישיונות בינלאומיים', 'מרמנת')" title="לחץ לפירוט סניפי מרמנת - רישיונות בינלאומיים">${fmtNum(iM)}</td>
+        <td class="clickable-num-bold" style="border-left:1px solid var(--border-color);" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'רישיונות בינלאומיים', 'ALL')" title="לחץ לפירוט כלל הסניפים - רישיונות בינלאומיים">${fmtNum(iT)}</td>
+        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'צילום משיטים', 'אופטיקה הלפרין')" title="לחץ לפירוט סניפי אופטיקה הלפרין - רישיונות משיטים">${fmtNum(sH)}</td>
+        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'צילום משיטים', 'מרמנת')" title="לחץ לפירוט סניפי מרמנת - רישיונות משיטים">${fmtNum(sM)}</td>
+        <td class="clickable-num-bold" style="border-left:1px solid var(--border-color);" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'צילום משיטים', 'ALL')" title="לחץ לפירוט כלל הסניפים - רישיונות משיטים">${fmtNum(sT)}</td>
+        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'ALL', 'אופטיקה הלפרין')" title="לחץ לפירוט סניפי אופטיקה הלפרין - כל השירותים">${fmtNum(rH)}</td>
+        <td class="clickable-num" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'ALL', 'מרמנת')" title="לחץ לפירוט סניפי מרמנת - כל השירותים">${fmtNum(rM)}</td>
+        <td class="clickable-num-bold" onclick="openPhotoMatrixDrilldown('${escHtml(mk)}', 'ALL', 'ALL')" title="לחץ לפירוט כלל הסניפים - כל השירותים">${fmtNum(rT)}</td>
       </tr>
     `;
 
@@ -5214,17 +5214,17 @@ function renderPhotoScreens() {
   // Also update Screen 4 (Report Screen)
   document.getElementById("photoReportKpiGrid").innerHTML = `
     <div class="kpi-card kpi-success">
-      <div class="kpi-label"><span>סה"כ לתשלום — תחנות צילום</span><span class="badge badge-success">6.93 ₪ לשאילתה</span></div>
+      <div class="kpi-label"><span>סה"כ לתשלום - תחנות צילום</span><span class="badge badge-success">6.93 ₪ לשאילתה</span></div>
       <div class="kpi-val">${fmtCurrency(photoAmt(gT))}</div>
       <div class="kpi-meta"><span>סה"כ שאילתות: ${fmtNum(gT)}</span><span>${photoState.files.length} קבצים | ${months.length} חודשים</span></div>
     </div>
     <div class="kpi-card kpi-halperin">
-      <div class="kpi-label"><span>אופטיקה הלפרין — כמות וסכום</span><span class="badge badge-halperin">${fmtNum(gH)} שאילתות</span></div>
+      <div class="kpi-label"><span>אופטיקה הלפרין - כמות וסכום</span><span class="badge badge-halperin">${fmtNum(gH)} שאילתות</span></div>
       <div class="kpi-val">${fmtCurrency(photoAmt(gH))}</div>
       <div class="kpi-meta"><span>נהגים: ${fmtNum(t.dH)} | בינלאומי: ${fmtNum(t.iH)} | משיטים: ${fmtNum(t.sH)}</span></div>
     </div>
     <div class="kpi-card kpi-marmanet">
-      <div class="kpi-label"><span>מרמנת — כמות וסכום</span><span class="badge badge-marmanet">${fmtNum(gM)} שאילתות</span></div>
+      <div class="kpi-label"><span>מרמנת - כמות וסכום</span><span class="badge badge-marmanet">${fmtNum(gM)} שאילתות</span></div>
       <div class="kpi-val">${fmtCurrency(photoAmt(gM))}</div>
       <div class="kpi-meta"><span>נהגים: ${fmtNum(t.dM)} | בינלאומי: ${fmtNum(t.iM)} | משיטים: ${fmtNum(t.sM)}</span></div>
     </div>
@@ -5367,7 +5367,7 @@ function openPhotoMatrixDrilldown(monthKey, serviceFilter, vendorFilter) {
     </table>
   </div>`;
 
-  openDrillModal(`פירוט ברמת סניפים — ${vendorLabel} | ${serviceLabel} | ${monthLabel}`, html);
+  openDrillModal(`פירוט ברמת סניפים - ${vendorLabel} | ${serviceLabel} | ${monthLabel}`, html);
 }
 
 function exportPhotoToExcel() {
@@ -5559,10 +5559,10 @@ async function decompressFlateBytes(compSlice) {
 function getTlvRowMetadata(code, action) {
   const act = (action || "").trim();
   const isExempt = act.includes("ביטול");
-  let subReport = "שלטון מקומי — עיריית תל אביב";
-  if (code === "113000000177") subReport = "שלטון מקומי — ארנונה (113000000177)";
-  else if (code === "855") subReport = "שלטון מקומי — חניה ומוביליטי (855)";
-  else if (code === "113000000857") subReport = "מגער — און-ליין (113000000857)";
+  let subReport = "שלטון מקומי - עיריית תל אביב";
+  if (code === "113000000177") subReport = "שלטון מקומי - ארנונה (113000000177)";
+  else if (code === "855") subReport = "שלטון מקומי - חניה ומוביליטי (855)";
+  else if (code === "113000000857") subReport = "מגער - און-ליין (113000000857)";
 
   let sku = "-";
   let skuDesc = "פטור מחיוב (פעולת ביטול)";
@@ -5601,7 +5601,7 @@ function getBtlRowMetadata(system, action) {
   let skuDesc = "פטור מחיוב (ביטולים / צווים / הגבלות)";
   if (isBillable) {
     sku = "8001384";
-    skuDesc = act === "פרטי רכב" ? "עיקול רכב / פרטי רכב (חשבון 1)" : (sys.includes("צמ\"ה") ? "עיקול רכב — צמ\"ה" : "עיקול רכב — אכיפה");
+    skuDesc = act === "פרטי רכב" ? "עיקול רכב / פרטי רכב (חשבון 1)" : (sys.includes("צמ\"ה") ? "עיקול רכב - צמ\"ה" : "עיקול רכב - אכיפה");
   }
   return { sku, skuDesc, billable: isBillable };
 }
@@ -6008,12 +6008,12 @@ function renderAutodchScreens() {
 
     const tlvKpiHtml = `
       <div class="kpi-card">
-        <div class="kpi-label"><span>סה"כ פעולות לחיוב — עיריית תל אביב</span><span class="badge badge-info">${months.length} חודשים</span></div>
+        <div class="kpi-label"><span>סה"כ פעולות לחיוב - עיריית תל אביב</span><span class="badge badge-info">${months.length} חודשים</span></div>
         <div class="kpi-val">${fmtNum(totalBillableQty)}</div>
         <div class="kpi-meta"><span>ארנונה (177): ${fmtNum(qty177)} | חניה (855): ${fmtNum(qty855)} | מגער (857): ${fmtNum(qty857)}</span></div>
       </div>
       <div class="kpi-card kpi-success">
-        <div class="kpi-label"><span>סה"כ סכום לתשלום — עיריית תל אביב</span><span class="badge badge-success">6.93 ₪ ליחידה</span></div>
+        <div class="kpi-label"><span>סה"כ סכום לתשלום - עיריית תל אביב</span><span class="badge badge-success">6.93 ₪ ליחידה</span></div>
         <div class="kpi-val">${fmtCurrency(totalBillableAmt)}</div>
         <div class="kpi-meta"><span>מחושב לפי ${fmtNum(totalBillableQty)} פעולות חייבות × 6.93 ₪</span></div>
       </div>
@@ -6045,7 +6045,7 @@ function renderAutodchScreens() {
     });
     sumHtml += `
       <tr class="total-row">
-        <td colspan="7">סה"כ לחיוב — עיריית תל אביב (${tlvBillable.length} שורות חיוב)</td>
+        <td colspan="7">סה"כ לחיוב - עיריית תל אביב (${tlvBillable.length} שורות חיוב)</td>
         <td class="num">${fmtNum(totalBillableQty)}</td>
         <td class="num">6.93 ₪</td>
         <td class="num">${fmtCurrency(totalBillableAmt)}</td>
@@ -6103,12 +6103,12 @@ function renderAutodchScreens() {
 
     const btlKpiHtml = `
       <div class="kpi-card">
-        <div class="kpi-label"><span>סה"כ פעולות לחיוב — ביטוח לאומי</span><span class="badge badge-info">111000000550</span></div>
+        <div class="kpi-label"><span>סה"כ פעולות לחיוב - ביטוח לאומי</span><span class="badge badge-info">111000000550</span></div>
         <div class="kpi-val">${fmtNum(totalBillableQty)}</div>
         <div class="kpi-meta"><span>פרטי רכב: ${fmtNum(qtyCarInfo)} | רישום עיקול: ${fmtNum(qtyCarLien)} | עיקול צמ"ה: ${fmtNum(qtyTzamaLien)}</span></div>
       </div>
       <div class="kpi-card kpi-success">
-        <div class="kpi-label"><span>סה"כ סכום לתשלום — ביטוח לאומי</span><span class="badge badge-success">6.93 ₪ ליחידה</span></div>
+        <div class="kpi-label"><span>סה"כ סכום לתשלום - ביטוח לאומי</span><span class="badge badge-success">6.93 ₪ ליחידה</span></div>
         <div class="kpi-val">${fmtCurrency(totalBillableAmt)}</div>
         <div class="kpi-meta"><span>מחושב לפי ${fmtNum(totalBillableQty)} פעולות חייבות × 6.93 ₪ (מק"ט 8001384)</span></div>
       </div>
@@ -6140,7 +6140,7 @@ function renderAutodchScreens() {
     });
     sumHtml += `
       <tr class="total-row">
-        <td colspan="7">סה"כ לחיוב — המוסד לביטוח הלאומי (${btlBillable.length} שורות חיוב)</td>
+        <td colspan="7">סה"כ לחיוב - המוסד לביטוח הלאומי (${btlBillable.length} שורות חיוב)</td>
         <td class="num">${fmtNum(totalBillableQty)}</td>
         <td class="num">6.93 ₪</td>
         <td class="num">${fmtCurrency(totalBillableAmt)}</td>
@@ -6222,7 +6222,7 @@ function exportTelAvivToExcel() {
   });
   totBillAmt = Number((totBillQty * AUTODCH_UNIT_PRICE).toFixed(2));
   sheet1Rows.push([
-    { v: "סה\"כ לחיוב — עיריית תל אביב", t: "s", bold: true },
+    { v: "סה\"כ לחיוב - עיריית תל אביב", t: "s", bold: true },
     { v: "", t: "s", bold: true },
     { v: "", t: "s", bold: true },
     { v: `${billable.length} שורות לחיוב`, t: "s", bold: true },
@@ -6304,7 +6304,7 @@ function exportBtlToExcel() {
   });
   totBillAmt = Number((totBillQty * AUTODCH_UNIT_PRICE).toFixed(2));
   sheet1Rows.push([
-    { v: "סה\"כ לחיוב — המוסד לביטוח הלאומי", t: "s", bold: true },
+    { v: "סה\"כ לחיוב - המוסד לביטוח הלאומי", t: "s", bold: true },
     { v: "111000000550", t: "s", bold: true },
     { v: "ביטוח לאומי - אכיפה", t: "s", bold: true },
     { v: "", t: "s", bold: true },
@@ -6478,7 +6478,7 @@ async function extractPdfDecodedPages(file) {
 }
 
 /* =========================================================================
-   DOMAIN 5: מבחנים עיוניים (THEORY TESTS — PDF PARSER & UI)
+   DOMAIN 5: מבחנים עיוניים (THEORY TESTS - PDF PARSER & UI)
    ========================================================================= */
 function openTestsFileBrowser(replaceAll) {
   if (replaceAll) {
@@ -6768,7 +6768,7 @@ function renderTestsScreens() {
     langHtml += `
       <tr>
         <td>${escHtml(formatMonthLabelHeb(r.monthKey))}</td>
-        <td style="font-weight:700;">${escHtml(r.vendorCode)} — ${escHtml(r.vendorName)}</td>
+        <td style="font-weight:700;">${escHtml(r.vendorCode)} - ${escHtml(r.vendorName)}</td>
         <td class="num" style="font-weight:700;">${fmtNum(r.totalExaminees)}</td>
         <td class="num">${fmtNum(r.passed)}</td>
         <td class="num">${escHtml(r.passRate)}</td>
@@ -6857,7 +6857,7 @@ function openTestsDrilldown(monthKey, vendorName) {
 
   const html = `
     <div style="margin-bottom:16px; padding:12px 16px; background:var(--bg-muted); border:1px solid var(--border-color); border-radius:var(--radius-md); display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-      <div><strong>זכיין:</strong> ${escHtml(r.vendorCode)} — ${escHtml(r.vendorName)}</div>
+      <div><strong>זכיין:</strong> ${escHtml(r.vendorCode)} - ${escHtml(r.vendorName)}</div>
       <div><strong>חודש דיווח:</strong> ${escHtml(formatMonthLabelHeb(r.monthKey))}</div>
       <div><strong>סה"כ נבחנים:</strong> <span style="color:var(--theme-primary); font-weight:700;">${fmtNum(r.totalExaminees)}</span> (עברו: ${fmtNum(r.passed)} | ${escHtml(r.passRate)})</div>
       <div><strong>סה"כ לתשלום:</strong> <span style="color:var(--color-success); font-weight:700;">${fmtCurrency(rowPay)}</span></div>
@@ -6885,7 +6885,7 @@ function openTestsDrilldown(monthKey, vendorName) {
       </table>
     </div>
   `;
-  openDrillModal(`פירוט מבחנים עיוניים לפי שפות — ${r.vendorName} (${formatMonthLabelHeb(r.monthKey)})`, html);
+  openDrillModal(`פירוט מבחנים עיוניים לפי שפות - ${r.vendorName} (${formatMonthLabelHeb(r.monthKey)})`, html);
 }
 
 function clearTestsData() {
@@ -6980,7 +6980,7 @@ function exportTestsToExcel() {
 }
 
 /* =========================================================================
-   DOMAIN 6: חיוב קורסים (COURSES BILLING — PDF NK2015F2 / NK2015FP)
+   DOMAIN 6: חיוב קורסים (COURSES BILLING - PDF NK2015F2 / NK2015FP)
    ========================================================================= */
 function openCoursesFileBrowser(replaceAll) {
   if (replaceAll) {
@@ -7361,7 +7361,7 @@ function renderCoursesScreens() {
         <td class="num">${skuIdx}</td>
         <td>${escHtml(formatMonthLabelHeb(r.monthKey))}</td>
         <td style="font-weight:700;">${escHtml(r.vendorDisplay)}</td>
-        <td style="font-weight:700;">קורסי חובה — רענון</td>
+        <td style="font-weight:700;">קורסי חובה - רענון</td>
         <td class="num">8001401</td>
         <td>קורס רענון</td>
         <td class="num" style="font-weight:700;">${fmtNum(r.refreshQty)}</td>
@@ -7378,7 +7378,7 @@ function renderCoursesScreens() {
         <td class="num">${skuIdx}</td>
         <td>${escHtml(formatMonthLabelHeb(r.monthKey))}</td>
         <td style="font-weight:700;">${escHtml(r.vendorDisplay)}</td>
-        <td style="font-weight:700;">קורסי חובה — נהיגה נכונה</td>
+        <td style="font-weight:700;">קורסי חובה - נהיגה נכונה</td>
         <td class="num">8001400</td>
         <td>בסיסיים: ${fmtNum(r.basicQty)} | מתקדמים: ${fmtNum(r.advancedQty)}</td>
         <td class="num" style="font-weight:700;">${fmtNum(r.correctDrivingQty)}</td>
@@ -7514,7 +7514,7 @@ function openCourseVendorDrilldown(monthKey, vendorKey) {
     ${timelinessHtml}
   `;
 
-  openDrillModal(`פירוט חיוב קורסים — ${r.vendorDisplay} (${formatMonthLabelHeb(r.monthKey)})`, html);
+  openDrillModal(`פירוט חיוב קורסים - ${r.vendorDisplay} (${formatMonthLabelHeb(r.monthKey)})`, html);
 }
 
 function clearCoursesData() {
@@ -7626,7 +7626,7 @@ function exportCoursesToExcel() {
 }
 
 /* =========================================================================
-   SCREEN 0A: מקורות הנתונים — CENTRAL SMART FILE ROUTER & AUTO-DETECTION
+   SCREEN 0A: מקורות הנתונים - CENTRAL SMART FILE ROUTER & AUTO-DETECTION
    ========================================================================= */
 function openCentralFileBrowser() {
   document.getElementById("centralFilesInput").click();
@@ -7698,7 +7698,7 @@ async function handleCentralFilesUpload(fileList) {
               fileType: "Excel (.xlsx)",
               domain: "תחנות צילום",
               periods: formatMonthLabelHeb(res.fileSummary.monthKey || "-"),
-              summary: `${res.fileSummary.vendor} — ${res.fileSummary.service} (${fmtNum(res.fileSummary.totalCalls)} שאילתות | ${fmtCurrency(amt)})`,
+              summary: `${res.fileSummary.vendor} - ${res.fileSummary.service} (${fmtNum(res.fileSummary.totalCalls)} שאילתות | ${fmtCurrency(amt)})`,
               screenId: "screenPhoto",
               navId: "navItemPhoto"
             });
@@ -7967,7 +7967,7 @@ function renderDataSourcesScreen() {
     {
       name: "שאילתות אצוות",
       format: "Excel (.xlsx)",
-      rule: "עמודות B–I עם קוד תשובה/יום בעמודה I (מק\"ט 8001394 — 6.93 ₪)",
+      rule: "עמודות B-I עם קוד תשובה/יום בעמודה I (מק\"ט 8001394 - 6.93 ₪)",
       loaded: hasBatch,
       filesInfo: hasBatch ? `${batchState.fileNames.length} קבצים (${batchPeriods})` : "טרם נטען קובץ",
       qty: batchQty,
@@ -7978,7 +7978,7 @@ function renderDataSourcesScreen() {
     {
       name: "שאילתות און ליין",
       format: "Excel (.xlsx)",
-      rule: "עמודות B–I ללא קוד תשובה בעמודה I — ללא קיבוץ שורות (6.93 ₪)",
+      rule: "עמודות B-I ללא קוד תשובה בעמודה I - ללא קיבוץ שורות (6.93 ₪)",
       loaded: hasOnline,
       filesInfo: hasOnline ? `${onlineState.fileNames.length} קבצים (${onlinePeriods})` : "טרם נטען קובץ",
       qty: onlineQty,
@@ -7989,7 +7989,7 @@ function renderDataSourcesScreen() {
     {
       name: "תחנות צילום",
       format: "Excel (.xlsx)",
-      rule: "דוחות MF_Report (הלפרין / מרמנת — נהגים, בינלאומי, משיטים — 6.93 ₪)",
+      rule: "דוחות MF_Report (הלפרין / מרמנת - נהגים, בינלאומי, משיטים - 6.93 ₪)",
       loaded: hasPhoto,
       filesInfo: hasPhoto ? `${photoState.files.length} קבצים (${photoPeriods})` : "טרם נטען קובץ",
       qty: photoQty,
@@ -8000,7 +8000,7 @@ function renderDataSourcesScreen() {
     {
       name: "מבחנים עיוניים",
       format: "PDF (.pdf)",
-      rule: "דוח 'מבחנים עיוניים לזכיין' (אורט, מעוף, אנקורי — מק\"ט 8002290)",
+      rule: "דוח 'מבחנים עיוניים לזכיין' (אורט, מעוף, אנקורי - מק\"ט 8002290)",
       loaded: hasTests,
       filesInfo: hasTests ? `${testsState.fileNames.length} דוחות (${testsPeriods})` : "טרם נטען קובץ",
       qty: testsQty,
@@ -8011,7 +8011,7 @@ function renderDataSourcesScreen() {
     {
       name: "חיוב קורסים",
       format: "PDF (.pdf)",
-      rule: "דוח NK2015F2 / NK2015FP (רענון ונהיגה נכונה — 18.20 ₪ / 6.93 ₪)",
+      rule: "דוח NK2015F2 / NK2015FP (רענון ונהיגה נכונה - 18.20 ₪ / 6.93 ₪)",
       loaded: hasCourses,
       filesInfo: hasCourses ? `${coursesState.fileNames.length} דוחות (${coursesPeriods})` : "טרם נטען קובץ",
       qty: coursesQty,
@@ -8022,7 +8022,7 @@ function renderDataSourcesScreen() {
     {
       name: "חיובים לתל אביב",
       format: "PDF (#AUTODCH)",
-      rule: "דוח כמות פניות למשרד התחבורה — קודים 113000000177, 855, 113000000857",
+      rule: "דוח כמות פניות למשרד התחבורה - קודים 113000000177, 855, 113000000857",
       loaded: hasTlv,
       filesInfo: hasTlv ? `${autodchState.fileNames.length} דוחות (${tlvPeriods})` : "טרם נטען קובץ",
       qty: tlvQty,
@@ -8033,7 +8033,7 @@ function renderDataSourcesScreen() {
     {
       name: "חיובים לביטוח הלאומי",
       format: "PDF (#AUTODCH)",
-      rule: "דוח כמות פניות למשרד התחבורה — קוד 111000000550 (מק\"ט 8001384)",
+      rule: "דוח כמות פניות למשרד התחבורה - קוד 111000000550 (מק\"ט 8001384)",
       loaded: hasBtl,
       filesInfo: hasBtl ? `${autodchState.fileNames.length} דוחות (${btlPeriods})` : "טרם נטען קובץ",
       qty: btlQty,
@@ -8084,7 +8084,7 @@ function renderDataSourcesScreen() {
   for (const d of domainsStatus) {
     const statusBadge = d.loaded
       ? `<span class="badge badge-success">פתוח ופעיל בתפריט ✓</span>`
-      : `<span class="badge badge-muted">נעול — ממתין לקובץ</span>`;
+      : `<span class="badge badge-muted">נעול - ממתין לקובץ</span>`;
     const actionBtn = d.loaded
       ? `<button class="btn btn-primary" style="min-height:34px; padding:0 12px; font-size:13px;" onclick="navigateScreen('${d.screenId}', document.getElementById('${d.navId}'))">עבור למסך ←</button>`
       : `<button class="btn" style="min-height:34px; padding:0 12px; font-size:13px;" onclick="openCentralFileBrowser()">טען קובץ</button>`;
@@ -8236,7 +8236,7 @@ function resolveUnifiedCustomerIdentity(rawCode, rawName, merkavaCode) {
     return {
       clientKey: "UNIFIED_VENDOR_MAOF",
       displayCode: code && code !== "מעוף" ? code : "ספק מבחנים",
-      displayName: "מעוף — זכיין מבחנים עיוניים",
+      displayName: "מעוף - זכיין מבחנים עיוניים",
       merkavaCode: merkava || "-"
     };
   }
@@ -8314,7 +8314,7 @@ function collectAllUnifiedBillingComponents() {
       rawCode: r.payerCode,
       monthKey: r.monthKey,
       domain: "שאילתות און ליין",
-      componentDesc: `שאילתות און ליין — ${r.clientName} (שורה #${r.rowSeq})`,
+      componentDesc: `שאילתות און ליין - ${r.clientName} (שורה #${r.rowSeq})`,
       sku: r.sku,
       quantity: r.quantity,
       unitTariff: ONLINE_QUERY_UNIT_PRICE,
@@ -8348,7 +8348,7 @@ function collectAllUnifiedBillingComponents() {
       rawCode: item.vendor,
       monthKey: item.monthKey,
       domain: "תחנות צילום",
-      componentDesc: `תחנות צילום — ${item.service} (${item.branchesCount.size} סניפים)`,
+      componentDesc: `תחנות צילום - ${item.service} (${item.branchesCount.size} סניפים)`,
       sku: "תחנות צילום",
       quantity: item.calls,
       unitTariff: PHOTO_QUERY_UNIT_PRICE,
@@ -8384,7 +8384,7 @@ function collectAllUnifiedBillingComponents() {
         rawCode: r.vendorKey,
         monthKey: r.monthKey,
         domain: "חיוב קורסים",
-        componentDesc: "קורסי חובה בנהיגה — קורסי רענון",
+        componentDesc: "קורסי חובה בנהיגה - קורסי רענון",
         sku: "8001401",
         quantity: r.refreshQty,
         unitTariff: r.unitTariff,
@@ -8417,7 +8417,7 @@ function collectAllUnifiedBillingComponents() {
       rawCode: r.code,
       monthKey: r.monthKey,
       domain: "עיריית תל אביב",
-      componentDesc: `${r.subReport} — ${r.action}`,
+      componentDesc: `${r.subReport} - ${r.action}`,
       sku: r.sku,
       quantity: r.quantity,
       unitTariff: AUTODCH_UNIT_PRICE,
@@ -8435,7 +8435,7 @@ function collectAllUnifiedBillingComponents() {
       rawCode: r.code,
       monthKey: r.monthKey,
       domain: "המוסד לביטוח הלאומי",
-      componentDesc: `${r.system} — ${r.action}`,
+      componentDesc: `${r.system} - ${r.action}`,
       sku: r.sku,
       quantity: r.quantity,
       unitTariff: AUTODCH_UNIT_PRICE,
@@ -8754,7 +8754,7 @@ function openUnifiedClientDrilldown(clientKey) {
     </div>
   `;
 
-  openDrillModal(`פירוט חיובים מאוחד ללקוח — ${cust.displayName}`, html);
+  openDrillModal(`פירוט חיובים מאוחד ללקוח - ${cust.displayName}`, html);
 }
 
 function exportUnifiedToExcel() {
