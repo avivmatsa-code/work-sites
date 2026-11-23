@@ -1,13 +1,163 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" data-theme="azure">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מערכת להכנת נתונים לחיוב לקוחות | משרד התחבורה והבטיחות בדרכים</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
+/* AMIS Clear UI — Design Tokens v0.4 */
+
+:root {
+  /* Typography */
+  --font-family-base: Arial, "Noto Sans Hebrew", sans-serif;
+  --font-size-xs: 13px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 17px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 28px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-pill: 999px;
+
+  /* Neutral colors */
+  --color-bg: #f5f7f9;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f9fafb;
+  --color-text: #1f2933;
+  --color-text-muted: #607080;
+  --color-border: #d5dee6;
+  --color-border-strong: #aebdca;
+
+  /* Semantic colors — unchanged across themes */
+  --color-success: #16834f;
+  --color-success-bg: #edf7f1;
+  --color-warning: #a86400;
+  --color-warning-bg: #fff7e6;
+  --color-danger: #c0363f;
+  --color-danger-bg: #fff0f0;
+  --color-info: #176fa5;
+  --color-info-bg: #edf6fb;
+
+  /* Shadows */
+  --shadow-panel: 0 2px 8px rgba(15, 35, 55, 0.06);
+  --shadow-floating: 0 8px 24px rgba(15, 35, 55, 0.12);
+
+  /* Component sizes */
+  --control-height: 44px;
+  --button-height: 44px;
+  --table-row-height: 50px;
+  --panel-header-height: 52px;
+  --app-header-height: 70px;
+
+  /* Primary action on dark header/background */
+  --header-primary-button-border: rgba(255, 255, 255, 0.78);
+  --header-primary-button-inner-outline: rgba(255, 255, 255, 0.18);
+
+  color-scheme: light;
+}
+
+/* Default theme: Azure */
+:root,
+[data-theme="azure"] {
+  --brand-primary: #0969c3;
+  --brand-hover: #075aa8;
+  --brand-active: #064b8d;
+  --brand-accent: #35a3ff;
+  --brand-subtle: #eaf5ff;
+  --brand-border: #93c8f2;
+  --focus-color: #0969c3;
+}
+
+[data-theme="turquoise"] {
+  --brand-primary: #008c95;
+  --brand-hover: #007780;
+  --brand-active: #00636b;
+  --brand-accent: #26c3c9;
+  --brand-subtle: #e7f8f8;
+  --brand-border: #84d3d6;
+  --focus-color: #008c95;
+}
+
+[data-theme="emerald"] {
+  --brand-primary: #00875a;
+  --brand-hover: #00724c;
+  --brand-active: #005e3e;
+  --brand-accent: #29bd83;
+  --brand-subtle: #e9f8f1;
+  --brand-border: #8bd4b6;
+  --focus-color: #00875a;
+}
+
+[data-theme="violet"] {
+  --brand-primary: #7047c8;
+  --brand-hover: #6039b1;
+  --brand-active: #502f95;
+  --brand-accent: #a27aff;
+  --brand-subtle: #f2edff;
+  --brand-border: #c0adf0;
+  --focus-color: #7047c8;
+}
+
+[data-theme="raspberry"] {
+  --brand-primary: #c52a68;
+  --brand-hover: #aa2259;
+  --brand-active: #8f1c4b;
+  --brand-accent: #ee6798;
+  --brand-subtle: #fdebf2;
+  --brand-border: #eca3bf;
+  --focus-color: #c52a68;
+}
+
+[data-theme="sunset"] {
+  --brand-primary: #d95d20;
+  --brand-hover: #bd4d18;
+  --brand-active: #9f4014;
+  --brand-accent: #ff914f;
+  --brand-subtle: #fff0e7;
+  --brand-border: #efb18d;
+  --focus-color: #d95d20;
+}
+
+/* Optional Aviv Matsa personal-systems theme only. Do not use for Ministry of Transport systems. */
+[data-theme="gray"] {
+  --brand-primary: #607080;
+  --brand-hover: #52616f;
+  --brand-active: #465461;
+  --brand-accent: #aebdca;
+  --brand-subtle: #eef2f5;
+  --brand-border: #b8c4cf;
+  --focus-color: #607080;
+}
+
+/* Backward-compatible aliases used by earlier AMIS adopters. */
+:root {
+  --color-brand: var(--brand-primary);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-active: var(--brand-active);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-subtle: var(--brand-subtle);
+  --color-brand-border: var(--brand-border);
+  --color-link: var(--brand-primary);
+  --color-focus: var(--focus-color);
+}
+
   :root {
     --theme-primary: #0969c3;
     --theme-hover: #075aa8;
@@ -49,7 +199,7 @@
   }
 
   body {
-    font-family: 'Noto Sans Hebrew', Arial, sans-serif;
+    font-family: var(--font-family-base);
     font-size: 14px;
     background-color: var(--bg-workspace);
     color: var(--text-primary);
@@ -1084,32 +1234,129 @@
       overflow: visible;
     }
   }
+  /* AMIS Clear UI v0.5: visual alignment with the revenue and collection system. */
+  :root {
+    --theme-primary: var(--brand-primary);
+    --theme-hover: var(--brand-hover);
+    --theme-active: var(--brand-active);
+    --theme-tint: var(--brand-subtle);
+    --header-bg: var(--brand-active);
+    --bg-workspace: var(--color-bg);
+    --bg-surface: var(--color-surface);
+    --bg-muted: var(--color-surface-subtle);
+    --border-color: var(--color-border);
+    --border-subtle: var(--color-border);
+    --text-primary: var(--color-text);
+    --text-secondary: var(--color-text-muted);
+    --bg-success: var(--color-success-bg);
+    --bg-warning: var(--color-warning-bg);
+    --bg-danger: var(--color-danger-bg);
+    --bg-info: var(--color-info-bg);
+  }
+  body { font-size: var(--font-size-md); background: var(--color-bg); color: var(--color-text); }
+  .app-header {
+    min-height: 88px; padding: var(--space-3) var(--space-6); gap: var(--space-8);
+    display: grid; grid-template-columns: minmax(250px, 1fr) minmax(300px, auto) minmax(220px, 1fr);
+    background: var(--brand-active); border-bottom: 4px solid var(--brand-border);
+  }
+  .header-right { min-width: 0; }
+  .logo-box { width: 56px; height: 56px; padding: 5px; border: 1px solid rgba(255,255,255,.75); }
+  .logo-box img { max-width: 100%; max-height: 100%; width: 100%; height: 100%; object-fit: contain; }
+  .header-ministry-name { font-size: var(--font-size-lg); font-weight: 700; line-height: 1.35; }
+  .header-org-line { font-size: var(--font-size-sm); color: rgba(255,255,255,.78); font-weight: 600; }
+  .header-identity { text-align: center; }
+  .header-sys-line { justify-content: center; }
+  .header-sys-name { font-size: var(--font-size-2xl); line-height: 1.25; }
+  .header-date { display: block; margin-top: var(--space-1); color: rgba(255,255,255,.78); font-size: var(--font-size-xs); }
+  .header-beta { border: 1px solid rgba(255,255,255,.42); border-radius: var(--radius-pill); padding: 2px 8px; background: rgba(255,255,255,.12); font-size: 11px; font-weight: 700; }
+  .header-left { justify-content: flex-end; flex-wrap: wrap; gap: var(--space-2); }
+  .header-action, .mobile-menu-btn {
+    min-height: var(--button-height); border: 1px solid rgba(255,255,255,.34);
+    border-radius: var(--radius-md); background: transparent; color: #fff;
+    padding: 0 var(--space-3); font: 700 var(--font-size-sm) var(--font-family-base); cursor: pointer;
+  }
+  .header-action:hover, .mobile-menu-btn:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.62); }
+  .btn-header-primary { background: var(--brand-hover); border: 1px solid var(--header-primary-button-border); box-shadow: inset 0 0 0 1px var(--header-primary-button-inner-outline); }
+  .btn-header-primary:hover:not(:disabled) { background: var(--brand-active); }
+  .app-sidebar { top: 88px; height: calc(100vh - 88px); max-height: calc(100vh - 88px); border-left: 1px solid var(--color-border); }
+  .nav-group-title { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+  .nav-item { min-height: 48px; color: var(--brand-active); font-weight: 700; border: 1px solid transparent; border-radius: var(--radius-md); }
+  .nav-item:hover:not(:disabled) { border-color: var(--brand-border); background: var(--brand-subtle); color: var(--brand-primary); }
+  .nav-item.active { border: 1px solid var(--brand-border); box-shadow: inset -3px 0 0 var(--brand-primary); background: var(--brand-subtle); color: var(--brand-active); }
+  .nav-item:disabled, .nav-item.disabled { opacity: 1; color: var(--color-text-muted); background: var(--color-surface-subtle); }
+  .app-workspace { padding: var(--space-6) var(--space-8); }
+  .workspace-context { margin-bottom: var(--space-3); color: var(--color-text-muted); font-size: var(--font-size-sm); }
+  .workspace-screen-title { font-size: var(--font-size-xl); }
+  .workspace-screen-subtitle { font-size: var(--font-size-sm); }
+  .card, .filter-card, .dropzone-card, .kpi-card { border-color: var(--color-border); box-shadow: var(--shadow-panel); }
+  .card { padding: var(--space-6); }
+  .kpi-card { padding: var(--space-4); }
+  .btn, .form-control { font-family: var(--font-family-base); }
+  .form-control, .btn { min-height: var(--control-height); }
+  .btn:focus-visible, .form-control:focus-visible, .nav-item:focus-visible, .header-action:focus-visible, .mobile-menu-btn:focus-visible, .theme-option-btn:focus-visible {
+    outline: 3px solid var(--focus-color); outline-offset: 2px;
+  }
+  .dropzone-area { border-color: var(--brand-border); background: var(--brand-subtle); }
+  .dropzone-area:hover, .dropzone-area.dragover { border-color: var(--brand-primary); }
+  thead th { background: var(--color-surface-subtle); border-bottom: 1px solid var(--color-border); color: var(--color-text-muted); }
+  tbody tr { height: var(--table-row-height); }
+  .modal-dialog { box-shadow: var(--shadow-floating); }
+  .dialog-header { background: var(--brand-active); }
+  .theme-option-btn.active { border-color: var(--brand-primary); background: var(--brand-subtle); }
+  @media (max-width: 1100px) {
+    .app-header { grid-template-columns: minmax(220px, 1fr) minmax(250px, 1fr); gap: var(--space-4); }
+    .header-identity { grid-column: 1 / -1; grid-row: 2; text-align: right; }
+    .header-sys-line { justify-content: flex-start; }
+  }
+  @media (max-width: 768px) {
+    .app-header { grid-template-columns: 1fr auto; padding: var(--space-2) var(--space-4); min-height: 88px; }
+    .header-right { grid-column: 1; }
+    .header-identity { grid-column: 1 / -1; grid-row: 2; }
+    .header-sys-name { font-size: var(--font-size-xl); }
+    .header-left { grid-column: 2; grid-row: 1; }
+    .header-action { display: none; }
+    .app-sidebar { top: 88px; right: -280px; height: calc(100vh - 88px); max-height: calc(100vh - 88px); }
+    .app-sidebar.open { right: 0; }
+  }
+  @media (max-width: 480px) {
+    .app-header { gap: var(--space-2); }
+    .header-ministry-name { font-size: var(--font-size-sm); }
+    .header-org-line { font-size: var(--font-size-xs); }
+    .logo-box { width: 44px; height: 44px; }
+    .btn-header-primary { display: none; }
+    .app-workspace { padding: var(--space-4); }
+  }
+  @media print {
+    .app-header { position: static; background: #fff; color: #000; border-bottom: 1px solid #aaa; }
+    .header-ministry-name, .header-sys-name { color: #000; }
+    .workspace-context { display: none; }
+  }
 </style>
 </head>
 <body>
 
-<!-- Header (AMIS MOT Profile) -->
+<!-- Header — AMIS Clear UI v0.5 / Ministry profile -->
 <header class="app-header">
   <div class="header-right">
-    <button id="btnMobileMenu" class="mobile-menu-btn" aria-expanded="false" aria-controls="appSidebar" onclick="toggleMobileSidebar()">☰</button>
+    <button id="btnMobileMenu" class="mobile-menu-btn" aria-expanded="false" aria-controls="appSidebar" aria-label="פתיחת תפריט" onclick="toggleMobileSidebar()">☰</button>
     <div class="logo-box">
-      <img src="{{MOT_LOGO_DATA_URI}}" alt="לוגו משרד התחבורה והבטיחות בדרכים">
+      <img src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה והבטיחות בדרכים">
     </div>
     <div class="header-titles">
-      <div class="header-org-line">משרד התחבורה והבטיחות בדרכים | אגף טכנולוגיות דיגיטליות ומידע | מחלקת שירות לקוחות וגבייה</div>
-      <div class="header-sys-line">
-        <span class="header-sys-name">מערכת להכנת נתונים לחיוב לקוחות</span>
-        <span class="header-sep">|</span>
-        <span id="headerCurrentDate" class="header-date"></span>
-        <span class="header-sep">|</span>
-        <span id="headerActiveDomainLabel" class="header-date">תחום פעיל: מקורות הנתונים</span>
-      </div>
+      <div class="header-ministry-name">משרד התחבורה והבטיחות בדרכים</div>
+      <div class="header-org-line">אגף טכנולוגיות דיגיטליות ומידע · מחלקת שירות לקוחות וגבייה</div>
     </div>
+  </div>
+  <div class="header-identity">
+    <div class="header-sys-line"><span class="header-sys-name">מערכת להכנת נתונים לחיוב לקוחות</span><span class="header-beta">BETA</span></div>
+    <div id="headerCurrentDate" class="header-date"></div>
   </div>
   <div class="header-left">
     <button id="btnHeaderExport" class="btn-header-primary" onclick="exportActiveDomainToExcel()" disabled title="ייצוא הנתונים המעובדים של התחום הפעיל לקובץ אקסל (.xlsx)">
       📊 ייצוא לאקסל (.xlsx)
     </button>
+    <button type="button" class="header-action" onclick="openThemeModal()">הגדרות תצוגה</button>
+    <button type="button" class="header-action" onclick="openAboutModal()">אודות</button>
     <!-- Hidden File Inputs -->
     <input type="file" id="centralFilesInput" multiple accept=".xlsx,.pdf" style="display:none">
     <input type="file" id="batchFilesInput" multiple accept=".xlsx" style="display:none">
@@ -1248,6 +1495,7 @@
 
   <!-- Main Workspace -->
   <main class="app-workspace">
+    <div class="workspace-context"><span id="headerActiveDomainLabel">תחום פעיל: מקורות הנתונים</span></div>
 
     <!-- Non-blocking Status Banner -->
     <div id="liveStatusBanner" class="status-banner" role="status" aria-live="polite">
@@ -2803,7 +3051,7 @@
     <div class="dialog-body">
       <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
         <div class="logo-box" style="border:1px solid var(--border-color);">
-          <img src="{{MOT_LOGO_DATA_URI}}" alt="לוגו משרד התחבורה">
+          <img src="https://upload.wikimedia.org/wikipedia/he/a/a3/Israeli_Ministry_of_Transport_and_Road_Safety_Symbol.svg" alt="סמל משרד התחבורה והבטיחות בדרכים">
         </div>
         <div>
           <div style="font-size:17px; font-weight:700;">מערכת להכנת נתונים לחיוב לקוחות</div>
@@ -2813,14 +3061,16 @@
       </div>
 
       <div style="font-size:14px; display:flex; flex-direction:column; gap:8px; padding:12px 16px; background:var(--bg-muted); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
-        <div><strong>תחומי חיוב פעילים (6 תחומים):</strong> שאילתות אצוות, תחנות צילום, מבחנים עיוניים, קורסים (רענון ונהיגה נכונה), חיובים לתל אביב, חיובים לביטוח הלאומי</div>
-        <div><strong>תקן עיצוב:</strong> AMIS Design Standard v0.5 (MOT Profile | Gemini Package 1.3)</div>
+        <div><strong>גרסת מערכת:</strong> 0.1.0 · 24 בנובמבר 2026 · BETA</div>
+        <div>מערכת זו בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. יש לבדוק מידע מהותי לפני הסתמכות עליו.</div>
+        <div><strong>תחומי חיוב פעילים:</strong> שאילתות אצוות, תחנות צילום, מבחנים עיוניים, קורסים (רענון ונהיגה נכונה), חיובים לתל אביב, חיובים לביטוח הלאומי</div>
+        <div><strong>תקן עיצוב:</strong> AMIS Clear UI v0.5 · פרופיל משרד התחבורה</div>
         <div><strong>אירועי יומן בקרה (Audit Trail):</strong> <span id="aboutAuditCount">0</span> פעולות מתועדות</div>
       </div>
 
       <div class="about-credit-box">
-        <div style="font-size:14px; font-weight:700; color:var(--text-primary);">Developed by Aviv Matsa</div>
-        <div style="font-size:13px; color:var(--text-secondary); margin-top:4px;">פותח בסיוע כלי AI ובבקרה אנושית</div>
+        <div style="font-size:14px; font-weight:700; color:var(--text-primary);">Aviv Matsa – Smart Information Systems</div>
+        <div style="font-size:13px; color:var(--text-secondary); margin-top:4px;">המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית. © 2026</div>
       </div>
     </div>
   </div>
@@ -2828,12 +3078,12 @@
 
 <script>
 const APPROVED_THEMES = [
-  { key: "azure", name: "כחול חי", primary: "#0969c3", hover: "#075aa8", active: "#064b8d", tint: "#ebf3fc" },
-  { key: "turquoise", name: "טורקיז", primary: "#008c95", hover: "#007780", active: "#00636b", tint: "#e6f5f6" },
-  { key: "emerald", name: "אזמרגד", primary: "#00875a", hover: "#00724c", active: "#005e3e", tint: "#e6f4ef" },
-  { key: "violet", name: "סגול", primary: "#7047c8", hover: "#6039b1", active: "#502f95", tint: "#f2eefb" },
-  { key: "raspberry", name: "פטל", primary: "#c52a68", hover: "#aa2259", active: "#8f1c4b", tint: "#fbeaf0" },
-  { key: "sunset", name: "כתום שקיעה", primary: "#d95d20", hover: "#bd4d18", active: "#9f4014", tint: "#fcf0e9" }
+  { key: "azure", name: "כחול חי", primary: "#0969c3" },
+  { key: "turquoise", name: "טורקיז", primary: "#008c95" },
+  { key: "emerald", name: "אזמרגד", primary: "#00875a" },
+  { key: "violet", name: "סגול", primary: "#7047c8" },
+  { key: "raspberry", name: "פטל", primary: "#c52a68" },
+  { key: "sunset", name: "כתום שקיעה", primary: "#d95d20" }
 ];
 
 const PHOTO_SERVICES_ORDER = ["צילום נהגים", "רישיונות בינלאומיים", "צילום משיטים"];
@@ -3123,12 +3373,10 @@ function closeDrillModal() {
 }
 
 function applyTheme(themeKey, closeAndFocus = false) {
-  const t = APPROVED_THEMES.find(x => x.key === themeKey) || APPROVED_THEMES[0];
+  const migratedKey = ({ ocean: "azure", forest: "emerald", plum: "violet" })[themeKey] || themeKey;
+  const t = APPROVED_THEMES.find(x => x.key === migratedKey) || APPROVED_THEMES[0];
   const root = document.documentElement;
-  root.style.setProperty("--theme-primary", t.primary);
-  root.style.setProperty("--theme-hover", t.hover);
-  root.style.setProperty("--theme-active", t.active);
-  root.style.setProperty("--theme-tint", t.tint);
+  root.dataset.theme = t.key;
   try { localStorage.setItem("AMIS_MOT_THEME", t.key); } catch (e) {}
   renderThemeOptions(t.key);
   logAudit("CHANGE_THEME", t.key, `ערכת נושא שונתה ל-${t.name}`);
@@ -3139,7 +3387,7 @@ function renderThemeOptions(activeKey) {
   const grid = document.getElementById("themeOptionsGrid");
   if (!grid) return;
   grid.innerHTML = APPROVED_THEMES.map(t => `
-    <button class="theme-option-btn ${t.key === activeKey ? 'active' : ''}" onclick="applyTheme('${t.key}', true)">
+    <button class="theme-option-btn ${t.key === activeKey ? 'active' : ''}" role="radio" aria-checked="${t.key === activeKey}" onclick="applyTheme('${t.key}', true)">
       <span class="theme-swatch" style="background-color:${t.primary};"></span>
       <span>${escHtml(t.name)}</span>
     </button>
