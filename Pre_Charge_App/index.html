@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="he" dir="rtl" data-theme="azure">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מערכת להכנת נתונים לחיוב לקוחות | משרד התחבורה והבטיחות בדרכים</title>
 
+<style>
 <style>
 /* AMIS Clear UI - Design Tokens v0.4 */
 
@@ -606,7 +607,45 @@
     flex-wrap: wrap;
   }
 
-  /* Compact Upload Bar when data is already loaded */
+  /* Compact Upload Bar when data is already loaded (Auto-minimized Dropzone) */
+  .dropzone-compact-bar {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    min-height: 44px;
+  }
+
+  .dropzone-card.has-loaded-data.is-minimized {
+    padding: 8px 16px;
+    margin-bottom: 16px;
+    border-right: 4px solid var(--color-success);
+  }
+
+  .dropzone-card.has-loaded-data.is-minimized .dropzone-compact-bar {
+    display: flex;
+  }
+
+  .dropzone-card.has-loaded-data.is-minimized .dropzone-area {
+    display: none;
+  }
+
+  .dropzone-compact-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+
+  .dropzone-compact-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
   .loaded-files-bar {
     background-color: var(--bg-surface);
     border: 1px solid var(--border-color);
@@ -1369,6 +1408,7 @@
     <input type="file" id="coursesAddFilesInput" multiple accept=".pdf" style="display:none">
     <input type="file" id="autodchFilesInput" multiple accept=".pdf" style="display:none">
     <input type="file" id="autodchAddFilesInput" multiple accept=".pdf" style="display:none">
+    <input type="file" id="missingInvoicesFilesInput" multiple accept=".xlsx" style="display:none">
   </div>
 </header>
 
@@ -1386,6 +1426,10 @@
       <button id="navItemUnified" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenUnified" onclick="navigateScreen('screenUnified', this)" title="ייפתח אוטומטית עם טעינת קובץ נתונים ראשון">
         <span>מסך החיובים המאוחד</span>
         <span class="badge badge-muted" id="navBadgeUnified">ממתין</span>
+      </button>
+      <button id="navItemMissingCharges" class="nav-item" data-screen="screenMissingCharges" onclick="navigateScreen('screenMissingCharges', this)" title="השוואת חיובי חודש פעילות מול קובץ החשבוניות שהופקו בחודש העוקב">
+        <span>זיהוי חיובים חסרים</span>
+        <span class="badge badge-muted" id="navBadgeMissingCharges">בדיקה</span>
       </button>
       <button id="navItemBatch" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenBatch" onclick="navigateScreen('screenBatch', this)" title="ייפתח אוטומטית עם טעינת קובץ שאילתות אצוות">
         <span>שאילתות אצוות</span>
@@ -1426,6 +1470,9 @@
       <button id="navRepUnified" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenUnifiedReport" onclick="navigateScreen('screenUnifiedReport', this)">
         <span>דוח בקרה - חיובים מאוחד</span>
       </button>
+      <button id="navRepMissingCharges" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenMissingChargesReport" onclick="navigateScreen('screenMissingChargesReport', this)">
+        <span>דוח בקרה - חיובים חסרים</span>
+      </button>
       <button id="navRepBatch" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenBatchReport" onclick="navigateScreen('screenBatchReport', this)">
         <span>דוח בקרה - שאילתות אצוות</span>
       </button>
@@ -1453,6 +1500,9 @@
       <div class="nav-group-title">כלים</div>
       <button class="nav-item" id="navBtnExportUnified" onclick="exportUnifiedToExcel()" disabled>
         <span>ייצוא חיובים מאוחד לאקסל</span>
+      </button>
+      <button class="nav-item" id="navBtnExportMissing" onclick="exportMissingChargesToExcel()" disabled>
+        <span>ייצוא חיובים חסרים לאקסל</span>
       </button>
       <button class="nav-item" id="navBtnExportBatch" onclick="exportBatchToExcel()" disabled>
         <span>ייצוא שאילתות אצוות לאקסל</span>
@@ -1493,9 +1543,7 @@
 
   <!-- Main Workspace -->
   <main class="app-workspace">
-    <div class="workspace-context"><span id="headerActiveDomainLabel">תחום פעיל: מקורות הנתונים</span><button id="btnHeaderExport" class="btn btn-primary" onclick="exportActiveDomainToExcel()" disabled title="ייצוא הנתונים המעובדים של התחום הפעיל לקובץ אקסל (.xlsx)">
-      📊 ייצוא לאקסל (.xlsx)
-    </button></div>
+    <div class="workspace-context"><span id="headerActiveDomainLabel">תחום פעיל: מקורות הנתונים</span><button id="btnHeaderExport" class="btn btn-primary" onclick="exportActiveDomainToExcel()" disabled title="ייצוא הנתונים המעובדים של התחום הפעיל לקובץ אקסל (.xlsx)">📊 ייצוא לאקסל (.xlsx)</button></div>
 
     <!-- Non-blocking Status Banner -->
     <div id="liveStatusBanner" class="status-banner" role="status" aria-live="polite">
@@ -3011,6 +3059,179 @@
       </div>
     </div>
 
+    <!-- ===================================================================
+         SCREEN 13: זיהוי חיובים חסרים (Missing Charges Reconciliation vs Yearly Invoices)
+         =================================================================== -->
+    <div id="screenMissingCharges" class="screen-pane">
+      <div class="workspace-header-bar">
+        <div>
+          <h1 class="workspace-screen-title">זיהוי חיובים חסרים - השוואת חיובי חודש פעילות מול קובץ החשבוניות שהופקו</h1>
+          <div class="workspace-screen-subtitle">בדיקת שלמות הפקת חשבוניות: חיובים שנמדדו בחודש פעילות (כגון אוקטובר) מושווים מול כל החשבוניות שהופקו (תאריך רישום) בחודש העוקב (נובמבר) לפי קוד מרכבה וסכום החשבונית, או לפי שם חשבון (עמודה E) כאשר חסר קוד מרכבה</div>
+        </div>
+        <div class="toolbar-actions" id="missingHeaderToolbar" style="display:none;">
+          <button class="btn btn-primary" onclick="openMissingInvoicesFileBrowser()">📂 החלפת / הוספת קובץ הכנסות</button>
+          <button class="btn btn-success" onclick="exportMissingChargesToExcel()">📊 ייצוא חיובים חסרים לאקסל (.xlsx)</button>
+          <button class="btn" onclick="clearMissingInvoicesData()">🗑️ ניקוי קובץ הכנסות</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפסה</button>
+        </div>
+      </div>
+
+      <section class="dropzone-card" aria-label="איזור טעינת קובץ הכנסות וחשבוניות שנתי">
+        <div id="missingInvoicesDropZone" class="dropzone-area" tabindex="0" role="button" aria-label="גרור קובץ הכנסות / חשבוניות שנה נוכחית (.xlsx) לכאן או לחץ לבחירת הקובץ" onclick="if(event.target.tagName !== 'BUTTON') openMissingInvoicesFileBrowser()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openMissingInvoicesFileBrowser();}">
+          <div class="dropzone-icon">🧾</div>
+          <div class="dropzone-title">טעינת קובץ ההכנסות - כל החשבוניות שהופקו השנה (.xlsx)</div>
+          <div class="dropzone-subtitle" id="missingInvoicesDropZoneSubtitle">
+            גרור לכאן את קובץ ההכנסות השנתי ממרכבה (למשל: 2026_11_23_-_הכנסות_שנה_נוכחית.xlsx), או לחץ לבחירת הקובץ מהמחשב.
+            המערכת תצליב אוטומטית בין כל החיובים שנטענו במערכת בחודש הפעילות לבין החשבוניות שהופקו בחודש העוקב (לפי קוד לקוח במרכבה בעמודה D, או שם חשבון בעמודה E, וסכום החשבונית בעמודה L).
+          </div>
+          <div class="dropzone-actions">
+            <button type="button" class="btn btn-primary" onclick="event.stopPropagation(); openMissingInvoicesFileBrowser()">📂 בחירת קובץ הכנסות / חשבוניות (.xlsx)</button>
+            <button type="button" id="btnMissingClear" class="btn" style="display:none;" onclick="event.stopPropagation(); clearMissingInvoicesData()">🗑️ ניקוי קובץ הכנסות</button>
+          </div>
+        </div>
+      </section>
+
+      <div id="missingChargesDataSection" class="domain-data-section">
+        <section class="filter-card" aria-label="סינון השוואת חיובים מול חשבוניות">
+          <div class="filter-grid">
+            <div class="form-field">
+              <label for="selMissingActivityMonth">1. חודש פעילות לבדיקה (מקבצי המקור)</label>
+              <select id="selMissingActivityMonth" class="form-control" onchange="onMissingFilterChange()">
+                <option value="ALL">כל חודשי הפעילות שנטענו</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="selMissingInvoiceMonth">2. חודש הפקת החשבונית (תאריך רישום)</label>
+              <select id="selMissingInvoiceMonth" class="form-control" onchange="onMissingFilterChange()">
+                <option value="AUTO_NEXT">אוטומטי: החודש העוקב לחודש הפעילות (M+1)</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="selMissingDomain">3. סינון לפי תחום חיוב</label>
+              <select id="selMissingDomain" class="form-control" onchange="onMissingFilterChange()">
+                <option value="ALL">כל תחומי החיוב שנטענו</option>
+                <option value="שאילתות אצוות">שאילתות אצוות</option>
+                <option value="שאילתות און ליין">שאילתות און ליין</option>
+                <option value="תחנות צילום">תחנות צילום</option>
+                <option value="מבחנים עיוניים">מבחנים עיוניים</option>
+                <option value="חיוב קורסים">חיוב קורסים</option>
+                <option value="עיריית תל אביב">עיריית תל אביב (PDF)</option>
+                <option value="המוסד לביטוח הלאומי">המוסד לביטוח הלאומי (PDF)</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="selMissingViewMode">4. תצוגת תוצאות וחיפוש</label>
+              <div style="display:flex; gap:8px;">
+                <select id="selMissingViewMode" class="form-control" onchange="onMissingFilterChange()">
+                  <option value="MISSING_ONLY">חיובים חסרים בלבד (ללא חשבונית מקבילה)</option>
+                  <option value="NO_INVOICE">ללא אף חשבונית ללקוח בחודש הרישום</option>
+                  <option value="AMOUNT_DIFF">קיימת חשבונית ללקוח אך בסכום שונה</option>
+                  <option value="MATCHED_ONLY">חיובים תקינים שנמצאה להם חשבונית</option>
+                  <option value="ALL">הצג הכל (חיובים חסרים + תקינים)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:12px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <div style="flex:1; min-width:260px;">
+              <input type="text" id="txtMissingSearch" class="form-control" placeholder="חיפוש חופשי: שם לקוח, שם חשבון (עמודה E), קוד מרכבה (עמודה D), קוד גורם או סכום..." oninput="onMissingFilterChange()">
+            </div>
+            <button class="btn" onclick="resetMissingFilters()">איפוס סינון</button>
+          </div>
+        </section>
+
+        <div class="kpi-grid" id="missingKpiGrid"></div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title" id="missingTableTitle">רשימת הלקוחות ותחומי החיוב שלא נמצאה להם רשומה מקבילה בקובץ החשבוניות</div>
+              <div class="card-subtitle">הקבלה אוטומטית לפי קוד הלקוח במרכבה (עמודה D) וסכום החשבונית (עמודה L), או לפי שם חשבון (עמודה E) כאשר חסר קוד מרכבה בקובץ המקור | לחץ (קליק אחד) על כל שורה לפירוט מלא</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-success" onclick="exportMissingChargesToExcel()">📥 ייצוא לאקסל (.xlsx)</button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table id="tblMissingCharges">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>חודש פעילות ← חודש רישום</th>
+                  <th>תחום חיוב</th>
+                  <th>קוד גורם</th>
+                  <th>קוד מרכבה</th>
+                  <th>שם הלקוח / שם חשבון (עמודה E)</th>
+                  <th>כמות לחיוב</th>
+                  <th>סכום חיוב צפוי (₪)</th>
+                  <th>סטטוס הקבלה וממצאים בקובץ החשבוניות</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="report-control-footer">
+            <span id="missingFooterSource">מקור ההשוואה: קובץ ההכנסות השנתי מול קבצי המקור שנטענו במערכת</span>
+            <span id="missingFooterControl">כלל בדיקה: חיובי חודש פעילות M נבדקים מול חשבוניות שתאריך הרישום שלהן בחודש M+1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SCREEN 14: דוח בקרה - זיהוי חיובים חסרים
+         =================================================================== -->
+    <div id="screenMissingChargesReport" class="screen-pane">
+      <div class="workspace-header-bar">
+        <div>
+          <h1 class="workspace-screen-title">דוח בקרה והתאמה - זיהוי חיובים חסרים מול חשבוניות מרכבה</h1>
+          <div class="workspace-screen-subtitle">דוח מרוכז להנהלת חשבונות וגבייה: פירוט כל הלקוחות ותחומי החיוב שטרם הופקה עבורם חשבונית מקבילה</div>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn-primary" onclick="navigateScreen('screenMissingCharges', document.getElementById('navItemMissingCharges'))">📂 מעבר למסך זיהוי חיובים חסרים</button>
+          <button class="btn btn-success" id="btnMissingReportExport" onclick="exportMissingChargesToExcel()" disabled>📊 ייצוא דוח לאקסל (.xlsx)</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפסת דוח</button>
+        </div>
+      </div>
+
+      <div id="missingReportEmptyState" class="card" style="text-align:center; padding:32px;">
+        <div style="font-size:16px; font-weight:700; margin-bottom:8px;">טרם נטענו קובץ ההכנסות ומקורות החיוב</div>
+        <div style="font-size:14px; color:var(--text-secondary); margin-bottom:16px;">יש לטעון את קובץ החשבוניות השנתי וקבצי מקור במסך "זיהוי חיובים חסרים" או במסך "מקורות הנתונים".</div>
+        <button class="btn btn-primary" onclick="navigateScreen('screenMissingCharges', document.getElementById('navItemMissingCharges'))">📂 עבור למסך זיהוי חיובים חסרים</button>
+      </div>
+
+      <div id="missingReportContent" class="domain-data-section">
+        <div class="kpi-grid" id="missingReportKpiGrid"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">טבלת דוח בקרה - לקוחות ותחומי חיוב ללא חשבונית מקבילה</div>
+          </div>
+          <div class="table-container">
+            <table id="tblMissingChargesReport">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>חודש פעילות ← חודש רישום</th>
+                  <th>תחום חיוב</th>
+                  <th>קוד גורם</th>
+                  <th>קוד מרכבה</th>
+                  <th>שם הלקוח / שם חשבון (עמודה E)</th>
+                  <th>כמות לחיוב</th>
+                  <th>סכום חיוב צפוי (₪)</th>
+                  <th>סטטוס הקבלה וממצאים בקובץ החשבוניות</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="report-control-footer">
+            <span>מקור הנתונים: הצלבת קבצי החיוב החודשיים מול קובץ הכנסות שנה נוכחית</span>
+            <span>התאמה לפי קוד לקוח במרכבה (עמודה D) או שם חשבון (עמודה E) וסכום החשבונית (עמודה L)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -3063,7 +3284,7 @@
       <div style="font-size:14px; display:flex; flex-direction:column; gap:8px; padding:12px 16px; background:var(--bg-muted); border-radius:var(--radius-md); border:1px solid var(--border-subtle);">
         <div><strong>גרסת מערכת:</strong> 0.1.0 · 24 בנובמבר 2026 · BETA</div>
         <div>מערכת זו בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. יש לבדוק מידע מהותי לפני הסתמכות עליו.</div>
-        <div><strong>תחומי חיוב פעילים:</strong> שאילתות אצוות, תחנות צילום, מבחנים עיוניים, קורסים (רענון ונהיגה נכונה), חיובים לתל אביב, חיובים לביטוח הלאומי</div>
+        <div><strong>תחומי חיוב ובקרה:</strong> שאילתות אצוות, שאילתות און ליין, תחנות צילום, מבחנים עיוניים, קורסים, חיובים לתל אביב ולביטוח הלאומי, ובדיקת חיובים חסרים</div>
         <div><strong>תקן עיצוב:</strong> AMIS Clear UI v0.5 · פרופיל משרד התחבורה</div>
         <div><strong>אירועי יומן בקרה (Audit Trail):</strong> <span id="aboutAuditCount">0</span> פעולות מתועדות</div>
       </div>
@@ -3189,6 +3410,18 @@ let unifiedState = {
   }
 };
 
+let missingInvoicesState = {
+  fileNames: [],
+  invoices: [],
+  filters: {
+    activityMonth: "ALL",
+    invoiceMonth: "AUTO_NEXT",
+    domain: "ALL",
+    viewMode: "MISSING_ONLY",
+    search: ""
+  }
+};
+
 let loadedFilesLog = [];
 
 function fmtNum(n) {
@@ -3208,6 +3441,132 @@ function updateStatusBanner(msg, type = "info", metaText = "") {
   banner.className = `status-banner ${type === "info" ? "" : type}`.trim();
   document.getElementById("liveStatusText").textContent = msg;
   document.getElementById("liveStatusMeta").textContent = metaText || `שעה: ${new Date().toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
+}
+
+/* =========================================================================
+   AUTO-MINIMIZABLE DROPZONE HELPER (COLLAPSE UPLOAD AREA ONCE FILES LOADED)
+   ========================================================================= */
+function toggleDropzoneExpand(dropZoneId, forceExpand) {
+  const zone = document.getElementById(dropZoneId);
+  if (!zone) return;
+  const card = zone.closest(".dropzone-card");
+  if (!card) return;
+  if (typeof forceExpand === "boolean") {
+    card.classList.toggle("is-minimized", !forceExpand);
+  } else {
+    card.classList.toggle("is-minimized");
+  }
+}
+
+function syncDropzoneMinimizedState(dropZoneId, hasData, summaryText, autoMinimize = false) {
+  const zone = document.getElementById(dropZoneId);
+  if (!zone) return;
+  const card = zone.closest(".dropzone-card");
+  if (!card) return;
+
+  let compactBar = card.querySelector(".dropzone-compact-bar");
+  if (!compactBar) {
+    compactBar = document.createElement("div");
+    compactBar.className = "dropzone-compact-bar";
+    compactBar.innerHTML = `
+      <div class="dropzone-compact-info">
+        <span class="badge badge-success">✓ קבצים נטענו</span>
+        <span class="dropzone-compact-text"></span>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button type="button" class="btn btn-primary" style="min-height:36px; padding:0 12px; font-size:13px;" onclick="toggleDropzoneExpand('${dropZoneId}', true)">📂 פתיחת חלון טעינה / החלפת קבצים ▾</button>
+      </div>
+    `;
+    card.insertBefore(compactBar, zone);
+  }
+
+  const actionsDiv = zone.querySelector(".dropzone-actions");
+  let minBtn = actionsDiv ? actionsDiv.querySelector(".btn-minimize-dropzone") : null;
+  if (actionsDiv && !minBtn) {
+    minBtn = document.createElement("button");
+    minBtn.type = "button";
+    minBtn.className = "btn btn-minimize-dropzone";
+    minBtn.textContent = "🔼 מזער חלון טעינה";
+    minBtn.onclick = e => {
+      e.stopPropagation();
+      toggleDropzoneExpand(dropZoneId, false);
+    };
+    actionsDiv.appendChild(minBtn);
+  }
+  if (minBtn) {
+    minBtn.style.display = hasData ? "inline-flex" : "none";
+  }
+
+  const textEl = compactBar.querySelector(".dropzone-compact-text");
+  if (textEl) textEl.textContent = summaryText || "";
+
+  if (!hasData) {
+    card.classList.remove("has-loaded-data", "is-minimized");
+  } else {
+    const wasLoaded = card.classList.contains("has-loaded-data");
+    card.classList.add("has-loaded-data");
+    if (!wasLoaded || autoMinimize) {
+      card.classList.add("is-minimized");
+    }
+  }
+}
+
+function syncAllDropzonesMinimizedState() {
+  const hasAny = hasAnyLoadedSystemData() || missingInvoicesState.invoices.length > 0;
+  const totalSysFiles =
+    batchState.fileNames.length +
+    onlineState.fileNames.length +
+    photoState.files.length +
+    testsState.fileNames.length +
+    coursesState.fileNames.length +
+    autodchState.fileNames.length +
+    missingInvoicesState.fileNames.length;
+
+  syncDropzoneMinimizedState(
+    "centralDropZone",
+    hasAny,
+    `נטענו ${fmtNum(totalSysFiles)} קבצים במערכת - המסכים הרלוונטיים פתוחים בתפריט הימני`
+  );
+  syncDropzoneMinimizedState(
+    "batchDropZone",
+    batchState.rawRows.length > 0,
+    document.getElementById("batchDropZoneSubtitle")?.textContent || ""
+  );
+  syncDropzoneMinimizedState(
+    "onlineDropZone",
+    onlineState.rawRows.length > 0,
+    document.getElementById("onlineDropZoneSubtitle")?.textContent || ""
+  );
+  syncDropzoneMinimizedState(
+    "photoDropZone",
+    photoState.rows.length > 0,
+    document.getElementById("photoDropZoneSubtitle")?.textContent || ""
+  );
+  syncDropzoneMinimizedState(
+    "testsDropZone",
+    testsState.rows.length > 0,
+    document.getElementById("testsDropZoneSubtitle")?.textContent || ""
+  );
+  syncDropzoneMinimizedState(
+    "coursesDropZone",
+    coursesState.rows.length > 0,
+    document.getElementById("coursesDropZoneSubtitle")?.textContent || ""
+  );
+  syncDropzoneMinimizedState(
+    "tlvDropZone",
+    autodchState.tlvRows.length > 0,
+    document.getElementById("tlvDropZoneSubtitle")?.textContent || ""
+  );
+  syncDropzoneMinimizedState(
+    "btlDropZone",
+    autodchState.btlRows.length > 0,
+    document.getElementById("btlDropZoneSubtitle")?.textContent || ""
+  );
+  syncDropzoneMinimizedState(
+    "missingInvoicesDropZone",
+    missingInvoicesState.invoices.length > 0,
+    document.getElementById("missingInvoicesDropZoneSubtitle")?.textContent || ""
+  );
 }
 
 function hasAnyLoadedSystemData() {
@@ -3237,10 +3596,15 @@ function syncSidebarMenuUnlockState() {
   const hasCourses = coursesState.rows.length > 0;
   const hasTlv = autodchState.tlvRows.length > 0;
   const hasBtl = autodchState.btlRows.length > 0;
+  const hasInvoices = missingInvoicesState.invoices.length > 0;
   const hasAny = hasAnyLoadedSystemData();
 
-  // מקורות הנתונים is ALWAYS enabled
+  // מקורות הנתונים & זיהוי חיובים חסרים are enabled so user can load files
   setNavBtnEnabled("navItemDataSources", true);
+  setNavBtnEnabled("navItemMissingCharges", true);
+  setNavBtnEnabled("navRepMissingCharges", hasAny || hasInvoices);
+  const navBtnExportMissing = document.getElementById("navBtnExportMissing");
+  if (navBtnExportMissing) navBtnExportMissing.disabled = !(hasAny && hasInvoices);
 
   // מסך החיובים המאוחד unlocks as soon as any file is loaded
   setNavBtnEnabled("navItemUnified", hasAny);
@@ -3278,7 +3642,10 @@ function syncAllScreensAndNavigation() {
   syncSidebarMenuUnlockState();
   if (typeof populateUnifiedMonths === "function") populateUnifiedMonths();
   if (typeof renderUnifiedScreens === "function") renderUnifiedScreens();
+  if (typeof populateMissingFilters === "function") populateMissingFilters();
+  if (typeof renderMissingChargesScreens === "function") renderMissingChargesScreens();
   if (typeof renderDataSourcesScreen === "function") renderDataSourcesScreen();
+  syncAllDropzonesMinimizedState();
   syncHeaderExportButtonState();
 }
 
@@ -3287,6 +3654,8 @@ function syncHeaderExportButtonState() {
   if (!btn) return;
   if (currentScreenId === "screenDataSources" || currentScreenId === "screenUnified" || currentScreenId === "screenUnifiedReport") {
     btn.disabled = !hasAnyLoadedSystemData();
+  } else if (currentScreenId === "screenMissingCharges" || currentScreenId === "screenMissingChargesReport") {
+    btn.disabled = !(hasAnyLoadedSystemData() && missingInvoicesState.invoices.length > 0);
   } else if (currentScreenId === "screenOnline" || currentScreenId === "screenOnlineReport") {
     btn.disabled = onlineState.rawRows.length === 0;
   } else if (currentScreenId === "screenPhoto" || currentScreenId === "screenPhotoReport") {
@@ -3323,6 +3692,8 @@ function navigateScreen(screenId, btnEl) {
     screenDataSources: "תחום פעיל: מקורות הנתונים (טעינה מרכזית)",
     screenUnified: "תחום פעיל: מסך החיובים המאוחד",
     screenUnifiedReport: "דוח פעיל: בקרת החיובים המאוחד",
+    screenMissingCharges: "תחום פעיל: זיהוי חיובים חסרים (הצלבה מול חשבוניות)",
+    screenMissingChargesReport: "דוח פעיל: בקרת זיהוי חיובים חסרים",
     screenBatch: "תחום פעיל: שאילתות אצוות",
     screenOnline: "תחום פעיל: שאילתות און ליין",
     screenPhoto: "תחום פעיל: תחנות צילום",
@@ -7665,7 +8036,47 @@ async function handleCentralFilesUpload(fileList) {
         const hdrC = String(firstCols.C || "").trim();
         const hdrD = String(firstCols.D || "").trim();
         const hdrE = String(firstCols.E || "").trim();
+        const hdrF = String(firstCols.F || "").trim();
         const hdrG = String(firstCols.G || "").trim();
+        const hdrL = String(firstCols.L || "").trim();
+
+        // Check if Yearly Revenue / Invoices file (קובץ הכנסות / חשבוניות מרכבה)
+        const isInvoicesFile =
+          (hdrD === "לקוח" && hdrE.includes("שם חשבון")) ||
+          hdrF.includes("תאריך רישום") ||
+          hdrL.includes("סכום במטבע מסמך") ||
+          file.name.includes("הכנסות") ||
+          file.name.includes("חשבוניות");
+
+        if (isInvoicesFile) {
+          const parsedInvs = parseInvoicesSheetRows(sheetRows, file.name);
+          if (parsedInvs.length > 0) {
+            missingInvoicesState.invoices = missingInvoicesState.invoices.filter(x => x.fileName !== file.name);
+            if (!missingInvoicesState.fileNames.includes(file.name)) missingInvoicesState.fileNames.push(file.name);
+            missingInvoicesState.invoices.push(...parsedInvs);
+            populateMissingFilters(true);
+            renderMissingChargesScreens();
+
+            const totInvAmt = Number(parsedInvs.reduce((a, b) => a + b.amount, 0).toFixed(2));
+            const invMonths = Array.from(new Set(parsedInvs.map(x => x.regMonthKey).filter(Boolean))).sort();
+            const monthsSummary = invMonths.length > 2
+              ? `${invMonths[0]} עד ${invMonths[invMonths.length - 1]} (${invMonths.length} חודשים)`
+              : invMonths.join(", ");
+
+            recordLoadedFileLog({
+              fileName: file.name,
+              fileType: "Excel (.xlsx)",
+              domain: "זיהוי חיובים חסרים (קובץ הכנסות)",
+              periods: monthsSummary,
+              summary: `${fmtNum(parsedInvs.length)} חשבוניות מרכבה (${fmtCurrency(totInvAmt)})`,
+              screenId: "screenMissingCharges",
+              navId: "navItemMissingCharges"
+            });
+            recognizedCount++;
+            unlockedDomains.add("זיהוי חיובים חסרים");
+            continue;
+          }
+        }
 
         // Check if Photo Stations (.xlsx)
         const isPhoto =
@@ -8040,18 +8451,34 @@ function renderDataSourcesScreen() {
       pay: btlPay,
       screenId: "screenBtl",
       navId: "navItemBtl"
+    },
+    {
+      name: "זיהוי חיובים חסרים (קובץ הכנסות)",
+      format: "Excel (.xlsx)",
+      rule: "קובץ חשבוניות שנה נוכחית ממרכבה (לקוח D, שם חשבון E, תאריך רישום F, סכום L)",
+      loaded: missingInvoicesState.invoices.length > 0,
+      filesInfo: missingInvoicesState.invoices.length > 0
+        ? `${missingInvoicesState.fileNames.length} קבצים (${fmtNum(missingInvoicesState.invoices.length)} חשבוניות)`
+        : "טרם נטען קובץ הכנסות",
+      qty: missingInvoicesState.invoices.length,
+      pay: Number(missingInvoicesState.invoices.reduce((a, b) => a + b.amount, 0).toFixed(2)),
+      screenId: "screenMissingCharges",
+      navId: "navItemMissingCharges",
+      isReconciliationOnly: true
     }
   ];
 
-  const activeDomainsCount = domainsStatus.filter(d => d.loaded).length;
+  const billingDomainsOnly = domainsStatus.filter(d => !d.isReconciliationOnly);
+  const activeDomainsCount = billingDomainsOnly.filter(d => d.loaded).length;
   const totalSystemFiles =
     batchState.fileNames.length +
     onlineState.fileNames.length +
     photoState.files.length +
     testsState.fileNames.length +
     coursesState.fileNames.length +
-    autodchState.fileNames.length;
-  const grandTotalPay = Number(domainsStatus.reduce((a, b) => a + b.pay, 0).toFixed(2));
+    autodchState.fileNames.length +
+    missingInvoicesState.fileNames.length;
+  const grandTotalPay = Number(billingDomainsOnly.reduce((a, b) => a + b.pay, 0).toFixed(2));
   const unifiedCustomersCount = getUnifiedCustomersList().length;
 
   if (navBadgeDS) {
@@ -8153,6 +8580,10 @@ function clearAllSystemData() {
   autodchState.fileNames = [];
   autodchState.tlvRows = [];
   autodchState.btlRows = [];
+
+  missingInvoicesState.fileNames = [];
+  missingInvoicesState.invoices = [];
+  missingInvoicesState.filters = { activityMonth: "ALL", invoiceMonth: "AUTO_NEXT", domain: "ALL", viewMode: "MISSING_ONLY", search: "" };
 
   loadedFilesLog = [];
 
@@ -8845,11 +9276,1122 @@ function exportUnifiedToExcel() {
 }
 
 /* =========================================================================
+   SCREEN 13 & 14: זיהוי חיובים חסרים (MISSING CHARGES RECONCILIATION ENGINE)
+   ========================================================================= */
+function openMissingInvoicesFileBrowser() {
+  document.getElementById("missingInvoicesFilesInput").click();
+}
+
+function getNextMonthKey(activityMonthKey) {
+  if (!activityMonthKey || !/^\d{4}-\d{2}$/.test(activityMonthKey)) return "";
+  const [yStr, mStr] = activityMonthKey.split("-");
+  let y = parseInt(yStr, 10);
+  let m = parseInt(mStr, 10);
+  m += 1;
+  if (m > 12) {
+    m = 1;
+    y += 1;
+  }
+  return `${y}-${String(m).padStart(2, "0")}`;
+}
+
+function parseExcelSerialOrDateStr(rawVal, colSYearMonth) {
+  const s = String(rawVal || "").trim();
+  const sYm = String(colSYearMonth || "").trim();
+  let regDateDisplay = s;
+  let regMonthKey = "";
+
+  // Convert Excel serial date number (e.g. 46336 -> 10/11/2026)
+  if (/^\d{5}(?:\.\d+)?$/.test(s)) {
+    const serial = Math.floor(parseFloat(s));
+    const utcMs = Math.round((serial - 25569) * 86400 * 1000);
+    const dt = new Date(utcMs);
+    if (!isNaN(dt.getTime())) {
+      const yyyy = dt.getUTCFullYear();
+      const mm = String(dt.getUTCMonth() + 1).padStart(2, "0");
+      const dd = String(dt.getUTCDate()).padStart(2, "0");
+      regDateDisplay = `${dd}/${mm}/${yyyy}`;
+      regMonthKey = `${yyyy}-${mm}`;
+    }
+  } else {
+    const mIso = s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+    const mIl = s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
+    if (mIso) {
+      const yyyy = mIso[1];
+      const mm = String(mIso[2]).padStart(2, "0");
+      const dd = String(mIso[3]).padStart(2, "0");
+      regDateDisplay = `${dd}/${mm}/${yyyy}`;
+      regMonthKey = `${yyyy}-${mm}`;
+    } else if (mIl) {
+      const dd = String(mIl[1]).padStart(2, "0");
+      const mm = String(mIl[2]).padStart(2, "0");
+      const yyyy = mIl[3];
+      regDateDisplay = `${dd}/${mm}/${yyyy}`;
+      regMonthKey = `${yyyy}-${mm}`;
+    }
+  }
+
+  // Fallback or verification from Column S (שנה/חודש e.g. 2026/11)
+  if (!regMonthKey && sYm) {
+    const mYm = sYm.match(/^(\d{4})[/-](\d{1,2})$/);
+    if (mYm) {
+      regMonthKey = `${mYm[1]}-${String(mYm[2]).padStart(2, "0")}`;
+    }
+  }
+
+  return { regDateDisplay, regMonthKey };
+}
+
+function normalizeMerkavaCode(code) {
+  const s = String(code || "").trim();
+  if (!s || s === "-" || /^0+$/.test(s)) return "";
+  return s.replace(/^0+/, "");
+}
+
+function normalizeHebAccountName(name) {
+  let s = String(name || "").trim();
+  if (!s) return "";
+  s = s
+    .replace(/עירית/g, "עיריית")
+    .replace(/וועצה/g, "מועצה")
+    .replace(/ועצה/g, "מועצה")
+    .replace(/בע''מ|בע"מ|בעמ|\(חל"צ\)|חל"צ/g, "")
+    .replace(/רשות החניה/g, "")
+    .replace(/["'().,\---/\\]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return s;
+}
+
+function isAccountNameMatch(sourceName, invoiceAccountName) {
+  const n1 = normalizeHebAccountName(sourceName);
+  const n2 = normalizeHebAccountName(invoiceAccountName);
+  if (!n1 || !n2) return false;
+  if (n1 === n2) return true;
+  // Compact without spaces (e.g. "מ. מ. להבים" vs "מ.מ. להבים")
+  const c1 = n1.replace(/\s+/g, "");
+  const c2 = n2.replace(/\s+/g, "");
+  if (c1.length >= 4 && c1 === c2) return true;
+  if (n1.length >= 5 && n2.length >= 5 && (n1.includes(n2) || n2.includes(n1))) return true;
+  return false;
+}
+
+function parseInvoicesSheetRows(sheetRows, fileName) {
+  if (!sheetRows || sheetRows.length === 0) return [];
+  const hRow = sheetRows[0]?.cols || sheetRows[0] || {};
+  let colMap = {
+    company: "B",
+    docType: "C",
+    merkavaClient: "D",
+    accountName: "E",
+    regDate: "F",
+    docNumber: "G",
+    amount: "L",
+    currency: "N",
+    text: "Q",
+    yearMonth: "S",
+    billingDoc: "W"
+  };
+
+  for (const [colLet, text] of Object.entries(hRow)) {
+    const t = String(text || "").trim();
+    if (t === "לקוח" || t === "קוד לקוח") colMap.merkavaClient = colLet;
+    else if (t.includes("שם חשבון")) {
+      if (!t.includes("נגדי")) colMap.accountName = colLet;
+    } else if (t.includes("תאריך רישום")) colMap.regDate = colLet;
+    else if (t === "מספר מסמך") colMap.docNumber = colLet;
+    else if (t.includes("סכום במטבע מסמך") || t === "סכום") colMap.amount = colLet;
+    else if (t === "טקסט") colMap.text = colLet;
+    else if (t === "שנה/חודש") colMap.yearMonth = colLet;
+    else if (t === "מסמך חיוב") colMap.billingDoc = colLet;
+  }
+
+  const parsed = [];
+  for (let i = 1; i < sheetRows.length; i++) {
+    const cols = sheetRows[i]?.cols || sheetRows[i] || {};
+    const rawMerkava = String(cols[colMap.merkavaClient] || "").trim();
+    const accountName = String(cols[colMap.accountName] || "").trim().replace(/\s{2,}/g, " ");
+    const rawAmt = String(cols[colMap.amount] || "").replace(/,/g, "").trim();
+    if (!rawMerkava && !accountName && !rawAmt) continue;
+    if (rawMerkava === "לקוח" || accountName === "שם חשבון") continue;
+
+    const amount = Number((parseFloat(rawAmt) || 0).toFixed(2));
+    const { regDateDisplay, regMonthKey } = parseExcelSerialOrDateStr(cols[colMap.regDate], cols[colMap.yearMonth]);
+
+    parsed.push({
+      id: `${fileName}_${i}`,
+      merkavaCode: rawMerkava,
+      normMerkava: normalizeMerkavaCode(rawMerkava),
+      accountName,
+      normName: normalizeHebAccountName(accountName),
+      regDateDisplay,
+      regMonthKey,
+      docNumber: String(cols[colMap.docNumber] || "").trim(),
+      amount,
+      text: String(cols[colMap.text] || "").trim(),
+      yearMonthRaw: String(cols[colMap.yearMonth] || "").trim(),
+      billingDoc: String(cols[colMap.billingDoc] || "").trim(),
+      fileName
+    });
+  }
+  return parsed;
+}
+
+async function handleMissingInvoicesUpload(fileList) {
+  const files = Array.from(fileList || []).filter(f => f.name.toLowerCase().endsWith(".xlsx"));
+  if (files.length === 0) {
+    updateStatusBanner("נא לבחור קובץ אקסל (.xlsx) של הכנסות / חשבוניות שנה נוכחית.", "warning");
+    return;
+  }
+
+  let added = 0;
+  for (const file of files) {
+    try {
+      const sheetRows = await parseXlsxFirstSheetRows(file);
+      const parsed = parseInvoicesSheetRows(sheetRows, file.name);
+      if (parsed.length > 0) {
+        missingInvoicesState.invoices = missingInvoicesState.invoices.filter(x => x.fileName !== file.name);
+        if (!missingInvoicesState.fileNames.includes(file.name)) missingInvoicesState.fileNames.push(file.name);
+        missingInvoicesState.invoices.push(...parsed);
+        added += parsed.length;
+
+        const totInvAmt = Number(parsed.reduce((a, b) => a + b.amount, 0).toFixed(2));
+        const invMonths = Array.from(new Set(parsed.map(x => x.regMonthKey).filter(Boolean))).sort();
+        const monthsSummary = invMonths.length > 2
+          ? `${invMonths[0]} עד ${invMonths[invMonths.length - 1]} (${invMonths.length} חודשים)`
+          : invMonths.join(", ");
+
+        recordLoadedFileLog({
+          fileName: file.name,
+          fileType: "Excel (.xlsx)",
+          domain: "זיהוי חיובים חסרים (קובץ הכנסות)",
+          periods: monthsSummary,
+          summary: `${fmtNum(parsed.length)} חשבוניות מרכבה (${fmtCurrency(totInvAmt)})`,
+          screenId: "screenMissingCharges",
+          navId: "navItemMissingCharges"
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      updateStatusBanner(`שגיאה בקריאת קובץ ההכנסות ${file.name}: ${err.message}`, "danger");
+      return;
+    }
+  }
+
+  if (added === 0) {
+    updateStatusBanner("לא נמצאו רשומות חשבוניות תקינות בקובץ שנבחר.", "warning");
+    return;
+  }
+
+  populateMissingFilters(true);
+  syncAllScreensAndNavigation();
+  updateStatusBanner(
+    `נקלט בהצלחה קובץ ההכנסות (${fmtNum(missingInvoicesState.invoices.length)} חשבוניות). בוצעה הצלבה אוטומטית מול תחומי החיוב הפעילים.`,
+    "success"
+  );
+  logAudit("UPLOAD_INVOICES", files.map(f => f.name).join(", "), `נקלטו ${added} חשבוניות מרכבה לבדיקת חיובים חסרים`);
+}
+
+function clearMissingInvoicesData() {
+  missingInvoicesState.fileNames = [];
+  missingInvoicesState.invoices = [];
+  missingInvoicesState.filters = { activityMonth: "ALL", invoiceMonth: "AUTO_NEXT", domain: "ALL", viewMode: "MISSING_ONLY", search: "" };
+  syncAllScreensAndNavigation();
+  updateStatusBanner("נתוני קובץ ההכנסות / החשבוניות נוקו.", "info");
+  logAudit("CLEAR_INVOICES", "screenMissingCharges", "ניקוי קובץ הכנסות שנתי");
+}
+
+function getKnownVendorMerkavaAndName(domain, rawCode, rawName) {
+  const n = String(rawName || "").trim();
+  const c = String(rawCode || "").trim();
+  if (n.includes("הלפרין")) return { merkavaCode: "31389774", accountHint: "אופטיקה הלפרין בע\"מ" };
+  if (n.includes("מרמנת")) return { merkavaCode: "30003106", accountHint: "מרמנת אירגון וניהול פרויקטים בע\"מ" };
+  if (n.includes("אורט") || c === "אורט") return { merkavaCode: "30060005", accountHint: "אורט ישראל (חל\"צ)" };
+  if (n.includes("עמל") || c === "רשת עמל") return { merkavaCode: "30064666", accountHint: "רשת עמל 1 בע\"מ (חל\"צ)" };
+  if (n.includes("אנקורי") || c === "אנקורי") return { merkavaCode: "30284439", accountHint: "מפעלי אנקורי (1971) בעמ" };
+  if (n.includes("מעוף") || c === "מעוף") return { merkavaCode: "30505400", accountHint: "מעוף משאבי אנוש )מקבוצת מעוף( בע\"מ" };
+  if (n.includes("בני עקיבא") || n.includes("מיב\"ע") || n.includes("מיבע")) return { merkavaCode: "", accountHint: "מרכז ישיבות בני עקיבא" };
+  if (c === "111000000550" || n.includes("ביטוח לאומי")) return { merkavaCode: "30000316", accountHint: "ביטוח לאומי המשרד הראשי" };
+  if (c === "113000000177" || c === "855" || c === "113000000857" || n.includes("תל אביב")) return { merkavaCode: "200279", accountHint: "עיריית תל אביב" };
+  return { merkavaCode: "", accountHint: n };
+}
+
+function collectExpectedBillingRecordsForReconciliation() {
+  const expected = [];
+  let seq = 0;
+
+  // 1. Batch Queries (grouped per client + month, non-zero only)
+  const batchMap = new Map();
+  for (const r of batchState.rawRows) {
+    const mk = `${r.year}-${String(r.month).padStart(2, "0")}`;
+    const k = `${mk}|||${r.payerCode}|||${r.clientName}`;
+    if (!batchMap.has(k)) {
+      batchMap.set(k, {
+        monthKey: mk,
+        payerCode: r.payerCode,
+        clientName: r.clientName,
+        merkavaCode: r.merkavaCode,
+        sku: r.sku || "8001394",
+        quantity: 0,
+        daysCount: 0,
+        fileName: r.fileName
+      });
+    }
+    const item = batchMap.get(k);
+    item.quantity += r.quantity;
+    item.daysCount++;
+  }
+  for (const b of batchMap.values()) {
+    if (b.quantity <= 0) continue;
+    seq++;
+    expected.push({
+      itemId: `EXP_BATCH_${seq}`,
+      monthKey: b.monthKey,
+      domain: "שאילתות אצוות",
+      subTopic: `שאילתות אצוות (מק"ט ${b.sku} | ${b.daysCount} ימים)`,
+      payerCode: b.payerCode,
+      merkavaCode: b.merkavaCode || "00000000",
+      clientName: b.clientName,
+      quantity: b.quantity,
+      expectedAmount: Number((b.quantity * BATCH_SKU_UNIT_PRICE).toFixed(2)),
+      altAmounts: [],
+      subComponents: [`מק"ט ${b.sku}: ${fmtNum(b.quantity)} שאילתות × 6.93 ₪`],
+      fileName: b.fileName
+    });
+  }
+
+  // 2. Online Queries (grouped by PayerCode + ClientName + Month for invoice comparison, while preserving individual row amounts as altAmounts)
+  const onlineClientMap = new Map();
+  const onlineMerkavaMonthTotals = new Map();
+  for (const r of onlineState.rawRows) {
+    if (r.quantity <= 0) continue;
+    const normM = normalizeMerkavaCode(r.merkavaCode);
+    if (normM) {
+      const mkKey = `${r.monthKey}|||${normM}`;
+      onlineMerkavaMonthTotals.set(mkKey, Number(((onlineMerkavaMonthTotals.get(mkKey) || 0) + r.amountToPay).toFixed(2)));
+    }
+    const k = `${r.monthKey}|||${r.payerCode}|||${r.clientName}`;
+    if (!onlineClientMap.has(k)) {
+      onlineClientMap.set(k, {
+        monthKey: r.monthKey,
+        payerCode: r.payerCode,
+        clientName: r.clientName,
+        merkavaCode: r.merkavaCode,
+        totalQty: 0,
+        totalAmt: 0,
+        skus: [],
+        rowAmounts: [],
+        fileName: r.fileName
+      });
+    }
+    const item = onlineClientMap.get(k);
+    item.totalQty += r.quantity;
+    item.totalAmt = Number((item.totalAmt + r.amountToPay).toFixed(2));
+    item.skus.push(`מק"ט ${r.sku}: ${fmtNum(r.quantity)} (${fmtCurrency(r.amountToPay)})`);
+    item.rowAmounts.push(r.amountToPay);
+  }
+  for (const o of onlineClientMap.values()) {
+    seq++;
+    const normM = normalizeMerkavaCode(o.merkavaCode);
+    const combinedMerkavaAmt = normM ? onlineMerkavaMonthTotals.get(`${o.monthKey}|||${normM}`) : null;
+    const altAmounts = [...o.rowAmounts];
+    if (combinedMerkavaAmt && Math.abs(combinedMerkavaAmt - o.totalAmt) > 0.05) {
+      altAmounts.push(combinedMerkavaAmt);
+    }
+    expected.push({
+      itemId: `EXP_ONLINE_${seq}`,
+      monthKey: o.monthKey,
+      domain: "שאילתות און ליין",
+      subTopic: `שאילתות און ליין (${o.skus.length} שורות מק"ט)`,
+      payerCode: o.payerCode,
+      merkavaCode: o.merkavaCode || "00000000",
+      clientName: o.clientName,
+      quantity: o.totalQty,
+      expectedAmount: o.totalAmt,
+      altAmounts,
+      subComponents: o.skus,
+      fileName: o.fileName
+    });
+  }
+
+  // 3. Photo Stations (each vendor + month + service is billed as its own invoice in Merkava, plus vendor monthly sum as altAmount)
+  const photoMap = new Map();
+  const photoVendorMonthSum = new Map();
+  for (const r of photoState.rows) {
+    if (r.calls <= 0) continue;
+    const k = `${r.monthKey}|||${r.vendor}|||${r.service}`;
+    const vKey = `${r.monthKey}|||${r.vendor}`;
+    const rowAmt = Number((r.calls * PHOTO_QUERY_UNIT_PRICE).toFixed(2));
+    photoVendorMonthSum.set(vKey, Number(((photoVendorMonthSum.get(vKey) || 0) + rowAmt).toFixed(2)));
+    if (!photoMap.has(k)) {
+      photoMap.set(k, {
+        monthKey: r.monthKey,
+        vendor: r.vendor,
+        service: r.service,
+        calls: 0,
+        fileName: r.fileName
+      });
+    }
+    photoMap.get(k).calls += r.calls;
+  }
+  for (const p of photoMap.values()) {
+    seq++;
+    const known = getKnownVendorMerkavaAndName("תחנות צילום", p.vendor, p.vendor);
+    const amt = Number((p.calls * PHOTO_QUERY_UNIT_PRICE).toFixed(2));
+    const vSum = photoVendorMonthSum.get(`${p.monthKey}|||${p.vendor}`) || amt;
+    expected.push({
+      itemId: `EXP_PHOTO_${seq}`,
+      monthKey: p.monthKey,
+      domain: "תחנות צילום",
+      subTopic: `תחנות צילום - ${p.service}`,
+      payerCode: p.vendor,
+      merkavaCode: known.merkavaCode || "00000000",
+      clientName: `${p.vendor} (${p.service})`,
+      accountSearchName: known.accountHint || p.vendor,
+      quantity: p.calls,
+      expectedAmount: amt,
+      altAmounts: vSum !== amt ? [vSum] : [],
+      subComponents: [`שירות: ${p.service} | ${fmtNum(p.calls)} שאילתות × 6.93 ₪ = ${fmtCurrency(amt)}`],
+      fileName: p.fileName
+    });
+  }
+
+  // 4. Theory Tests (per vendor + month)
+  for (const r of testsState.rows) {
+    if (r.totalExaminees <= 0) continue;
+    seq++;
+    const known = getKnownVendorMerkavaAndName("מבחנים עיוניים", r.vendorCode, r.vendorName);
+    const amt = Number((r.totalExaminees * testsState.tariff).toFixed(2));
+    expected.push({
+      itemId: `EXP_TESTS_${seq}`,
+      monthKey: r.monthKey,
+      domain: "מבחנים עיוניים",
+      subTopic: `מבחנים עיוניים לזכיין (מק"ט ${r.sku || "8002290"})`,
+      payerCode: r.vendorCode,
+      merkavaCode: known.merkavaCode || "00000000",
+      clientName: r.vendorName,
+      accountSearchName: known.accountHint || r.vendorName,
+      quantity: r.totalExaminees,
+      expectedAmount: amt,
+      altAmounts: [
+        Number((r.totalExaminees * 4.20).toFixed(2)),
+        Number((r.totalExaminees * 6.93).toFixed(2))
+      ],
+      subComponents: [`${fmtNum(r.totalExaminees)} נבחנים × ${fmtCurrency(testsState.tariff)} = ${fmtCurrency(amt)}`],
+      fileName: r.fileName
+    });
+  }
+
+  // 5. Courses (per vendor + month: Refresh + Correct Driving total)
+  for (const r of coursesState.rows) {
+    if (r.totalQty <= 0) continue;
+    seq++;
+    const known = getKnownVendorMerkavaAndName("חיוב קורסים", r.vendorKey, r.vendorDisplay);
+    const alt1820 = Number((r.totalQty * 18.20).toFixed(2));
+    const alt693 = Number((r.totalQty * 6.93).toFixed(2));
+    expected.push({
+      itemId: `EXP_COURSES_${seq}`,
+      monthKey: r.monthKey,
+      domain: "חיוב קורסים",
+      subTopic: `קורסי רענון (${fmtNum(r.refreshQty)}) + נהיגה נכונה (${fmtNum(r.correctDrivingQty)})`,
+      payerCode: r.vendorKey,
+      merkavaCode: known.merkavaCode || "00000000",
+      clientName: r.vendorDisplay,
+      accountSearchName: known.accountHint || r.vendorDisplay,
+      quantity: r.totalQty,
+      expectedAmount: r.totalPay,
+      altAmounts: [r.refreshPay, r.correctDrivingPay, alt1820, alt693],
+      subComponents: [
+        `קורסי רענון (8001401): ${fmtNum(r.refreshQty)} × ${fmtCurrency(r.unitTariff)} = ${fmtCurrency(r.refreshPay)}`,
+        `קורסי נהיגה נכונה (8001400): ${fmtNum(r.correctDrivingQty)} × ${fmtCurrency(r.unitTariff)} = ${fmtCurrency(r.correctDrivingPay)}`
+      ],
+      fileName: r.fileName
+    });
+  }
+
+  // 6. Tel Aviv Municipality (#AUTODCH billable rows)
+  for (const r of autodchState.tlvRows) {
+    if (!r.billable || r.quantity <= 0) continue;
+    seq++;
+    expected.push({
+      itemId: `EXP_TLV_${seq}`,
+      monthKey: r.monthKey,
+      domain: "עיריית תל אביב",
+      subTopic: `${r.subReport} - ${r.action}`,
+      payerCode: r.code,
+      merkavaCode: "200279",
+      clientName: `עיריית תל אביב (${r.action})`,
+      accountSearchName: "עיריית תל אביב",
+      quantity: r.quantity,
+      expectedAmount: r.amountToPay,
+      altAmounts: [],
+      subComponents: [`קוד ${r.code} | ${r.action} (${r.sku}): ${fmtNum(r.quantity)} × 6.93 ₪ = ${fmtCurrency(r.amountToPay)}`],
+      fileName: r.fileName
+    });
+  }
+
+  // 7. National Insurance (#AUTODCH billable rows)
+  for (const r of autodchState.btlRows) {
+    if (!r.billable || r.quantity <= 0) continue;
+    seq++;
+    expected.push({
+      itemId: `EXP_BTL_${seq}`,
+      monthKey: r.monthKey,
+      domain: "המוסד לביטוח הלאומי",
+      subTopic: `${r.system} - ${r.action}`,
+      payerCode: r.code,
+      merkavaCode: "30000316",
+      clientName: `המוסד לביטוח לאומי (${r.action})`,
+      accountSearchName: "ביטוח לאומי",
+      quantity: r.quantity,
+      expectedAmount: r.amountToPay,
+      altAmounts: [],
+      subComponents: [`${r.system} - ${r.action} (${r.sku}): ${fmtNum(r.quantity)} × 6.93 ₪ = ${fmtCurrency(r.amountToPay)}`],
+      fileName: r.fileName
+    });
+  }
+
+  return expected;
+}
+
+function runMissingChargesReconciliation() {
+  const f = missingInvoicesState.filters;
+  const allExpected = collectExpectedBillingRecordsForReconciliation();
+  const allInvoices = missingInvoicesState.invoices;
+
+  const filteredExpected = allExpected.filter(item => {
+    if (f.activityMonth && f.activityMonth !== "ALL" && item.monthKey !== f.activityMonth) return false;
+    if (f.domain && f.domain !== "ALL" && item.domain !== f.domain) return false;
+    return true;
+  });
+
+  const results = [];
+  for (const item of filteredExpected) {
+    const targetInvMonthKey =
+      f.invoiceMonth === "AUTO_NEXT"
+        ? getNextMonthKey(item.monthKey)
+        : f.invoiceMonth === "ALL_INVOICES"
+        ? "ALL"
+        : f.invoiceMonth;
+
+    // Candidate invoices in target registration month
+    const monthInvoices = allInvoices.filter(inv =>
+      targetInvMonthKey === "ALL" ? true : inv.regMonthKey === targetInvMonthKey
+    );
+
+    const normSrcMerkava = normalizeMerkavaCode(item.merkavaCode);
+    const searchName = item.accountSearchName || item.clientName;
+
+    // Find invoices belonging to this customer in target registration month:
+    // 1. Primary: by Merkava Code (Column D) if available
+    // 2. Fallback: by Account Name (Column E) when Merkava Code is missing ("00000000") or not matched
+    let clientInvoicesInMonth = [];
+    let matchedIdentityMethod = "";
+
+    if (normSrcMerkava) {
+      clientInvoicesInMonth = monthInvoices.filter(inv => inv.normMerkava === normSrcMerkava);
+      if (clientInvoicesInMonth.length > 0) {
+        matchedIdentityMethod = "לפי קוד מרכבה";
+      }
+    }
+
+    if (clientInvoicesInMonth.length === 0) {
+      clientInvoicesInMonth = monthInvoices.filter(inv => isAccountNameMatch(searchName, inv.accountName));
+      if (clientInvoicesInMonth.length > 0) {
+        matchedIdentityMethod = normSrcMerkava
+          ? "לפי שם חשבון (עמודה E - קוד מרכבה שונה)"
+          : "לפי שם חשבון (עמודה E - ללא קוד מרכבה במקור)";
+      }
+    }
+
+    // Also find all invoices for this customer across the entire year (for drilldown diagnostics)
+    const clientInvoicesAllYear = allInvoices.filter(inv =>
+      (normSrcMerkava && inv.normMerkava === normSrcMerkava) ||
+      isAccountNameMatch(searchName, inv.accountName)
+    );
+
+    // Check if any invoice in target month matches the expected amount (or altAmounts)
+    let matchedInvoice = null;
+    let isExactAmount = false;
+
+    for (const inv of clientInvoicesInMonth) {
+      if (Math.abs(inv.amount - item.expectedAmount) <= 0.06) {
+        matchedInvoice = inv;
+        isExactAmount = true;
+        break;
+      }
+    }
+
+    if (!matchedInvoice && item.altAmounts && item.altAmounts.length > 0) {
+      for (const altAmt of item.altAmounts) {
+        if (!altAmt || altAmt <= 0) continue;
+        const foundAlt = clientInvoicesInMonth.find(inv => Math.abs(inv.amount - altAmt) <= 0.06);
+        if (foundAlt) {
+          matchedInvoice = foundAlt;
+          isExactAmount = true;
+          break;
+        }
+      }
+    }
+
+    let status = "NO_INVOICE"; // NO_INVOICE | AMOUNT_DIFF | MATCHED
+    if (matchedInvoice && isExactAmount) {
+      status = "MATCHED";
+    } else if (clientInvoicesInMonth.length > 0) {
+      status = "AMOUNT_DIFF";
+    } else {
+      status = "NO_INVOICE";
+    }
+
+    const discoveredMerkava =
+      clientInvoicesInMonth[0]?.merkavaCode ||
+      clientInvoicesAllYear[0]?.merkavaCode ||
+      "";
+    const discoveredAccountName =
+      clientInvoicesInMonth[0]?.accountName ||
+      clientInvoicesAllYear[0]?.accountName ||
+      "";
+
+    results.push({
+      ...item,
+      targetInvMonthKey,
+      status,
+       isMissing: status !== "MATCHED",
+      matchedIdentityMethod,
+      matchedInvoice,
+      clientInvoicesInMonth,
+      clientInvoicesAllYear,
+      discoveredMerkava,
+      discoveredAccountName
+    });
+  }
+
+  return results;
+}
+
+function populateMissingFilters(autoSelectLatestMonth = false) {
+  const selAct = document.getElementById("selMissingActivityMonth");
+  const selInv = document.getElementById("selMissingInvoiceMonth");
+  if (!selAct || !selInv) return;
+
+  const allExpected = collectExpectedBillingRecordsForReconciliation();
+  const actMonths = Array.from(new Set(allExpected.map(x => x.monthKey).filter(Boolean))).sort();
+
+  let actHtml = `<option value="ALL">כל חודשי הפעילות שנטענו (${actMonths.length})</option>`;
+  for (const mk of actMonths) {
+    const nextMk = getNextMonthKey(mk);
+    actHtml += `<option value="${escHtml(mk)}">חודש פעילות ${escHtml(formatMonthLabelHeb(mk))} (בדיקת רישום: ${escHtml(nextMk)})</option>`;
+  }
+  selAct.innerHTML = actHtml;
+
+  if (autoSelectLatestMonth && actMonths.length > 0 && missingInvoicesState.filters.activityMonth === "ALL") {
+    missingInvoicesState.filters.activityMonth = actMonths[actMonths.length - 1];
+  }
+  if (missingInvoicesState.filters.activityMonth !== "ALL" && !actMonths.includes(missingInvoicesState.filters.activityMonth)) {
+    missingInvoicesState.filters.activityMonth = actMonths.length > 0 ? actMonths[actMonths.length - 1] : "ALL";
+  }
+  selAct.value = missingInvoicesState.filters.activityMonth;
+
+  const invMonths = Array.from(new Set(missingInvoicesState.invoices.map(x => x.regMonthKey).filter(Boolean))).sort();
+  let invHtml = `<option value="AUTO_NEXT">אוטומטי: החודש העוקב לחודש הפעילות (M+1)</option>`;
+  invHtml += `<option value="ALL_INVOICES">כל חודשי הרישום בקובץ ההכנסות (${invMonths.length} חודשים)</option>`;
+  for (const imk of invMonths) {
+    const cnt = missingInvoicesState.invoices.filter(x => x.regMonthKey === imk).length;
+    invHtml += `<option value="${escHtml(imk)}">תאריך רישום: ${escHtml(formatMonthLabelHeb(imk))} (${fmtNum(cnt)} חשבוניות)</option>`;
+  }
+  selInv.innerHTML = invHtml;
+  if (
+    missingInvoicesState.filters.invoiceMonth !== "AUTO_NEXT" &&
+    missingInvoicesState.filters.invoiceMonth !== "ALL_INVOICES" &&
+    !invMonths.includes(missingInvoicesState.filters.invoiceMonth)
+  ) {
+    missingInvoicesState.filters.invoiceMonth = "AUTO_NEXT";
+  }
+  selInv.value = missingInvoicesState.filters.invoiceMonth;
+}
+
+function onMissingFilterChange() {
+  missingInvoicesState.filters.activityMonth = document.getElementById("selMissingActivityMonth").value;
+  missingInvoicesState.filters.invoiceMonth = document.getElementById("selMissingInvoiceMonth").value;
+  missingInvoicesState.filters.domain = document.getElementById("selMissingDomain").value;
+  missingInvoicesState.filters.viewMode = document.getElementById("selMissingViewMode").value;
+  missingInvoicesState.filters.search = document.getElementById("txtMissingSearch").value;
+  renderMissingChargesScreens();
+}
+
+function resetMissingFilters() {
+  const allExpected = collectExpectedBillingRecordsForReconciliation();
+  const actMonths = Array.from(new Set(allExpected.map(x => x.monthKey).filter(Boolean))).sort();
+  missingInvoicesState.filters = {
+    activityMonth: actMonths.length > 0 ? actMonths[actMonths.length - 1] : "ALL",
+    invoiceMonth: "AUTO_NEXT",
+    domain: "ALL",
+    viewMode: "MISSING_ONLY",
+    search: ""
+  };
+  document.getElementById("selMissingActivityMonth").value = missingInvoicesState.filters.activityMonth;
+  document.getElementById("selMissingInvoiceMonth").value = "AUTO_NEXT";
+  document.getElementById("selMissingDomain").value = "ALL";
+  document.getElementById("selMissingViewMode").value = "MISSING_ONLY";
+  document.getElementById("txtMissingSearch").value = "";
+  renderMissingChargesScreens();
+}
+
+function renderMissingChargesScreens() {
+  const hasInvoices = missingInvoicesState.invoices.length > 0;
+  const hasSourceData = hasAnyLoadedSystemData();
+  const hasBoth = hasInvoices && hasSourceData;
+
+  const dataSection = document.getElementById("missingChargesDataSection");
+  const toolbar = document.getElementById("missingHeaderToolbar");
+  const btnClear = document.getElementById("btnMissingClear");
+  const navBadge = document.getElementById("navBadgeMissingCharges");
+  const repEmpty = document.getElementById("missingReportEmptyState");
+  const repContent = document.getElementById("missingReportContent");
+  const repExport = document.getElementById("btnMissingReportExport");
+
+  if (dataSection) dataSection.classList.toggle("visible", hasInvoices || hasSourceData);
+  if (repContent) repContent.classList.toggle("visible", hasBoth);
+  if (repEmpty) repEmpty.style.display = hasBoth ? "none" : "block";
+  if (toolbar) toolbar.style.display = hasInvoices ? "flex" : "none";
+  if (btnClear) btnClear.style.display = hasInvoices ? "inline-flex" : "none";
+  if (repExport) repExport.disabled = !hasBoth;
+
+  const subEl = document.getElementById("missingInvoicesDropZoneSubtitle");
+  if (subEl) {
+    if (hasInvoices) {
+      subEl.textContent = `קובץ הכנסות פעיל (${missingInvoicesState.fileNames.join(", ")}): סה"כ ${fmtNum(missingInvoicesState.invoices.length)} חשבוניות מרכבה שנטענו להשוואה.`;
+    } else {
+      subEl.textContent = "גרור לכאן את קובץ ההכנסות השנתי ממרכבה (למשל: 2026_11_23_-_הכנסות_שנה_נוכחית.xlsx), או לחץ לבחירת הקובץ מהמחשב.";
+    }
+  }
+
+  const allReconciled = runMissingChargesReconciliation();
+  const missingAll = allReconciled.filter(r => r.isMissing);
+  const noInvoiceCount = allReconciled.filter(r => r.status === "NO_INVOICE").length;
+  const amountDiffCount = allReconciled.filter(r => r.status === "AMOUNT_DIFF").length;
+  const matchedAll = allReconciled.filter(r => r.status === "MATCHED");
+  const matchedByNameCount = matchedAll.filter(r => r.matchedIdentityMethod.includes("שם חשבון")).length;
+
+  const missingTotalAmt = Number(missingAll.reduce((a, b) => a + b.expectedAmount, 0).toFixed(2));
+  const matchedTotalAmt = Number(matchedAll.reduce((a, b) => a + b.expectedAmount, 0).toFixed(2));
+  const matchRatePct = allReconciled.length > 0 ? Math.round((matchedAll.length / allReconciled.length) * 100) : 0;
+
+  if (navBadge) {
+    if (!hasInvoices) {
+      navBadge.textContent = "טען הכנסות";
+      navBadge.className = "badge badge-info";
+    } else if (!hasSourceData) {
+      navBadge.textContent = `${fmtNum(missingInvoicesState.invoices.length)} חשב'`;
+      navBadge.className = "badge badge-info";
+    } else if (missingAll.length > 0) {
+      navBadge.textContent = `${fmtNum(missingAll.length)} חסרים`;
+      navBadge.className = "badge badge-danger";
+    } else {
+      navBadge.textContent = "הכל תקין";
+      navBadge.className = "badge badge-success";
+    }
+  }
+
+  const kpiHtml = `
+    <div class="kpi-card ${missingAll.length > 0 ? 'kpi-danger' : 'kpi-success'}">
+      <div class="kpi-label">
+        <span>חיובים חסרים (ללא חשבונית מקבילה)</span>
+        <span class="badge ${missingAll.length > 0 ? 'badge-danger' : 'badge-success'}">${fmtNum(missingAll.length)} רשומות</span>
+      </div>
+      <div class="kpi-val">${fmtCurrency(missingTotalAmt)}</div>
+      <div class="kpi-meta">
+        <span>ללא חשבונית כלל: ${fmtNum(noInvoiceCount)} | קיימת חשבונית בסכום אחר: ${fmtNum(amountDiffCount)}</span>
+      </div>
+    </div>
+    <div class="kpi-card kpi-success">
+      <div class="kpi-label">
+        <span>חיובים שנמצאה להם חשבונית תואמת</span>
+        <span class="badge badge-success">${fmtNum(matchedAll.length)} תקינים (${matchRatePct}%)</span>
+      </div>
+      <div class="kpi-val">${fmtCurrency(matchedTotalAmt)}</div>
+      <div class="kpi-meta">
+        <span>לפי קוד מרכבה: ${fmtNum(matchedAll.length - matchedByNameCount)} | לפי שם חשבון (עמודה E): ${fmtNum(matchedByNameCount)}</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">
+        <span>נתוני קובץ ההכנסות וההשוואה</span>
+        <span class="badge badge-info">${hasInvoices ? `${fmtNum(missingInvoicesState.invoices.length)} חשבוניות` : 'טרם נטען קובץ הכנסות'}</span>
+      </div>
+      <div class="kpi-val">${fmtNum(allReconciled.length)} חיובים נבדקו</div>
+      <div class="kpi-meta">
+        <span>חודש פעילות נבדק מול תאריך רישום בחודש העוקב (M+1)</span>
+      </div>
+    </div>
+  `;
+
+  const kpi1 = document.getElementById("missingKpiGrid");
+  const kpi2 = document.getElementById("missingReportKpiGrid");
+  if (kpi1) kpi1.innerHTML = kpiHtml;
+  if (kpi2) kpi2.innerHTML = kpiHtml;
+
+  // Apply ViewMode & Search filters for table display
+  const f = missingInvoicesState.filters;
+  const q = (f.search || "").trim().toLowerCase();
+
+  const displayedRows = allReconciled.filter(r => {
+    if (f.viewMode === "MISSING_ONLY" && !r.isMissing) return false;
+    if (f.viewMode === "NO_INVOICE" && r.status !== "NO_INVOICE") return false;
+    if (f.viewMode === "AMOUNT_DIFF" && r.status !== "AMOUNT_DIFF") return false;
+    if (f.viewMode === "MATCHED_ONLY" && r.status !== "MATCHED") return false;
+    if (q) {
+      const hay = `${r.clientName} ${r.discoveredAccountName} ${r.payerCode} ${r.merkavaCode} ${r.discoveredMerkava} ${r.domain} ${r.subTopic} ${r.expectedAmount}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  let tbHtml = "";
+  if (!hasInvoices) {
+    tbHtml = `
+      <tr>
+        <td colspan="9" style="text-align:center; padding:32px;">
+          <div style="font-size:16px; font-weight:700; margin-bottom:8px;">טרם נטען קובץ ההכנסות השנתי (חשבוניות מרכבה)</div>
+          <div style="color:var(--text-secondary); margin-bottom:16px;">לחץ על הכפתור או גרור את קובץ ההכנסות (2026_11_23_-_הכנסות_שנה_נוכחית.xlsx) כדי להריץ את השוואת החיובים החסרים.</div>
+          <button class="btn btn-primary" onclick="openMissingInvoicesFileBrowser()">📂 בחר קובץ הכנסות / חשבוניות (.xlsx)</button>
+        </td>
+      </tr>
+    `;
+  } else if (!hasSourceData) {
+    tbHtml = `
+      <tr>
+        <td colspan="9" style="text-align:center; padding:32px;">
+          <div style="font-size:16px; font-weight:700; margin-bottom:8px;">קובץ ההכנסות נטען בהצלחה (${fmtNum(missingInvoicesState.invoices.length)} חשבוניות), אך טרם נטענו קבצי מקור לחיוב</div>
+          <div style="color:var(--text-secondary); margin-bottom:16px;">טען קבצי חיוב (שאילתות אצוות, שאילתות און ליין, תחנות צילום, מבחנים, קורסים או דוחות PDF) במסך "מקורות הנתונים".</div>
+          <button class="btn btn-primary" onclick="navigateScreen('screenDataSources', document.getElementById('navItemDataSources'))">📂 עבור למסך מקורות הנתונים</button>
+        </td>
+      </tr>
+    `;
+  } else if (displayedRows.length === 0) {
+    tbHtml = `
+      <tr>
+        <td colspan="9" style="text-align:center; padding:28px;">
+          <div style="font-weight:700; color:var(--text-secondary); margin-bottom:12px;">לא נמצאו רשומות התואמות לסינון הנוכחי</div>
+          <button class="btn btn-primary" onclick="resetMissingFilters()">הצג את כל החיובים החסרים (איפוס סינון)</button>
+        </td>
+      </tr>
+    `;
+  } else {
+    let sumQty = 0;
+    let sumAmt = 0;
+    displayedRows.forEach((r, idx) => {
+      sumQty += r.quantity;
+      sumAmt += r.expectedAmount;
+
+      const isMissingMerkavaInSource = !r.merkavaCode || /^0+$/.test(r.merkavaCode) || r.merkavaCode === "-";
+      let merkavaCellHtml = "";
+      if (!isMissingMerkavaInSource) {
+        merkavaCellHtml = `<span class="num">${escHtml(r.merkavaCode)}</span>`;
+      } else if (r.discoveredMerkava) {
+        merkavaCellHtml = `
+          <span class="badge badge-warning" title="חסר בקובץ המקור - זוהה לפי שם חשבון בעמודה E">במקור: 00000000</span>
+          <div style="font-size:12px; color:var(--theme-primary); font-weight:700; margin-top:2px;">בחשבונית: ${escHtml(r.discoveredMerkava)}</div>
+        `;
+      } else {
+        merkavaCellHtml = `<span class="badge badge-warning">00000000 (ללא מרכבה)</span>`;
+      }
+
+      const accountSubHtml = r.discoveredAccountName && r.discoveredAccountName !== r.clientName
+        ? `<div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">שם חשבון (עמודה E): <strong>${escHtml(r.discoveredAccountName)}</strong></div>`
+        : "";
+
+      let statusHtml = "";
+      if (r.status === "NO_INVOICE") {
+        statusHtml = `
+          <span class="badge badge-danger">❌ חסרה חשבונית בחודש ${escHtml(r.targetInvMonthKey)}</span>
+          <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">לא נמצאה רשומה לקוד מרכבה או לשם החשבון בחודש הרישום</div>
+        `;
+      } else if (r.status === "AMOUNT_DIFF") {
+        const invListStr = r.clientInvoicesInMonth
+          .slice(0, 3)
+          .map(inv => `${fmtCurrency(inv.amount)} (${inv.text || inv.docNumber})`)
+          .join(" | ");
+        statusHtml = `
+          <span class="badge badge-warning">⚠️ לא נמצאה חשבונית בסכום ${fmtCurrency(r.expectedAmount)}</span>
+          <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">חשבוניות שהופקו ללקוח ב-${escHtml(r.targetInvMonthKey)}: <strong>${escHtml(invListStr)}</strong></div>
+        `;
+      } else {
+        const inv = r.matchedInvoice;
+        statusHtml = `
+          <span class="badge badge-success">✓ נמצאה חשבונית #${escHtml(inv.docNumber)} (${escHtml(inv.regDateDisplay)})</span>
+          <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">${escHtml(r.matchedIdentityMethod)} | סכום: <strong>${fmtCurrency(inv.amount)}</strong> | ${escHtml(inv.text)}</div>
+        `;
+      }
+
+      tbHtml += `
+        <tr class="clickable-row" onclick="openMissingChargeDrilldown('${escHtml(r.itemId)}')" title="לחיצה (קליק אחד) לפתיחת פירוט ההשוואה וכל החשבוניות של הלקוח">
+          <td class="num">${idx + 1}</td>
+          <td>
+            <span class="badge badge-muted">${escHtml(r.monthKey)}</span>
+            <span style="margin:0 4px;">←</span>
+            <span class="badge badge-info">${escHtml(r.targetInvMonthKey)}</span>
+          </td>
+          <td>
+            <div style="font-weight:700;">${escHtml(r.domain)}</div>
+            <div style="font-size:12px; color:var(--text-secondary);">${escHtml(r.subTopic)}</div>
+          </td>
+          <td class="num">${escHtml(r.payerCode)}</td>
+          <td>${merkavaCellHtml}</td>
+          <td>
+            <span class="client-name-dbl" onclick="event.stopPropagation(); openMissingChargeDrilldown('${escHtml(r.itemId)}')">${escHtml(r.clientName)}</span>
+            ${accountSubHtml}
+          </td>
+          <td class="num" style="font-weight:700;">${fmtNum(r.quantity)}</td>
+          <td class="num" style="font-weight:700; color:${r.isMissing ? 'var(--color-danger)' : 'var(--color-success)'};">${fmtCurrency(r.expectedAmount)}</td>
+          <td>${statusHtml}</td>
+        </tr>
+      `;
+    });
+
+    sumAmt = Number(sumAmt.toFixed(2));
+    tbHtml += `
+      <tr class="total-row">
+        <td colspan="6">סה"כ מוצג בטבלה (${fmtNum(displayedRows.length)} רשומות חיוב)</td>
+        <td class="num">${fmtNum(sumQty)}</td>
+        <td class="num">${fmtCurrency(sumAmt)}</td>
+        <td>-</td>
+      </tr>
+    `;
+  }
+
+  const t1 = document.querySelector("#tblMissingCharges tbody");
+  const t2 = document.querySelector("#tblMissingChargesReport tbody");
+  if (t1) t1.innerHTML = tbHtml;
+  if (t2) t2.innerHTML = tbHtml;
+}
+
+function openMissingChargeDrilldown(itemId) {
+  const allReconciled = runMissingChargesReconciliation();
+  const item = allReconciled.find(x => x.itemId === itemId);
+  if (!item) return;
+
+  const subCompHtml = item.subComponents
+    .map((sc, i) => `<div>${i + 1}. ${escHtml(sc)}</div>`)
+    .join("");
+
+  let monthInvsRowsHtml = "";
+  if (item.clientInvoicesInMonth.length === 0) {
+    monthInvsRowsHtml = `
+      <tr>
+        <td colspan="6" style="text-align:center; padding:16px; color:var(--color-danger); font-weight:700;">
+          לא נמצאה אף חשבונית ללקוח זה בחודש הרישום ${escHtml(item.targetInvMonthKey)}
+        </td>
+      </tr>
+    `;
+  } else {
+    item.clientInvoicesInMonth.forEach((inv, idx) => {
+      const diff = Number((inv.amount - item.expectedAmount).toFixed(2));
+      const isMatch = Math.abs(diff) <= 0.06;
+      const rowStyle = isMatch ? `style="background-color:var(--bg-success);"` : "";
+      monthInvsRowsHtml += `
+        <tr ${rowStyle}>
+          <td class="num">${idx + 1}</td>
+          <td class="num" style="font-weight:700;">${escHtml(inv.docNumber)}</td>
+          <td class="num">${escHtml(inv.regDateDisplay)} (${escHtml(inv.yearMonthRaw)})</td>
+          <td class="num">${escHtml(inv.merkavaCode)} - ${escHtml(inv.accountName)}</td>
+          <td class="num" style="font-weight:700; color:var(--color-success);">${fmtCurrency(inv.amount)}</td>
+          <td>${escHtml(inv.text || "-")} ${isMatch ? '<span class="badge badge-success">תואם לחיוב ✓</span>' : `<span class="badge badge-warning">הפרש: ${fmtCurrency(diff)}</span>`}</td>
+        </tr>
+      `;
+    });
+  }
+
+  let yearInvsRowsHtml = "";
+  if (item.clientInvoicesAllYear.length === 0) {
+    yearInvsRowsHtml = `
+      <tr>
+        <td colspan="6" style="text-align:center; padding:16px; color:var(--text-secondary);">
+          לא נמצאו חשבוניות ללקוח זה בכל קובץ ההכנסות השנתי
+        </td>
+      </tr>
+    `;
+  } else {
+    item.clientInvoicesAllYear.slice(0, 25).forEach((inv, idx) => {
+      yearInvsRowsHtml += `
+        <tr>
+          <td class="num">${idx + 1}</td>
+          <td class="num" style="font-weight:700;">${escHtml(inv.docNumber)}</td>
+          <td class="num">${escHtml(inv.regDateDisplay)} (${escHtml(inv.yearMonthRaw)})</td>
+          <td class="num">${escHtml(inv.merkavaCode)}</td>
+          <td class="num" style="font-weight:700;">${fmtCurrency(inv.amount)}</td>
+          <td>${escHtml(inv.text || "-")}</td>
+        </tr>
+      `;
+    });
+  }
+
+  const html = `
+    <div style="margin-bottom:16px; padding:12px 16px; background:var(--bg-muted); border:1px solid var(--border-color); border-radius:var(--radius-md); display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+      <div><strong>שם הלקוח במקור:</strong> ${escHtml(item.clientName)} (${escHtml(item.payerCode)})</div>
+      <div><strong>קוד מרכבה במקור:</strong> ${escHtml(item.merkavaCode)} ${item.discoveredMerkava ? `| <strong>בחשבונית:</strong> ${escHtml(item.discoveredMerkava)}` : ""}</div>
+      <div><strong>תחום חיוב:</strong> <span class="badge badge-info">${escHtml(item.domain)}</span></div>
+      <div><strong>סכום חיוב צפוי (${escHtml(item.monthKey)}):</strong> <span style="color:var(--theme-primary); font-weight:700;">${fmtCurrency(item.expectedAmount)}</span></div>
+    </div>
+
+    <div style="margin-bottom:16px; padding:12px 16px; background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md);">
+      <div style="font-weight:700; margin-bottom:6px;">מרכיבי החיוב בחודש הפעילות (${escHtml(formatMonthLabelHeb(item.monthKey))}) - קובץ: ${escHtml(item.fileName)}</div>
+      <div style="font-size:13px; color:var(--text-secondary); display:flex; flex-direction:column; gap:4px;">${subCompHtml}</div>
+    </div>
+
+    <div style="font-size:16px; font-weight:700; margin-bottom:8px;">1. חשבוניות שנמצאו ללקוח בחודש הרישום הנבדק (${escHtml(item.targetInvMonthKey)})</div>
+    <div class="table-container" style="margin-bottom:20px;">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>מספר מסמך (עמודה G)</th>
+            <th>תאריך רישום (עמודה F)</th>
+            <th>לקוח ושם חשבון (עמודות D, E)</th>
+            <th>סכום חשבונית (עמודה L)</th>
+            <th>טקסט והתאמה (עמודה Q)</th>
+          </tr>
+        </thead>
+        <tbody>${monthInvsRowsHtml}</tbody>
+      </table>
+    </div>
+
+    <div style="font-size:16px; font-weight:700; margin-bottom:8px;">2. היסטוריית חשבוניות של הלקוח לאורך השנה בקובץ ההכנסות (${fmtNum(item.clientInvoicesAllYear.length)} חשבוניות)</div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>מספר מסמך (עמודה G)</th>
+            <th>תאריך רישום (עמודה F)</th>
+            <th>קוד לקוח במרכבה (D)</th>
+            <th>סכום במטבע מסמך (L)</th>
+            <th>טקסט החשבונית (Q)</th>
+          </tr>
+        </thead>
+        <tbody>${yearInvsRowsHtml}</tbody>
+      </table>
+    </div>
+  `;
+
+  openDrillModal(`בדיקת חיוב מול חשבוניות - ${item.clientName} (${item.domain})`, html);
+}
+
+function exportMissingChargesToExcel() {
+  const allReconciled = runMissingChargesReconciliation();
+  if (allReconciled.length === 0) {
+    updateStatusBanner("אין נתוני השוואת חיובים חסרים לייצוא. נא לטעון קובץ הכנסות וקבצי מקור תחילה.", "warning");
+    return;
+  }
+
+  const missingOnly = allReconciled.filter(r => r.isMissing);
+  let totMissingQty = 0, totMissingAmt = 0;
+
+  const sheet1Rows = missingOnly.map(r => {
+    totMissingQty += r.quantity;
+    totMissingAmt += r.expectedAmount;
+    const otherInvs = r.clientInvoicesInMonth.map(inv => `${inv.amount} ₪ (#${inv.docNumber} - ${inv.text})`).join(" | ");
+    const statusText = r.status === "NO_INVOICE"
+      ? "! לא הופקה חשבונית ללקוח בחודש הרישום"
+      : `! קיימת חשבונית בסכום אחר (${otherInvs})`;
+
+    return [
+      { v: r.monthKey, t: "s", warn: true },
+      { v: r.targetInvMonthKey, t: "s", warn: true },
+      { v: r.domain, t: "s", warn: true },
+      { v: r.subTopic, t: "s", warn: true },
+      { v: r.payerCode, t: "s", warn: true },
+      { v: r.merkavaCode, t: "s", warn: true },
+      { v: r.discoveredMerkava || "-", t: "s", warn: true },
+      { v: `! ${r.clientName}`, t: "s", warn: true },
+      { v: r.discoveredAccountName || "-", t: "s", warn: true },
+      { v: r.quantity, t: "n", warn: true },
+      { v: r.expectedAmount, t: "c", warn: true },
+      { v: statusText, t: "s", warn: true }
+    ];
+  });
+
+  totMissingAmt = Number(totMissingAmt.toFixed(2));
+  sheet1Rows.push([
+    { v: "סה\"כ חיובים חסרים", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: `${missingOnly.length} חיובים חסרים`, t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: totMissingQty, t: "n", bold: true },
+    { v: totMissingAmt, t: "c", bold: true },
+    { v: "", t: "s", bold: true }
+  ]);
+
+  let totAllQty = 0, totAllAmt = 0;
+  const sheet2Rows = allReconciled.map(r => {
+    totAllQty += r.quantity;
+    totAllAmt += r.expectedAmount;
+    const isWarn = r.isMissing;
+    const matchInfo = r.status === "MATCHED"
+      ? `תקין - חשבונית #${r.matchedInvoice.docNumber} (${r.matchedInvoice.regDateDisplay}) | ${r.matchedIdentityMethod}`
+      : r.status === "NO_INVOICE"
+      ? "! חסרה חשבונית ללקוח"
+      : `! חסרה חשבונית בסכום זה (קיימות: ${r.clientInvoicesInMonth.map(i => i.amount).join(", ")})`;
+
+    return [
+      { v: r.monthKey, t: "s", warn: isWarn },
+      { v: r.targetInvMonthKey, t: "s", warn: isWarn },
+      { v: r.domain, t: "s", warn: isWarn },
+      { v: r.payerCode, t: "s", warn: isWarn },
+      { v: r.merkavaCode, t: "s", warn: isWarn },
+      { v: r.clientName, t: "s", warn: isWarn },
+      { v: r.discoveredAccountName || "-", t: "s", warn: isWarn },
+      { v: r.quantity, t: "n", warn: isWarn },
+      { v: r.expectedAmount, t: "c", warn: isWarn },
+      { v: matchInfo, t: "s", warn: isWarn }
+    ];
+  });
+
+  totAllAmt = Number(totAllAmt.toFixed(2));
+  sheet2Rows.push([
+    { v: "סה\"כ כל החיובים שנבדקו", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: `${allReconciled.length} רשומות`, t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: totAllQty, t: "n", bold: true },
+    { v: totAllAmt, t: "c", bold: true },
+    { v: `חסרים: ${missingOnly.length} (${fmtCurrency(totMissingAmt)})`, t: "s", bold: true }
+  ]);
+
+  downloadNativeXlsx("דוח_זיהוי_חיובים_חסרים_מול_חשבוניות.xlsx", [
+    {
+      name: "רשימת חיובים חסרים בלבד",
+      headers: ["חודש פעילות", "חודש רישום נבדק", "תחום חיוב", "פירוט נושא", "קוד גורם במקור", "קוד מרכבה במקור", "קוד מרכבה בחשבונית", "שם הלקוח במקור", "שם חשבון (עמודה E)", "כמות לחיוב", "סכום חיוב חסר (₪)", "ממצאי בדיקה בקובץ החשבוניות"],
+      rows: sheet1Rows,
+      colWidths: [16, 16, 20, 28, 16, 16, 18, 32, 32, 16, 20, 48]
+    },
+    {
+      name: "בקרת הצלבה מלאה (חסרים ותקינים)",
+      headers: ["חודש פעילות", "חודש רישום", "תחום חיוב", "קוד גורם", "קוד מרכבה", "שם הלקוח", "שם חשבון (עמודה E)", "כמות לחיוב", "סכום חיוב צפוי (₪)", "סטטוס הקבלה וחשבונית"],
+      rows: sheet2Rows,
+      colWidths: [16, 16, 20, 16, 16, 32, 32, 16, 20, 48]
+    }
+  ]);
+
+  updateStatusBanner(`יוצא בהצלחה דוח זיהוי חיובים חסרים לאקסל (${fmtNum(missingOnly.length)} חיובים חסרים בסך ${fmtCurrency(totMissingAmt)}).`, "success");
+}
+
+/* =========================================================================
    GLOBAL ACTIONS & FILE INPUT / DRAG-AND-DROP LISTENERS
    ========================================================================= */
 function exportActiveDomainToExcel() {
   if (currentScreenId === "screenDataSources" || currentScreenId === "screenUnified" || currentScreenId === "screenUnifiedReport") {
     exportUnifiedToExcel();
+  } else if (currentScreenId === "screenMissingCharges" || currentScreenId === "screenMissingChargesReport") {
+    exportMissingChargesToExcel();
   } else if (currentScreenId === "screenOnline" || currentScreenId === "screenOnlineReport") {
     exportOnlineToExcel();
   } else if (currentScreenId === "screenPhoto" || currentScreenId === "screenPhotoReport") {
@@ -8870,6 +10412,8 @@ function exportActiveDomainToExcel() {
 function clearActiveDomainData() {
   if (currentScreenId === "screenDataSources" || currentScreenId === "screenUnified" || currentScreenId === "screenUnifiedReport") {
     clearAllSystemData();
+  } else if (currentScreenId === "screenMissingCharges" || currentScreenId === "screenMissingChargesReport") {
+    clearMissingInvoicesData();
   } else if (currentScreenId === "screenOnline" || currentScreenId === "screenOnlineReport") {
     clearOnlineData();
   } else if (currentScreenId === "screenPhoto" || currentScreenId === "screenPhotoReport") {
@@ -8888,6 +10432,13 @@ function clearActiveDomainData() {
 document.getElementById("centralFilesInput").addEventListener("change", e => {
   if (e.target.files && e.target.files.length > 0) {
     handleCentralFilesUpload(e.target.files);
+    e.target.value = "";
+  }
+});
+
+document.getElementById("missingInvoicesFilesInput").addEventListener("change", e => {
+  if (e.target.files && e.target.files.length > 0) {
+    handleMissingInvoicesUpload(e.target.files);
     e.target.value = "";
   }
 });
@@ -9014,6 +10565,7 @@ function setupDropZone(zoneId, onFilesDropped) {
   applyTheme(savedTheme, false);
 
   setupDropZone("centralDropZone", files => handleCentralFilesUpload(files));
+  setupDropZone("missingInvoicesDropZone", files => handleMissingInvoicesUpload(files));
   setupDropZone("batchDropZone", files => handleBatchFilesUpload(files, false));
   setupDropZone("onlineDropZone", files => handleOnlineFilesUpload(files, false));
   setupDropZone("photoDropZone", files => handlePhotoFilesUpload(files, false));
@@ -9028,6 +10580,7 @@ function setupDropZone(zoneId, onFilesDropped) {
   renderTestsScreens();
   renderCoursesScreens();
   renderAutodchScreens();
+  renderMissingChargesScreens();
   syncAllScreensAndNavigation();
   updateStatusBanner("המערכת מוכנה. גרור קבצים מכל סוג (Excel / PDF) לאיזור הטעינה המרכזי במסך 'מקורות הנתונים' לזיהוי אוטומטי ופתיחת המסכים בתפריט.", "info");
 })();
