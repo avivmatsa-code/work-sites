@@ -2045,7 +2045,7 @@
                     <div><strong>ניהול הכנסות וגבייה</strong><div class="control-label" style="margin-top:4px;">משרד התחבורה והבטיחות בדרכים</div></div>
                 </div>
                 <div class="about-copy">
-                    <p><strong>גרסת מערכת: 1.8.30 · 22 בנובמבר 2026</strong> · BETA</p>
+                    <p><strong>גרסת מערכת: 1.8.31 · 23 בנובמבר 2026</strong> · BETA</p>
                     <p>מערכת זו נמצאת בגרסת בטא. ייתכנו טעויות, תקלות או תוצאות לא מדויקות. מומלץ לבדוק מידע מהותי לפני הסתמכות עליו.</p>
                     <p>המערכת תוכננה ופותחה על ידי אביב מצא, בסיוע כלי בינה מלאכותית.</p>
                     <p>© 2026 אביב מצא</p>
@@ -2776,7 +2776,7 @@
                         <div class="historical-panel__header"><i class="fa-solid fa-users-viewfinder text-blue-600" aria-hidden="true"></i><h3>חיובים וגבייה לפי סקטורים</h3></div>
                         <div class="historical-panel__body">
                             <table>
-                                <thead><tr><th>סקטור</th><th>מספר לקוחות</th><th>חיובים שהופקו</th><th>נגבה עד כה</th><th>שיעור גבייה</th></tr></thead>
+                                <thead><tr><th>סקטור</th><th>מספר לקוחות</th><th>חיובים שהופקו</th><th>חלק מהחיובים</th><th>נגבה עד כה</th><th>שיעור גבייה</th></tr></thead>
                                 <tbody id="management-sector-table-body"></tbody>
                             </table>
                         </div>
@@ -8271,15 +8271,19 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                 Math.max(0, amount - monthlyUnpaid[month])
             );
 
+            const issuedKeys = buildInvoiceIdentitySet(revenues);
+            const issuedOpen = effectiveOpenRows.filter(row=>!row.isFee && invoiceExistsInIdentitySet(row,issuedKeys));
             const sectorRows = sectors.map(sector => {
                 const sectorRevenues = revenues.filter(row => row.sector === sector);
-                const sectorDebts = currentDebts.filter(row => row.sector === sector);
+                const sectorDebts = issuedOpen.filter(row => row.sector === sector);
                 const billed = sectorRevenues.reduce((sum, row) => sum + row.amount, 0);
                 const debt = sectorDebts.reduce((sum, row) => sum + row.amount, 0);
                 const collected = Math.max(0, billed - debt);
                 const clients = countUniqueClients([...sectorRevenues, ...sectorDebts]);
                 return {
                     sector, clients, billed, collected, debt,
+                    overdue: sectorDebts.reduce((sum,row)=>sum+(row.isOverdue?row.amount:0),0),
+                    future: sectorDebts.reduce((sum,row)=>sum+(!row.isOverdue?row.amount:0),0),
                     rate: billed > 0 ? collected / billed * 100 : 0
                 };
             });
@@ -8362,15 +8366,14 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                 <tr class="bg-slate-100 font-bold"><td>סה"כ</td><td>${formatCurrency(data.totalBilled)}</td><td>${formatCurrency(data.totalCollected)}</td><td>${data.collectionRate.toFixed(1)}%</td></tr>
                 ${collectionCompositionTableFooter(collectionComposition, '', 'dashboard')}`;
 
-            const totalSectorClients = countUniqueClients([
-                ...revenueDb.filter(row => getRevenueYear(row) === CURRENT_YEAR && !row.isFee),
-                ...db.filter(row => isValidDate(row.dueDate) && row.dueDate.getFullYear() === CURRENT_YEAR && !row.isFee)
-            ]);
+            const totalSectorClients = countUniqueClients(revenueDb.filter(row=>getRevenueYear(row)===CURRENT_YEAR&&!row.isFee));
+            const sectorCollected=data.sectorRows.reduce((sum,r)=>sum+r.collected,0);
             document.getElementById('management-sector-table-body').innerHTML = data.sectorRows.map(row => `
                 <tr>
                     <td><strong>${escapeHtml(row.sector)}</strong></td>
                     <td>${row.clients.toLocaleString('he-IL')}</td>
                     <td>${formatCurrency(row.billed)}</td>
+                    <td>${reviewPercent(row.billed,data.totalBilled)}</td>
                     <td>${formatCurrency(row.collected)}</td>
                     <td>${row.rate.toFixed(1)}%</td>
                 </tr>
@@ -8379,8 +8382,9 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                     <td>סה"כ</td>
                     <td>${totalSectorClients.toLocaleString('he-IL')}</td>
                     <td>${formatCurrency(data.totalBilled)}</td>
-                    <td>${formatCurrency(data.totalCollected)}</td>
-                    <td>${data.collectionRate.toFixed(1)}%</td>
+                    <td>${data.totalBilled?'100%':'—'}</td>
+                    <td>${formatCurrency(sectorCollected)}</td>
+                    <td>${reviewPercent(sectorCollected,data.totalBilled)}</td>
                 </tr>`;
 
             const debtInvoicesTotal = data.pastDebts.length;
@@ -8433,7 +8437,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             managementSectorChart = renderReportDoughnutChart(
                 managementSectorChart,
                 'management-sector-chart',
-                data.sectorRows.map(row => row.sector),
+                data.sectorRows.map(row => row.sector+' — '+reviewPercent(row.billed,data.totalBilled)),
                 data.sectorRows.map(row => row.billed),
                 'חיובים'
             );
@@ -8472,6 +8476,60 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             );
         }
 
+        const reviewPercent=(value,total)=>total>0?(100*value/total).toFixed(1)+'%':'—';
+        function reviewAnalysis(heading,headerHtml,bodyId,image,alt,note=''){
+            return '<section class="review-block"><h2>'+heading+'</h2><div class="review-grid"><div class="review-frame"><table><thead>'+headerHtml+'</thead><tbody>'+document.getElementById(bodyId).innerHTML+'</tbody></table>'+(note?'<small>'+note+'</small>':'')+'</div><div class="review-frame review-picture">'+(image?'<img src="'+image+'" alt="'+alt+'">':'')+'</div></div></section>';
+        }
+        function sectorStatus(data){
+            const labels=['נגבה','בפיגור','עתידי'],colors=['#078563','#bd3844','#88bddb'];
+            return '<section class="review-block"><h2>מצב הגבייה מתוך חיובי השנה בכל סקטור</h2><p>כל פס מייצג 100% מחיובי הסקטור. סכום הפיגור מוצג לצדו בשקלים.</p>'+data.sectorRows.map(r=>{
+                const values=[r.collected,r.overdue,r.future],valid=r.billed>0&&values.every(v=>v>=0)&&Math.abs(values.reduce((x,y)=>x+y,0)-r.billed)<0.02;
+                return '<div class="sector-status"><header><b>'+escapeHtml(r.sector)+'</b><span>בפיגור: '+formatCurrency(r.overdue)+'</span></header>'+(valid?'<div class="sector-track">'+values.map((v,i)=>'<i style="width:'+100*v/r.billed+'%;background:'+colors[i]+'"></i>').join('')+'</div><small>'+values.map((v,i)=>labels[i]+': '+reviewPercent(v,r.billed)).join(' · ')+'</small>':(r.billed?'לא ניתן להציג חלוקה מאוזנת לפי הנתונים שנטענו':'אין חיובים בתקופה'))+'</div>';
+            }).join('')+'</section>';
+        }
+        function reviewProgress(activity,now=new Date()){
+            const to=formatLocalIsoDate(now),from=to.slice(0,4)+'-01-01',month=now.getMonth();
+            const unit=month===0?'יום':month<3?'שבוע':'חודש';
+            const m=mrModel({rows:mr.rows,activity,sector:'הכל',from,to,unit,sort:0,dir:1});
+            const heading='<h2>התקדמות הגבייה לפי תאריך</h2><p>'+mrLabel(from)+' – '+mrLabel(to)+' · '+activity+' · עמודות לפי '+unit+'</p>';
+            if(!m.rows.length)return heading+'<p>'+(!mr.rows?'לא נטען מקור חשבוניות שהותאמו.':'אין נתוני התאמות בחתך הדוח לתקופה זו.')+'</p>';
+            const titles=['סכום שהותאם בתקופה (₪)','סכום גבייה מצטברת (₪)','סה״כ חשבוניות שהותאמו במצטבר'];
+            const plots=matchedChartConfigs(m).map(([id,config],i)=>{
+                const canvas=document.createElement('canvas');canvas.width=i?405:550;canvas.height=i?230:245;
+                Object.assign(config.options,{responsive:false,devicePixelRatio:2,events:[]});
+                config.options.scales.x.ticks.maxTicksLimit=i?4:7;
+                const chart=new Chart(canvas,config);
+                try{return '<figure class="review-frame"><figcaption>'+titles[i]+'</figcaption><img src="'+chart.toBase64Image()+'" alt="'+titles[i]+'"></figure>'}finally{chart.destroy()}
+            });
+            const cards=[['סכום שהותאם','₪'+mrMoney(m.total)],['סה״כ חשבוניות שהותאמו',new Set(m.rows.map(r=>r.id)).size],['סה״כ לקוחות ששילמו',new Set(m.rows.map(r=>r.cells[2])).size]];
+            return heading+'<div class="progress-top">'+plots[0]+'<div class="progress-cards">'+cards.map(([l,v])=>'<div class="kpi-card"><span>'+l+'</span><strong>'+v+'</strong></div>').join('')+'</div></div><div class="review-grid">'+plots.slice(1).join('')+'</div>';
+        }
+        function printOverviewPages(title,pageBodies){
+            const reportPages = pageBodies.map((body, index) => `
+                <section class="fees-print-page${index === pageBodies.length - 1 ? ' fees-print-page--last' : ''}">
+                    <div class="fees-print-page__layout">
+                        ${getClientDocumentPrintHeader(title)}
+                        <main class="print-content fees-print-page__content">${body}</main>
+                        ${getClientDocumentPrintFooter()}
+                    </div>
+                </section>`).join('');
+
+            const win = window.open('', '_blank');
+            if (!win) { alert('פתיחת החלון החדש נחסמה.'); return; }
+            win.document.write(`
+                <html dir="rtl" lang="he"><head><title>${title}</title>${getClientDocumentPrintStyles()}
+                    <style>
+                        html,body{width:210mm;margin:0!important;padding:0!important}
+                        .fees-print-page{width:210mm;height:296mm;overflow:hidden;break-after:page;page-break-after:always}.fees-print-page+.fees-print-page{break-before:page;page-break-before:always}.fees-print-page__layout{height:100%;padding:10mm 17mm 8mm;display:flex;flex-direction:column;overflow:hidden}.fees-print-page__content{flex:1;min-height:0;padding-top:5mm}.fees-print-page .print-header,.fees-print-page .print-footer{flex:0 0 auto}.fees-print-page .print-footer{margin-top:auto}
+                        .fees-print-page--last{break-after:auto;page-break-after:auto}
+                        .fees-page-title,.fees-analysis-title{color:#0B3C5D;font-size:20px;margin:0 0 18px;padding-bottom:8px;border-bottom:2px solid #d6e0e8}.fees-analysis-unit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:16px;align-items:stretch}.fees-analysis-frame{height:100%;min-height:92mm;border:1px solid var(--print-border);border-radius:8px;background:#fff;padding:10px;overflow:hidden;display:flex;flex-direction:column}.fees-analysis-unit .report-section{margin:0;height:100%;display:flex;flex-direction:column}.fees-analysis-table-frame .report-section table{margin-top:0}.fees-analysis-chart-frame{align-items:center;justify-content:center}.fees-analysis-chart{display:block;width:100%;height:100%;min-height:0;object-fit:contain}.fees-count-note{font-size:9.5px;color:#607080;margin:6px 0 0}.kpi-note{display:block;color:#607080;font-size:8.5px;margin-top:3px}.fees-print-page table{font-size:8pt}.fees-print-page th,.fees-print-page td{padding:1.7mm 1.8mm}.fees-page-title+.report-section{margin-top:0}
+                        .review-block{margin:14px 0;break-inside:avoid}.review-block h2,.fees-print-page__content>h2{font-size:17px;color:#0b4165;margin:0 0 10px;padding-bottom:5px;border-bottom:1px solid #c8d7e2}.review-grid,.progress-top{display:grid;grid-template-columns:1fr 1fr;gap:10px}.review-frame{min-width:0;border:1px solid #cbd5df;border-radius:7px;padding:8px;margin:0}.review-picture{display:grid;place-items:center}.review-frame img{display:block;width:100%;height:auto;max-height:67mm;object-fit:contain}.review-frame table{margin:0;width:100%;font-size:10px}.print-content .review-frame td,.print-content .review-frame th{padding:4px}.review-frame figcaption,.review-frame small{display:block;margin-bottom:6px}.progress-top{grid-template-columns:2fr 1fr;margin:16px 0}.progress-cards{display:grid;gap:6px}.progress-cards strong{display:block;font-size:19px;color:#0b476a}.sector-status{padding:10px 2px;border-bottom:1px solid #dbe5ed}.sector-status header{display:flex;justify-content:space-between}.sector-track{display:flex;height:13px;border-radius:4px;overflow:hidden;margin:5px 0}.fees-print-page .past-debt-section{margin:8px 0 12px}.fees-print-page .past-debt-summary{display:flex;gap:8px;margin:0}.fees-print-page .past-debt-card{flex:1;padding:7px 9px}.fees-print-page .past-debt-card span,.fees-print-page .past-debt-card strong,.fees-print-page .past-debt-card small{display:block}.fees-print-page .past-debt-section__title{font-size:14px;color:#0b4165;margin:0 0 5px}.review-sector .review-grid{grid-template-columns:1.35fr 1fr}
+                        @page{size:A4 portrait;margin:0}
+                    </style>
+                </head><body>${reportPages}<script>window.addEventListener('load',function(){window.focus();setTimeout(function(){window.print()},500)});<\/script></body></html>`);
+            win.document.close();
+        }
+
         function printManagementReport() {
             renderManagementReport();
             const data = getManagementReportData();
@@ -8486,48 +8544,8 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                 historicalYears: managementHistoricalYearsChart ? managementHistoricalYearsChart.toBase64Image() : '',
                 historicalSectors: managementHistoricalSectorsChart ? managementHistoricalSectorsChart.toBase64Image() : ''
             };
-            const tableBlock = (heading, headerHtml, bodyId) => `
-                <section class="report-section">
-                    <h2>${heading}</h2>
-                    <table><thead>${headerHtml}</thead><tbody>${document.getElementById(bodyId).innerHTML}</tbody></table>
-                </section>`;
-            const analysisBlock = (heading, headerHtml, bodyId, image, alt, note = '') => `
-                <div class="management-analysis-unit">
-                    <div>${tableBlock(heading, headerHtml, bodyId)}${note ? `<p class="management-count-note">${note}</p>` : ''}</div>
-                    ${image ? `<img class="management-analysis-chart management-analysis-chart--${bodyId.includes('sector') ? 'doughnut' : 'bar'}" src="${image}" alt="${alt}">` : '<div></div>'}
-                </div>`;
-            const win = window.open('', '_blank');
-            if (!win) {
-                alert('פתיחת החלון החדש נחסמה.');
-                return;
-            }
-            win.document.write(`
-                <html dir="rtl" lang="he"><head><title>${title}</title>
-                    ${getClientDocumentPrintStyles()}
-                    <style>
-                        .management-report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
-                        .management-report-grid,.management-analysis-unit,.report-section,table{break-inside:avoid;page-break-inside:avoid}
-                        .management-report-grid .report-section{margin:0!important}
-                        .management-report-chart{width:100%;max-height:170px;object-fit:contain}
-                        .management-analysis-unit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch;margin-top:18px}
-                        .management-analysis-unit .report-section{margin:0}
-                        .management-analysis-chart{width:100%;height:100%;max-height:none;align-self:stretch}
-                        .management-analysis-chart--bar{object-fit:fill}
-                        .management-analysis-chart--doughnut{object-fit:contain}
-                        .management-count-note{font-size:9.5px;color:#607080;margin:4px 0 0}
-                        .kpi-note{display:block;color:#607080;font-size:8.5px;margin-top:3px}
-                        .management-first-page,.management-page{break-after:page;page-break-after:always}
-                        .management-page--last{break-after:auto;page-break-after:auto}
-                        .management-page>h2{color:#0B3C5D;font-size:20px;margin:0 0 18px;padding-bottom:8px;border-bottom:2px solid #d6e0e8}
-                        .management-first-page .document-title{margin:8px 0 14px}
-                        .management-first-page table{font-size:7.5pt}
-                        .management-first-page th,.management-first-page td{padding:1.4mm 1.6mm}
-                        @page{size:A4 portrait}
-                    </style>
-                </head><body>
-                    ${getClientDocumentPageStart(title)}
-                    <section class="management-first-page">
-                        <h1 class="document-title">${title}</h1>
+            const analysisBlock=reviewAnalysis;
+            const pages=[`<h1 class="document-title">${title}</h1>
                         <div class="kpis">
                             <div class="kpi-card"><div class="kpi-title">חיובים שהופקו</div><div class="kpi-value" style="color:#0B3C5D">${document.getElementById('management-kpi-billed').textContent}</div><small class="kpi-note">סך החיובים שהופקו בשנת העבודה</small></div>
                             <div class="kpi-card"><div class="kpi-title">גבייה שוטפת</div><div class="kpi-value" style="color:#047857">${formatCurrency(collectionComposition.ongoingCollected)}</div>${buildCollectionCardBreakdown(collectionComposition)}</div>
@@ -8535,24 +8553,13 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                             <div class="kpi-card"><div class="kpi-title">צפי גבייה עתידי</div><div class="kpi-value" style="color:#16834f">${document.getElementById('management-kpi-future').textContent}</div><small class="kpi-note">חשבוניות שטרם הגיע מועד גבייתן<br>מתוכן בהוראת הקבע הקרובה: ${formatCurrency(data.nextDirectDebit)}</small></div>
                         </div>
                         ${buildPastDebtSummary(data.pastDebts.reduce((sum, row) => sum + row.amount, 0), collectionComposition)}
-                        ${analysisBlock('חיובים וגבייה לפי חודש הפקת החשבונית', '<tr><th>חודש הפקת החשבונית</th><th>סכום חיובים</th><th>נגבה עד כה</th><th>שיעור גבייה</th></tr>', 'management-monthly-table-body', chartImages.monthly, 'גרף חיובים וגבייה בחודשי שנת העבודה')}
-                        ${analysisBlock('חיובים וגבייה לפי סקטורים', '<tr><th>סקטור</th><th>מספר לקוחות</th><th>חיובים שהופקו</th><th>נגבה עד כה</th><th>שיעור גבייה</th></tr>', 'management-sector-table-body', chartImages.sectors, 'גרף התפלגות חיובים לפי סקטורים')}
-                    </section>
-                    <section class="${hasHistoricalSource ? 'management-page' : 'management-page management-page--last'}">
-                        <h2>חובות פתוחים</h2>
+                        ${analysisBlock('חיובים וגבייה לפי חודש הפקת החשבונית', '<tr><th>חודש הפקת החשבונית</th><th>סכום חיובים</th><th>נגבה עד כה</th><th>שיעור גבייה</th></tr>', 'management-monthly-table-body', chartImages.monthly, 'גרף חיובים וגבייה בחודשי שנת העבודה')}`,`<div class="review-sector">${analysisBlock('חיובים וגבייה לפי סקטורים', '<tr><th>סקטור</th><th>מספר לקוחות</th><th>חיובים שהופקו</th><th>חלק מהחיובים</th><th>נגבה עד כה</th><th>שיעור גבייה</th></tr>', 'management-sector-table-body', chartImages.sectors, 'גרף התפלגות חיובים לפי סקטורים')}</div>${sectorStatus(data)}`,reviewProgress("שירותי מידע"),`<h2>חובות פתוחים</h2>
                         ${analysisBlock('חובות עבר פתוחים לפי שנים', '<tr><th>שנת חוב</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום החוב</th></tr>', 'management-debt-years-table-body', chartImages.debtYears, 'גרף חובות עבר פתוחים לפי שנים', 'בשורת הסה״כ, כל לקוח נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.')}
-                        ${analysisBlock('חובות עבר פתוחים לפי סקטורים', '<tr><th>סקטור</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום החוב</th></tr>', 'management-debt-sectors-table-body', chartImages.debtSectors, 'גרף חובות עבר פתוחים לפי סקטורים')}
-                    </section>
-                    ${hasHistoricalSource ? `<section class="management-page management-page--last">
-                        <h2>חובות עבר שנגבו בשנת העבודה</h2>
+                        ${analysisBlock('חובות עבר פתוחים לפי סקטורים', '<tr><th>סקטור</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום החוב</th></tr>', 'management-debt-sectors-table-body', chartImages.debtSectors, 'גרף חובות עבר פתוחים לפי סקטורים')}`];
+            if(hasHistoricalSource)pages.push(`<h2>חובות עבר שנגבו בשנת העבודה</h2>
                         ${analysisBlock('חובות עבר שנגבו השנה לפי שנים', '<tr><th>שנת הפקת החשבונית</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום שנגבה</th></tr>', 'management-historical-years-table-body', chartImages.historicalYears, 'גרף חובות עבר שנגבו השנה לפי שנים', 'בשורת הסה״כ, כל לקוח נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.')}
-                        ${analysisBlock('חובות עבר שנגבו השנה לפי סקטורים', '<tr><th>סקטור</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום שנגבה</th></tr>', 'management-historical-sectors-table-body', chartImages.historicalSectors, 'גרף חובות עבר שנגבו השנה לפי סקטורים')}
-                    </section>` : ''}
-                    ${getClientDocumentPageEnd()}
-                    <script>window.addEventListener('load',function(){window.focus();setTimeout(function(){window.print()},500)});<\/script>
-                </body></html>
-            `);
-            win.document.close();
+                        ${analysisBlock('חובות עבר שנגבו השנה לפי סקטורים', '<tr><th>סקטור</th><th>מספר לקוחות</th><th>מספר חשבוניות</th><th>סכום שנגבה</th></tr>', 'management-historical-sectors-table-body', chartImages.historicalSectors, 'גרף חובות עבר שנגבו השנה לפי סקטורים')}`);
+            printOverviewPages(title,pages);
         }
 
         function getFeesManagementReportData() {
@@ -8730,15 +8737,7 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             const historicalYearsImage = feesManagementHistoricalYearsChart ? feesManagementHistoricalYearsChart.toBase64Image() : '';
             const tableBlock = (heading, headerHtml, bodyHtml) => `
                 <section class="report-section">${heading ? `<h2>${heading}</h2>` : ''}<table><thead>${headerHtml}</thead><tbody>${bodyHtml}</tbody></table></section>`;
-            const analysisBlock = (heading, headerHtml, bodyId, image, alt, note = '') => `
-                <div class="fees-analysis-block">
-                    <h2 class="fees-analysis-title">${heading}</h2>
-                    <div class="fees-analysis-unit">
-                        <div class="fees-analysis-frame fees-analysis-table-frame">${tableBlock('', headerHtml, document.getElementById(bodyId).innerHTML)}${note ? `<p class="fees-count-note">${note}</p>` : ''}</div>
-                        <div class="fees-analysis-frame fees-analysis-chart-frame">${image ? `<img class="fees-analysis-chart" src="${image}" alt="${alt}">` : ''}</div>
-                    </div>
-                </div>`;
-
+            const analysisBlock=reviewAnalysis;
             const entityChunks = [];
             const rowsPerPage = 24;
             if (data.entityRows.length === 0) entityChunks.push([]);
@@ -8771,34 +8770,14 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
                  </div>
                  ${buildPastDebtSummary(data.pastDebts.reduce((sum, row) => sum + row.amount, 0), collectionComposition)}
                  ${analysisBlock('חיובים וגבייה לפי חודש הפקת החשבונית', '<tr><th>חודש הפקת החשבונית</th><th>סכום חיובים</th><th>נגבה עד כה</th><th>שיעור גבייה</th></tr>', 'fees-management-monthly-table-body', monthlyImage, 'גרף חיובים וגבייה בחודשי שנת העבודה')}`,
+                reviewProgress('אגרות העברת בעלות'),
                 `${analysisBlock('חובות עבר פתוחים לפי שנים', '<tr><th>שנת חוב</th><th>מספר גופים</th><th>מספר חשבוניות</th><th>סכום החוב</th></tr>', 'fees-management-debt-years-table-body', debtYearsImage, 'גרף חובות עבר פתוחים לפי שנים', 'בשורת הסה"כ, כל גוף נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.')}`
             ];
             if (hasHistoricalSource) {
                 pageBodies.push(`${analysisBlock('חובות עבר שנגבו בשנה הנוכחית לפי שנת החוב', '<tr><th>שנת הפקת החשבונית</th><th>מספר גופים</th><th>מספר חשבוניות</th><th>סכום שנגבה</th></tr>', 'fees-management-historical-years-table-body', historicalYearsImage, 'גרף חובות עבר שנגבו בשנה הנוכחית לפי שנת החוב', 'בשורת הסה"כ, כל גוף נספר פעם אחת בלבד, גם אם הוא מופיע במספר שנים.')}`);
             }
             pageBodies.push(...entityPages);
-            const reportPages = pageBodies.map((body, index) => `
-                <section class="fees-print-page${index === pageBodies.length - 1 ? ' fees-print-page--last' : ''}">
-                    <div class="fees-print-page__layout">
-                        ${getClientDocumentPrintHeader(title)}
-                        <main class="print-content fees-print-page__content">${body}</main>
-                        ${getClientDocumentPrintFooter()}
-                    </div>
-                </section>`).join('');
-
-            const win = window.open('', '_blank');
-            if (!win) { alert('פתיחת החלון החדש נחסמה.'); return; }
-            win.document.write(`
-                <html dir="rtl" lang="he"><head><title>${title}</title>${getClientDocumentPrintStyles()}
-                    <style>
-                        html,body{width:210mm;margin:0!important;padding:0!important}
-                        .fees-print-page{width:210mm;height:296mm;overflow:hidden;break-after:page;page-break-after:always}.fees-print-page+.fees-print-page{break-before:page;page-break-before:always}.fees-print-page__layout{height:100%;padding:10mm 17mm 8mm;display:flex;flex-direction:column;overflow:hidden}.fees-print-page__content{flex:1;min-height:0;padding-top:5mm}.fees-print-page .print-header,.fees-print-page .print-footer{flex:0 0 auto}.fees-print-page .print-footer{margin-top:auto}
-                        .fees-print-page--last{break-after:auto;page-break-after:auto}
-                        .fees-page-title,.fees-analysis-title{color:#0B3C5D;font-size:20px;margin:0 0 18px;padding-bottom:8px;border-bottom:2px solid #d6e0e8}.fees-analysis-unit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:16px;align-items:stretch}.fees-analysis-frame{height:100%;min-height:92mm;border:1px solid var(--print-border);border-radius:8px;background:#fff;padding:10px;overflow:hidden;display:flex;flex-direction:column}.fees-analysis-unit .report-section{margin:0;height:100%;display:flex;flex-direction:column}.fees-analysis-table-frame .report-section table{margin-top:0}.fees-analysis-chart-frame{align-items:center;justify-content:center}.fees-analysis-chart{display:block;width:100%;height:100%;min-height:0;object-fit:contain}.fees-count-note{font-size:9.5px;color:#607080;margin:6px 0 0}.kpi-note{display:block;color:#607080;font-size:8.5px;margin-top:3px}.fees-print-page table{font-size:8pt}.fees-print-page th,.fees-print-page td{padding:1.7mm 1.8mm}.fees-page-title+.report-section{margin-top:0}
-                        @page{size:A4 portrait;margin:0}
-                    </style>
-                </head><body>${reportPages}<script>window.addEventListener('load',function(){window.focus();setTimeout(function(){window.print()},500)});<\/script></body></html>`);
-            win.document.close();
+            printOverviewPages(title,pageBodies);
         }
 
         // ============================================================
@@ -9558,14 +9537,14 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             mr.to=mr.min>today?mr.min:today;mr.from=mr.to.slice(0,7)+'-01';if(mr.from<mr.min)mr.from=mr.min;
             mr.one=false;mr.unit='יום';mr.client=mr.clientCode='';mr.directory=new Map(mr.rows.map(r=>[r.cells[2],r.cells[1]]));
         }
-        function mrBucket(s){if(mr.unit==='חודש')return s.slice(0,7)+'-01';if(mr.unit==='שבוע'){const d=mrDay(s);d.setUTCDate(d.getUTCDate()-d.getUTCDay());return mrIso(d)}return s}
-        function mrModel(){
-            const rows=mr.rows.filter(({cells:c,activity,sector})=>c[0]>=mr.from&&c[0]<=mr.to&&(mr.activity==='הכל'||activity===mr.activity)&&(mr.sector==='הכל'||sector===mr.sector)&&(!mr.clientCode||c[2]===mr.clientCode));
+        function mrBucket(s,unit=mr.unit){if(unit==='חודש')return s.slice(0,7)+'-01';if(unit==='שבוע'){const d=mrDay(s);d.setUTCDate(d.getUTCDate()-d.getUTCDay());return mrIso(d)}return s}
+        function mrModel(state=mr){
+            const rows=(state.rows||[]).filter(({cells:c,activity,sector})=>c[0]>=state.from&&c[0]<=state.to&&(state.activity==='הכל'||activity===state.activity)&&(state.sector==='הכל'||sector===state.sector)&&(!state.clientCode||c[2]===state.clientCode));
             const daily=new Map(), buckets=new Map();let total=0;
-            for(let d=mrDay(mr.from);mrIso(d)<=mr.to;d.setUTCDate(d.getUTCDate()+1)){const day=mrIso(d);daily.set(day,0);buckets.set(mrBucket(day),0)}
-            for(const {cells:c} of rows){const k=mrBucket(c[0]);daily.set(c[0],daily.get(c[0])+c[7]);buckets.set(k,buckets.get(k)+c[7]);total+=c[7]}
-            const details=rows.filter(r=>!mr.focus||mrBucket(r.cells[0])===mr.focus);
-            const coll=new Intl.Collator('he',{numeric:true});details.sort((a,b)=>mr.dir*(mr.sort===7?a.cells[7]-b.cells[7]:coll.compare(a.cells[mr.sort],b.cells[mr.sort])));
+            for(let d=mrDay(state.from);mrIso(d)<=state.to;d.setUTCDate(d.getUTCDate()+1)){const day=mrIso(d);daily.set(day,0);buckets.set(mrBucket(day,state.unit),0)}
+            for(const {cells:c} of rows){const k=mrBucket(c[0],state.unit);daily.set(c[0],daily.get(c[0])+c[7]);buckets.set(k,buckets.get(k)+c[7]);total+=c[7]}
+            const details=rows.filter(r=>!state.focus||mrBucket(r.cells[0],state.unit)===state.focus);
+            const coll=new Intl.Collator('he',{numeric:true});details.sort((a,b)=>state.dir*(state.sort===7?a.cells[7]-b.cells[7]:coll.compare(a.cells[state.sort],b.cells[state.sort])));
             return {rows,total,details,daily,buckets};
         }
         function mrFilters(){
@@ -9613,11 +9592,16 @@ function getCollectionComposition(currentYearCollected, predicate = () => true) 
             mrEl('note').textContent=warning+(rows.length?(single?'':'לחיצה על עמודה תציג את החשבוניות המרכיבות אותה.'):'לא נמצאו התאמות בחתך שנבחר.');
             mrEl('summary').innerHTML=[['סכום שהותאם','₪'+mrMoney(total)],['חשבוניות',new Set(rows.map(r=>r.id)).size],['לקוחות',new Set(rows.map(r=>r.cells[2])).size]].map(([l,v])=>'<div class="unmatched-report-summary__card"><span>'+l+'</span><strong>'+v+'</strong></div>').join('');
             mrDetail(model);if(single)return;
+            for(const [id,config] of matchedChartConfigs(model,mr.focus,key=>{mr.focus=key;mr.page=0;mrRender()}))mr.charts.push(new Chart(mrEl(id),config));
+        }
+        function matchedChartConfigs({rows,buckets,daily},focus='',select=null){
+            const configs=[];
             const counts=new Map([...daily.keys()].map(k=>[k,0])),seen=new Set();for(const r of rows){if(!seen.has(r.id)){seen.add(r.id);counts.set(r.cells[0],counts.get(r.cells[0])+1)}}
             for(const [id,series] of [['bar',buckets],['line',daily],['count',counts]]){
               const keys=[...series.keys()], bar=id==='bar';let running=0;
-              mr.charts.push(new Chart(mrEl(id),{type:bar?'bar':'line',data:{labels:keys.map(mrLabel),datasets:[{label:bar?'סכום בתקופה':id==='count'?'חשבוניות במצטבר':'סכום מצטבר',data:[...series.values()].map(v=>(bar?v:running+=v)/(id==='count'?1:100)),fill:!bar,pointRadius:keys.length===1?3:0,borderColor:bar?keys.map(k=>k===mr.focus?'#00402f':'#06855c'):id==='count'?'#0966a4':'#046347',borderWidth:bar?keys.map(k=>k===mr.focus?3:1):2,backgroundColor:bar?keys.map(k=>k===mr.focus?'#00543c':'#119669'):id==='count'?'rgba(9,102,164,.18)':'rgba(6,140,94,.16)'}]},options:{animation:false,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:8}},y:{beginAtZero:true}},onClick:(_,items)=>{if(bar&&items.length){mr.focus=keys[items[0].index];mr.page=0;mrRender()}}}}));
+              configs.push([id,{type:bar?'bar':'line',data:{labels:keys.map(mrLabel),datasets:[{label:bar?'סכום בתקופה':id==='count'?'חשבוניות במצטבר':'סכום מצטבר',data:[...series.values()].map(v=>(bar?v:running+=v)/(id==='count'?1:100)),fill:!bar,pointRadius:keys.length===1?3:0,borderColor:bar?keys.map(k=>k===focus?'#00402f':'#06855c'):id==='count'?'#0966a4':'#046347',borderWidth:bar?keys.map(k=>k===focus?3:1):2,backgroundColor:bar?keys.map(k=>k===focus?'#00543c':'#119669'):id==='count'?'rgba(9,102,164,.18)':'rgba(6,140,94,.16)'}]},options:{animation:false,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:8}},y:{beginAtZero:true}},onClick:(_,items)=>{if(bar&&items.length)select?.(keys[items[0].index])}}}]);
             }
+            return configs;
         }
 
         function getChartDisplayTitle(chart) {
