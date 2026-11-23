@@ -1278,7 +1278,7 @@
   .header-action:hover, .mobile-menu-btn:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.62); }
   .btn-header-primary { background: var(--brand-hover); border: 1px solid var(--header-primary-button-border); box-shadow: inset 0 0 0 1px var(--header-primary-button-inner-outline); }
   .btn-header-primary:hover:not(:disabled) { background: var(--brand-active); }
-  .app-sidebar { top: 96px; height: calc(100vh - 96px); max-height: calc(100vh - 96px); border-left: 1px solid var(--color-border); }
+  .app-sidebar { top: var(--measured-header-height, 96px); height: calc(100vh - var(--measured-header-height, 96px)); max-height: calc(100vh - var(--measured-header-height, 96px)); border-left: 1px solid var(--color-border); }
   .nav-group-title { font-size: var(--font-size-xs); color: var(--color-text-muted); }
   .nav-item { min-height: 48px; color: var(--brand-active); font-weight: 700; border: 1px solid transparent; border-radius: var(--radius-md); }
   .nav-item:hover:not(:disabled) { border-color: var(--brand-border); background: var(--brand-subtle); color: var(--brand-primary); }
@@ -1316,7 +1316,7 @@
     .header-sys-name { font-size: var(--font-size-xl); }
     .header-left { grid-column: 2; grid-row: 1; }
     .header-action { display: none; }
-    .app-sidebar { top: 96px; right: -280px; height: calc(100vh - 96px); max-height: calc(100vh - 96px); }
+    .app-sidebar { top: var(--measured-header-height, 96px); right: -280px; height: calc(100vh - var(--measured-header-height, 96px)); max-height: calc(100vh - var(--measured-header-height, 96px)); }
     .app-sidebar.open { right: 0; }
   }
   @media (max-width: 480px) {
@@ -8999,6 +8999,11 @@ function setupDropZone(zoneId, onFilesDropped) {
    STARTUP INITIALIZATION (EMPTY BY DEFAULT, OPENING ON "מקורות הנתונים")
    ========================================================================= */
 (function initApp() {
+  const header = document.querySelector(".app-header");
+  const syncHeaderHeight = () => document.documentElement.style.setProperty("--measured-header-height", `${header.offsetHeight}px`);
+  syncHeaderHeight();
+  if (window.ResizeObserver) new ResizeObserver(syncHeaderHeight).observe(header);
+  else window.addEventListener("resize", syncHeaderHeight);
   const now = new Date();
   document.getElementById("headerCurrentDate").textContent = now.toLocaleDateString("he-IL", {
     year: "numeric", month: "long", day: "numeric"
