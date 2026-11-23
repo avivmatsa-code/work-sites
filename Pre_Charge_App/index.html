@@ -1255,7 +1255,7 @@
   }
   body { font-size: var(--font-size-md); background: var(--color-bg); color: var(--color-text); }
   .app-header {
-    min-height: 88px; padding: var(--space-3) var(--space-6); gap: var(--space-8);
+    min-height: 96px; padding: var(--space-3) var(--space-6); gap: var(--space-8);
     display: grid; grid-template-columns: minmax(250px, 1fr) minmax(300px, auto) minmax(220px, 1fr);
     background: var(--brand-active); border-bottom: 4px solid var(--brand-border);
   }
@@ -1278,14 +1278,15 @@
   .header-action:hover, .mobile-menu-btn:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.62); }
   .btn-header-primary { background: var(--brand-hover); border: 1px solid var(--header-primary-button-border); box-shadow: inset 0 0 0 1px var(--header-primary-button-inner-outline); }
   .btn-header-primary:hover:not(:disabled) { background: var(--brand-active); }
-  .app-sidebar { top: 88px; height: calc(100vh - 88px); max-height: calc(100vh - 88px); border-left: 1px solid var(--color-border); }
+  .app-sidebar { top: 96px; height: calc(100vh - 96px); max-height: calc(100vh - 96px); border-left: 1px solid var(--color-border); }
   .nav-group-title { font-size: var(--font-size-xs); color: var(--color-text-muted); }
   .nav-item { min-height: 48px; color: var(--brand-active); font-weight: 700; border: 1px solid transparent; border-radius: var(--radius-md); }
   .nav-item:hover:not(:disabled) { border-color: var(--brand-border); background: var(--brand-subtle); color: var(--brand-primary); }
   .nav-item.active { border: 1px solid var(--brand-border); box-shadow: inset -3px 0 0 var(--brand-primary); background: var(--brand-subtle); color: var(--brand-active); }
   .nav-item:disabled, .nav-item.disabled { opacity: 1; color: var(--color-text-muted); background: var(--color-surface-subtle); }
   .app-workspace { padding: var(--space-6) var(--space-8); }
-  .workspace-context { margin-bottom: var(--space-3); color: var(--color-text-muted); font-size: var(--font-size-sm); }
+  .workspace-context { margin-bottom: var(--space-3); color: var(--color-text-muted); font-size: var(--font-size-sm); display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); flex-wrap:wrap; }
+  .workspace-context .btn { font-size: var(--font-size-sm); }
   .workspace-screen-title { font-size: var(--font-size-xl); }
   .workspace-screen-subtitle { font-size: var(--font-size-sm); }
   .card, .filter-card, .dropzone-card, .kpi-card { border-color: var(--color-border); box-shadow: var(--shadow-panel); }
@@ -1303,19 +1304,19 @@
   .modal-dialog { box-shadow: var(--shadow-floating); }
   .dialog-header { background: var(--brand-active); }
   .theme-option-btn.active { border-color: var(--brand-primary); background: var(--brand-subtle); }
-  @media (max-width: 1100px) {
+  @media (max-width: 900px) {
     .app-header { grid-template-columns: minmax(220px, 1fr) minmax(250px, 1fr); gap: var(--space-4); }
     .header-identity { grid-column: 1 / -1; grid-row: 2; text-align: right; }
     .header-sys-line { justify-content: flex-start; }
   }
   @media (max-width: 768px) {
-    .app-header { grid-template-columns: 1fr auto; padding: var(--space-2) var(--space-4); min-height: 88px; }
+    .app-header { grid-template-columns: 1fr auto; padding: var(--space-2) var(--space-4); min-height: 96px; }
     .header-right { grid-column: 1; }
     .header-identity { grid-column: 1 / -1; grid-row: 2; }
     .header-sys-name { font-size: var(--font-size-xl); }
     .header-left { grid-column: 2; grid-row: 1; }
     .header-action { display: none; }
-    .app-sidebar { top: 88px; right: -280px; height: calc(100vh - 88px); max-height: calc(100vh - 88px); }
+    .app-sidebar { top: 96px; right: -280px; height: calc(100vh - 96px); max-height: calc(100vh - 96px); }
     .app-sidebar.open { right: 0; }
   }
   @media (max-width: 480px) {
@@ -1352,9 +1353,6 @@
     <div id="headerCurrentDate" class="header-date"></div>
   </div>
   <div class="header-left">
-    <button id="btnHeaderExport" class="btn-header-primary" onclick="exportActiveDomainToExcel()" disabled title="ייצוא הנתונים המעובדים של התחום הפעיל לקובץ אקסל (.xlsx)">
-      📊 ייצוא לאקסל (.xlsx)
-    </button>
     <button type="button" class="header-action" onclick="openThemeModal()">הגדרות תצוגה</button>
     <button type="button" class="header-action" onclick="openAboutModal()">אודות</button>
     <!-- Hidden File Inputs -->
@@ -1495,7 +1493,9 @@
 
   <!-- Main Workspace -->
   <main class="app-workspace">
-    <div class="workspace-context"><span id="headerActiveDomainLabel">תחום פעיל: מקורות הנתונים</span></div>
+    <div class="workspace-context"><span id="headerActiveDomainLabel">תחום פעיל: מקורות הנתונים</span><button id="btnHeaderExport" class="btn btn-primary" onclick="exportActiveDomainToExcel()" disabled title="ייצוא הנתונים המעובדים של התחום הפעיל לקובץ אקסל (.xlsx)">
+      📊 ייצוא לאקסל (.xlsx)
+    </button></div>
 
     <!-- Non-blocking Status Banner -->
     <div id="liveStatusBanner" class="status-banner" role="status" aria-live="polite">
