@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl" data-theme="azure">
 <head>
 <meta charset="UTF-8">
@@ -1260,16 +1260,100 @@
     }
   }
 
+  @page {
+    size: A4 landscape;
+    margin: 8mm;
+  }
+
   @media print {
-    .app-sidebar, .app-header .header-left, .mobile-menu-btn, .filter-card, .dropzone-card, .loaded-files-bar, .toolbar-actions {
+    html, body {
+      width: 100% !important;
+      background: #ffffff !important;
+      color: #000000 !important;
+      font-size: 11px !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .app-sidebar, .sidebar-backdrop, .app-header .header-left, .mobile-menu-btn, .filter-card, .dropzone-card, .loaded-files-bar, .toolbar-actions, .workspace-context, .card-header button, .btn {
       display: none !important;
     }
+    .app-shell {
+      display: block !important;
+      min-height: auto !important;
+    }
     .app-workspace {
-      padding: 0;
+      padding: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow: visible !important;
+    }
+    .workspace-header-bar {
+      margin-bottom: 8px !important;
+    }
+    .workspace-screen-title {
+      font-size: 16px !important;
+    }
+    .workspace-screen-subtitle {
+      font-size: 11px !important;
+    }
+    .kpi-grid {
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 8px !important;
+      margin-bottom: 10px !important;
+    }
+    .kpi-card {
+      padding: 8px 12px !important;
+      box-shadow: none !important;
+      break-inside: avoid;
+    }
+    .kpi-val {
+      font-size: 18px !important;
+    }
+    .card {
+      padding: 10px !important;
+      margin-bottom: 12px !important;
+      box-shadow: none !important;
+    }
+    .card-header {
+      padding-bottom: 6px !important;
+      margin-bottom: 8px !important;
     }
     .table-container {
-      max-height: none;
-      overflow: visible;
+      max-height: none !important;
+      overflow: visible !important;
+      border: 1px solid #999 !important;
+    }
+    table {
+      width: 100% !important;
+      max-width: 100% !important;
+      table-layout: auto !important;
+      border-collapse: collapse !important;
+    }
+    thead {
+      display: table-header-group;
+    }
+    thead th {
+      position: static !important;
+      padding: 4px 5px !important;
+      font-size: 10.5px !important;
+      white-space: normal !important;
+      word-break: break-word !important;
+      line-height: 1.25 !important;
+    }
+    tbody tr {
+      height: auto !important;
+      break-inside: avoid;
+    }
+    tbody td {
+      padding: 4px 5px !important;
+      font-size: 10.5px !important;
+      white-space: normal !important;
+      word-break: break-word !important;
+      line-height: 1.25 !important;
+    }
+    .badge {
+      padding: 2px 6px !important;
+      font-size: 10px !important;
     }
   }
   /* AMIS Clear UI v0.5: visual alignment with the revenue and collection system. */
@@ -1366,9 +1450,11 @@
     .app-workspace { padding: var(--space-4); }
   }
   @media print {
-    .app-header { position: static; background: #fff; color: #000; border-bottom: 1px solid #aaa; }
-    .header-ministry-name, .header-sys-name { color: #000; }
-    .workspace-context { display: none; }
+    .app-header { position: static; min-height: auto !important; padding: 6px 12px !important; background: #fff !important; color: #000 !important; border-bottom: 2px solid #000 !important; }
+    .header-ministry-name, .header-sys-name, .header-org-line, .header-date { color: #000 !important; }
+    .header-sys-name { font-size: 18px !important; }
+    .logo-box { width: 40px !important; height: 40px !important; }
+    .workspace-context, .status-banner { display: none !important; }
   }
 </style>
 </head>
@@ -1391,8 +1477,6 @@
     <div id="headerCurrentDate" class="header-date"></div>
   </div>
   <div class="header-left">
-    <button type="button" class="header-action" onclick="openThemeModal()">הגדרות תצוגה</button>
-    <button type="button" class="header-action" onclick="openAboutModal()">אודות</button>
     <!-- Hidden File Inputs -->
     <input type="file" id="centralFilesInput" multiple accept=".xlsx,.pdf" style="display:none">
     <input type="file" id="batchFilesInput" multiple accept=".xlsx" style="display:none">
@@ -1407,6 +1491,8 @@
     <input type="file" id="coursesAddFilesInput" multiple accept=".pdf" style="display:none">
     <input type="file" id="autodchFilesInput" multiple accept=".pdf" style="display:none">
     <input type="file" id="autodchAddFilesInput" multiple accept=".pdf" style="display:none">
+    <input type="file" id="ownershipFilesInput" multiple accept=".xlsx" style="display:none">
+    <input type="file" id="ownershipAddFilesInput" multiple accept=".xlsx" style="display:none">
     <input type="file" id="missingInvoicesFilesInput" multiple accept=".xlsx" style="display:none">
   </div>
 </header>
@@ -1414,14 +1500,10 @@
 <div class="app-shell">
   <div id="sidebarBackdrop" class="sidebar-backdrop" onclick="closeMobileSidebar()"></div>
 
-  <!-- Right Sidebar (4 Mandatory Categories: מסכים, דוחות, כלים, הגדרות) -->
+  <!-- Right Sidebar (הפרדה בין שירותי מידע לאגרות העברת בעלות + הגדרות) -->
   <aside id="appSidebar" class="app-sidebar" aria-label="תפריט ניווט ראשי">
     <div class="nav-group">
-      <div class="nav-group-title">מסכים (תחומי חיוב)</div>
-      <button id="navItemDataSources" class="nav-item active" data-screen="screenDataSources" onclick="navigateScreen('screenDataSources', this)">
-        <span>מקורות הנתונים</span>
-        <span class="badge badge-info" id="navBadgeDataSources">ראשי</span>
-      </button>
+      <div class="nav-group-title">ריכוז ובקרת חיובים</div>
       <button id="navItemUnified" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenUnified" onclick="navigateScreen('screenUnified', this)" title="ייפתח אוטומטית עם טעינת קובץ נתונים ראשון">
         <span>מסך החיובים המאוחד</span>
         <span class="badge badge-muted" id="navBadgeUnified">ממתין</span>
@@ -1430,6 +1512,10 @@
         <span>זיהוי חיובים חסרים</span>
         <span class="badge badge-muted" id="navBadgeMissingCharges">בדיקה</span>
       </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">שירותי מידע</div>
       <button id="navItemBatch" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenBatch" onclick="navigateScreen('screenBatch', this)" title="ייפתח אוטומטית עם טעינת קובץ שאילתות אצוות">
         <span>שאילתות אצוות</span>
         <span class="badge badge-muted" id="navBadgeBatch">ממתין</span>
@@ -1465,72 +1551,19 @@
     </div>
 
     <div class="nav-group">
-      <div class="nav-group-title">דוחות</div>
-      <button id="navRepUnified" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenUnifiedReport" onclick="navigateScreen('screenUnifiedReport', this)">
-        <span>דוח בקרה - חיובים מאוחד</span>
-      </button>
-      <button id="navRepMissingCharges" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenMissingChargesReport" onclick="navigateScreen('screenMissingChargesReport', this)">
-        <span>דוח בקרה - חיובים חסרים</span>
-      </button>
-      <button id="navRepBatch" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenBatchReport" onclick="navigateScreen('screenBatchReport', this)">
-        <span>דוח בקרה - שאילתות אצוות</span>
-      </button>
-      <button id="navRepOnline" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenOnlineReport" onclick="navigateScreen('screenOnlineReport', this)">
-        <span>דוח בקרה - שאילתות און ליין</span>
-      </button>
-      <button id="navRepPhoto" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenPhotoReport" onclick="navigateScreen('screenPhotoReport', this)">
-        <span>דוח בקרה - תחנות צילום</span>
-      </button>
-      <button id="navRepTests" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenTestsReport" onclick="navigateScreen('screenTestsReport', this)">
-        <span>דוח בקרה - מבחנים עיוניים</span>
-      </button>
-      <button id="navRepCourses" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenCoursesReport" onclick="navigateScreen('screenCoursesReport', this)">
-        <span>דוח בקרה - חיוב קורסים</span>
-      </button>
-      <button id="navRepTelAviv" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenTelAvivReport" onclick="navigateScreen('screenTelAvivReport', this)">
-        <span>דוח בקרה - חיובים לתל אביב</span>
-      </button>
-      <button id="navRepBtl" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenBtlReport" onclick="navigateScreen('screenBtlReport', this)">
-        <span>דוח בקרה - ביטוח לאומי</span>
-      </button>
-    </div>
-
-    <div class="nav-group">
-      <div class="nav-group-title">כלים</div>
-      <button class="nav-item" id="navBtnExportUnified" onclick="exportUnifiedToExcel()" disabled>
-        <span>ייצוא חיובים מאוחד לאקסל</span>
-      </button>
-      <button class="nav-item" id="navBtnExportMissing" onclick="exportMissingChargesToExcel()" disabled>
-        <span>ייצוא חיובים חסרים לאקסל</span>
-      </button>
-      <button class="nav-item" id="navBtnExportBatch" onclick="exportBatchToExcel()" disabled>
-        <span>ייצוא שאילתות אצוות לאקסל</span>
-      </button>
-      <button class="nav-item" id="navBtnExportOnline" onclick="exportOnlineToExcel()" disabled>
-        <span>ייצוא שאילתות און ליין לאקסל</span>
-      </button>
-      <button class="nav-item" id="navBtnExportPhoto" onclick="exportPhotoToExcel()" disabled>
-        <span>ייצוא תחנות צילום לאקסל</span>
-      </button>
-      <button class="nav-item" id="navBtnExportTests" onclick="exportTestsToExcel()" disabled>
-        <span>ייצוא מבחנים עיוניים לאקסל</span>
-      </button>
-      <button class="nav-item" id="navBtnExportCourses" onclick="exportCoursesToExcel()" disabled>
-        <span>ייצוא חיוב קורסים לאקסל</span>
-      </button>
-      <button class="nav-item" id="navBtnExportTelAviv" onclick="exportTelAvivToExcel()" disabled>
-        <span>ייצוא חיובי תל אביב לאקסל</span>
-      </button>
-      <button class="nav-item" id="navBtnExportBtl" onclick="exportBtlToExcel()" disabled>
-        <span>ייצוא חיובי ביטוח לאומי לאקסל</span>
-      </button>
-      <button class="nav-item" onclick="clearActiveDomainData()">
-        <span>ניקוי נתונים בתחום הפעיל</span>
+      <div class="nav-group-title">אגרות העברת בעלות (תקנה נפרדת)</div>
+      <button id="navItemOwnership" class="nav-item disabled" disabled aria-disabled="true" data-screen="screenOwnership" onclick="navigateScreen('screenOwnership', this)" title="ייפתח אוטומטית עם טעינת קובץ אגרות העברת בעלות מציי רכב">
+        <span>אגרות העברת בעלות</span>
+        <span class="badge badge-muted" id="navBadgeOwnership">ממתין</span>
       </button>
     </div>
 
     <div class="nav-group nav-group-settings">
       <div class="nav-group-title">הגדרות</div>
+      <button id="navItemDataSources" class="nav-item active" data-screen="screenDataSources" onclick="navigateScreen('screenDataSources', this)">
+        <span>מקורות הנתונים</span>
+        <span class="badge badge-info" id="navBadgeDataSources">ראשי</span>
+      </button>
       <button id="btnThemeSettings" class="nav-item" onclick="openThemeModal()">
         <span>הגדרות תצוגה</span>
       </button>
@@ -1542,7 +1575,13 @@
 
   <!-- Main Workspace -->
   <main class="app-workspace">
-    <div class="workspace-context"><span id="headerActiveDomainLabel">תחום פעיל: מקורות הנתונים</span><button id="btnHeaderExport" class="btn btn-primary" onclick="exportActiveDomainToExcel()" disabled title="ייצוא הנתונים המעובדים של התחום הפעיל לקובץ אקסל (.xlsx)">📊 ייצוא לאקסל (.xlsx)</button></div>
+    <div class="workspace-context">
+      <span id="headerActiveDomainLabel">תחום פעיל: מקורות הנתונים</span>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <button id="btnHeaderExport" class="btn btn-primary" onclick="exportActiveDomainToExcel()" disabled title="ייצוא הנתונים המעובדים של התחום הפעיל לקובץ אקסל (.xlsx)">📊 ייצוא לאקסל (.xlsx)</button>
+        <button id="btnHeaderPrint" class="btn" onclick="window.print()" title="הדפסת הדוח או המסך הפעיל לרוחב הדף (Landscape)">🖨️ הדפס דוח</button>
+      </div>
+    </div>
 
     <!-- Non-blocking Status Banner -->
     <div id="liveStatusBanner" class="status-banner" role="status" aria-live="polite">
@@ -1562,11 +1601,12 @@
       <div class="workspace-header-bar">
         <div>
           <h1 class="workspace-screen-title">מקורות הנתונים - טעינה מרכזית וזיהוי אוטומטי של קבצי חיוב</h1>
-          <div class="workspace-screen-subtitle">גרור או בחר קובץ אחד או יותר (קבצי Excel ודוחות PDF מכל הסוגים). המערכת תזהה לבד כל קובץ, תנתח אותו, ותפתח אוטומטית בתפריט את המסכים המתאימים ואת מסך החיובים המאוחד.</div>
+          <div class="workspace-screen-subtitle">גרור או בחר קובץ אחד או יותר (קבצי שירותי מידע, קבצי אגרות העברת בעלות מציי רכב, וקובץ הכנסות). המערכת מזהה כל קובץ, מפרידה בין תקנת שירותי מידע לתקנת אגרות העברת בעלות, ופותחת את המסכים המתאימים.</div>
         </div>
         <div class="toolbar-actions" id="centralHeaderToolbar" style="display:none;">
           <button class="btn btn-primary" onclick="openCentralFileBrowser()">➕ הוספת קבצים נוספים</button>
           <button class="btn btn-success" onclick="navigateScreen('screenUnified', document.getElementById('navItemUnified'))">📊 מעבר למסך החיובים המאוחד</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
           <button class="btn" onclick="clearAllSystemData()">🗑️ ניקוי כל נתוני הסשן</button>
         </div>
       </div>
@@ -1576,8 +1616,8 @@
           <div class="dropzone-icon">📥</div>
           <div class="dropzone-title">איזור טעינה מרכזי חכם - קבצי אקסל (.xlsx) ודוחות PDF (.pdf)</div>
           <div class="dropzone-subtitle" id="centralDropZoneSubtitle">
-            ניתן לגרור לכאן בבת אחת קבצים מכל הסוגים: שאילתות אצוות (.xlsx), שאילתות און ליין (.xlsx), תחנות צילום (.xlsx), מבחנים עיוניים (.pdf), חיוב קורסים (.pdf), ודוחות פניות #AUTODCH לתל אביב וביטוח לאומי (.pdf).
-            המערכת מזהה אוטומטית את מבנה הקובץ ופותחת בתפריט את המסכים הרלוונטיים.
+            ניתן לגרור לכאן בבת אחת קבצים מכל הסוגים: שירותי מידע (שאילתות אצוות, שאילתות און ליין, תחנות צילום, מבחנים עיוניים, חיוב קורסים, דוחות #AUTODCH לתל אביב וביטוח לאומי) וכן קבצי אגרות העברת בעלות מציי רכב (.xlsx).
+            המערכת מזהה אוטומטית את מבנה הקובץ ומפרידה בין סכומי שירותי המידע לסכומי העברת הבעלות.
           </div>
           <div class="dropzone-actions">
             <button type="button" class="btn btn-primary" onclick="event.stopPropagation(); openCentralFileBrowser()">📂 בחירת קבצים מהמחשב (Excel / PDF)</button>
@@ -1592,7 +1632,7 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">מצב תחומי החיוב במערכת ופתיחת מסכים בתפריט</div>
+            <div class="card-title">מצב תחומי החיוב במערכת (הפרדה בין תקנת שירותי מידע לתקנת אגרות העברת בעלות)</div>
             <div class="card-subtitle">כל תחום חיוב נפתח אוטומטית בתפריט הימני ברגע שנטען עבורו קובץ נתונים מתאים</div>
           </div>
         </div>
@@ -1601,6 +1641,7 @@
             <thead>
               <tr>
                 <th>תחום חיוב</th>
+                <th>קטגוריה / תקנה</th>
                 <th>סוג קובץ נתמך</th>
                 <th>כלל זיהוי אוטומטי</th>
                 <th>סטטוס בתפריט</th>
@@ -1648,13 +1689,14 @@
     <div id="screenUnified" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">מסך החיובים המאוחד - ריכוז כלל הלקוחות והספקים מכל מקורות הנתונים</h1>
-          <div class="workspace-screen-subtitle">ריכוז סך החיובים לכל לקוח בהתאם לכלל הקבצים שנטענו במערכת | לחיצה (קליק אחד) על שורת לקוח פותחת פירוט מלא לפי נושאי החיוב ומרכיביהם</div>
+          <h1 class="workspace-screen-title">מסך החיובים המאוחד - ריכוז כלל הלקוחות והספקים (בהפרדה בין שירותי מידע להעברת בעלות)</h1>
+          <div class="workspace-screen-subtitle">ריכוז החיובים לכל לקוח בהתאם לקבצים שנטענו, תוך הפרדה מלאה בין סכומי שירותי מידע לסכומי אגרות העברת בעלות (תקנות תקציביות נפרדות) | לחיצה על שורת לקוח פותחת פירוט מלא</div>
         </div>
         <div class="toolbar-actions">
           <button class="btn btn-primary" onclick="openCentralFileBrowser()">➕ טעינת קבצים נוספים</button>
+          <button class="btn" onclick="navigateScreen('screenUnifiedReport')">📋 דוח בקרה</button>
           <button class="btn btn-success" onclick="exportUnifiedToExcel()">📊 ייצוא מאוחד לאקסל (.xlsx)</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסה</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -1667,29 +1709,33 @@
             </select>
           </div>
           <div class="form-field">
-            <label for="selUnifiedDomain">סינון לפי תחום / נושא חיוב</label>
+            <label for="selUnifiedDomain">סינון לפי קטגוריית תקנה / תחום חיוב</label>
             <select id="selUnifiedDomain" class="form-control" onchange="onUnifiedFilterChange()">
-              <option value="ALL">כל תחומי החיוב שנטענו</option>
-              <option value="שאילתות אצוות">שאילתות אצוות</option>
-              <option value="שאילתות און ליין">שאילתות און ליין</option>
-              <option value="תחנות צילום">תחנות צילום</option>
-              <option value="מבחנים עיוניים">מבחנים עיוניים</option>
-              <option value="חיוב קורסים">חיוב קורסים</option>
-              <option value="עיריית תל אביב">עיריית תל אביב (PDF)</option>
-              <option value="המוסד לביטוח הלאומי">המוסד לביטוח הלאומי (PDF)</option>
+              <option value="ALL">כל התחומים (עמודות נפרדות לשירותי מידע ולהעברת בעלות)</option>
+              <option value="CAT:INFO">שירותי מידע בלבד (כל תחומי המידע)</option>
+              <option value="CAT:OWNERSHIP">אגרות העברת בעלות בלבד (תקנה נפרדת)</option>
+              <option value="שאילתות אצוות">שירותי מידע: שאילתות אצוות</option>
+              <option value="שאילתות און ליין">שירותי מידע: שאילתות און ליין</option>
+              <option value="תחנות צילום">שירותי מידע: תחנות צילום</option>
+              <option value="מבחנים עיוניים">שירותי מידע: מבחנים עיוניים</option>
+              <option value="חיוב קורסים">שירותי מידע: חיוב קורסים</option>
+              <option value="עיריית תל אביב">שירותי מידע: עיריית תל אביב (PDF)</option>
+              <option value="המוסד לביטוח הלאומי">שירותי מידע: המוסד לביטוח הלאומי (PDF)</option>
+              <option value="אגרות העברת בעלות">העברת בעלות: אגרות העברת בעלות מציי רכב</option>
             </select>
           </div>
           <div class="form-field">
-            <label for="txtUnifiedSearch">חיפוש שם לקוח / קוד גורם משלם / קוד מרכבה</label>
-            <input type="text" id="txtUnifiedSearch" class="form-control" placeholder="הקלד שם לקוח, קוד גורם או קוד מרכבה..." oninput="onUnifiedFilterChange()">
+            <label for="txtUnifiedSearch">חיפוש שם לקוח / קוד גורם משלם / קוד מרכבה / ח.פ.</label>
+            <input type="text" id="txtUnifiedSearch" class="form-control" placeholder="הקלד שם לקוח, קוד גורם, ח.פ. או קוד מרכבה..." oninput="onUnifiedFilterChange()">
           </div>
           <div class="form-field">
             <label for="selUnifiedSort">מיון תצוגה</label>
             <div style="display:flex; gap:8px;">
               <select id="selUnifiedSort" class="form-control" onchange="onUnifiedFilterChange()">
-                <option value="PAY_DESC">לפי סך חיוב כספי (מהגבוה לנמוך)</option>
+                <option value="PAY_DESC">לפי היקף חיוב כספי (מהגבוה לנמוך)</option>
+                <option value="INFO_DESC">לפי חיוב שירותי מידע (מהגבוה לנמוך)</option>
+                <option value="OWNERSHIP_DESC">לפי חיוב אגרות העברת בעלות (מהגבוה לנמוך)</option>
                 <option value="NAME_ASC">לפי שם הלקוח (א' - ת')</option>
-                <option value="QTY_DESC">לפי כמות שאילתות / יחידות (מהגבוה לנמוך)</option>
                 <option value="TOPICS_DESC">לפי מספר תחומי חיוב משולבים</option>
               </select>
               <button class="btn" onclick="resetUnifiedFilters()">איפוס</button>
@@ -1703,11 +1749,12 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">טבלת החיובים המאוחדת לכלל הלקוחות במערכת</div>
-            <div class="card-subtitle">לחיצה (קליק אחד) על כל לקוח פותחת חלונית פירוט מלאה לפי נושאי החיוב וכל מרכיבי החיובים שלו</div>
+            <div class="card-title">טבלת החיובים המאוחדת לכלל הלקוחות במערכת (הפרדה מלאה בין שירותי מידע לאגרות העברת בעלות)</div>
+            <div class="card-subtitle">לחיצה (קליק אחד) על כל לקוח פותחת חלונית פירוט מלאה המפרידה בין מרכיבי שירותי המידע למרכיבי אגרות העברת הבעלות</div>
           </div>
           <div style="display:flex; gap:8px;">
             <button class="btn btn-success" onclick="exportUnifiedToExcel()">📥 ייצוא לאקסל (.xlsx)</button>
+            <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
           </div>
         </div>
         <div class="table-container">
@@ -1720,8 +1767,10 @@
                 <th>קוד מרכבה</th>
                 <th>שם הלקוח / הספק</th>
                 <th>תחומי חיוב (נושאים)</th>
-                <th>סה"כ כמות יחידות לחיוב</th>
-                <th>סך הכל לתשלום מאוחד (₪)</th>
+                <th>כמות (שירותי מידע)</th>
+                <th>סך לתשלום - שירותי מידע (₪)</th>
+                <th>כמות העברות בעלות</th>
+                <th>סך לתשלום - אגרות העברת בעלות (₪)</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -1729,7 +1778,7 @@
         </div>
         <div class="report-control-footer">
           <span id="unifiedFooterSource">מקור הנתונים: איחוד אוטומטי מכל הקבצים שנטענו בסשן</span>
-          <span id="unifiedFooterControl">בקרת התאמה: סה"כ החיובים המאוחד שווה לסכום המדויק של כל תחומי החיוב שנטענו</span>
+          <span id="unifiedFooterControl">בקרת תקנות: סכומי שירותי המידע וסכומי אגרות העברת הבעלות מוצגים ומסוכמים בנפרד עבור התקנות השונות</span>
         </div>
       </div>
     </div>
@@ -1740,19 +1789,23 @@
     <div id="screenUnifiedReport" class="screen-pane">
       <div class="workspace-header-bar">
         <div>
-          <h1 class="workspace-screen-title">דוח בקרה והתאמה - מסך החיובים המאוחד</h1>
-          <div class="workspace-screen-subtitle">דוח מרוכז להנהלת חשבונות וגבייה: ריכוז חיובי כל הלקוחות מכל מקורות הנתונים שנטענו</div>
+          <h1 class="workspace-screen-title">דוח בקרה והתאמה - מסך החיובים המאוחד (שירותי מידע ואגרות העברת בעלות)</h1>
+          <div class="workspace-screen-subtitle">דוח מרוכז להנהלת חשבונות וגבייה: ריכוז חיובי כל הלקוחות תוך הפרדה מלאה בין תקנת שירותי מידע לתקנת אגרות העברת בעלות</div>
         </div>
         <div class="toolbar-actions">
           <button class="btn btn-primary" onclick="navigateScreen('screenUnified', document.getElementById('navItemUnified'))">📂 מעבר למסך החיובים המאוחד</button>
           <button class="btn btn-success" onclick="exportUnifiedToExcel()">📊 ייצוא דוח לאקסל (.xlsx)</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסת דוח</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
       <div class="kpi-grid" id="unifiedReportKpiGrid"></div>
       <div class="card">
         <div class="card-header">
-          <div class="card-title">טבלת בקרת חיובים מאוחדת לכלל הלקוחות</div>
+          <div class="card-title">טבלת בקרת חיובים מאוחדת לכלל הלקוחות (הפרדה בין שירותי מידע להעברת בעלות)</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-success" onclick="exportUnifiedToExcel()">📥 ייצוא לאקסל (.xlsx)</button>
+            <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
+          </div>
         </div>
         <div class="table-container">
           <table id="tblUnifiedReport">
@@ -1764,8 +1817,10 @@
                 <th>קוד מרכבה</th>
                 <th>שם הלקוח / הספק</th>
                 <th>תחומי חיוב (נושאים)</th>
-                <th>סה"כ כמות יחידות לחיוב</th>
-                <th>סך הכל לתשלום מאוחד (₪)</th>
+                <th>כמות (שירותי מידע)</th>
+                <th>סך לתשלום - שירותי מידע (₪)</th>
+                <th>כמות העברות בעלות</th>
+                <th>סך לתשלום - אגרות העברת בעלות (₪)</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -1773,7 +1828,7 @@
         </div>
         <div class="report-control-footer">
           <span>מקור הנתונים: כלל מקורות הנתונים הפעילים במערכת</span>
-          <span>בקרת התאמה מלאה בין המסכים הפרטניים לסיכום הלקוחות המאוחד</span>
+          <span>בקרת התאמה מלאה והפרדה תקציבית בין שירותי מידע לאגרות העברת בעלות</span>
         </div>
       </div>
     </div>
@@ -1790,9 +1845,10 @@
         <div class="toolbar-actions" id="batchHeaderToolbar" style="display:none;">
           <button class="btn btn-primary" onclick="openBatchFileBrowser(false)">➕ הוספת קובץ נוסף</button>
           <button class="btn" onclick="openBatchFileBrowser(true)">📂 החלפת כל הקבצים</button>
+          <button class="btn" onclick="navigateScreen('screenBatchReport')">📋 דוח בקרה</button>
           <button class="btn btn-success" onclick="exportBatchToExcel()">📊 ייצוא לאקסל (.xlsx)</button>
           <button class="btn" onclick="clearBatchData()">🗑️ ניקוי</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסה</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -1868,6 +1924,7 @@
             </div>
             <div style="display:flex; gap:8px;">
               <button class="btn btn-success" onclick="exportBatchToExcel()">📥 ייצוא לאקסל (.xlsx)</button>
+              <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
             </div>
           </div>
           <div class="table-container">
@@ -1907,9 +1964,10 @@
         <div class="toolbar-actions" id="onlineHeaderToolbar" style="display:none;">
           <button class="btn btn-primary" onclick="openOnlineFileBrowser(false)">➕ הוספת קובץ נוסף</button>
           <button class="btn" onclick="openOnlineFileBrowser(true)">📂 החלפת כל הקבצים</button>
+          <button class="btn" onclick="navigateScreen('screenOnlineReport')">📋 דוח בקרה</button>
           <button class="btn btn-success" onclick="exportOnlineToExcel()">📊 ייצוא לאקסל (.xlsx)</button>
           <button class="btn" onclick="clearOnlineData()">🗑️ ניקוי</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסה</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -1981,6 +2039,7 @@
             </div>
             <div style="display:flex; gap:8px;">
               <button class="btn btn-success" onclick="exportOnlineToExcel()">📥 ייצוא לאקסל (.xlsx)</button>
+              <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
             </div>
           </div>
           <div class="table-container">
@@ -2020,7 +2079,7 @@
         <div class="toolbar-actions">
           <button class="btn btn-primary" onclick="navigateScreen('screenOnline', document.getElementById('navItemOnline'))">📂 מעבר למסך שאילתות און ליין</button>
           <button class="btn btn-success" id="btnOnlineReportExport" onclick="exportOnlineToExcel()" disabled>📊 ייצוא דוח לאקסל (.xlsx)</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסת דוח</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -2073,9 +2132,10 @@
         <div class="toolbar-actions" id="photoHeaderToolbar" style="display:none;">
           <button class="btn btn-primary" onclick="openPhotoFileBrowser(false)">➕ הוספת / עדכון קבצים</button>
           <button class="btn" onclick="openPhotoFileBrowser(true)">📂 החלפת כל הקבצים</button>
+          <button class="btn" onclick="navigateScreen('screenPhotoReport')">📋 דוח בקרה</button>
           <button class="btn btn-success" onclick="exportPhotoToExcel()">📊 ייצוא לאקסל (.xlsx)</button>
           <button class="btn" onclick="clearPhotoData()">🗑️ ניקוי</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסה</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -2106,6 +2166,7 @@
             </div>
             <div style="display:flex; gap:8px;">
               <button class="btn btn-success" onclick="exportPhotoToExcel()">📥 ייצוא לאקסל (.xlsx)</button>
+              <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
             </div>
           </div>
           <div class="table-container">
@@ -2194,7 +2255,7 @@
         <div class="toolbar-actions">
           <button class="btn btn-primary" onclick="navigateScreen('screenBatch', document.querySelector('[data-screen=screenBatch]'))">📂 מעבר למסך טעינת קבצים</button>
           <button class="btn btn-success" id="btnBatchReportExport" onclick="exportBatchToExcel()" disabled>📊 ייצוא דוח לאקסל (.xlsx)</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסת דוח</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -2248,7 +2309,7 @@
         <div class="toolbar-actions">
           <button class="btn btn-primary" onclick="navigateScreen('screenPhoto', document.querySelector('[data-screen=screenPhoto]'))">📂 מעבר למסך טעינת 6 הקבצים</button>
           <button class="btn btn-success" id="btnPhotoReportExport" onclick="exportPhotoToExcel()" disabled>📊 ייצוא דוח לאקסל (.xlsx)</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסת דוח</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -2303,9 +2364,10 @@
         <div class="toolbar-actions" id="tlvHeaderToolbar" style="display:none;">
           <button class="btn btn-primary" onclick="openAutodchFileBrowser(false)">➕ הוספת דוח PDF נוסף</button>
           <button class="btn" onclick="openAutodchFileBrowser(true)">📂 החלפת כל דוחות ה-PDF</button>
+          <button class="btn" onclick="navigateScreen('screenTelAvivReport')">📋 דוח בקרה</button>
           <button class="btn btn-success" onclick="exportTelAvivToExcel()">📊 ייצוא לאקסל (.xlsx)</button>
           <button class="btn" onclick="clearAutodchData()">🗑️ ניקוי</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסה</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -2371,6 +2433,7 @@
             </div>
             <div style="display:flex; gap:8px;">
               <button class="btn btn-success" onclick="exportTelAvivToExcel()">📥 ייצוא לאקסל (.xlsx)</button>
+              <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
             </div>
           </div>
           <div class="table-container">
@@ -2441,9 +2504,10 @@
         <div class="toolbar-actions" id="btlHeaderToolbar" style="display:none;">
           <button class="btn btn-primary" onclick="openAutodchFileBrowser(false)">➕ הוספת דוח PDF נוסף</button>
           <button class="btn" onclick="openAutodchFileBrowser(true)">📂 החלפת כל דוחות ה-PDF</button>
+          <button class="btn" onclick="navigateScreen('screenBtlReport')">📋 דוח בקרה</button>
           <button class="btn btn-success" onclick="exportBtlToExcel()">📊 ייצוא לאקסל (.xlsx)</button>
           <button class="btn" onclick="clearAutodchData()">🗑️ ניקוי</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסה</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -2510,6 +2574,7 @@
             </div>
             <div style="display:flex; gap:8px;">
               <button class="btn btn-success" onclick="exportBtlToExcel()">📥 ייצוא לאקסל (.xlsx)</button>
+              <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
             </div>
           </div>
           <div class="table-container">
@@ -2580,7 +2645,7 @@
         <div class="toolbar-actions">
           <button class="btn btn-primary" onclick="navigateScreen('screenTelAviv', document.querySelector('[data-screen=screenTelAviv]'))">📂 מעבר למסך חיובים לתל אביב</button>
           <button class="btn btn-success" id="btnTlvReportExport" onclick="exportTelAvivToExcel()" disabled>📊 ייצוא דוח לאקסל (.xlsx)</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסת דוח</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -2635,7 +2700,7 @@
         <div class="toolbar-actions">
           <button class="btn btn-primary" onclick="navigateScreen('screenBtl', document.querySelector('[data-screen=screenBtl]'))">📂 מעבר למסך חיובים לביטוח הלאומי</button>
           <button class="btn btn-success" id="btnBtlReportExport" onclick="exportBtlToExcel()" disabled>📊 ייצוא דוח לאקסל (.xlsx)</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסת דוח</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -2690,9 +2755,10 @@
         <div class="toolbar-actions" id="testsHeaderToolbar" style="display:none;">
           <button class="btn btn-primary" onclick="openTestsFileBrowser(false)">➕ הוספת דוח PDF נוסף</button>
           <button class="btn" onclick="openTestsFileBrowser(true)">📂 החלפת כל הקבצים</button>
+          <button class="btn" onclick="navigateScreen('screenTestsReport')">📋 דוח בקרה</button>
           <button class="btn btn-success" onclick="exportTestsToExcel()">📊 ייצוא לאקסל (.xlsx)</button>
           <button class="btn" onclick="clearTestsData()">🗑️ ניקוי</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסה</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -2755,6 +2821,7 @@
             </div>
             <div style="display:flex; gap:8px;">
               <button class="btn btn-success" onclick="exportTestsToExcel()">📥 ייצוא לאקסל (.xlsx)</button>
+              <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
             </div>
           </div>
           <div class="table-container">
@@ -2827,9 +2894,10 @@
         <div class="toolbar-actions" id="coursesHeaderToolbar" style="display:none;">
           <button class="btn btn-primary" onclick="openCoursesFileBrowser(false)">➕ הוספת דוח PDF נוסף</button>
           <button class="btn" onclick="openCoursesFileBrowser(true)">📂 החלפת כל הקבצים</button>
+          <button class="btn" onclick="navigateScreen('screenCoursesReport')">📋 דוח בקרה</button>
           <button class="btn btn-success" onclick="exportCoursesToExcel()">📊 ייצוא לאקסל (.xlsx)</button>
           <button class="btn" onclick="clearCoursesData()">🗑️ ניקוי</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסה</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -2892,6 +2960,7 @@
             </div>
             <div style="display:flex; gap:8px;">
               <button class="btn btn-success" onclick="exportCoursesToExcel()">📥 ייצוא לאקסל (.xlsx)</button>
+              <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
             </div>
           </div>
           <div class="table-container">
@@ -2961,7 +3030,7 @@
         <div class="toolbar-actions">
           <button class="btn btn-primary" onclick="navigateScreen('screenTests', document.querySelector('[data-screen=screenTests]'))">📂 מעבר למסך מבחנים</button>
           <button class="btn btn-success" id="btnTestsReportExport" onclick="exportTestsToExcel()" disabled>📊 ייצוא דוח לאקסל (.xlsx)</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסת דוח</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -3015,7 +3084,7 @@
         <div class="toolbar-actions">
           <button class="btn btn-primary" onclick="navigateScreen('screenCourses', document.querySelector('[data-screen=screenCourses]'))">📂 מעבר למסך קורסים</button>
           <button class="btn btn-success" id="btnCoursesReportExport" onclick="exportCoursesToExcel()" disabled>📊 ייצוא דוח לאקסל (.xlsx)</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסת דוח</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -3069,9 +3138,10 @@
         </div>
         <div class="toolbar-actions" id="missingHeaderToolbar" style="display:none;">
           <button class="btn btn-primary" onclick="openMissingInvoicesFileBrowser()">📂 החלפת / הוספת קובץ הכנסות</button>
+          <button class="btn" onclick="navigateScreen('screenMissingChargesReport')">📋 דוח בקרה</button>
           <button class="btn btn-success" onclick="exportMissingChargesToExcel()">📊 ייצוא חיובים חסרים לאקסל (.xlsx)</button>
           <button class="btn" onclick="clearMissingInvoicesData()">🗑️ ניקוי קובץ הכנסות</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסה</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -3109,13 +3179,16 @@
               <label for="selMissingDomain">3. סינון לפי תחום חיוב</label>
               <select id="selMissingDomain" class="form-control" onchange="onMissingFilterChange()">
                 <option value="ALL">כל תחומי החיוב שנטענו</option>
-                <option value="שאילתות אצוות">שאילתות אצוות</option>
-                <option value="שאילתות און ליין">שאילתות און ליין</option>
-                <option value="תחנות צילום">תחנות צילום</option>
-                <option value="מבחנים עיוניים">מבחנים עיוניים</option>
-                <option value="חיוב קורסים">חיוב קורסים</option>
-                <option value="עיריית תל אביב">עיריית תל אביב (PDF)</option>
-                <option value="המוסד לביטוח הלאומי">המוסד לביטוח הלאומי (PDF)</option>
+                <option value="CAT:INFO">שירותי מידע בלבד (כל תחומי המידע)</option>
+                <option value="CAT:OWNERSHIP">אגרות העברת בעלות בלבד (תקנה נפרדת)</option>
+                <option value="שאילתות אצוות">שירותי מידע: שאילתות אצוות</option>
+                <option value="שאילתות און ליין">שירותי מידע: שאילתות און ליין</option>
+                <option value="תחנות צילום">שירותי מידע: תחנות צילום</option>
+                <option value="מבחנים עיוניים">שירותי מידע: מבחנים עיוניים</option>
+                <option value="חיוב קורסים">שירותי מידע: חיוב קורסים</option>
+                <option value="עיריית תל אביב">שירותי מידע: עיריית תל אביב (PDF)</option>
+                <option value="המוסד לביטוח הלאומי">שירותי מידע: המוסד לביטוח הלאומי (PDF)</option>
+                <option value="אגרות העברת בעלות">העברת בעלות: אגרות העברת בעלות מציי רכב</option>
               </select>
             </div>
             <div class="form-field">
@@ -3149,6 +3222,7 @@
             </div>
             <div style="display:flex; gap:8px;">
               <button class="btn btn-success" onclick="exportMissingChargesToExcel()">📥 ייצוא לאקסל (.xlsx)</button>
+              <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
             </div>
           </div>
           <div class="table-container">
@@ -3189,7 +3263,7 @@
         <div class="toolbar-actions">
           <button class="btn btn-primary" onclick="navigateScreen('screenMissingCharges', document.getElementById('navItemMissingCharges'))">📂 מעבר למסך זיהוי חיובים חסרים</button>
           <button class="btn btn-success" id="btnMissingReportExport" onclick="exportMissingChargesToExcel()" disabled>📊 ייצוא דוח לאקסל (.xlsx)</button>
-          <button class="btn" onclick="window.print()">🖨️ הדפסת דוח</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
         </div>
       </div>
 
@@ -3226,6 +3300,213 @@
           <div class="report-control-footer">
             <span>מקור הנתונים: הצלבת קבצי החיוב החודשיים מול קובץ הכנסות שנה נוכחית</span>
             <span>התאמה לפי קוד לקוח במרכבה (עמודה D) או שם חשבון (עמודה E) וסכום החשבונית (עמודה L)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SCREEN 15: אגרות העברת בעלות מציי רכב (Ownership Transfer Fees - Separate Budget Regulation)
+         =================================================================== -->
+    <div id="screenOwnership" class="screen-pane">
+      <div class="workspace-header-bar">
+        <div>
+          <h1 class="workspace-screen-title">אגרות העברת בעלות מציי רכב - הכנת נתונים לחיוב (תקנה נפרדת משירותי מידע)</h1>
+          <div class="workspace-screen-subtitle">קליטת קבצי אגרות העברת בעלות מציי רכב (.xlsx), סינון אוטומטי של שורות סיכום לחברה ולטבלה, והצגת סך העברות בעלות וסכום לתשלום לפי חברה וסוג אגרה (257 / 87 / 43 ₪)</div>
+        </div>
+        <div class="toolbar-actions" id="ownershipHeaderToolbar" style="display:none;">
+          <button class="btn btn-primary" onclick="openOwnershipFileBrowser(false)">➕ הוספת קובץ נוסף</button>
+          <button class="btn" onclick="openOwnershipFileBrowser(true)">📂 החלפת כל הקבצים</button>
+          <button class="btn" onclick="navigateScreen('screenOwnershipReport')">📋 דוח בקרה</button>
+          <button class="btn btn-success" onclick="exportOwnershipToExcel()">📊 ייצוא לאקסל (.xlsx)</button>
+          <button class="btn" onclick="clearOwnershipData()">🗑️ ניקוי</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
+        </div>
+      </div>
+
+      <section class="dropzone-card" aria-label="איזור טעינת קבצי אגרות העברת בעלות מציי רכב">
+        <div id="ownershipDropZone" class="dropzone-area" tabindex="0" role="button" aria-label="גרור קבצי אגרות העברת בעלות (.xlsx) לכאן או לחץ לבחירת קבצים" onclick="if(event.target.tagName !== 'BUTTON') openOwnershipFileBrowser(false)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openOwnershipFileBrowser(false);}">
+          <div class="dropzone-icon">🚗</div>
+          <div class="dropzone-title">טעינת קבצי אגרות העברת בעלות מציי רכב (.xlsx) - תקנה תקציבית נפרדת</div>
+          <div class="dropzone-subtitle" id="ownershipDropZoneSubtitle">
+            גרור לכאן קובץ אקסל (אחד או יותר) של אגרות העברת בעלות מציי רכב, או טען דרך "מקורות הנתונים".
+            המערכת מדלגת אוטומטית על שורות "סה"כ" של הטבלה ושל כל חברה, ומחשבת במדויק רק את שורות הפירוט לפי תעריפי האגרה (257 ₪, 87 ₪, 43 ₪).
+          </div>
+          <div class="dropzone-actions">
+            <button type="button" class="btn btn-primary" onclick="event.stopPropagation(); openOwnershipFileBrowser(false)">📂 פתיחת חלונית לבחירת / הוספת קבצים (Browse)</button>
+            <button type="button" id="btnOwnershipReplaceAll" class="btn" style="display:none;" onclick="event.stopPropagation(); openOwnershipFileBrowser(true)">🔄 החלפת כל הקבצים מחדש</button>
+            <button type="button" id="btnOwnershipClear" class="btn" style="display:none;" onclick="event.stopPropagation(); clearOwnershipData()">🗑️ ניקוי נתונים</button>
+          </div>
+        </div>
+      </section>
+
+      <div id="ownershipDataSection" class="domain-data-section">
+        <section class="filter-card" aria-label="סינון ומיון אגרות העברת בעלות">
+          <div class="filter-grid">
+            <div class="form-field">
+              <label for="selOwnershipMonth">חודש פעילות / קובץ שנטען</label>
+              <select id="selOwnershipMonth" class="form-control" onchange="onOwnershipFilterChange()">
+                <option value="ALL">כל החודשים והקבצים שנטענו</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="selOwnershipFee">סינון לפי תעריף אגרה (₪)</label>
+              <select id="selOwnershipFee" class="form-control" onchange="onOwnershipFilterChange()">
+                <option value="ALL">כל סוגי האגרות (257 / 87 / 43 ₪)</option>
+                <option value="257">אגרה 257 ₪</option>
+                <option value="87">אגרה 87 ₪</option>
+                <option value="43">אגרה 43 ₪</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="txtOwnershipSearch">חיפוש שם חברה / מספר חברה (ח.פ.) / קוד גורם / קוד מרכבה</label>
+              <input type="text" id="txtOwnershipSearch" class="form-control" placeholder="הקלד שם חברה, ח.פ., קוד גורם או קוד מרכבה..." oninput="onOwnershipFilterChange()">
+            </div>
+            <div class="form-field">
+              <label for="selOwnershipSort">סדר תצוגה ומיון</label>
+              <div style="display:flex; gap:8px;">
+                <select id="selOwnershipSort" class="form-control" onchange="onOwnershipFilterChange()">
+                  <option value="FILE_ORDER">לפי סדר החברות בקובץ</option>
+                  <option value="AMT_DESC">לפי סכום לתשלום (מהגבוה לנמוך)</option>
+                  <option value="QTY_DESC">לפי כמות העברות בעלות (מהגבוה לנמוך)</option>
+                  <option value="NAME_ASC">לפי שם החברה (א' - ת')</option>
+                </select>
+                <button class="btn" onclick="resetOwnershipFilters()">איפוס</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="kpi-grid" id="ownershipKpiGrid"></div>
+
+        <!-- Table 1: Aggregated per Company -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">טבלה 1: ריכוז חיוב אגרות העברת בעלות לפי חברת ציי רכב לחודש (תקנת העברת בעלות)</div>
+              <div class="card-subtitle">לחיצה (קליק אחד) על כל שורת חברה פותחת את פירוט העברות הבעלות שלה לפי תעריפי האגרה | שורות הסיכום מהקובץ המקורי סוננו ולא נספרו פעמיים</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-success" onclick="exportOwnershipToExcel()">📥 ייצוא לאקסל (.xlsx)</button>
+              <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table id="tblOwnershipCompanies">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>חודש פעילות</th>
+                  <th>מספר חברה (ח.פ.)</th>
+                  <th>קוד גורם</th>
+                  <th>קוד מרכבה</th>
+                  <th>שם החברה (צי רכב)</th>
+                  <th>העברות באגרה 257 ₪</th>
+                  <th>העברות באגרה 43 ₪</th>
+                  <th>העברות באגרה 87 ₪</th>
+                  <th>סה"כ העברות בעלות</th>
+                  <th>סה"כ סכום אגרות לתשלום (₪)</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Table 2: Detail rows by fee rate -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">טבלה 2: פירוט מלא של שורות החיוב לפי תעריף אגרה (ללא שורות סיכום)</div>
+              <div class="card-subtitle">הצגת שורות הפירוט הגולמיות לכל חברה ותעריף אגרה כפי שנקלטו מהקובץ לאחר ניקוי שורות "סה"כ"</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-success" onclick="exportOwnershipToExcel()">📥 ייצוא לאקסל (.xlsx)</button>
+              <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table id="tblOwnershipDetailRows">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>חודש פעילות</th>
+                  <th>מספר חברה (ח.פ.)</th>
+                  <th>קוד גורם</th>
+                  <th>קוד מרכבה</th>
+                  <th>שם החברה</th>
+                  <th>תעריף אגרה (₪)</th>
+                  <th>מספר העברות בעלות</th>
+                  <th>סכום לתשלום (₪)</th>
+                  <th>קובץ מקור</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="report-control-footer">
+            <span id="ownershipFooterSource">מקור הנתונים: קבצי אגרות העברת בעלות מציי רכב</span>
+            <span id="ownershipFooterControl">בקרת התאמה: שורות "סה"כ" לחברה ולטבלה סוננו אוטומטית | הסכומים מופנים לתקנת אגרות העברת בעלות בנפרד משירותי מידע</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         SCREEN 16: דוח בקרה - אגרות העברת בעלות מציי רכב
+         =================================================================== -->
+    <div id="screenOwnershipReport" class="screen-pane">
+      <div class="workspace-header-bar">
+        <div>
+          <h1 class="workspace-screen-title">דוח בקרה והתאמה לחיוב - אגרות העברת בעלות מציי רכב</h1>
+          <div class="workspace-screen-subtitle">דוח מרוכז להנהלת חשבונות וגבייה: ריכוז חיובי אגרות העברת בעלות לפי חברה, קוד מרכבה ותעריף אגרה (תקנה נפרדת משירותי מידע)</div>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn-primary" onclick="navigateScreen('screenOwnership', document.getElementById('navItemOwnership'))">📂 מעבר למסך אגרות העברת בעלות</button>
+          <button class="btn btn-success" id="btnOwnershipReportExport" onclick="exportOwnershipToExcel()" disabled>📊 ייצוא דוח לאקסל (.xlsx)</button>
+          <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
+        </div>
+      </div>
+
+      <div id="ownershipReportEmptyState" class="card" style="text-align:center; padding:32px;">
+        <div style="font-size:16px; font-weight:700; margin-bottom:8px;">טרם נטענו קבצי אגרות העברת בעלות מציי רכב</div>
+        <div style="font-size:14px; color:var(--text-secondary); margin-bottom:16px;">יש לטעון קובץ אקסל במסך "אגרות העברת בעלות" או במסך "מקורות הנתונים".</div>
+        <button class="btn btn-primary" onclick="navigateScreen('screenOwnership', document.getElementById('navItemOwnership'))">📂 עבור למסך אגרות העברת בעלות</button>
+      </div>
+
+      <div id="ownershipReportContent" class="domain-data-section">
+        <div class="kpi-grid" id="ownershipReportKpiGrid"></div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">טבלת בקרת חיובים - אגרות העברת בעלות מציי רכב</div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-success" onclick="exportOwnershipToExcel()">📥 ייצוא לאקסל (.xlsx)</button>
+              <button class="btn" onclick="window.print()">🖨️ הדפס דוח</button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table id="tblOwnershipReport">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>חודש פעילות</th>
+                  <th>מספר חברה (ח.פ.)</th>
+                  <th>קוד גורם</th>
+                  <th>קוד מרכבה</th>
+                  <th>שם החברה (צי רכב)</th>
+                  <th>העברות באגרה 257 ₪</th>
+                  <th>העברות באגרה 43 ₪</th>
+                  <th>העברות באגרה 87 ₪</th>
+                  <th>סה"כ העברות בעלות</th>
+                  <th>סה"כ סכום אגרות לתשלום (₪)</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="report-control-footer">
+            <span>מקור הנתונים: קבצי אגרות העברת בעלות מציי רכב (.xlsx)</span>
+            <span>בקרת התאמה מלאה: סכום שורות הפירוט של כלל החברות תואם ב-100% לנתוני המקור ללא כפילות שורות סיכום</span>
           </div>
         </div>
       </div>
@@ -3400,6 +3681,17 @@ let coursesState = {
   }
 };
 
+let ownershipState = {
+  fileNames: [],
+  rows: [],
+  filters: {
+    month: "ALL",
+    fee: "ALL",
+    search: "",
+    sort: "FILE_ORDER"
+  }
+};
+
 let unifiedState = {
   filters: {
     month: "ALL",
@@ -3519,6 +3811,7 @@ function syncAllDropzonesMinimizedState() {
     testsState.fileNames.length +
     coursesState.fileNames.length +
     autodchState.fileNames.length +
+    ownershipState.fileNames.length +
     missingInvoicesState.fileNames.length;
 
   syncDropzoneMinimizedState(
@@ -3562,6 +3855,11 @@ function syncAllDropzonesMinimizedState() {
     document.getElementById("btlDropZoneSubtitle")?.textContent || ""
   );
   syncDropzoneMinimizedState(
+    "ownershipDropZone",
+    ownershipState.rows.length > 0,
+    document.getElementById("ownershipDropZoneSubtitle")?.textContent || ""
+  );
+  syncDropzoneMinimizedState(
     "missingInvoicesDropZone",
     missingInvoicesState.invoices.length > 0,
     document.getElementById("missingInvoicesDropZoneSubtitle")?.textContent || ""
@@ -3576,7 +3874,8 @@ function hasAnyLoadedSystemData() {
     testsState.rows.length > 0 ||
     coursesState.rows.length > 0 ||
     autodchState.tlvRows.length > 0 ||
-    autodchState.btlRows.length > 0
+    autodchState.btlRows.length > 0 ||
+    ownershipState.rows.length > 0
   );
 }
 
@@ -3595,6 +3894,7 @@ function syncSidebarMenuUnlockState() {
   const hasCourses = coursesState.rows.length > 0;
   const hasTlv = autodchState.tlvRows.length > 0;
   const hasBtl = autodchState.btlRows.length > 0;
+  const hasOwnership = ownershipState.rows.length > 0;
   const hasInvoices = missingInvoicesState.invoices.length > 0;
   const hasAny = hasAnyLoadedSystemData();
 
@@ -3633,6 +3933,8 @@ function syncSidebarMenuUnlockState() {
   setNavBtnEnabled("navItemBtl", hasBtl);
   setNavBtnEnabled("navRepBtl", hasBtl);
 
+  setNavBtnEnabled("navItemOwnership", hasOwnership);
+
   // חיובים מיוחדים remains disabled as requested
   setNavBtnEnabled("navItemSpecial", false);
 }
@@ -3667,6 +3969,8 @@ function syncHeaderExportButtonState() {
     btn.disabled = autodchState.tlvRows.length === 0;
   } else if (currentScreenId === "screenBtl" || currentScreenId === "screenBtlReport") {
     btn.disabled = autodchState.btlRows.length === 0;
+  } else if (currentScreenId === "screenOwnership" || currentScreenId === "screenOwnershipReport") {
+    btn.disabled = ownershipState.rows.length === 0;
   } else {
     btn.disabled = batchState.rawRows.length === 0;
   }
@@ -3689,24 +3993,26 @@ function navigateScreen(screenId, btnEl) {
 
   const domainMap = {
     screenDataSources: "תחום פעיל: מקורות הנתונים (טעינה מרכזית)",
-    screenUnified: "תחום פעיל: מסך החיובים המאוחד",
+    screenUnified: "תחום פעיל: מסך החיובים המאוחד (הפרדה בין שירותי מידע להעברת בעלות)",
     screenUnifiedReport: "דוח פעיל: בקרת החיובים המאוחד",
     screenMissingCharges: "תחום פעיל: זיהוי חיובים חסרים (הצלבה מול חשבוניות)",
     screenMissingChargesReport: "דוח פעיל: בקרת זיהוי חיובים חסרים",
-    screenBatch: "תחום פעיל: שאילתות אצוות",
-    screenOnline: "תחום פעיל: שאילתות און ליין",
-    screenPhoto: "תחום פעיל: תחנות צילום",
-    screenTests: "תחום פעיל: מבחנים עיוניים",
-    screenCourses: "תחום פעיל: חיוב קורסים",
-    screenTelAviv: "תחום פעיל: חיובים לתל אביב",
-    screenBtl: "תחום פעיל: חיובים לביטוח הלאומי",
+    screenBatch: "תחום פעיל: שירותי מידע · שאילתות אצוות",
+    screenOnline: "תחום פעיל: שירותי מידע · שאילתות און ליין",
+    screenPhoto: "תחום פעיל: שירותי מידע · תחנות צילום",
+    screenTests: "תחום פעיל: שירותי מידע · מבחנים עיוניים",
+    screenCourses: "תחום פעיל: שירותי מידע · חיוב קורסים",
+    screenTelAviv: "תחום פעיל: שירותי מידע · חיובים לתל אביב",
+    screenBtl: "תחום פעיל: שירותי מידע · חיובים לביטוח הלאומי",
+    screenOwnership: "תחום פעיל: תקנה נפרדת · אגרות העברת בעלות מציי רכב",
     screenBatchReport: "דוח פעיל: בקרת שאילתות אצוות",
     screenOnlineReport: "דוח פעיל: בקרת שאילתות און ליין",
     screenPhotoReport: "דוח פעיל: בקרת תחנות צילום",
     screenTestsReport: "דוח פעיל: בקרת מבחנים עיוניים",
     screenCoursesReport: "דוח פעיל: בקרת חיוב קורסים",
     screenTelAvivReport: "דוח פעיל: בקרת חיובים לתל אביב",
-    screenBtlReport: "דוח פעיל: בקרת חיובים לביטוח הלאומי"
+    screenBtlReport: "דוח פעיל: בקרת חיובים לביטוח הלאומי",
+    screenOwnershipReport: "דוח פעיל: בקרת אגרות העברת בעלות מציי רכב"
   };
   document.getElementById("headerActiveDomainLabel").textContent = domainMap[screenId] || "מערכת הכנת נתונים לחיוב";
   syncHeaderExportButtonState();
@@ -4086,20 +4392,24 @@ function downloadNativeXlsx(filename, sheets) {
     </border>
   </borders>
   <cellStyleXfs count="1">
-    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyAlignment="1"><alignment vertical="center"/></xf>
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2" wrapText="0"/></xf>
   </cellStyleXfs>
-  <cellXfs count="10">
-    <xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2"/></xf>
-    <xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2"/></xf>
-    <xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
-    <xf numFmtId="0" fontId="2" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2"/></xf>
-    <xf numFmtId="164" fontId="2" fillId="3" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
-    <xf numFmtId="165" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
-    <xf numFmtId="165" fontId="2" fillId="3" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
-    <xf numFmtId="0" fontId="3" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2"/></xf>
-    <xf numFmtId="164" fontId="3" fillId="4" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
-    <xf numFmtId="165" fontId="3" fillId="4" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+  <cellXfs count="11">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2" wrapText="0"/></xf>
+    <xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2" wrapText="0"/></xf>
+    <xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2" wrapText="0"/></xf>
+    <xf numFmtId="0" fontId="2" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2" wrapText="0"/></xf>
+    <xf numFmtId="164" fontId="2" fillId="3" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2" wrapText="0"/></xf>
+    <xf numFmtId="165" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2" wrapText="0"/></xf>
+    <xf numFmtId="165" fontId="2" fillId="3" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2" wrapText="0"/></xf>
+    <xf numFmtId="0" fontId="3" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2" wrapText="0"/></xf>
+    <xf numFmtId="164" fontId="3" fillId="4" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2" wrapText="0"/></xf>
+    <xf numFmtId="165" fontId="3" fillId="4" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2" wrapText="0"/></xf>
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" readingOrder="2" wrapText="0"/></xf>
   </cellXfs>
+  <cellStyles count="1">
+    <cellStyle name="Normal" xfId="0" builtinId="0"/>
+  </cellStyles>
 </styleSheet>`;
 
   sheets.forEach((sh, idx) => {
@@ -4136,8 +4446,10 @@ function downloadNativeXlsx(filename, sheets) {
           }
           cellsXml += `<c r="${ref}" s="${styleId}"><v>${Number(val)}</v></c>`;
         } else {
-          const styleId = isWarnRow ? 7 : (isBoldRow ? 3 : 0);
-          cellsXml += `<c r="${ref}" s="${styleId}" t="inlineStr"><is><t>${xmlEscape(val ?? "")}</t></is></c>`;
+          // Use styleId 10 instead of 0 for regular text cells so Excel never overrides s="0" with built-in bottom-aligned Normal style
+          const styleId = isWarnRow ? 7 : (isBoldRow ? 3 : 10);
+          const cleanText = String(val ?? "").replace(/[\r\n]+/g, " ").trim();
+          cellsXml += `<c r="${ref}" s="${styleId}" t="inlineStr"><is><t>${xmlEscape(cleanText)}</t></is></c>`;
         }
       });
       rowsXml += `<row r="${rowNum}" ht="24" customHeight="1">${cellsXml}</row>`;
@@ -4196,9 +4508,31 @@ function openBatchFileBrowser(replaceAll) {
   }
 }
 
+function isExemptQueryClient(merkavaCode, clientName, payerCode) {
+  const m = String(merkavaCode || "").trim().replace(/^0+/, "");
+  const n = String(clientName || "").trim();
+  const p = String(payerCode || "").trim();
+  if (m === "10000040" || m === "30845203") return true;
+  if (p === "111000000505" || p === "111000000730") return true;
+  if (n.includes("יארג\"א") || n.includes("יארגא") || n.includes("יארג''א")) return true;
+  if (n.includes("דרך נוף נתיבי הצפון")) return true;
+  return false;
+}
+
+function isQuerySummaryRow(monthVal, payerCode, clientName, colAVal) {
+  const m = String(monthVal || "").trim();
+  const p = String(payerCode || "").trim();
+  const n = String(clientName || "").trim();
+  const a = String(colAVal || "").trim();
+  // Summary row has Merkava code / quantity and NO activity month (אין חודש פעילות)
+  if (!m || !/^\d{1,2}$/.test(m)) return true;
+  if (p.includes("סה\"כ") || p.includes("סיכום") || n.includes("סה\"כ") || n.includes("סיכום") || a.includes("סה\"כ") || a.includes("סיכום")) return true;
+  return false;
+}
+
 function parseBatchSheetRows(sheetRows, fileName) {
   if (!sheetRows || sheetRows.length === 0) return [];
-  const hRow = sheetRows[0] || {};
+  const hRow = sheetRows[0]?.cols || sheetRows[0] || {};
   // Standard structure: B=שנה, C=חודש פעילות, D=קוד גורם משלם, E=גורם (שם הלקוח), F=כמות חודשית, G=מק"ט לחיוב, H=קוד מרכבה, I=קוד תשובה (יום בחודש)
   let colMap = { year: "B", month: "C", payerCode: "D", clientName: "E", quantity: "F", sku: "G", merkavaCode: "H", day: "I" };
 
@@ -4216,22 +4550,28 @@ function parseBatchSheetRows(sheetRows, fileName) {
 
   const parsed = [];
   for (let i = 1; i < sheetRows.length; i++) {
-    const r = sheetRows[i];
+    const r = sheetRows[i]?.cols || sheetRows[i] || {};
     const payerCode = (r[colMap.payerCode] || "").trim();
     const clientName = (r[colMap.clientName] || "").trim();
+    const merkavaCode = (r[colMap.merkavaCode] || "").trim();
+    const monthRaw = (r[colMap.month] || "").trim();
     const qtyRaw = (r[colMap.quantity] || "").replace(/,/g, "").trim();
-    if (!payerCode && !clientName && !qtyRaw) continue;
+    if (!payerCode && !clientName && !qtyRaw && !merkavaCode) continue;
     if (payerCode === "קוד גורם משלם" || clientName === "גורם" || clientName === "שם הלקוח") continue;
+
+    // Ignore summary rows (where activity month is missing) and exempt clients (יארג"א 10000040 & דרך נוף נתיבי הצפון 30845203)
+    if (isQuerySummaryRow(monthRaw, payerCode, clientName, r.A)) continue;
+    if (isExemptQueryClient(merkavaCode, clientName, payerCode)) continue;
 
     const quantity = parseFloat(qtyRaw) || 0;
     parsed.push({
-      year: (r[colMap.year] || "").trim(),
-      month: (r[colMap.month] || "").trim(),
+      year: (r[colMap.year] || "").trim() || "2026",
+      month: monthRaw,
       payerCode,
       clientName,
       quantity,
       sku: (r[colMap.sku] || "8001394").trim(),
-      merkavaCode: (r[colMap.merkavaCode] || "").trim(),
+      merkavaCode,
       dayInMonth: (r[colMap.day] || "").trim(),
       fileName
     });
@@ -4394,7 +4734,7 @@ function renderBatchScreens() {
   toolbar.style.display = hasData ? "flex" : "none";
   btnAddMore.style.display = hasData ? "inline-flex" : "none";
   btnClear.style.display = hasData ? "inline-flex" : "none";
-  navExport.disabled = !hasData;
+  if (navExport) navExport.disabled = !hasData;
   repExport.disabled = !hasData;
   syncHeaderExportButtonState();
 
@@ -4776,17 +5116,21 @@ function parseOnlineSheetRows(sheetRows, fileName) {
 
     const payerCode = (cols[colMap.payerCode] || "").trim();
     const clientName = (cols[colMap.clientName] || "").trim().replace(/\s{2,}/g, " ");
+    const merkavaCode = (cols[colMap.merkavaCode] || "").trim();
+    const monthRaw = (cols[colMap.month] || "").trim();
     const qtyRaw = (cols[colMap.quantity] || "").replace(/,/g, "").trim();
-    if (!payerCode && !clientName && !qtyRaw) continue;
+    if (!payerCode && !clientName && !qtyRaw && !merkavaCode) continue;
     if (payerCode === "קוד גורם משלם" || clientName === "גורם") continue;
 
+    // Ignore summary rows (where activity month is missing) and exempt clients (יארג"א 10000040 & דרך נוף נתיבי הצפון 30845203)
+    if (isQuerySummaryRow(monthRaw, payerCode, clientName, cols.A)) continue;
+    if (isExemptQueryClient(merkavaCode, clientName, payerCode)) continue;
+
     const year = (cols[colMap.year] || "").trim() || "2026";
-    const monthRaw = (cols[colMap.month] || "").trim() || "01";
     const month = String(parseInt(monthRaw, 10) || monthRaw).padStart(2, "0");
     const monthKey = `${year}-${month}`;
     const quantity = parseInt(qtyRaw || "0", 10) || 0;
     const sku = (cols[colMap.sku] || "").trim() || "8001398";
-    const merkavaCode = (cols[colMap.merkavaCode] || "").trim();
     const amountToPay = Number((quantity * ONLINE_QUERY_UNIT_PRICE).toFixed(2));
     rowSeq++;
 
@@ -4929,7 +5273,7 @@ function renderOnlineScreens() {
   toolbar.style.display = hasData ? "flex" : "none";
   btnAddMore.style.display = hasData ? "inline-flex" : "none";
   btnClear.style.display = hasData ? "inline-flex" : "none";
-  navExport.disabled = !hasData;
+  if (navExport) navExport.disabled = !hasData;
   repExport.disabled = !hasData;
   syncHeaderExportButtonState();
 
@@ -5425,7 +5769,7 @@ function renderPhotoScreens() {
   toolbar.style.display = hasData ? "flex" : "none";
   btnReplace.style.display = hasData ? "inline-flex" : "none";
   btnClear.style.display = hasData ? "inline-flex" : "none";
-  navExport.disabled = !hasData;
+  if (navExport) navExport.disabled = !hasData;
   repExport.disabled = !hasData;
   syncHeaderExportButtonState();
 
@@ -6325,7 +6669,8 @@ function renderAutodchScreens() {
   document.getElementById("tlvHeaderToolbar").style.display = hasTlv ? "flex" : "none";
   document.getElementById("btnTlvReplaceAll").style.display = hasTlv ? "inline-flex" : "none";
   document.getElementById("btnTlvClear").style.display = hasTlv ? "inline-flex" : "none";
-  document.getElementById("navBtnExportTelAviv").disabled = !hasTlv;
+  const navBtnExportTelAviv = document.getElementById("navBtnExportTelAviv");
+  if (navBtnExportTelAviv) navBtnExportTelAviv.disabled = !hasTlv;
   document.getElementById("btnTlvReportExport").disabled = !hasTlv;
 
   // Toggle visibility & buttons for Bituach Leumi
@@ -6335,7 +6680,8 @@ function renderAutodchScreens() {
   document.getElementById("btlHeaderToolbar").style.display = hasBtl ? "flex" : "none";
   document.getElementById("btnBtlReplaceAll").style.display = hasBtl ? "inline-flex" : "none";
   document.getElementById("btnBtlClear").style.display = hasBtl ? "inline-flex" : "none";
-  document.getElementById("navBtnExportBtl").disabled = !hasBtl;
+  const navBtnExportBtl = document.getElementById("navBtnExportBtl");
+  if (navBtnExportBtl) navBtnExportBtl.disabled = !hasBtl;
   document.getElementById("btnBtlReportExport").disabled = !hasBtl;
 
   syncHeaderExportButtonState();
@@ -7066,7 +7412,8 @@ function renderTestsScreens() {
   document.getElementById("testsHeaderToolbar").style.display = hasData ? "flex" : "none";
   document.getElementById("btnTestsReplaceAll").style.display = hasData ? "inline-flex" : "none";
   document.getElementById("btnTestsClear").style.display = hasData ? "inline-flex" : "none";
-  document.getElementById("navBtnExportTests").disabled = !hasData;
+  const navBtnExportTests = document.getElementById("navBtnExportTests");
+  if (navBtnExportTests) navBtnExportTests.disabled = !hasData;
   document.getElementById("btnTestsReportExport").disabled = !hasData;
   syncHeaderExportButtonState();
 
@@ -7647,7 +7994,8 @@ function renderCoursesScreens() {
   document.getElementById("coursesHeaderToolbar").style.display = hasData ? "flex" : "none";
   document.getElementById("btnCoursesReplaceAll").style.display = hasData ? "inline-flex" : "none";
   document.getElementById("btnCoursesClear").style.display = hasData ? "inline-flex" : "none";
-  document.getElementById("navBtnExportCourses").disabled = !hasData;
+  const navBtnExportCourses = document.getElementById("navBtnExportCourses");
+  if (navBtnExportCourses) navBtnExportCourses.disabled = !hasData;
   document.getElementById("btnCoursesReportExport").disabled = !hasData;
   syncHeaderExportButtonState();
 
@@ -7996,6 +8344,667 @@ function exportCoursesToExcel() {
 }
 
 /* =========================================================================
+   DOMAIN 7: אגרות העברת בעלות מציי רכב (OWNERSHIP TRANSFER FEES - SEPARATE REGULATION)
+   ========================================================================= */
+function openOwnershipFileBrowser(replaceAll) {
+  if (replaceAll) {
+    document.getElementById("ownershipFilesInput").click();
+  } else {
+    document.getElementById("ownershipAddFilesInput").click();
+  }
+}
+
+function parseOwnershipPeriodToken(rawStr, fileName) {
+  const candidates = [String(rawStr || "").trim(), String(fileName || "").trim()];
+  for (const s of candidates) {
+    // Matches t10-2026, t8-2026, 10-2026, 10/2026, 08.2026
+    const m1 = s.match(/t?(\d{1,2})\s*[-/.]\s*(20\d{2})/i);
+    if (m1) {
+      const mm = parseInt(m1[1], 10);
+      const yyyy = parseInt(m1[2], 10);
+      if (mm >= 1 && mm <= 12) {
+        return { year: String(yyyy), month: String(mm).padStart(2, "0"), monthKey: `${yyyy}-${String(mm).padStart(2, "0")}` };
+      }
+    }
+    const m2 = s.match(/(20\d{2})\s*[-/.]\s*(\d{1,2})/);
+    if (m2) {
+      const yyyy = parseInt(m2[1], 10);
+      const mm = parseInt(m2[2], 10);
+      if (mm >= 1 && mm <= 12) {
+        return { year: String(yyyy), month: String(mm).padStart(2, "0"), monthKey: `${yyyy}-${String(mm).padStart(2, "0")}` };
+      }
+    }
+  }
+  return { year: "2026", month: "10", monthKey: "2026-10" };
+}
+
+function isOwnershipTransferSheet(sheetRows, fileName) {
+  if (!sheetRows || sheetRows.length === 0) return false;
+  const fn = String(fileName || "");
+  if (fn.includes("העברת_בעלות") || fn.includes("העברת בעלות")) return true;
+  for (let i = 0; i < Math.min(sheetRows.length, 6); i++) {
+    const r = sheetRows[i]?.cols || sheetRows[i] || {};
+    const line = Object.values(r).join(" ");
+    if (
+      line.includes("אגרות העברת בעלות") ||
+      line.includes("מספר העברות בעלות") ||
+      (line.includes("מספר חברה") && line.includes("אגרה"))
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function parseOwnershipSheetRows(sheetRows, fileName) {
+  if (!sheetRows || sheetRows.length === 0) return [];
+  let periodStr = "";
+  let headerRowIdx = -1;
+  let colMap = {
+    companyNum: "A",
+    payerCode: "B",
+    companyName: "C",
+    merkavaCode: "D",
+    feeRate: "E",
+    transfersCount: "F",
+    amount: "G"
+  };
+
+  for (let i = 0; i < Math.min(sheetRows.length, 10); i++) {
+    const r = sheetRows[i]?.cols || sheetRows[i] || {};
+    const aVal = String(r.A || "").trim();
+    if (!periodStr && /^t?\d{1,2}\s*[-/.]\s*20\d{2}$/i.test(aVal)) {
+      periodStr = aVal;
+    }
+    const vals = Object.entries(r);
+    const hasHeader = vals.some(([, v]) => String(v || "").includes("מספר העברות בעלות") || String(v || "").trim() === "אגרה");
+    if (hasHeader) {
+      headerRowIdx = i;
+      for (const [colLet, text] of vals) {
+        const t = String(text || "").trim();
+        if (t.includes("מספר חברה")) colMap.companyNum = colLet;
+        else if (t.includes("קוד גורם")) colMap.payerCode = colLet;
+        else if (t.includes("שם חברה") || t === "שם הלקוח") colMap.companyName = colLet;
+        else if (t.includes("מרכבה")) colMap.merkavaCode = colLet;
+        else if (t === "אגרה" || t.includes("תעריף")) colMap.feeRate = colLet;
+        else if (t.includes("העברות בעלות") || t.includes("כמות")) colMap.transfersCount = colLet;
+        else if (t === "סכום" || t.includes("לתשלום")) colMap.amount = colLet;
+      }
+      break;
+    }
+  }
+
+  const { year, month, monthKey } = parseOwnershipPeriodToken(periodStr, fileName);
+  const startIdx = headerRowIdx >= 0 ? headerRowIdx + 1 : 0;
+
+  let curCompanyNum = "";
+  let curPayerCode = "";
+  let curCompanyName = "";
+  let curMerkavaCode = "";
+  let companySeq = 0;
+  let rowSeq = 0;
+  const parsed = [];
+
+  for (let i = startIdx; i < sheetRows.length; i++) {
+    const r = sheetRows[i]?.cols || sheetRows[i] || {};
+    const rawCompNum = String(r[colMap.companyNum] || "").trim();
+    const rawPayer = String(r[colMap.payerCode] || "").trim();
+    const rawName = String(r[colMap.companyName] || "").trim().replace(/\s{2,}/g, " ");
+    const rawMerkava = String(r[colMap.merkavaCode] || "").trim();
+    const rawFee = String(r[colMap.feeRate] || "").replace(/,/g, "").trim();
+    const rawQty = String(r[colMap.transfersCount] || "").replace(/,/g, "").trim();
+    const rawAmt = String(r[colMap.amount] || "").replace(/,/g, "").trim();
+
+    if (!rawCompNum && !rawPayer && !rawName && !rawFee && !rawQty && !rawAmt) continue;
+    if (rawCompNum === "מספר חברה" || rawFee === "אגרה") continue;
+
+    // Strict Rule: NEVER count table summary rows or company subtotal rows ("סה"כ" / "סיכום")
+    // and NEVER count bottom report timestamp/page footer rows (where fee or amount is empty)!
+    const isTotalLabel =
+      rawCompNum.includes("סה\"כ") ||
+      rawCompNum.includes("סיכום") ||
+      rawName.includes("סה\"כ") ||
+      rawName.includes("סיכום") ||
+      rawPayer.includes("סה\"כ");
+
+    if (isTotalLabel) {
+      // Even though we skip this subtotal row, we can note the company context if present
+      if (rawPayer && !rawPayer.includes("סה\"כ")) curPayerCode = rawPayer;
+      if (rawName && !rawName.includes("סה\"כ")) curCompanyName = rawName;
+      if (rawMerkava) curMerkavaCode = rawMerkava;
+      continue;
+    }
+
+    // Must have a valid numeric fee rate (e.g. 257, 87, 43) and valid numeric transfers & amount
+    if (!rawFee || !/^\d+(\.\d+)?$/.test(rawFee)) continue;
+    if (!rawQty || !/^\d+(\.\d+)?$/.test(rawQty)) continue;
+    if (!rawAmt || !/^\d+(\.\d+)?$/.test(rawAmt)) continue;
+
+    const feeRate = parseFloat(rawFee) || 0;
+    const transfersCount = parseInt(rawQty, 10) || 0;
+    const amount = Number((parseFloat(rawAmt) || 0).toFixed(2));
+    if (feeRate <= 0 || transfersCount <= 0) continue;
+
+    if (rawCompNum && /^\d{5,12}$/.test(rawCompNum)) {
+      curCompanyNum = rawCompNum;
+      companySeq++;
+    }
+    if (rawPayer) curPayerCode = rawPayer;
+    if (rawName) curCompanyName = rawName;
+    if (rawMerkava) curMerkavaCode = rawMerkava;
+
+    rowSeq++;
+    parsed.push({
+      rowId: `${fileName}_OWN_${rowSeq}`,
+      rowSeq,
+      companySeq: companySeq || rowSeq,
+      year,
+      month,
+      monthKey,
+      companyNum: curCompanyNum || "-",
+      payerCode: curPayerCode || "-",
+      companyName: curCompanyName || "חברת צי רכב",
+      merkavaCode: curMerkavaCode || "00000000",
+      feeRate,
+      transfersCount,
+      amount,
+      fileName
+    });
+  }
+
+  return parsed;
+}
+
+async function handleOwnershipFilesUpload(fileList, replaceExisting) {
+  const files = Array.from(fileList || []).filter(f => f.name.toLowerCase().endsWith(".xlsx"));
+  if (files.length === 0) {
+    updateStatusBanner("נא לבחור קובץ אקסל (.xlsx) של אגרות העברת בעלות מציי רכב.", "warning");
+    return;
+  }
+
+  if (replaceExisting) {
+    ownershipState.fileNames = [];
+    ownershipState.rows = [];
+    ownershipState.filters = { month: "ALL", fee: "ALL", search: "", sort: "FILE_ORDER" };
+  }
+
+  let addedRows = 0;
+  for (const file of files) {
+    try {
+      const sheetRows = await parseXlsxFirstSheetRows(file);
+      const parsed = parseOwnershipSheetRows(sheetRows, file.name);
+      if (parsed.length > 0) {
+        const monthsInFile = new Set(parsed.map(r => r.monthKey));
+        ownershipState.rows = ownershipState.rows.filter(r => !(r.fileName === file.name || monthsInFile.has(r.monthKey)));
+        if (!ownershipState.fileNames.includes(file.name)) ownershipState.fileNames.push(file.name);
+        ownershipState.rows.push(...parsed);
+        addedRows += parsed.length;
+
+        const totTransfers = parsed.reduce((a, b) => a + b.transfersCount, 0);
+        const totAmt = Number(parsed.reduce((a, b) => a + b.amount, 0).toFixed(2));
+        const periodsStr = Array.from(monthsInFile).map(mk => formatMonthLabelHeb(mk)).join(", ");
+        recordLoadedFileLog({
+          fileName: file.name,
+          fileType: "Excel (.xlsx)",
+          domain: "אגרות העברת בעלות מציי רכב",
+          periods: periodsStr,
+          summary: `${fmtNum(parsed.length)} שורות אגרה (ללא שורות סה"כ) | ${fmtNum(totTransfers)} העברות (${fmtCurrency(totAmt)})`,
+          screenId: "screenOwnership",
+          navId: "navItemOwnership"
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      updateStatusBanner(`שגיאה בקריאת קובץ העברת בעלות ${file.name}: ${err.message}`, "danger");
+      return;
+    }
+  }
+
+  if (ownershipState.rows.length === 0) {
+    updateStatusBanner("הקובץ שנבחר אינו מכיל רשומות תקינות של אגרות העברת בעלות מציי רכב.", "warning");
+    return;
+  }
+
+  populateOwnershipFilters(true);
+  renderOwnershipScreens();
+  syncAllScreensAndNavigation();
+  const companies = getAggregatedOwnershipCompanies();
+  const totalTransfers = companies.reduce((a, b) => a + b.totalTransfers, 0);
+  const totalPay = Number(companies.reduce((a, b) => a + b.totalAmount, 0).toFixed(2));
+  updateStatusBanner(
+    `נקלטו בהצלחה קבצי אגרות העברת בעלות (${fmtNum(companies.length)} חברות | ${fmtNum(totalTransfers)} העברות בעלות | סה"כ לתשלום בתקנה נפרדת: ${fmtCurrency(totalPay)}).`,
+    "success"
+  );
+  logAudit("UPLOAD_OWNERSHIP", files.map(f => f.name).join(", "), `נקלטו ${addedRows} שורות פירוט אגרות העברת בעלות`);
+}
+
+function populateOwnershipFilters(resetToAll = false) {
+  const sel = document.getElementById("selOwnershipMonth");
+  if (!sel) return;
+  const months = Array.from(new Set(ownershipState.rows.map(r => r.monthKey).filter(Boolean))).sort();
+  let html = `<option value="ALL">כל החודשים שנטענו (${months.length} חודשים | ${ownershipState.fileNames.length} קבצים)</option>`;
+  for (const mk of months) {
+    const cnt = ownershipState.rows.filter(r => r.monthKey === mk).reduce((a, b) => a + b.transfersCount, 0);
+    html += `<option value="${escHtml(mk)}">${escHtml(formatMonthLabelHeb(mk))} (${fmtNum(cnt)} העברות בעלות)</option>`;
+  }
+  sel.innerHTML = html;
+  if (resetToAll || !months.includes(ownershipState.filters.month)) {
+    ownershipState.filters.month = "ALL";
+  }
+  sel.value = ownershipState.filters.month;
+}
+
+function onOwnershipFilterChange() {
+  ownershipState.filters.month = document.getElementById("selOwnershipMonth").value;
+  ownershipState.filters.fee = document.getElementById("selOwnershipFee").value;
+  ownershipState.filters.search = document.getElementById("txtOwnershipSearch").value;
+  ownershipState.filters.sort = document.getElementById("selOwnershipSort").value;
+  renderOwnershipScreens();
+}
+
+function resetOwnershipFilters() {
+  ownershipState.filters = { month: "ALL", fee: "ALL", search: "", sort: "FILE_ORDER" };
+  document.getElementById("selOwnershipMonth").value = "ALL";
+  document.getElementById("selOwnershipFee").value = "ALL";
+  document.getElementById("txtOwnershipSearch").value = "";
+  document.getElementById("selOwnershipSort").value = "FILE_ORDER";
+  renderOwnershipScreens();
+}
+
+function getFilteredOwnershipDetailRows() {
+  const f = ownershipState.filters;
+  const q = (f.search || "").trim().toLowerCase();
+  return ownershipState.rows.filter(r => {
+    if (f.month && f.month !== "ALL" && r.monthKey !== f.month) return false;
+    if (f.fee && f.fee !== "ALL" && String(r.feeRate) !== String(f.fee)) return false;
+    if (q) {
+      const hay = `${r.companyName} ${r.companyNum} ${r.payerCode} ${r.merkavaCode} ${r.monthKey} ${r.feeRate}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function getAggregatedOwnershipCompanies() {
+  const rows = getFilteredOwnershipDetailRows();
+  const map = new Map();
+  for (const r of rows) {
+    // Group per company per month (using companyNum + merkavaCode so a company like Carasso with two payerCodes under one companyNum & Merkava is unified cleanly, while keeping all payerCodes)
+    const key = `${r.monthKey}|||${r.companyNum !== "-" ? r.companyNum : r.payerCode}|||${r.merkavaCode}`;
+    if (!map.has(key)) {
+      map.set(key, {
+        key,
+        monthKey: r.monthKey,
+        year: r.year,
+        month: r.month,
+        companyNum: r.companyNum,
+        payerCodes: new Set(),
+        merkavaCode: r.merkavaCode,
+        companyName: r.companyName,
+        companySeq: r.companySeq,
+        qty257: 0,
+        amt257: 0,
+        qty43: 0,
+        amt43: 0,
+        qty87: 0,
+        amt87: 0,
+        otherQty: 0,
+        otherAmt: 0,
+        totalTransfers: 0,
+        totalAmount: 0,
+        detailRows: [],
+        fileName: r.fileName
+      });
+    }
+    const item = map.get(key);
+    if (r.payerCode && r.payerCode !== "-") item.payerCodes.add(r.payerCode);
+    if (r.feeRate === 257) {
+      item.qty257 += r.transfersCount;
+      item.amt257 = Number((item.amt257 + r.amount).toFixed(2));
+    } else if (r.feeRate === 43) {
+      item.qty43 += r.transfersCount;
+      item.amt43 = Number((item.amt43 + r.amount).toFixed(2));
+    } else if (r.feeRate === 87) {
+      item.qty87 += r.transfersCount;
+      item.amt87 = Number((item.amt87 + r.amount).toFixed(2));
+    } else {
+      item.otherQty += r.transfersCount;
+      item.otherAmt = Number((item.otherAmt + r.amount).toFixed(2));
+    }
+    item.totalTransfers += r.transfersCount;
+    item.totalAmount = Number((item.totalAmount + r.amount).toFixed(2));
+    item.detailRows.push(r);
+  }
+
+  const list = Array.from(map.values()).map(item => ({
+    ...item,
+    payerCodeDisplay: Array.from(item.payerCodes).join(", ") || "-"
+  }));
+
+  const sortMode = ownershipState.filters.sort;
+  if (sortMode === "AMT_DESC") {
+    list.sort((a, b) => b.totalAmount - a.totalAmount || a.companyName.localeCompare(b.companyName, "he"));
+  } else if (sortMode === "QTY_DESC") {
+    list.sort((a, b) => b.totalTransfers - a.totalTransfers || b.totalAmount - a.totalAmount);
+  } else if (sortMode === "NAME_ASC") {
+    list.sort((a, b) => a.companyName.localeCompare(b.companyName, "he") || a.monthKey.localeCompare(b.monthKey));
+  } else {
+    list.sort((a, b) => a.monthKey.localeCompare(b.monthKey) || a.companySeq - b.companySeq);
+  }
+
+  return list;
+}
+
+function renderOwnershipScreens() {
+  const hasData = ownershipState.rows.length > 0;
+  const dataSection = document.getElementById("ownershipDataSection");
+  const toolbar = document.getElementById("ownershipHeaderToolbar");
+  const btnReplace = document.getElementById("btnOwnershipReplaceAll");
+  const btnClear = document.getElementById("btnOwnershipClear");
+  const navBadge = document.getElementById("navBadgeOwnership");
+  const repEmpty = document.getElementById("ownershipReportEmptyState");
+  const repContent = document.getElementById("ownershipReportContent");
+  const repExport = document.getElementById("btnOwnershipReportExport");
+
+  if (dataSection) dataSection.classList.toggle("visible", hasData);
+  if (repContent) repContent.classList.toggle("visible", hasData);
+  if (repEmpty) repEmpty.style.display = hasData ? "none" : "block";
+  if (toolbar) toolbar.style.display = hasData ? "flex" : "none";
+  if (btnReplace) btnReplace.style.display = hasData ? "inline-flex" : "none";
+  if (btnClear) btnClear.style.display = hasData ? "inline-flex" : "none";
+  if (repExport) repExport.disabled = !hasData;
+  syncHeaderExportButtonState();
+
+  if (!hasData) {
+    if (navBadge) {
+      navBadge.textContent = "ממתין";
+      navBadge.className = "badge badge-muted";
+    }
+    const subEl = document.getElementById("ownershipDropZoneSubtitle");
+    if (subEl) {
+      subEl.textContent = "גרור לכאן קובץ אקסל (אחד או יותר) של אגרות העברת בעלות מציי רכב, או טען דרך 'מקורות הנתונים'. שורות הסיכום לחברה ולטבלה מסוננות אוטומטית.";
+    }
+    return;
+  }
+
+  const companies = getAggregatedOwnershipCompanies();
+  const detailRows = getFilteredOwnershipDetailRows();
+  const months = Array.from(new Set(companies.map(c => c.monthKey))).sort();
+  const totalTransfers = companies.reduce((a, b) => a + b.totalTransfers, 0);
+  const totalAmount = Number(companies.reduce((a, b) => a + b.totalAmount, 0).toFixed(2));
+  const tot257 = companies.reduce((a, b) => a + b.qty257, 0);
+  const tot43 = companies.reduce((a, b) => a + b.qty43, 0);
+  const tot87 = companies.reduce((a, b) => a + b.qty87, 0);
+
+  if (navBadge) {
+    navBadge.textContent = `${fmtNum(companies.length)} חברות`;
+    navBadge.className = "badge badge-success";
+  }
+
+  const subEl = document.getElementById("ownershipDropZoneSubtitle");
+  if (subEl) {
+    subEl.textContent = `שמורים בזיכרון הסשן (${ownershipState.fileNames.length} קבצים): ${ownershipState.fileNames.join(", ")} | ${fmtNum(companies.length)} שורות חברה (${fmtNum(totalTransfers)} העברות בעלות | ${fmtCurrency(totalAmount)}).`;
+  }
+
+  const kpiHtml = `
+    <div class="kpi-card">
+      <div class="kpi-label"><span>חברות ציי רכב לחיוב</span><span class="badge badge-info">${months.length} חודשי פעילות</span></div>
+      <div class="kpi-val">${fmtNum(companies.length)}</div>
+      <div class="kpi-meta"><span>מתוך ${fmtNum(detailRows.length)} שורות פירוט אגרה (ללא שורות סה"כ)</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label"><span>סה"כ מספר העברות בעלות</span><span class="badge badge-info">אגרות 257 / 87 / 43 ₪</span></div>
+      <div class="kpi-val">${fmtNum(totalTransfers)}</div>
+      <div class="kpi-meta"><span>אגרה 257: ${fmtNum(tot257)} | אגרה 43: ${fmtNum(tot43)} | אגרה 87: ${fmtNum(tot87)}</span></div>
+    </div>
+    <div class="kpi-card kpi-success">
+      <div class="kpi-label"><span>סה"כ אגרות העברת בעלות לתשלום (₪)</span><span class="badge badge-warning">תקנת העברת בעלות</span></div>
+      <div class="kpi-val">${fmtCurrency(totalAmount)}</div>
+      <div class="kpi-meta"><span>מופרד מתקנת שירותי מידע | בקרת התאמה 100%</span></div>
+    </div>
+  `;
+
+  const kpi1 = document.getElementById("ownershipKpiGrid");
+  const kpi2 = document.getElementById("ownershipReportKpiGrid");
+  if (kpi1) kpi1.innerHTML = kpiHtml;
+  if (kpi2) kpi2.innerHTML = kpiHtml;
+
+  let compHtml = "";
+  if (companies.length === 0) {
+    compHtml = `
+      <tr>
+        <td colspan="11" style="text-align:center; padding:24px;">
+          <div style="font-weight:700; color:var(--text-secondary); margin-bottom:12px;">לא נמצאו חברות התואמות לסינון שנבחר</div>
+          <button class="btn btn-primary" onclick="resetOwnershipFilters()">איפוס מסננים</button>
+        </td>
+      </tr>
+    `;
+  } else {
+    companies.forEach((c, idx) => {
+      compHtml += `
+        <tr class="clickable-row" onclick="openOwnershipCompanyDrilldown('${escHtml(c.key)}')" title="לחיצה (קליק אחד) לפתיחת פירוט שורות האגרה של החברה">
+          <td class="num">${idx + 1}</td>
+          <td><span class="badge badge-muted">${escHtml(c.month)}/${escHtml(c.year)}</span></td>
+          <td class="num">${escHtml(c.companyNum)}</td>
+          <td class="num">${escHtml(c.payerCodeDisplay)}</td>
+          <td class="num" style="font-weight:700;">${escHtml(c.merkavaCode)}</td>
+          <td>
+            <span class="client-name-dbl" onclick="event.stopPropagation(); openOwnershipCompanyDrilldown('${escHtml(c.key)}')">${escHtml(c.companyName)}</span>
+          </td>
+          <td class="num">${c.qty257 > 0 ? `${fmtNum(c.qty257)} (${fmtCurrency(c.amt257)})` : "-"}</td>
+          <td class="num">${c.qty43 > 0 ? `${fmtNum(c.qty43)} (${fmtCurrency(c.amt43)})` : "-"}</td>
+          <td class="num">${c.qty87 > 0 ? `${fmtNum(c.qty87)} (${fmtCurrency(c.amt87)})` : "-"}</td>
+          <td class="num" style="font-weight:700;">${fmtNum(c.totalTransfers)}</td>
+          <td class="num" style="font-weight:700; color:var(--color-success);">${fmtCurrency(c.totalAmount)}</td>
+        </tr>
+      `;
+    });
+
+    compHtml += `
+      <tr class="total-row">
+        <td colspan="6">סה"כ אגרות העברת בעלות (${fmtNum(companies.length)} חברות - ללא שורות סיכום כפולות)</td>
+        <td class="num">${fmtNum(tot257)} העברות</td>
+        <td class="num">${fmtNum(tot43)} העברות</td>
+        <td class="num">${fmtNum(tot87)} העברות</td>
+        <td class="num">${fmtNum(totalTransfers)}</td>
+        <td class="num">${fmtCurrency(totalAmount)}</td>
+      </tr>
+    `;
+  }
+
+  const tbComp = document.querySelector("#tblOwnershipCompanies tbody");
+  const tbRep = document.querySelector("#tblOwnershipReport tbody");
+  if (tbComp) tbComp.innerHTML = compHtml;
+  if (tbRep) tbRep.innerHTML = compHtml;
+
+  let detHtml = "";
+  detailRows.forEach((r, idx) => {
+    detHtml += `
+      <tr>
+        <td class="num">${idx + 1}</td>
+        <td><span class="badge badge-muted">${escHtml(r.month)}/${escHtml(r.year)}</span></td>
+        <td class="num">${escHtml(r.companyNum)}</td>
+        <td class="num">${escHtml(r.payerCode)}</td>
+        <td class="num">${escHtml(r.merkavaCode)}</td>
+        <td style="font-weight:700;">${escHtml(r.companyName)}</td>
+        <td class="num"><span class="badge badge-info">${fmtNum(r.feeRate)} ₪</span></td>
+        <td class="num" style="font-weight:700;">${fmtNum(r.transfersCount)}</td>
+        <td class="num" style="font-weight:700; color:var(--color-success);">${fmtCurrency(r.amount)}</td>
+        <td style="font-size:13px; color:var(--text-secondary);">${escHtml(r.fileName)}</td>
+      </tr>
+    `;
+  });
+  if (detailRows.length > 0) {
+    detHtml += `
+      <tr class="total-row">
+        <td colspan="7">סה"כ שורות פירוט (${fmtNum(detailRows.length)} שורות)</td>
+        <td class="num">${fmtNum(totalTransfers)}</td>
+        <td class="num">${fmtCurrency(totalAmount)}</td>
+        <td>-</td>
+      </tr>
+    `;
+  }
+  const tbDet = document.querySelector("#tblOwnershipDetailRows tbody");
+  if (tbDet) tbDet.innerHTML = detHtml;
+}
+
+function openOwnershipCompanyDrilldown(compKey) {
+  const companies = getAggregatedOwnershipCompanies();
+  const c = companies.find(x => x.key === compKey);
+  if (!c) return;
+
+  let rowsHtml = "";
+  c.detailRows.forEach((r, idx) => {
+    rowsHtml += `
+      <tr>
+        <td class="num">${idx + 1}</td>
+        <td>${escHtml(formatMonthLabelHeb(r.monthKey))}</td>
+        <td class="num">${escHtml(r.companyNum)}</td>
+        <td class="num">${escHtml(r.payerCode)}</td>
+        <td class="num">${escHtml(r.merkavaCode)}</td>
+        <td class="num" style="font-weight:700;"><span class="badge badge-info">${fmtNum(r.feeRate)} ₪</span></td>
+        <td class="num" style="font-weight:700;">${fmtNum(r.transfersCount)}</td>
+        <td class="num" style="font-weight:700; color:var(--color-success);">${fmtCurrency(r.amount)}</td>
+      </tr>
+    `;
+  });
+
+  const html = `
+    <div style="margin-bottom:16px; padding:12px 16px; background:var(--bg-muted); border:1px solid var(--border-color); border-radius:var(--radius-md); display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+      <div><strong>שם החברה:</strong> ${escHtml(c.companyName)} (ח.פ. ${escHtml(c.companyNum)})</div>
+      <div><strong>קוד גורם:</strong> ${escHtml(c.payerCodeDisplay)} | <strong>קוד מרכבה:</strong> ${escHtml(c.merkavaCode)}</div>
+      <div><strong>חודש פעילות:</strong> ${escHtml(formatMonthLabelHeb(c.monthKey))}</div>
+      <div><strong>סה"כ אגרות העברת בעלות:</strong> <span style="color:var(--color-success); font-weight:700;">${fmtCurrency(c.totalAmount)}</span> (${fmtNum(c.totalTransfers)} העברות)</div>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>חודש פעילות</th>
+            <th>מספר חברה (ח.פ.)</th>
+            <th>קוד גורם</th>
+            <th>קוד מרכבה</th>
+            <th>תעריף אגרה (₪)</th>
+            <th>מספר העברות בעלות</th>
+            <th>סכום לתשלום (₪)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+          <tr class="total-row">
+            <td colspan="6">סה"כ לחברה (${escHtml(c.companyName)})</td>
+            <td class="num">${fmtNum(c.totalTransfers)}</td>
+            <td class="num">${fmtCurrency(c.totalAmount)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+  openDrillModal(`פירוט אגרות העברת בעלות - ${c.companyName} (${c.month}/${c.year})`, html);
+}
+
+function clearOwnershipData() {
+  ownershipState.fileNames = [];
+  ownershipState.rows = [];
+  ownershipState.filters = { month: "ALL", fee: "ALL", search: "", sort: "FILE_ORDER" };
+  populateOwnershipFilters(true);
+  renderOwnershipScreens();
+  syncAllScreensAndNavigation();
+  updateStatusBanner("נתוני אגרות העברת בעלות מציי רכב נוקו.", "info");
+  logAudit("CLEAR_OWNERSHIP", "screenOwnership", "ניקוי נתוני אגרות העברת בעלות");
+}
+
+function exportOwnershipToExcel() {
+  const companies = getAggregatedOwnershipCompanies();
+  const detailRows = getFilteredOwnershipDetailRows();
+  if (companies.length === 0) {
+    updateStatusBanner("אין נתוני אגרות העברת בעלות לייצוא. נא לטעון קובץ תחילה.", "warning");
+    return;
+  }
+
+  let tot257 = 0, tot43 = 0, tot87 = 0, totTrans = 0, totAmt = 0;
+  const sheet1Rows = companies.map(c => {
+    tot257 += c.qty257;
+    tot43 += c.qty43;
+    tot87 += c.qty87;
+    totTrans += c.totalTransfers;
+    totAmt += c.totalAmount;
+    return [
+      { v: `${c.month}/${c.year}`, t: "s" },
+      { v: c.companyNum, t: "s" },
+      { v: c.payerCodeDisplay, t: "s" },
+      { v: c.merkavaCode, t: "s" },
+      { v: c.companyName, t: "s", bold: true },
+      { v: c.qty257, t: "n" },
+      { v: c.amt257, t: "c" },
+      { v: c.qty43, t: "n" },
+      { v: c.amt43, t: "c" },
+      { v: c.qty87, t: "n" },
+      { v: c.amt87, t: "c" },
+      { v: c.totalTransfers, t: "n", bold: true },
+      { v: c.totalAmount, t: "c", bold: true }
+    ];
+  });
+
+  totAmt = Number(totAmt.toFixed(2));
+  sheet1Rows.push([
+    { v: "סה\"כ כללי (אגרות העברת בעלות)", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: `${companies.length} חברות`, t: "s", bold: true },
+    { v: tot257, t: "n", bold: true },
+    { v: Number((tot257 * 257).toFixed(2)), t: "c", bold: true },
+    { v: tot43, t: "n", bold: true },
+    { v: Number((tot43 * 43).toFixed(2)), t: "c", bold: true },
+    { v: tot87, t: "n", bold: true },
+    { v: Number((tot87 * 87).toFixed(2)), t: "c", bold: true },
+    { v: totTrans, t: "n", bold: true },
+    { v: totAmt, t: "c", bold: true }
+  ]);
+
+  const sheet2Rows = detailRows.map(r => [
+    { v: `${r.month}/${r.year}`, t: "s" },
+    { v: r.companyNum, t: "s" },
+    { v: r.payerCode, t: "s" },
+    { v: r.merkavaCode, t: "s" },
+    { v: r.companyName, t: "s" },
+    { v: r.feeRate, t: "n" },
+    { v: r.transfersCount, t: "n" },
+    { v: r.amount, t: "c" },
+    { v: r.fileName, t: "s" }
+  ]);
+  sheet2Rows.push([
+    { v: "סה\"כ שורות פירוט", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: `${detailRows.length} שורות`, t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: totTrans, t: "n", bold: true },
+    { v: totAmt, t: "c", bold: true },
+    { v: "", t: "s", bold: true }
+  ]);
+
+  downloadNativeXlsx("ריכוז_אגרות_העברת_בעלות_מציי_רכב.xlsx", [
+    {
+      name: "ריכוז אגרות לפי חברה",
+      headers: ["חודש פעילות", "מספר חברה (ח.פ.)", "קוד גורם", "קוד מרכבה", "שם החברה", "כמות (257 ₪)", "סכום (257 ₪)", "כמות (43 ₪)", "סכום (43 ₪)", "כמות (87 ₪)", "סכום (87 ₪)", "סה\"כ העברות בעלות", "סה\"כ לתשלום (₪)"],
+      rows: sheet1Rows,
+      colWidths: [16, 18, 18, 16, 34, 15, 16, 15, 16, 15, 16, 18, 20]
+    },
+    {
+      name: "פירוט שורות לפי תעריף אגרה",
+      headers: ["חודש פעילות", "מספר חברה (ח.פ.)", "קוד גורם", "קוד מרכבה", "שם החברה", "תעריף אגרה (₪)", "מספר העברות בעלות", "סכום לתשלום (₪)", "קובץ מקור"],
+      rows: sheet2Rows,
+      colWidths: [16, 18, 18, 16, 34, 16, 18, 20, 28]
+    }
+  ]);
+  updateStatusBanner(`יוצא בהצלחה דוח אגרות העברת בעלות מציי רכב (${fmtNum(companies.length)} חברות | ${fmtCurrency(totAmt)}).`, "success");
+}
+
+/* =========================================================================
    SCREEN 0A: מקורות הנתונים - CENTRAL SMART FILE ROUTER & AUTO-DETECTION
    ========================================================================= */
 function openCentralFileBrowser() {
@@ -8038,6 +9047,35 @@ async function handleCentralFilesUpload(fileList) {
         const hdrF = String(firstCols.F || "").trim();
         const hdrG = String(firstCols.G || "").trim();
         const hdrL = String(firstCols.L || "").trim();
+
+        // 0. Check if Ownership Transfer Fees file (אגרות העברת בעלות מציי רכב)
+        if (isOwnershipTransferSheet(sheetRows, file.name)) {
+          const parsedOwn = parseOwnershipSheetRows(sheetRows, file.name);
+          if (parsedOwn.length > 0) {
+            const monthsInFile = new Set(parsedOwn.map(r => r.monthKey));
+            ownershipState.rows = ownershipState.rows.filter(r => !(r.fileName === file.name || monthsInFile.has(r.monthKey)));
+            if (!ownershipState.fileNames.includes(file.name)) ownershipState.fileNames.push(file.name);
+            ownershipState.rows.push(...parsedOwn);
+            populateOwnershipFilters(true);
+            renderOwnershipScreens();
+
+            const totTransfers = parsedOwn.reduce((a, b) => a + b.transfersCount, 0);
+            const totAmt = Number(parsedOwn.reduce((a, b) => a + b.amount, 0).toFixed(2));
+            const periodsStr = Array.from(monthsInFile).map(mk => formatMonthLabelHeb(mk)).join(", ");
+            recordLoadedFileLog({
+              fileName: file.name,
+              fileType: "Excel (.xlsx)",
+              domain: "אגרות העברת בעלות (תקנה נפרדת)",
+              periods: periodsStr,
+              summary: `${fmtNum(parsedOwn.length)} שורות אגרה (ללא שורות סה"כ) | ${fmtNum(totTransfers)} העברות (${fmtCurrency(totAmt)})`,
+              screenId: "screenOwnership",
+              navId: "navItemOwnership"
+            });
+            recognizedCount++;
+            unlockedDomains.add("אגרות העברת בעלות");
+            continue;
+          }
+        }
 
         // Check if Yearly Revenue / Invoices file (קובץ הכנסות / חשבוניות מרכבה)
         const isInvoicesFile =
@@ -8331,6 +9369,7 @@ function renderDataSourcesScreen() {
   const hasCourses = coursesState.rows.length > 0;
   const hasTlv = autodchState.tlvRows.length > 0;
   const hasBtl = autodchState.btlRows.length > 0;
+  const hasOwnership = ownershipState.rows.length > 0;
   const hasAny = hasAnyLoadedSystemData();
 
   const toolbar = document.getElementById("centralHeaderToolbar");
@@ -8373,9 +9412,14 @@ function renderDataSourcesScreen() {
   const btlPay = Number((btlQty * AUTODCH_UNIT_PRICE).toFixed(2));
   const btlPeriods = Array.from(new Set(autodchState.btlRows.map(r => formatMonthLabelHeb(r.monthKey)))).join(", ");
 
+  const ownershipQty = ownershipState.rows.reduce((a, b) => a + b.transfersCount, 0);
+  const ownershipPay = Number(ownershipState.rows.reduce((a, b) => a + b.amount, 0).toFixed(2));
+  const ownershipPeriods = Array.from(new Set(ownershipState.rows.map(r => formatMonthLabelHeb(r.monthKey)))).join(", ");
+
   const domainsStatus = [
     {
       name: "שאילתות אצוות",
+      category: "שירותי מידע",
       format: "Excel (.xlsx)",
       rule: "עמודות B-I עם קוד תשובה/יום בעמודה I (מק\"ט 8001394 - 6.93 ₪)",
       loaded: hasBatch,
@@ -8383,10 +9427,12 @@ function renderDataSourcesScreen() {
       qty: batchQty,
       pay: batchPay,
       screenId: "screenBatch",
-      navId: "navItemBatch"
+      navId: "navItemBatch",
+      isInfoService: true
     },
     {
       name: "שאילתות און ליין",
+      category: "שירותי מידע",
       format: "Excel (.xlsx)",
       rule: "עמודות B-I ללא קוד תשובה בעמודה I - ללא קיבוץ שורות (6.93 ₪)",
       loaded: hasOnline,
@@ -8394,10 +9440,12 @@ function renderDataSourcesScreen() {
       qty: onlineQty,
       pay: onlinePay,
       screenId: "screenOnline",
-      navId: "navItemOnline"
+      navId: "navItemOnline",
+      isInfoService: true
     },
     {
       name: "תחנות צילום",
+      category: "שירותי מידע",
       format: "Excel (.xlsx)",
       rule: "דוחות MF_Report (הלפרין / מרמנת - נהגים, בינלאומי, משיטים - 6.93 ₪)",
       loaded: hasPhoto,
@@ -8405,10 +9453,12 @@ function renderDataSourcesScreen() {
       qty: photoQty,
       pay: photoPay,
       screenId: "screenPhoto",
-      navId: "navItemPhoto"
+      navId: "navItemPhoto",
+      isInfoService: true
     },
     {
       name: "מבחנים עיוניים",
+      category: "שירותי מידע",
       format: "PDF (.pdf)",
       rule: "דוח 'מבחנים עיוניים לזכיין' (אורט, מעוף, אנקורי - מק\"ט 8002290)",
       loaded: hasTests,
@@ -8416,10 +9466,12 @@ function renderDataSourcesScreen() {
       qty: testsQty,
       pay: testsPay,
       screenId: "screenTests",
-      navId: "navItemTests"
+      navId: "navItemTests",
+      isInfoService: true
     },
     {
       name: "חיוב קורסים",
+      category: "שירותי מידע",
       format: "PDF (.pdf)",
       rule: "דוח NK2015F2 / NK2015FP (רענון ונהיגה נכונה - 18.20 ₪ / 6.93 ₪)",
       loaded: hasCourses,
@@ -8427,10 +9479,12 @@ function renderDataSourcesScreen() {
       qty: coursesQty,
       pay: coursesPay,
       screenId: "screenCourses",
-      navId: "navItemCourses"
+      navId: "navItemCourses",
+      isInfoService: true
     },
     {
       name: "חיובים לתל אביב",
+      category: "שירותי מידע",
       format: "PDF (#AUTODCH)",
       rule: "דוח כמות פניות למשרד התחבורה - קודים 113000000177, 855, 113000000857",
       loaded: hasTlv,
@@ -8438,10 +9492,12 @@ function renderDataSourcesScreen() {
       qty: tlvQty,
       pay: tlvPay,
       screenId: "screenTelAviv",
-      navId: "navItemTelAviv"
+      navId: "navItemTelAviv",
+      isInfoService: true
     },
     {
       name: "חיובים לביטוח הלאומי",
+      category: "שירותי מידע",
       format: "PDF (#AUTODCH)",
       rule: "דוח כמות פניות למשרד התחבורה - קוד 111000000550 (מק\"ט 8001384)",
       loaded: hasBtl,
@@ -8449,10 +9505,25 @@ function renderDataSourcesScreen() {
       qty: btlQty,
       pay: btlPay,
       screenId: "screenBtl",
-      navId: "navItemBtl"
+      navId: "navItemBtl",
+      isInfoService: true
+    },
+    {
+      name: "אגרות העברת בעלות מציי רכב",
+      category: "אגרות העברת בעלות",
+      format: "Excel (.xlsx)",
+      rule: "קובץ אגרות העברת בעלות מציי רכב (אגרות 257 / 87 / 43 ₪ - סינון שורות סה\"כ)",
+      loaded: hasOwnership,
+      filesInfo: hasOwnership ? `${ownershipState.fileNames.length} קבצים (${ownershipPeriods})` : "טרם נטען קובץ",
+      qty: ownershipQty,
+      pay: ownershipPay,
+      screenId: "screenOwnership",
+      navId: "navItemOwnership",
+      isOwnership: true
     },
     {
       name: "זיהוי חיובים חסרים (קובץ הכנסות)",
+      category: "בקרת חשבוניות",
       format: "Excel (.xlsx)",
       rule: "קובץ חשבוניות שנה נוכחית ממרכבה (לקוח D, שם חשבון E, תאריך רישום F, סכום L)",
       loaded: missingInvoicesState.invoices.length > 0,
@@ -8468,6 +9539,7 @@ function renderDataSourcesScreen() {
   ];
 
   const billingDomainsOnly = domainsStatus.filter(d => !d.isReconciliationOnly);
+  const infoDomainsOnly = domainsStatus.filter(d => d.isInfoService);
   const activeDomainsCount = billingDomainsOnly.filter(d => d.loaded).length;
   const totalSystemFiles =
     batchState.fileNames.length +
@@ -8476,8 +9548,10 @@ function renderDataSourcesScreen() {
     testsState.fileNames.length +
     coursesState.fileNames.length +
     autodchState.fileNames.length +
+    ownershipState.fileNames.length +
     missingInvoicesState.fileNames.length;
-  const grandTotalPay = Number(billingDomainsOnly.reduce((a, b) => a + b.pay, 0).toFixed(2));
+  const infoTotalPay = Number(infoDomainsOnly.reduce((a, b) => a + b.pay, 0).toFixed(2));
+  const infoTotalQty = infoDomainsOnly.reduce((a, b) => a + b.qty, 0);
   const unifiedCustomersCount = getUnifiedCustomersList().length;
 
   if (navBadgeDS) {
@@ -8489,19 +9563,19 @@ function renderDataSourcesScreen() {
   if (kpiEl) {
     kpiEl.innerHTML = `
       <div class="kpi-card">
-        <div class="kpi-label"><span>תחומי חיוב שנפתחו בתפריט</span><span class="badge ${activeDomainsCount > 0 ? 'badge-success' : 'badge-muted'}">${activeDomainsCount} מתוך 7 תחומים</span></div>
-        <div class="kpi-val">${activeDomainsCount} / 7</div>
+        <div class="kpi-label"><span>תחומי חיוב ולקוחות במערכת</span><span class="badge ${activeDomainsCount > 0 ? 'badge-success' : 'badge-muted'}">${activeDomainsCount} מתוך 8 תחומים</span></div>
+        <div class="kpi-val">${fmtNum(unifiedCustomersCount)} לקוחות</div>
         <div class="kpi-meta"><span>סה"כ קבצים שנטענו בסשן: ${fmtNum(totalSystemFiles)} קבצים</span></div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-label"><span>סה"כ לקוחות במסך החיובים המאוחד</span><span class="badge badge-info">${hasAny ? 'זמין בתפריט' : 'ממתין לטעינה'}</span></div>
-        <div class="kpi-val">${fmtNum(unifiedCustomersCount)}</div>
-        <div class="kpi-meta"><span>איחוד אוטומטי של כל הלקוחות והספקים מהקבצים שנטענו</span></div>
-      </div>
       <div class="kpi-card kpi-success">
-        <div class="kpi-label"><span>סך הכל חיובים במערכת (₪)</span><span class="badge badge-success">כל המקורות</span></div>
-        <div class="kpi-val">${fmtCurrency(grandTotalPay)}</div>
-        <div class="kpi-meta"><span>סיכום מצטבר של כל תחומי החיוב הפעילים במערכת</span></div>
+        <div class="kpi-label"><span>סך הכל חיובי שירותי מידע (₪)</span><span class="badge badge-info">תקנת שירותי מידע</span></div>
+        <div class="kpi-val">${fmtCurrency(infoTotalPay)}</div>
+        <div class="kpi-meta"><span>סה"כ יחידות מידע: ${fmtNum(infoTotalQty)} (שאילתות, צילום, מבחנים, קורסים, ת"א וביטוח לאומי)</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label"><span>סך הכל אגרות העברת בעלות (₪)</span><span class="badge badge-warning">תקנת העברת בעלות (נפרד)</span></div>
+        <div class="kpi-val">${fmtCurrency(ownershipPay)}</div>
+        <div class="kpi-meta"><span>סה"כ העברות בעלות מציי רכב: ${fmtNum(ownershipQty)} (${ownershipState.fileNames.length} קבצים)</span></div>
       </div>
     `;
   }
@@ -8511,6 +9585,11 @@ function renderDataSourcesScreen() {
     const statusBadge = d.loaded
       ? `<span class="badge badge-success">פתוח ופעיל בתפריט ✓</span>`
       : `<span class="badge badge-muted">נעול - ממתין לקובץ</span>`;
+    const catBadge = d.isOwnership
+      ? `<span class="badge badge-warning">אגרות העברת בעלות</span>`
+      : d.isInfoService
+      ? `<span class="badge badge-info">שירותי מידע</span>`
+      : `<span class="badge badge-muted">בקרת חשבוניות</span>`;
     const actionBtn = d.loaded
       ? `<button class="btn btn-primary" style="min-height:34px; padding:0 12px; font-size:13px;" onclick="navigateScreen('${d.screenId}', document.getElementById('${d.navId}'))">עבור למסך ←</button>`
       : `<button class="btn" style="min-height:34px; padding:0 12px; font-size:13px;" onclick="openCentralFileBrowser()">טען קובץ</button>`;
@@ -8518,7 +9597,8 @@ function renderDataSourcesScreen() {
     domRowsHtml += `
       <tr>
         <td style="font-weight:700;">${escHtml(d.name)}</td>
-        <td><span class="badge badge-info">${escHtml(d.format)}</span></td>
+        <td>${catBadge}</td>
+        <td><span class="badge badge-muted">${escHtml(d.format)}</span></td>
         <td style="font-size:13px; color:var(--text-secondary);">${escHtml(d.rule)}</td>
         <td>${statusBadge}</td>
         <td style="font-weight:${d.loaded ? '700' : '400'};">${escHtml(d.filesInfo)}</td>
@@ -8580,6 +9660,10 @@ function clearAllSystemData() {
   autodchState.tlvRows = [];
   autodchState.btlRows = [];
 
+  ownershipState.fileNames = [];
+  ownershipState.rows = [];
+  ownershipState.filters = { month: "ALL", fee: "ALL", search: "", sort: "FILE_ORDER" };
+
   missingInvoicesState.fileNames = [];
   missingInvoicesState.invoices = [];
   missingInvoicesState.filters = { activityMonth: "ALL", invoiceMonth: "AUTO_NEXT", domain: "ALL", viewMode: "MISSING_ONLY", search: "" };
@@ -8591,6 +9675,7 @@ function clearAllSystemData() {
   populateTestsFilters();
   populateCoursesFilters();
   populateAutodchMonths();
+  populateOwnershipFilters(true);
 
   renderBatchScreens();
   renderOnlineScreens();
@@ -8598,6 +9683,7 @@ function clearAllSystemData() {
   renderTestsScreens();
   renderCoursesScreens();
   renderAutodchScreens();
+  renderOwnershipScreens();
 
   navigateScreen("screenDataSources", document.getElementById("navItemDataSources"));
   syncAllScreensAndNavigation();
@@ -8612,6 +9698,7 @@ function resolveUnifiedCustomerIdentity(rawCode, rawName, merkavaCode) {
   const code = String(rawCode || "").trim();
   const name = String(rawName || "").trim().replace(/\s{2,}/g, " ");
   const merkava = String(merkavaCode || "").trim();
+  const normM = normalizeMerkavaCode(merkava);
 
   // Check well-known entities that may appear across multiple PDF and Excel reports
   if (code === "111000000550" || name.includes("ביטוח לאומי")) {
@@ -8687,7 +9774,8 @@ function resolveUnifiedCustomerIdentity(rawCode, rawName, merkavaCode) {
     };
   }
 
-  const key = code ? `CLIENT_${code}` : `NAME_${name}`;
+  // Unify by payerCode (or Merkava code for commercial fleet entities when payerCode matches)
+  const key = code && code !== "-" ? `CLIENT_${code}` : normM ? `MERKAVA_${normM}` : `NAME_${name}`;
   return {
     clientKey: key,
     displayCode: code || "-",
@@ -8699,7 +9787,7 @@ function resolveUnifiedCustomerIdentity(rawCode, rawName, merkavaCode) {
 function collectAllUnifiedBillingComponents() {
   const components = [];
 
-  // 1. Batch Queries (grouped per client + month)
+  // 1. Batch Queries (grouped per client + month) -> שירותי מידע
   const batchMap = new Map();
   for (const r of batchState.rawRows) {
     const mk = `${r.year}-${String(r.month).padStart(2, "0")}`;
@@ -8726,6 +9814,8 @@ function collectAllUnifiedBillingComponents() {
       ...id,
       rawCode: item.payerCode,
       monthKey: item.monthKey,
+      category: "INFO",
+      categoryLabel: "שירותי מידע",
       domain: "שאילתות אצוות",
       componentDesc: `שאילתות אצווה (${item.daysCount} ימי פעילות בחודש)`,
       sku: item.sku,
@@ -8736,13 +9826,15 @@ function collectAllUnifiedBillingComponents() {
     });
   }
 
-  // 2. Online Queries (every row as-is without grouping)
+  // 2. Online Queries (every row as-is without grouping) -> שירותי מידע
   for (const r of onlineState.rawRows) {
     const id = resolveUnifiedCustomerIdentity(r.payerCode, r.clientName, r.merkavaCode);
     components.push({
       ...id,
       rawCode: r.payerCode,
       monthKey: r.monthKey,
+      category: "INFO",
+      categoryLabel: "שירותי מידע",
       domain: "שאילתות און ליין",
       componentDesc: `שאילתות און ליין - ${r.clientName} (שורה #${r.rowSeq})`,
       sku: r.sku,
@@ -8753,7 +9845,7 @@ function collectAllUnifiedBillingComponents() {
     });
   }
 
-  // 3. Photo Stations (grouped by vendor + month + service)
+  // 3. Photo Stations (grouped by vendor + month + service) -> שירותי מידע
   const photoMap = new Map();
   for (const r of photoState.rows) {
     const k = `${r.vendor}|||${r.monthKey}|||${r.service}`;
@@ -8777,6 +9869,8 @@ function collectAllUnifiedBillingComponents() {
       ...id,
       rawCode: item.vendor,
       monthKey: item.monthKey,
+      category: "INFO",
+      categoryLabel: "שירותי מידע",
       domain: "תחנות צילום",
       componentDesc: `תחנות צילום - ${item.service} (${item.branchesCount.size} סניפים)`,
       sku: "תחנות צילום",
@@ -8787,7 +9881,7 @@ function collectAllUnifiedBillingComponents() {
     });
   }
 
-  // 4. Theory Tests
+  // 4. Theory Tests -> שירותי מידע
   for (const r of testsState.rows) {
     const id = resolveUnifiedCustomerIdentity(r.vendorCode, r.vendorName, "-");
     const pay = Number((r.totalExaminees * testsState.tariff).toFixed(2));
@@ -8795,6 +9889,8 @@ function collectAllUnifiedBillingComponents() {
       ...id,
       rawCode: r.vendorCode,
       monthKey: r.monthKey,
+      category: "INFO",
+      categoryLabel: "שירותי מידע",
       domain: "מבחנים עיוניים",
       componentDesc: `מבחנים עיוניים לזכיין (עברו: ${fmtNum(r.passed)} | ${r.passRate})`,
       sku: r.sku || "8002290",
@@ -8805,7 +9901,7 @@ function collectAllUnifiedBillingComponents() {
     });
   }
 
-  // 5. Courses (Refresh + Correct Driving components)
+  // 5. Courses (Refresh + Correct Driving components) -> שירותי מידע
   for (const r of coursesState.rows) {
     const id = resolveUnifiedCustomerIdentity(r.vendorKey, r.vendorDisplay, "-");
     if (r.refreshQty > 0) {
@@ -8813,6 +9909,8 @@ function collectAllUnifiedBillingComponents() {
         ...id,
         rawCode: r.vendorKey,
         monthKey: r.monthKey,
+        category: "INFO",
+        categoryLabel: "שירותי מידע",
         domain: "חיוב קורסים",
         componentDesc: "קורסי חובה בנהיגה - קורסי רענון",
         sku: "8001401",
@@ -8827,6 +9925,8 @@ function collectAllUnifiedBillingComponents() {
         ...id,
         rawCode: r.vendorKey,
         monthKey: r.monthKey,
+        category: "INFO",
+        categoryLabel: "שירותי מידע",
         domain: "חיוב קורסים",
         componentDesc: `קורסי נהיגה נכונה (בסיסיים: ${fmtNum(r.basicQty)} | מתקדמים: ${fmtNum(r.advancedQty)})`,
         sku: "8001400",
@@ -8838,7 +9938,7 @@ function collectAllUnifiedBillingComponents() {
     }
   }
 
-  // 6. Tel Aviv Municipality (#AUTODCH billable rows)
+  // 6. Tel Aviv Municipality (#AUTODCH billable rows) -> שירותי מידע
   for (const r of autodchState.tlvRows) {
     if (!r.billable) continue;
     const id = resolveUnifiedCustomerIdentity(r.code, r.clientName, "200279");
@@ -8846,6 +9946,8 @@ function collectAllUnifiedBillingComponents() {
       ...id,
       rawCode: r.code,
       monthKey: r.monthKey,
+      category: "INFO",
+      categoryLabel: "שירותי מידע",
       domain: "עיריית תל אביב",
       componentDesc: `${r.subReport} - ${r.action}`,
       sku: r.sku,
@@ -8856,7 +9958,7 @@ function collectAllUnifiedBillingComponents() {
     });
   }
 
-  // 7. National Insurance (#AUTODCH billable rows)
+  // 7. National Insurance (#AUTODCH billable rows) -> שירותי מידע
   for (const r of autodchState.btlRows) {
     if (!r.billable) continue;
     const id = resolveUnifiedCustomerIdentity(r.code, r.clientName, "-");
@@ -8864,12 +9966,33 @@ function collectAllUnifiedBillingComponents() {
       ...id,
       rawCode: r.code,
       monthKey: r.monthKey,
+      category: "INFO",
+      categoryLabel: "שירותי מידע",
       domain: "המוסד לביטוח הלאומי",
       componentDesc: `${r.system} - ${r.action}`,
       sku: r.sku,
       quantity: r.quantity,
       unitTariff: AUTODCH_UNIT_PRICE,
       amountToPay: r.amountToPay,
+      fileName: r.fileName
+    });
+  }
+
+  // 8. Ownership Transfer Fees (אגרות העברת בעלות מציי רכב) -> תקנה נפרדת (OWNERSHIP)
+  for (const r of ownershipState.rows) {
+    const id = resolveUnifiedCustomerIdentity(r.payerCode, r.companyName, r.merkavaCode);
+    components.push({
+      ...id,
+      rawCode: r.payerCode !== "-" ? r.payerCode : r.companyNum,
+      monthKey: r.monthKey,
+      category: "OWNERSHIP",
+      categoryLabel: "אגרות העברת בעלות",
+      domain: "אגרות העברת בעלות",
+      componentDesc: `העברת בעלות מציי רכב - אגרה ${fmtNum(r.feeRate)} ₪ (ח.פ. ${r.companyNum})`,
+      sku: `אגרה ${r.feeRate}`,
+      quantity: r.transfersCount,
+      unitTariff: r.feeRate,
+      amountToPay: r.amount,
       fileName: r.fileName
     });
   }
@@ -8884,7 +10007,11 @@ function getUnifiedCustomersList() {
 
   const filteredComponents = allComponents.filter(c => {
     if (f.month && f.month !== "ALL" && c.monthKey !== f.month) return false;
-    if (f.domain && f.domain !== "ALL" && c.domain !== f.domain) return false;
+    if (f.domain && f.domain !== "ALL") {
+      if (f.domain === "CAT:INFO" && c.category !== "INFO") return false;
+      else if (f.domain === "CAT:OWNERSHIP" && c.category !== "OWNERSHIP") return false;
+      else if (!f.domain.startsWith("CAT:") && c.domain !== f.domain) return false;
+    }
     return true;
   });
 
@@ -8898,6 +10025,10 @@ function getUnifiedCustomersList() {
         merkavaCodes: new Set(),
         months: new Set(),
         domains: new Set(),
+        infoQuantity: 0,
+        infoAmountToPay: 0,
+        ownershipQuantity: 0,
+        ownershipAmountToPay: 0,
         totalQuantity: 0,
         totalAmountToPay: 0,
         components: []
@@ -8910,6 +10041,13 @@ function getUnifiedCustomersList() {
     }
     if (c.monthKey) cust.months.add(c.monthKey);
     cust.domains.add(c.domain);
+    if (c.category === "OWNERSHIP") {
+      cust.ownershipQuantity += c.quantity;
+      cust.ownershipAmountToPay = Number((cust.ownershipAmountToPay + c.amountToPay).toFixed(2));
+    } else {
+      cust.infoQuantity += c.quantity;
+      cust.infoAmountToPay = Number((cust.infoAmountToPay + c.amountToPay).toFixed(2));
+    }
     cust.totalQuantity += c.quantity;
     cust.totalAmountToPay = Number((cust.totalAmountToPay + c.amountToPay).toFixed(2));
     cust.components.push(c);
@@ -8932,6 +10070,10 @@ function getUnifiedCustomersList() {
 
   if (f.sort === "NAME_ASC") {
     list.sort((a, b) => a.displayName.localeCompare(b.displayName, "he"));
+  } else if (f.sort === "INFO_DESC") {
+    list.sort((a, b) => b.infoAmountToPay - a.infoAmountToPay || b.ownershipAmountToPay - a.ownershipAmountToPay);
+  } else if (f.sort === "OWNERSHIP_DESC") {
+    list.sort((a, b) => b.ownershipAmountToPay - a.ownershipAmountToPay || b.infoAmountToPay - a.infoAmountToPay);
   } else if (f.sort === "QTY_DESC") {
     list.sort((a, b) => b.totalQuantity - a.totalQuantity || b.totalAmountToPay - a.totalAmountToPay);
   } else if (f.sort === "TOPICS_DESC") {
@@ -8986,8 +10128,10 @@ function renderUnifiedScreens() {
     navBadge.className = hasAny ? "badge badge-success" : "badge badge-muted";
   }
 
-  const totalQty = customers.reduce((a, b) => a + b.totalQuantity, 0);
-  const totalPay = Number(customers.reduce((a, b) => a + b.totalAmountToPay, 0).toFixed(2));
+  const totalInfoQty = customers.reduce((a, b) => a + b.infoQuantity, 0);
+  const totalInfoPay = Number(customers.reduce((a, b) => a + b.infoAmountToPay, 0).toFixed(2));
+  const totalOwnQty = customers.reduce((a, b) => a + b.ownershipQuantity, 0);
+  const totalOwnPay = Number(customers.reduce((a, b) => a + b.ownershipAmountToPay, 0).toFixed(2));
   const multiTopicCount = customers.filter(c => c.domainsArr.length > 1).length;
   const activeTopicsSet = new Set();
   customers.forEach(c => c.domainsArr.forEach(d => activeTopicsSet.add(d)));
@@ -8998,15 +10142,15 @@ function renderUnifiedScreens() {
       <div class="kpi-val">${fmtNum(customers.length)}</div>
       <div class="kpi-meta"><span>מתוכם ${fmtNum(multiTopicCount)} לקוחות המשלבים מספר נושאי חיוב</span></div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label"><span>סה"כ יחידות / שאילתות לחיוב</span><span class="badge badge-muted">מאוחד מכל הקבצים</span></div>
-      <div class="kpi-val">${fmtNum(totalQty)}</div>
-      <div class="kpi-meta"><span>סך כל השאילתות, המבחנים, הקורסים והפניות לחיוב</span></div>
-    </div>
     <div class="kpi-card kpi-success">
-      <div class="kpi-label"><span>סך הכל לתשלום מאוחד (₪)</span><span class="badge badge-success">בקרת התאמה 100%</span></div>
-      <div class="kpi-val">${fmtCurrency(totalPay)}</div>
-      <div class="kpi-meta"><span>סכום החיובים המלא של כלל הלקוחות לפי הסינון שנבחר</span></div>
+      <div class="kpi-label"><span>סך לתשלום - שירותי מידע (₪)</span><span class="badge badge-info">תקנת שירותי מידע</span></div>
+      <div class="kpi-val">${fmtCurrency(totalInfoPay)}</div>
+      <div class="kpi-meta"><span>סה"כ יחידות / שאילתות שירותי מידע: ${fmtNum(totalInfoQty)}</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label"><span>סך לתשלום - אגרות העברת בעלות (₪)</span><span class="badge badge-warning">תקנת העברת בעלות (נפרד)</span></div>
+      <div class="kpi-val">${fmtCurrency(totalOwnPay)}</div>
+      <div class="kpi-meta"><span>סה"כ העברות בעלות מציי רכב: ${fmtNum(totalOwnQty)}</span></div>
     </div>
   `;
   const kpi1 = document.getElementById("unifiedKpiGrid");
@@ -9018,7 +10162,7 @@ function renderUnifiedScreens() {
   if (customers.length === 0) {
     rowsHtml = `
       <tr>
-        <td colspan="8" style="text-align:center; padding:28px;">
+        <td colspan="10" style="text-align:center; padding:28px;">
           <div style="font-weight:700; color:var(--text-secondary); margin-bottom:12px;">לא נמצאו לקוחות התואמים לסינון או שטרם נטענו קבצים במערכת</div>
           <button class="btn btn-primary" onclick="resetUnifiedFilters()">איפוס מסננים</button>
         </td>
@@ -9027,7 +10171,10 @@ function renderUnifiedScreens() {
   } else {
     customers.forEach((c, idx) => {
       const monthsBadges = c.monthsArr.map(mk => `<span class="badge badge-muted" style="margin-left:4px;">${escHtml(mk)}</span>`).join("");
-      const domainsBadges = c.domainsArr.map(d => `<span class="badge badge-info" style="margin-left:4px; margin-bottom:2px;">${escHtml(d)}</span>`).join("");
+      const domainsBadges = c.domainsArr.map(d => {
+        const cls = d === "אגרות העברת בעלות" ? "badge-warning" : "badge-info";
+        return `<span class="badge ${cls}" style="margin-left:4px; margin-bottom:2px;">${escHtml(d)}</span>`;
+      }).join("");
       const merkavaHtml = c.merkavaStr === "00000000" || c.merkavaStr === "-"
         ? `<span class="badge badge-warning">${escHtml(c.merkavaStr)}</span>`
         : `<span class="num">${escHtml(c.merkavaStr)}</span>`;
@@ -9042,18 +10189,22 @@ function renderUnifiedScreens() {
             <span class="client-name-dbl" onclick="event.stopPropagation(); openUnifiedClientDrilldown('${escHtml(c.clientKey)}')">${escHtml(c.displayName)}</span>
           </td>
           <td>${domainsBadges}</td>
-          <td class="num" style="font-weight:700;">${fmtNum(c.totalQuantity)}</td>
-          <td class="num" style="font-weight:700; color:var(--color-success);">${fmtCurrency(c.totalAmountToPay)}</td>
+          <td class="num" style="font-weight:700;">${c.infoQuantity > 0 ? fmtNum(c.infoQuantity) : "-"}</td>
+          <td class="num" style="font-weight:700; color:${c.infoAmountToPay > 0 ? 'var(--color-success)' : 'var(--text-secondary)'};">${c.infoAmountToPay > 0 ? fmtCurrency(c.infoAmountToPay) : "-"}</td>
+          <td class="num" style="font-weight:700;">${c.ownershipQuantity > 0 ? fmtNum(c.ownershipQuantity) : "-"}</td>
+          <td class="num" style="font-weight:700; color:${c.ownershipAmountToPay > 0 ? 'var(--theme-primary)' : 'var(--text-secondary)'};">${c.ownershipAmountToPay > 0 ? fmtCurrency(c.ownershipAmountToPay) : "-"}</td>
         </tr>
       `;
     });
 
     rowsHtml += `
       <tr class="total-row">
-        <td colspan="5">סה"כ מאוחד לכלל הלקוחות (${fmtNum(customers.length)} לקוחות)</td>
+        <td colspan="5">סה"כ לפי תקנות תקציביות נפרדות (${fmtNum(customers.length)} לקוחות)</td>
         <td>${activeTopicsSet.size} תחומי חיוב</td>
-        <td class="num">${fmtNum(totalQty)}</td>
-        <td class="num">${fmtCurrency(totalPay)}</td>
+        <td class="num">${fmtNum(totalInfoQty)}</td>
+        <td class="num">${fmtCurrency(totalInfoPay)}</td>
+        <td class="num">${fmtNum(totalOwnQty)}</td>
+        <td class="num">${fmtCurrency(totalOwnPay)}</td>
       </tr>
     `;
   }
@@ -9065,7 +10216,7 @@ function renderUnifiedScreens() {
 
   const fCtrl = document.getElementById("unifiedFooterControl");
   if (fCtrl) {
-    fCtrl.textContent = `סה"כ מאוחד: ${fmtNum(customers.length)} לקוחות | ${fmtNum(totalQty)} יחידות לחיוב | סה"כ לתשלום: ${fmtCurrency(totalPay)}`;
+    fCtrl.textContent = `סה"כ שירותי מידע: ${fmtCurrency(totalInfoPay)} (${fmtNum(totalInfoQty)} יחידות) | סה"כ אגרות העברת בעלות (בנפרד): ${fmtCurrency(totalOwnPay)} (${fmtNum(totalOwnQty)} העברות)`;
   }
 }
 
@@ -9080,6 +10231,7 @@ function openUnifiedClientDrilldown(clientKey) {
     if (!topicMap.has(comp.domain)) {
       topicMap.set(comp.domain, {
         domain: comp.domain,
+        categoryLabel: comp.categoryLabel || (comp.category === "OWNERSHIP" ? "אגרות העברת בעלות" : "שירותי מידע"),
         componentsCount: 0,
         quantity: 0,
         amountToPay: 0
@@ -9093,10 +10245,14 @@ function openUnifiedClientDrilldown(clientKey) {
 
   let topicRowsHtml = "";
   Array.from(topicMap.values()).forEach((t, idx) => {
+    const catBadge = t.domain === "אגרות העברת בעלות"
+      ? `<span class="badge badge-warning">תקנת העברת בעלות</span>`
+      : `<span class="badge badge-info">תקנת שירותי מידע</span>`;
     topicRowsHtml += `
       <tr>
         <td class="num">${idx + 1}</td>
-        <td><span class="badge badge-info">${escHtml(t.domain)}</span></td>
+        <td>${catBadge}</td>
+        <td><strong>${escHtml(t.domain)}</strong></td>
         <td class="num">${fmtNum(t.componentsCount)} מרכיבים</td>
         <td class="num" style="font-weight:700;">${fmtNum(t.quantity)}</td>
         <td class="num" style="font-weight:700; color:var(--color-success);">${fmtCurrency(t.amountToPay)}</td>
@@ -9106,11 +10262,12 @@ function openUnifiedClientDrilldown(clientKey) {
 
   let compRowsHtml = "";
   cust.components.forEach((comp, idx) => {
+    const badgeCls = comp.category === "OWNERSHIP" ? "badge-warning" : "badge-info";
     compRowsHtml += `
       <tr>
         <td class="num">${idx + 1}</td>
         <td><span class="badge badge-muted">${escHtml(formatMonthLabelHeb(comp.monthKey))}</span></td>
-        <td><span class="badge badge-info">${escHtml(comp.domain)}</span></td>
+        <td><span class="badge ${badgeCls}">${escHtml(comp.domain)}</span></td>
         <td class="num">${escHtml(comp.rawCode || "-")}</td>
         <td style="font-weight:700;">${escHtml(comp.componentDesc)}</td>
         <td class="num">${escHtml(comp.sku)}</td>
@@ -9126,15 +10283,17 @@ function openUnifiedClientDrilldown(clientKey) {
     <div style="margin-bottom:16px; padding:12px 16px; background:var(--bg-muted); border:1px solid var(--border-color); border-radius:var(--radius-md); display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
       <div><strong>שם הלקוח / הספק:</strong> ${escHtml(cust.displayName)}</div>
       <div><strong>קוד גורם / זכיין:</strong> ${escHtml(cust.codesStr)} | <strong>קוד מרכבה:</strong> ${escHtml(cust.merkavaStr)}</div>
-      <div><strong>סך הכל לתשלום מאוחד:</strong> <span style="color:var(--color-success); font-weight:700; font-size:17px;">${fmtCurrency(cust.totalAmountToPay)}</span> (${fmtNum(cust.totalQuantity)} יחידות)</div>
+      <div><strong>שירותי מידע:</strong> <span style="color:var(--color-success); font-weight:700;">${fmtCurrency(cust.infoAmountToPay)}</span> (${fmtNum(cust.infoQuantity)} יח')</div>
+      <div><strong>אגרות העברת בעלות:</strong> <span style="color:var(--theme-primary); font-weight:700;">${fmtCurrency(cust.ownershipAmountToPay)}</span> (${fmtNum(cust.ownershipQuantity)} העברות)</div>
     </div>
 
-    <div style="font-size:16px; font-weight:700; margin-bottom:8px;">1. ריכוז חיובי הלקוח לפי נושאי חיוב (${topicMap.size} נושאים)</div>
+    <div style="font-size:16px; font-weight:700; margin-bottom:8px;">1. ריכוז חיובי הלקוח לפי נושאי חיוב ותקנות (${topicMap.size} נושאים)</div>
     <div class="table-container" style="margin-bottom:20px;">
       <table>
         <thead>
           <tr>
             <th>#</th>
+            <th>תקנה תקציבית</th>
             <th>נושא החיוב (תחום)</th>
             <th>מספר מרכיבי חיוב</th>
             <th>סה"כ כמות יחידות בנושא</th>
@@ -9143,12 +10302,20 @@ function openUnifiedClientDrilldown(clientKey) {
         </thead>
         <tbody>
           ${topicRowsHtml}
-          <tr class="total-row">
-            <td colspan="2">סה"כ מאוחד ללקוח (${escHtml(cust.displayName)})</td>
-            <td class="num">${fmtNum(cust.components.length)} מרכיבים</td>
-            <td class="num">${fmtNum(cust.totalQuantity)}</td>
-            <td class="num">${fmtCurrency(cust.totalAmountToPay)}</td>
-          </tr>
+          ${cust.infoAmountToPay > 0 ? `
+          <tr class="subtotal-row">
+            <td colspan="3">סה"כ לתשלום - תקנת שירותי מידע</td>
+            <td class="num">-</td>
+            <td class="num">${fmtNum(cust.infoQuantity)}</td>
+            <td class="num">${fmtCurrency(cust.infoAmountToPay)}</td>
+          </tr>` : ""}
+          ${cust.ownershipAmountToPay > 0 ? `
+          <tr class="subtotal-row">
+            <td colspan="3">סה"כ לתשלום - תקנת אגרות העברת בעלות (נפרד)</td>
+            <td class="num">-</td>
+            <td class="num">${fmtNum(cust.ownershipQuantity)}</td>
+            <td class="num">${fmtCurrency(cust.ownershipAmountToPay)}</td>
+          </tr>` : ""}
         </tbody>
       </table>
     </div>
@@ -9163,7 +10330,7 @@ function openUnifiedClientDrilldown(clientKey) {
             <th>נושא חיוב</th>
             <th>קוד גורם</th>
             <th>תיאור מרכיב החיוב</th>
-            <th>מק"ט לחיוב</th>
+            <th>מק"ט / אגרה</th>
             <th>כמות</th>
             <th>תעריף (₪)</th>
             <th>סכום לתשלום (₪)</th>
@@ -9172,19 +10339,12 @@ function openUnifiedClientDrilldown(clientKey) {
         </thead>
         <tbody>
           ${compRowsHtml}
-          <tr class="total-row">
-            <td colspan="6">סה"כ כל מרכיבי החיוב ללקוח</td>
-            <td class="num">${fmtNum(cust.totalQuantity)}</td>
-            <td>-</td>
-            <td class="num">${fmtCurrency(cust.totalAmountToPay)}</td>
-            <td>-</td>
-          </tr>
         </tbody>
       </table>
     </div>
   `;
 
-  openDrillModal(`פירוט חיובים מאוחד ללקוח - ${cust.displayName}`, html);
+  openDrillModal(`פירוט חיובים ללקוח - ${cust.displayName}`, html);
 }
 
 function exportUnifiedToExcel() {
@@ -9194,23 +10354,26 @@ function exportUnifiedToExcel() {
     return;
   }
 
-  let totQty = 0;
-  let totPay = 0;
+  let totInfoQty = 0, totInfoPay = 0, totOwnQty = 0, totOwnPay = 0;
   const sheet1Rows = [];
   const sheet2Rows = [];
 
   for (const c of customers) {
-    totQty += c.totalQuantity;
-    totPay += c.totalAmountToPay;
+    totInfoQty += c.infoQuantity;
+    totInfoPay += c.infoAmountToPay;
+    totOwnQty += c.ownershipQuantity;
+    totOwnPay += c.ownershipAmountToPay;
+
     sheet1Rows.push([
       { v: c.monthsArr.join(", "), t: "s" },
       { v: c.codesStr, t: "s" },
       { v: c.merkavaStr, t: "s" },
       { v: c.displayName, t: "s", bold: true },
       { v: c.domainsArr.join(" | "), t: "s" },
-      { v: c.components.length, t: "n" },
-      { v: c.totalQuantity, t: "n", bold: true },
-      { v: c.totalAmountToPay, t: "c", bold: true }
+      { v: c.infoQuantity, t: "n" },
+      { v: c.infoAmountToPay, t: "c", bold: true },
+      { v: c.ownershipQuantity, t: "n" },
+      { v: c.ownershipAmountToPay, t: "c", bold: true }
     ]);
 
     for (const comp of c.components) {
@@ -9219,6 +10382,7 @@ function exportUnifiedToExcel() {
         { v: c.displayName, t: "s" },
         { v: comp.rawCode || c.codesStr, t: "s" },
         { v: c.merkavaStr, t: "s" },
+        { v: comp.categoryLabel || (comp.category === "OWNERSHIP" ? "אגרות העברת בעלות" : "שירותי מידע"), t: "s" },
         { v: comp.domain, t: "s" },
         { v: comp.componentDesc, t: "s" },
         { v: comp.sku, t: "s" },
@@ -9230,48 +10394,37 @@ function exportUnifiedToExcel() {
     }
   }
 
-  totPay = Number(totPay.toFixed(2));
-  sheet1Rows.push([
-    { v: "סה\"כ כללי מאוחד", t: "s", bold: true },
-    { v: "", t: "s", bold: true },
-    { v: "", t: "s", bold: true },
-    { v: `${customers.length} לקוחות`, t: "s", bold: true },
-    { v: "", t: "s", bold: true },
-    { v: sheet2Rows.length, t: "n", bold: true },
-    { v: totQty, t: "n", bold: true },
-    { v: totPay, t: "c", bold: true }
-  ]);
+  totInfoPay = Number(totInfoPay.toFixed(2));
+  totOwnPay = Number(totOwnPay.toFixed(2));
 
-  sheet2Rows.push([
-    { v: "סה\"כ כל מרכיבי החיוב", t: "s", bold: true },
+  sheet1Rows.push([
+    { v: "סה\"כ כללי (בהפרדה בין התקנות)", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
     { v: `${customers.length} לקוחות`, t: "s", bold: true },
     { v: "", t: "s", bold: true },
-    { v: "", t: "s", bold: true },
-    { v: "", t: "s", bold: true },
-    { v: `${sheet2Rows.length} מרכיבים`, t: "s", bold: true },
-    { v: "", t: "s", bold: true },
-    { v: totQty, t: "n", bold: true },
-    { v: "", t: "s", bold: true },
-    { v: totPay, t: "c", bold: true },
-    { v: "", t: "s", bold: true }
+    { v: totInfoQty, t: "n", bold: true },
+    { v: totInfoPay, t: "c", bold: true },
+    { v: totOwnQty, t: "n", bold: true },
+    { v: totOwnPay, t: "c", bold: true }
   ]);
 
   downloadNativeXlsx("דוח_חיובים_מאוחד_לכלל_הלקוחות.xlsx", [
     {
-      name: "ריכוז חיובים מאוחד ללקוחות",
-      headers: ["חודשי חיוב", "קוד גורם / זכיין", "קוד מרכבה", "שם הלקוח / הספק", "תחומי חיוב משולבים", "מספר מרכיבים", "סה\"כ יחידות לחיוב", "סך הכל לתשלום מאוחד (₪)"],
+      name: "ריכוז חיובים (הפרדת תקנות)",
+      headers: ["חודשי חיוב", "קוד גורם / זכיין", "קוד מרכבה", "שם הלקוח / הספק", "תחומי חיוב משולבים", "כמות (שירותי מידע)", "סך לתשלום - שירותי מידע (₪)", "כמות העברות בעלות", "סך לתשלום - אגרות העברת בעלות (₪)"],
       rows: sheet1Rows,
-      colWidths: [20, 18, 16, 36, 36, 16, 18, 22]
+      colWidths: [18, 18, 16, 34, 34, 18, 22, 18, 24]
     },
     {
       name: "פירוט כל מרכיבי החיובים",
-      headers: ["חודש פעילות", "שם הלקוח / הספק", "קוד גורם", "קוד מרכבה", "נושא חיוב (תחום)", "תיאור מרכיב החיוב", "מק\"ט לחיוב", "כמות יחידות", "תעריף ליחידה (₪)", "סכום לתשלום (₪)", "קובץ מקור"],
+      headers: ["חודש פעילות", "שם הלקוח / הספק", "קוד גורם", "קוד מרכבה", "תקנה תקציבית", "נושא חיוב (תחום)", "תיאור מרכיב החיוב", "מק\"ט / אגרה", "כמות יחידות", "תעריף ליחידה (₪)", "סכום לתשלום (₪)", "קובץ מקור"],
       rows: sheet2Rows,
-      colWidths: [22, 32, 16, 16, 22, 38, 14, 16, 16, 20, 28]
+      colWidths: [20, 30, 16, 16, 20, 22, 36, 14, 16, 16, 20, 26]
     }
   ]);
 
-  updateStatusBanner(`יוצא בהצלחה קובץ אקסל מאוחד לכלל הלקוחות (${fmtNum(customers.length)} לקוחות | ${fmtCurrency(totPay)}).`, "success");
+  updateStatusBanner(`יוצא בהצלחה קובץ אקסל מאוחד (שירותי מידע: ${fmtCurrency(totInfoPay)} | אגרות העברת בעלות: ${fmtCurrency(totOwnPay)}).`, "success");
 }
 
 /* =========================================================================
@@ -9347,6 +10500,35 @@ function normalizeMerkavaCode(code) {
   return s.replace(/^0+/, "");
 }
 
+const LOCAL_AUTHORITY_MUNICIPALITY_MAP = {
+  "113000000005": { municipalityName: "עירית חיפה", municipalityMerkava: "20000184" },
+  "113000000032": { municipalityName: "עירית באר שבע", municipalityMerkava: "20000258" },
+  "113000000035": { municipalityName: "עירית טבריה", municipalityMerkava: "20000229" },
+  "113000000033": { municipalityName: "עירית ראשון לציון", municipalityMerkava: "20000251" },
+  "113000000574": { municipalityName: "עירית אור עקיבא", municipalityMerkava: "20000094" },
+  "113000000956": { municipalityName: "מ. מ. עומר", municipalityMerkava: "20000082" },
+  "113000000415": { municipalityName: "מ. מ. מגדל תפן", municipalityMerkava: "20000307" },
+  "113000000068": { municipalityName: "עירית מגאר", municipalityMerkava: "" },
+  "113000000016": { municipalityName: "עיריית נתניה", municipalityMerkava: "20000252" },
+  "113000000096": { municipalityName: "מ. מ. להבים", municipalityMerkava: "20000178" }
+};
+
+function isLocalAuthorityEntity(payerCode, clientName) {
+  const p = String(payerCode || "").trim();
+  const n = String(clientName || "").trim();
+  if (p.startsWith("113")) return true;
+  if (/(עיריית|עירית|מועצה מקומית|מועצה אזורית|וועצה אזורית|ועצה אזורית|מ\.\s*מ\.|מ\.מ\.|מ\.\s*א\.|מ\.א\.|איגוד ערים)/.test(n)) return true;
+  return false;
+}
+
+function isOneCityEntity(merkavaCode, accountOrClientName) {
+  const m = normalizeMerkavaCode(merkavaCode);
+  const n = String(accountOrClientName || "").trim();
+  if (m === "30001086") return true;
+  if (/(וואן סיטי|ואן סיטי|one\s*city)/i.test(n)) return true;
+  return false;
+}
+
 function normalizeHebAccountName(name) {
   let s = String(name || "").trim();
   if (!s) return "";
@@ -9354,12 +10536,23 @@ function normalizeHebAccountName(name) {
     .replace(/עירית/g, "עיריית")
     .replace(/וועצה/g, "מועצה")
     .replace(/ועצה/g, "מועצה")
+    .replace(/מ\.\s*מ\./g, "מועצה מקומית")
+    .replace(/מ\.מ\./g, "מועצה מקומית")
+    .replace(/מ\.\s*א\./g, "מועצה אזורית")
+    .replace(/מ\.א\./g, "מועצה אזורית")
     .replace(/בע''מ|בע"מ|בעמ|\(חל"צ\)|חל"צ/g, "")
-    .replace(/רשות החניה/g, "")
+    .replace(/רשות החניה|רשות חניה|חניה|אכיפה/g, "")
     .replace(/["'().,\---/\\]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
   return s;
+}
+
+function extractCoreMunicipalSettlementName(name) {
+  return normalizeHebAccountName(name)
+    .replace(/^(עיריית|מועצה מקומית|מועצה אזורית|כפר)\s+/g, "")
+    .replace(/^כפר\s+/g, "")
+    .trim();
 }
 
 function isAccountNameMatch(sourceName, invoiceAccountName) {
@@ -9372,6 +10565,10 @@ function isAccountNameMatch(sourceName, invoiceAccountName) {
   const c2 = n2.replace(/\s+/g, "");
   if (c1.length >= 4 && c1 === c2) return true;
   if (n1.length >= 5 && n2.length >= 5 && (n1.includes(n2) || n2.includes(n1))) return true;
+  // Check municipal settlement core name (e.g. "מועצה מקומית עומר" vs "מ. מ. עומר")
+  const m1 = extractCoreMunicipalSettlementName(sourceName);
+  const m2 = extractCoreMunicipalSettlementName(invoiceAccountName);
+  if (m1 && m2 && m1.length >= 3 && m1 === m2) return true;
   return false;
 }
 
@@ -9750,6 +10947,70 @@ function collectExpectedBillingRecordsForReconciliation() {
     });
   }
 
+  // Mark items 1..7 as Information Services ("שירותי מידע")
+  for (const item of expected) {
+    item.regulationCategory = "INFO_SERVICES";
+    item.regulationLabel = "שירותי מידע";
+  }
+
+  // 8. Ownership Transfer Fees (אגרות העברת בעלות מציי רכב - תקנה נפרדת)
+  // Group by monthKey + companyKey (Merkava code / Company number) so we compare against the monthly Ownership Transfer invoice in Merkava,
+  // while keeping individual payerCode/fee subtotals in altAmounts (e.g. when a company has 2 payerCodes billed separately like Carasso Motors).
+  const ownMap = new Map();
+  for (const r of ownershipState.rawRows) {
+    if (r.amountToPay <= 0 && r.quantity <= 0) continue;
+    const normM = normalizeMerkavaCode(r.merkavaCode);
+    const compKey = `${r.monthKey}|||${normM || r.companyNum || r.clientName}`;
+    if (!ownMap.has(compKey)) {
+      ownMap.set(compKey, {
+        monthKey: r.monthKey,
+        companyNum: r.companyNum,
+        payerCodesSet: new Set(),
+        payerAmountsMap: new Map(),
+        merkavaCode: r.merkavaCode || "00000000",
+        clientName: r.clientName,
+        totalQty: 0,
+        totalAmt: 0,
+        rowAmounts: [],
+        subComponents: [],
+        fileName: r.fileName
+      });
+    }
+    const g = ownMap.get(compKey);
+    if (r.payerCode) {
+      g.payerCodesSet.add(r.payerCode);
+      g.payerAmountsMap.set(r.payerCode, Number(((g.payerAmountsMap.get(r.payerCode) || 0) + r.amountToPay).toFixed(2)));
+    }
+    g.totalQty += r.quantity;
+    g.totalAmt = Number((g.totalAmt + r.amountToPay).toFixed(2));
+    g.rowAmounts.push(r.amountToPay);
+    g.subComponents.push(`קוד גורם ${r.payerCode} | אגרה ${fmtCurrency(r.feeRate)}: ${fmtNum(r.quantity)} העברות = ${fmtCurrency(r.amountToPay)}`);
+  }
+
+  for (const o of ownMap.values()) {
+    if (o.totalAmt <= 0) continue;
+    seq++;
+    const payerSums = Array.from(o.payerAmountsMap.values());
+    const altAmounts = Array.from(new Set([...payerSums, ...o.rowAmounts])).filter(a => Math.abs(a - o.totalAmt) > 0.05);
+    expected.push({
+      itemId: `EXP_OWN_${seq}`,
+      monthKey: o.monthKey,
+      regulationCategory: "OWNERSHIP_TRANSFER",
+      regulationLabel: "אגרות העברת בעלות",
+      domain: "אגרות העברת בעלות",
+      subTopic: `העברת בעלות מציי רכב (ח.פ ${o.companyNum || "-"})`,
+      payerCode: Array.from(o.payerCodesSet).join(", "),
+      merkavaCode: o.merkavaCode || "00000000",
+      clientName: o.clientName,
+      accountSearchName: o.clientName,
+      quantity: o.totalQty,
+      expectedAmount: o.totalAmt,
+      altAmounts,
+      subComponents: o.subComponents,
+      fileName: o.fileName
+    });
+  }
+
   return expected;
 }
 
@@ -9760,7 +11021,15 @@ function runMissingChargesReconciliation() {
 
   const filteredExpected = allExpected.filter(item => {
     if (f.activityMonth && f.activityMonth !== "ALL" && item.monthKey !== f.activityMonth) return false;
-    if (f.domain && f.domain !== "ALL" && item.domain !== f.domain) return false;
+    if (f.domain && f.domain !== "ALL") {
+      if (f.domain === "CAT:INFO") {
+        if (item.regulationCategory !== "INFO_SERVICES") return false;
+      } else if (f.domain === "CAT:OWNERSHIP") {
+        if (item.regulationCategory !== "OWNERSHIP_TRANSFER") return false;
+      } else if (item.domain !== f.domain) {
+        return false;
+      }
+    }
     return true;
   });
 
@@ -9778,26 +11047,54 @@ function runMissingChargesReconciliation() {
       targetInvMonthKey === "ALL" ? true : inv.regMonthKey === targetInvMonthKey
     );
 
-    const normSrcMerkava = normalizeMerkavaCode(item.merkavaCode);
-    const searchName = item.accountSearchName || item.clientName;
+    const isLocalAuth = isLocalAuthorityEntity(item.payerCode, item.clientName);
+    const knownMuni = LOCAL_AUTHORITY_MUNICIPALITY_MAP[String(item.payerCode || "").trim()] || null;
+
+    // Rule: When in Queries reports a local authority has customer name or Merkava code of "וואן סיטי איי טי בע"מ" (30001086),
+    // search for the invoice in the Revenue file by the Municipality (לפי העירייה) and NOT under "וואן סיטי איי טי בע"מ".
+    const isLocalAuthUnderOneCity =
+      isLocalAuth && (isOneCityEntity(item.merkavaCode, item.clientName) || isOneCityEntity(item.merkavaCode, ""));
+
+    const effectiveSrcMerkava = isLocalAuthUnderOneCity
+      ? normalizeMerkavaCode(knownMuni?.municipalityMerkava || "")
+      : normalizeMerkavaCode(item.merkavaCode);
+
+    const searchName =
+      isLocalAuth && isOneCityEntity("", item.clientName) && knownMuni?.municipalityName
+        ? knownMuni.municipalityName
+        : item.accountSearchName || item.clientName;
+
+    // Filter helper to ensure a local authority never matches "וואן סיטי איי טי בע"מ" in the invoices file
+    const isAllowedInvoiceForItem = inv => {
+      if (isLocalAuth && isOneCityEntity(inv.merkavaCode, inv.accountName)) return false;
+      return true;
+    };
 
     // Find invoices belonging to this customer in target registration month:
-    // 1. Primary: by Merkava Code (Column D) if available
-    // 2. Fallback: by Account Name (Column E) when Merkava Code is missing ("00000000") or not matched
+    // 1. Primary: by Merkava Code (Column D) if available (and not redirected from One City IT)
+    // 2. Fallback: by Account Name / Municipality Name (Column E)
     let clientInvoicesInMonth = [];
     let matchedIdentityMethod = "";
 
-    if (normSrcMerkava) {
-      clientInvoicesInMonth = monthInvoices.filter(inv => inv.normMerkava === normSrcMerkava);
+    if (effectiveSrcMerkava) {
+      clientInvoicesInMonth = monthInvoices.filter(inv => isAllowedInvoiceForItem(inv) && inv.normMerkava === effectiveSrcMerkava);
       if (clientInvoicesInMonth.length > 0) {
-        matchedIdentityMethod = "לפי קוד מרכבה";
+        matchedIdentityMethod = isLocalAuthUnderOneCity
+          ? "לפי העירייה (תחת וואן סיטי איי טי במקור)"
+          : "לפי קוד מרכבה";
       }
     }
 
     if (clientInvoicesInMonth.length === 0) {
-      clientInvoicesInMonth = monthInvoices.filter(inv => isAccountNameMatch(searchName, inv.accountName));
+      clientInvoicesInMonth = monthInvoices.filter(inv =>
+        isAllowedInvoiceForItem(inv) &&
+        (isAccountNameMatch(searchName, inv.accountName) ||
+          (knownMuni?.municipalityName && isAccountNameMatch(knownMuni.municipalityName, inv.accountName)))
+      );
       if (clientInvoicesInMonth.length > 0) {
-        matchedIdentityMethod = normSrcMerkava
+        matchedIdentityMethod = isLocalAuthUnderOneCity
+          ? "לפי שם העירייה (עמודה E - במקור שויך לוואן סיטי איי טי)"
+          : effectiveSrcMerkava
           ? "לפי שם חשבון (עמודה E - קוד מרכבה שונה)"
           : "לפי שם חשבון (עמודה E - ללא קוד מרכבה במקור)";
       }
@@ -9805,8 +11102,10 @@ function runMissingChargesReconciliation() {
 
     // Also find all invoices for this customer across the entire year (for drilldown diagnostics)
     const clientInvoicesAllYear = allInvoices.filter(inv =>
-      (normSrcMerkava && inv.normMerkava === normSrcMerkava) ||
-      isAccountNameMatch(searchName, inv.accountName)
+      isAllowedInvoiceForItem(inv) &&
+      ((effectiveSrcMerkava && inv.normMerkava === effectiveSrcMerkava) ||
+        isAccountNameMatch(searchName, inv.accountName) ||
+        (knownMuni?.municipalityName && isAccountNameMatch(knownMuni.municipalityName, inv.accountName)))
     );
 
     // Check if any invoice in target month matches the expected amount (or altAmounts)
@@ -9972,8 +11271,10 @@ function renderMissingChargesScreens() {
   const matchedAll = allReconciled.filter(r => r.status === "MATCHED");
   const matchedByNameCount = matchedAll.filter(r => r.matchedIdentityMethod.includes("שם חשבון")).length;
 
-  const missingTotalAmt = Number(missingAll.reduce((a, b) => a + b.expectedAmount, 0).toFixed(2));
-  const matchedTotalAmt = Number(matchedAll.reduce((a, b) => a + b.expectedAmount, 0).toFixed(2));
+  const missingInfoAmt = Number(missingAll.filter(r => r.regulationCategory === "INFO_SERVICES").reduce((a, b) => a + b.expectedAmount, 0).toFixed(2));
+  const missingOwnAmt = Number(missingAll.filter(r => r.regulationCategory === "OWNERSHIP_TRANSFER").reduce((a, b) => a + b.expectedAmount, 0).toFixed(2));
+  const matchedInfoAmt = Number(matchedAll.filter(r => r.regulationCategory === "INFO_SERVICES").reduce((a, b) => a + b.expectedAmount, 0).toFixed(2));
+  const matchedOwnAmt = Number(matchedAll.filter(r => r.regulationCategory === "OWNERSHIP_TRANSFER").reduce((a, b) => a + b.expectedAmount, 0).toFixed(2));
   const matchRatePct = allReconciled.length > 0 ? Math.round((matchedAll.length / allReconciled.length) * 100) : 0;
 
   if (navBadge) {
@@ -9995,11 +11296,12 @@ function renderMissingChargesScreens() {
   const kpiHtml = `
     <div class="kpi-card ${missingAll.length > 0 ? 'kpi-danger' : 'kpi-success'}">
       <div class="kpi-label">
-        <span>חיובים חסרים (ללא חשבונית מקבילה)</span>
+        <span>חיובים חסרים - הפרדה לפי תקנות</span>
         <span class="badge ${missingAll.length > 0 ? 'badge-danger' : 'badge-success'}">${fmtNum(missingAll.length)} רשומות</span>
       </div>
-      <div class="kpi-val">${fmtCurrency(missingTotalAmt)}</div>
-      <div class="kpi-meta">
+      <div class="kpi-val" style="font-size:20px;">שירותי מידע: ${fmtCurrency(missingInfoAmt)}</div>
+      <div class="kpi-meta" style="flex-direction:column; align-items:flex-start; gap:2px;">
+        <span style="font-weight:700; color:var(--text-primary);">אגרות העברת בעלות: ${fmtCurrency(missingOwnAmt)}</span>
         <span>ללא חשבונית כלל: ${fmtNum(noInvoiceCount)} | קיימת חשבונית בסכום אחר: ${fmtNum(amountDiffCount)}</span>
       </div>
     </div>
@@ -10008,8 +11310,9 @@ function renderMissingChargesScreens() {
         <span>חיובים שנמצאה להם חשבונית תואמת</span>
         <span class="badge badge-success">${fmtNum(matchedAll.length)} תקינים (${matchRatePct}%)</span>
       </div>
-      <div class="kpi-val">${fmtCurrency(matchedTotalAmt)}</div>
-      <div class="kpi-meta">
+      <div class="kpi-val" style="font-size:20px;">שירותי מידע: ${fmtCurrency(matchedInfoAmt)}</div>
+      <div class="kpi-meta" style="flex-direction:column; align-items:flex-start; gap:2px;">
+        <span style="font-weight:700; color:var(--text-primary);">אגרות העברת בעלות: ${fmtCurrency(matchedOwnAmt)}</span>
         <span>לפי קוד מרכבה: ${fmtNum(matchedAll.length - matchedByNameCount)} | לפי שם חשבון (עמודה E): ${fmtNum(matchedByNameCount)}</span>
       </div>
     </div>
@@ -10062,7 +11365,7 @@ function renderMissingChargesScreens() {
       <tr>
         <td colspan="9" style="text-align:center; padding:32px;">
           <div style="font-size:16px; font-weight:700; margin-bottom:8px;">קובץ ההכנסות נטען בהצלחה (${fmtNum(missingInvoicesState.invoices.length)} חשבוניות), אך טרם נטענו קבצי מקור לחיוב</div>
-          <div style="color:var(--text-secondary); margin-bottom:16px;">טען קבצי חיוב (שאילתות אצוות, שאילתות און ליין, תחנות צילום, מבחנים, קורסים או דוחות PDF) במסך "מקורות הנתונים".</div>
+          <div style="color:var(--text-secondary); margin-bottom:16px;">טען קבצי חיוב (שירותי מידע או אגרות העברת בעלות) במסך "מקורות הנתונים".</div>
           <button class="btn btn-primary" onclick="navigateScreen('screenDataSources', document.getElementById('navItemDataSources'))">📂 עבור למסך מקורות הנתונים</button>
         </td>
       </tr>
@@ -10077,16 +11380,30 @@ function renderMissingChargesScreens() {
       </tr>
     `;
   } else {
-    let sumQty = 0;
-    let sumAmt = 0;
+    let sumInfoQty = 0, sumInfoAmt = 0, cntInfo = 0;
+    let sumOwnQty = 0, sumOwnAmt = 0, cntOwn = 0;
     displayedRows.forEach((r, idx) => {
-      sumQty += r.quantity;
-      sumAmt += r.expectedAmount;
+      if (r.regulationCategory === "OWNERSHIP_TRANSFER") {
+        sumOwnQty += r.quantity;
+        sumOwnAmt += r.expectedAmount;
+        cntOwn++;
+      } else {
+        sumInfoQty += r.quantity;
+        sumInfoAmt += r.expectedAmount;
+        cntInfo++;
+      }
 
       const isMissingMerkavaInSource = !r.merkavaCode || /^0+$/.test(r.merkavaCode) || r.merkavaCode === "-";
       let merkavaCellHtml = "";
       if (!isMissingMerkavaInSource) {
-        merkavaCellHtml = `<span class="num">${escHtml(r.merkavaCode)}</span>`;
+        if (r.discoveredMerkava && r.discoveredMerkava !== r.merkavaCode) {
+          merkavaCellHtml = `
+            <span class="num">${escHtml(r.merkavaCode)}</span>
+            <div style="font-size:12px; color:var(--theme-primary); font-weight:700; margin-top:2px;">בעירייה: ${escHtml(r.discoveredMerkava)}</div>
+          `;
+        } else {
+          merkavaCellHtml = `<span class="num">${escHtml(r.merkavaCode)}</span>`;
+        }
       } else if (r.discoveredMerkava) {
         merkavaCellHtml = `
           <span class="badge badge-warning" title="חסר בקובץ המקור - זוהה לפי שם חשבון בעמודה E">במקור: 00000000</span>
@@ -10123,6 +11440,10 @@ function renderMissingChargesScreens() {
         `;
       }
 
+      const catBadge = r.regulationCategory === "OWNERSHIP_TRANSFER"
+        ? `<span class="badge badge-warning" style="margin-right:4px;">תקנת העברת בעלות</span>`
+        : `<span class="badge badge-info" style="margin-right:4px;">שירותי מידע</span>`;
+
       tbHtml += `
         <tr class="clickable-row" onclick="openMissingChargeDrilldown('${escHtml(r.itemId)}')" title="לחיצה (קליק אחד) לפתיחת פירוט ההשוואה וכל החשבוניות של הלקוח">
           <td class="num">${idx + 1}</td>
@@ -10132,7 +11453,7 @@ function renderMissingChargesScreens() {
             <span class="badge badge-info">${escHtml(r.targetInvMonthKey)}</span>
           </td>
           <td>
-            <div style="font-weight:700;">${escHtml(r.domain)}</div>
+            <div style="font-weight:700;">${escHtml(r.domain)} ${catBadge}</div>
             <div style="font-size:12px; color:var(--text-secondary);">${escHtml(r.subTopic)}</div>
           </td>
           <td class="num">${escHtml(r.payerCode)}</td>
@@ -10148,15 +11469,28 @@ function renderMissingChargesScreens() {
       `;
     });
 
-    sumAmt = Number(sumAmt.toFixed(2));
-    tbHtml += `
-      <tr class="total-row">
-        <td colspan="6">סה"כ מוצג בטבלה (${fmtNum(displayedRows.length)} רשומות חיוב)</td>
-        <td class="num">${fmtNum(sumQty)}</td>
-        <td class="num">${fmtCurrency(sumAmt)}</td>
-        <td>-</td>
-      </tr>
-    `;
+    sumInfoAmt = Number(sumInfoAmt.toFixed(2));
+    sumOwnAmt = Number(sumOwnAmt.toFixed(2));
+    if (cntInfo > 0) {
+      tbHtml += `
+        <tr class="total-row">
+          <td colspan="6">סה"כ שירותי מידע בטבלה (${fmtNum(cntInfo)} רשומות חיוב - תקנת שירותי מידע)</td>
+          <td class="num">${fmtNum(sumInfoQty)}</td>
+          <td class="num">${fmtCurrency(sumInfoAmt)}</td>
+          <td>תקנת שירותי מידע</td>
+        </tr>
+      `;
+    }
+    if (cntOwn > 0) {
+      tbHtml += `
+        <tr class="total-row">
+          <td colspan="6">סה"כ אגרות העברת בעלות בטבלה (${fmtNum(cntOwn)} רשומות חיוב - תקנה נפרדת)</td>
+          <td class="num">${fmtNum(sumOwnQty)}</td>
+          <td class="num">${fmtCurrency(sumOwnAmt)}</td>
+          <td>תקנת אגרות העברת בעלות</td>
+        </tr>
+      `;
+    }
   }
 
   const t1 = document.querySelector("#tblMissingCharges tbody");
@@ -10229,7 +11563,7 @@ function openMissingChargeDrilldown(itemId) {
     <div style="margin-bottom:16px; padding:12px 16px; background:var(--bg-muted); border:1px solid var(--border-color); border-radius:var(--radius-md); display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
       <div><strong>שם הלקוח במקור:</strong> ${escHtml(item.clientName)} (${escHtml(item.payerCode)})</div>
       <div><strong>קוד מרכבה במקור:</strong> ${escHtml(item.merkavaCode)} ${item.discoveredMerkava ? `| <strong>בחשבונית:</strong> ${escHtml(item.discoveredMerkava)}` : ""}</div>
-      <div><strong>תחום חיוב:</strong> <span class="badge badge-info">${escHtml(item.domain)}</span></div>
+      <div><strong>תחום חיוב ותקנה:</strong> <span class="badge badge-info">${escHtml(item.domain)} (${escHtml(item.regulationLabel || "שירותי מידע")})</span></div>
       <div><strong>סכום חיוב צפוי (${escHtml(item.monthKey)}):</strong> <span style="color:var(--theme-primary); font-weight:700;">${fmtCurrency(item.expectedAmount)}</span></div>
     </div>
 
@@ -10284,11 +11618,17 @@ function exportMissingChargesToExcel() {
   }
 
   const missingOnly = allReconciled.filter(r => r.isMissing);
-  let totMissingQty = 0, totMissingAmt = 0;
+  let totMissingInfoQty = 0, totMissingInfoAmt = 0;
+  let totMissingOwnQty = 0, totMissingOwnAmt = 0;
 
   const sheet1Rows = missingOnly.map(r => {
-    totMissingQty += r.quantity;
-    totMissingAmt += r.expectedAmount;
+    if (r.regulationCategory === "OWNERSHIP_TRANSFER") {
+      totMissingOwnQty += r.quantity;
+      totMissingOwnAmt += r.expectedAmount;
+    } else {
+      totMissingInfoQty += r.quantity;
+      totMissingInfoAmt += r.expectedAmount;
+    }
     const otherInvs = r.clientInvoicesInMonth.map(inv => `${inv.amount} ₪ (#${inv.docNumber} - ${inv.text})`).join(" | ");
     const statusText = r.status === "NO_INVOICE"
       ? "! לא הופקה חשבונית ללקוח בחודש הרישום"
@@ -10297,6 +11637,7 @@ function exportMissingChargesToExcel() {
     return [
       { v: r.monthKey, t: "s", warn: true },
       { v: r.targetInvMonthKey, t: "s", warn: true },
+      { v: r.regulationLabel || "שירותי מידע", t: "s", warn: true },
       { v: r.domain, t: "s", warn: true },
       { v: r.subTopic, t: "s", warn: true },
       { v: r.payerCode, t: "s", warn: true },
@@ -10310,26 +11651,49 @@ function exportMissingChargesToExcel() {
     ];
   });
 
-  totMissingAmt = Number(totMissingAmt.toFixed(2));
+  totMissingInfoAmt = Number(totMissingInfoAmt.toFixed(2));
+  totMissingOwnAmt = Number(totMissingOwnAmt.toFixed(2));
   sheet1Rows.push([
-    { v: "סה\"כ חיובים חסרים", t: "s", bold: true },
+    { v: "סה\"כ חיובים חסרים - שירותי מידע (תקנה)", t: "s", bold: true },
     { v: "", t: "s", bold: true },
-    { v: `${missingOnly.length} חיובים חסרים`, t: "s", bold: true },
-    { v: "", t: "s", bold: true },
-    { v: "", t: "s", bold: true },
+    { v: "שירותי מידע", t: "s", bold: true },
     { v: "", t: "s", bold: true },
     { v: "", t: "s", bold: true },
     { v: "", t: "s", bold: true },
     { v: "", t: "s", bold: true },
-    { v: totMissingQty, t: "n", bold: true },
-    { v: totMissingAmt, t: "c", bold: true },
-    { v: "", t: "s", bold: true }
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: totMissingInfoQty, t: "n", bold: true },
+    { v: totMissingInfoAmt, t: "c", bold: true },
+    { v: "תקנת שירותי מידע", t: "s", bold: true }
+  ]);
+  sheet1Rows.push([
+    { v: "סה\"כ חיובים חסרים - אגרות העברת בעלות (תקנה נפרדת)", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "אגרות העברת בעלות", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: totMissingOwnQty, t: "n", bold: true },
+    { v: totMissingOwnAmt, t: "c", bold: true },
+    { v: "תקנת אגרות העברת בעלות", t: "s", bold: true }
   ]);
 
-  let totAllQty = 0, totAllAmt = 0;
+  let totAllInfoQty = 0, totAllInfoAmt = 0;
+  let totAllOwnQty = 0, totAllOwnAmt = 0;
   const sheet2Rows = allReconciled.map(r => {
-    totAllQty += r.quantity;
-    totAllAmt += r.expectedAmount;
+    if (r.regulationCategory === "OWNERSHIP_TRANSFER") {
+      totAllOwnQty += r.quantity;
+      totAllOwnAmt += r.expectedAmount;
+    } else {
+      totAllInfoQty += r.quantity;
+      totAllInfoAmt += r.expectedAmount;
+    }
     const isWarn = r.isMissing;
     const matchInfo = r.status === "MATCHED"
       ? `תקין - חשבונית #${r.matchedInvoice.docNumber} (${r.matchedInvoice.regDateDisplay}) | ${r.matchedIdentityMethod}`
@@ -10340,6 +11704,7 @@ function exportMissingChargesToExcel() {
     return [
       { v: r.monthKey, t: "s", warn: isWarn },
       { v: r.targetInvMonthKey, t: "s", warn: isWarn },
+      { v: r.regulationLabel || "שירותי מידע", t: "s", warn: isWarn },
       { v: r.domain, t: "s", warn: isWarn },
       { v: r.payerCode, t: "s", warn: isWarn },
       { v: r.merkavaCode, t: "s", warn: isWarn },
@@ -10351,36 +11716,51 @@ function exportMissingChargesToExcel() {
     ];
   });
 
-  totAllAmt = Number(totAllAmt.toFixed(2));
+  totAllInfoAmt = Number(totAllInfoAmt.toFixed(2));
+  totAllOwnAmt = Number(totAllOwnAmt.toFixed(2));
   sheet2Rows.push([
-    { v: "סה\"כ כל החיובים שנבדקו", t: "s", bold: true },
+    { v: "סה\"כ שירותי מידע שנבדקו (תקנה)", t: "s", bold: true },
     { v: "", t: "s", bold: true },
-    { v: `${allReconciled.length} רשומות`, t: "s", bold: true },
-    { v: "", t: "s", bold: true },
-    { v: "", t: "s", bold: true },
+    { v: "שירותי מידע", t: "s", bold: true },
     { v: "", t: "s", bold: true },
     { v: "", t: "s", bold: true },
-    { v: totAllQty, t: "n", bold: true },
-    { v: totAllAmt, t: "c", bold: true },
-    { v: `חסרים: ${missingOnly.length} (${fmtCurrency(totMissingAmt)})`, t: "s", bold: true }
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: totAllInfoQty, t: "n", bold: true },
+    { v: totAllInfoAmt, t: "c", bold: true },
+    { v: `חסרים בשירותי מידע: ${fmtCurrency(totMissingInfoAmt)}`, t: "s", bold: true }
+  ]);
+  sheet2Rows.push([
+    { v: "סה\"כ אגרות העברת בעלות שנבדקו (תקנה נפרדת)", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "אגרות העברת בעלות", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: "", t: "s", bold: true },
+    { v: totAllOwnQty, t: "n", bold: true },
+    { v: totAllOwnAmt, t: "c", bold: true },
+    { v: `חסרים בהעברת בעלות: ${fmtCurrency(totMissingOwnAmt)}`, t: "s", bold: true }
   ]);
 
   downloadNativeXlsx("דוח_זיהוי_חיובים_חסרים_מול_חשבוניות.xlsx", [
     {
       name: "רשימת חיובים חסרים בלבד",
-      headers: ["חודש פעילות", "חודש רישום נבדק", "תחום חיוב", "פירוט נושא", "קוד גורם במקור", "קוד מרכבה במקור", "קוד מרכבה בחשבונית", "שם הלקוח במקור", "שם חשבון (עמודה E)", "כמות לחיוב", "סכום חיוב חסר (₪)", "ממצאי בדיקה בקובץ החשבוניות"],
+      headers: ["חודש פעילות", "חודש רישום נבדק", "קטגוריית תקנה", "תחום חיוב", "פירוט נושא", "קוד גורם במקור", "קוד מרכבה במקור", "קוד מרכבה בחשבונית", "שם הלקוח במקור", "שם חשבון (עמודה E)", "כמות לחיוב", "סכום חיוב חסר (₪)", "ממצאי בדיקה בקובץ החשבוניות"],
       rows: sheet1Rows,
-      colWidths: [16, 16, 20, 28, 16, 16, 18, 32, 32, 16, 20, 48]
+      colWidths: [16, 16, 20, 20, 28, 16, 16, 18, 32, 32, 16, 20, 48]
     },
     {
       name: "בקרת הצלבה מלאה (חסרים ותקינים)",
-      headers: ["חודש פעילות", "חודש רישום", "תחום חיוב", "קוד גורם", "קוד מרכבה", "שם הלקוח", "שם חשבון (עמודה E)", "כמות לחיוב", "סכום חיוב צפוי (₪)", "סטטוס הקבלה וחשבונית"],
+      headers: ["חודש פעילות", "חודש רישום", "קטגוריית תקנה", "תחום חיוב", "קוד גורם", "קוד מרכבה", "שם הלקוח", "שם חשבון (עמודה E)", "כמות לחיוב", "סכום חיוב צפוי (₪)", "סטטוס הקבלה וחשבונית"],
       rows: sheet2Rows,
-      colWidths: [16, 16, 20, 16, 16, 32, 32, 16, 20, 48]
+      colWidths: [16, 16, 20, 20, 16, 16, 32, 32, 16, 20, 48]
     }
   ]);
 
-  updateStatusBanner(`יוצא בהצלחה דוח זיהוי חיובים חסרים לאקסל (${fmtNum(missingOnly.length)} חיובים חסרים בסך ${fmtCurrency(totMissingAmt)}).`, "success");
+  updateStatusBanner(`יוצא בהצלחה דוח זיהוי חיובים חסרים לאקסל (שירותי מידע חסרים: ${fmtCurrency(totMissingInfoAmt)} | אגרות העברת בעלות חסרות: ${fmtCurrency(totMissingOwnAmt)}).`, "success");
 }
 
 /* =========================================================================
@@ -10403,6 +11783,8 @@ function exportActiveDomainToExcel() {
     exportTelAvivToExcel();
   } else if (currentScreenId === "screenBtl" || currentScreenId === "screenBtlReport") {
     exportBtlToExcel();
+  } else if (currentScreenId === "screenOwnership" || currentScreenId === "screenOwnershipReport") {
+    exportOwnershipToExcel();
   } else {
     exportBatchToExcel();
   }
@@ -10423,6 +11805,8 @@ function clearActiveDomainData() {
     clearCoursesData();
   } else if (currentScreenId === "screenTelAviv" || currentScreenId === "screenTelAvivReport" || currentScreenId === "screenBtl" || currentScreenId === "screenBtlReport") {
     clearAutodchData();
+  } else if (currentScreenId === "screenOwnership" || currentScreenId === "screenOwnershipReport") {
+    clearOwnershipData();
   } else {
     clearBatchData();
   }
@@ -10526,6 +11910,20 @@ document.getElementById("autodchAddFilesInput").addEventListener("change", e => 
   }
 });
 
+document.getElementById("ownershipFilesInput").addEventListener("change", e => {
+  if (e.target.files && e.target.files.length > 0) {
+    handleOwnershipFilesUpload(e.target.files, true);
+    e.target.value = "";
+  }
+});
+
+document.getElementById("ownershipAddFilesInput").addEventListener("change", e => {
+  if (e.target.files && e.target.files.length > 0) {
+    handleOwnershipFilesUpload(e.target.files, false);
+    e.target.value = "";
+  }
+});
+
 function setupDropZone(zoneId, onFilesDropped) {
   const zone = document.getElementById(zoneId);
   if (!zone) return;
@@ -10572,6 +11970,7 @@ function setupDropZone(zoneId, onFilesDropped) {
   setupDropZone("coursesDropZone", files => handleCoursesFilesUpload(files, false));
   setupDropZone("tlvDropZone", files => handleAutodchFilesUpload(files, false));
   setupDropZone("btlDropZone", files => handleAutodchFilesUpload(files, false));
+  setupDropZone("ownershipDropZone", files => handleOwnershipFilesUpload(files, false));
 
   renderBatchScreens();
   renderOnlineScreens();
@@ -10579,6 +11978,7 @@ function setupDropZone(zoneId, onFilesDropped) {
   renderTestsScreens();
   renderCoursesScreens();
   renderAutodchScreens();
+  renderOwnershipScreens();
   renderMissingChargesScreens();
   syncAllScreensAndNavigation();
   updateStatusBanner("המערכת מוכנה. גרור קבצים מכל סוג (Excel / PDF) לאיזור הטעינה המרכזי במסך 'מקורות הנתונים' לזיהוי אוטומטי ופתיחת המסכים בתפריט.", "info");
